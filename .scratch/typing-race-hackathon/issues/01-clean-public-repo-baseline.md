@@ -1,7 +1,7 @@
 # 01 Task: Clean, secret-free public repository baseline
 
 Type: task
-Status: claimed
+Status: resolved
 Blocked by: none
 Mode: AFK, with one HITL gate (user approves the file list before the first push)
 
@@ -28,3 +28,20 @@ Work to do, in order:
 ## Answer
 
 <!-- Record: pushed commit SHA, tracked file count, secret-scan summary, restore commands, protection settings recorded. -->
+
+Resolved 2026-09-17. Pushed commit `124c444` to `https://github.com/prodelt/typing-race-hackathon` as branch `main` (75 files).
+
+**What was done**
+- History rebuilt as a single clean initial commit on an orphan branch; `master` and the seven `research/*` branches deleted; all agent worktrees removed.
+- The seven research reports were folded into `docs/research/` before the branches went away, so nothing was lost.
+- Third-party skill copies (`.agents/skills/`, `.claude/skills/`) and the cloned reference repos are no longer tracked; `README.md` documents how to restore them.
+- `tasks/` (the organizer snapshot with REVIEW_REQUIRED licences) is ignored and was never committed.
+- The ineffective entries added to `.specify/.gitignore` were reverted; the real rules now live in the root `.gitignore`, which also un-ignores `.scratch/typing-race-hackathon/`.
+- Added `README.md` (Ukrainian, jury-facing), `.env.example` with empty values, and `.gitattributes` with `eol=lf` so agents and CI don't fight over line endings.
+- Author identity for this repo set to `prodelt <137156646+prodelt@users.noreply.github.com>` so the personal email stays out of public history (user's choice).
+- Secret scan: pattern-based (AWS keys, GitHub tokens, OpenAI/Resend keys, Slack tokens, JWTs, private keys, `service_role`) over every staged file — clean. `gitleaks` is not installed locally; research 06 recommends `gitleaks-action@v3` in CI, which ticket 15 will wire up.
+
+**Branch protection for `main`, recorded and to be applied at the first code task**
+- Require a pull request before merging.
+- Require status checks: the CI jobs defined in ticket 15.
+- Block force pushes and deletions; require linear history; squash merge only.
