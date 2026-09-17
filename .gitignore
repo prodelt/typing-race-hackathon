@@ -1,0 +1,43 @@
+# Local agent scratch — only the wayfinder map and its tickets are published
+.tasks/
+.scratch/*
+!.scratch/typing-race-hackathon/
+
+# Third-party skill copies and cloned reference repos.
+# Restore with skills-lock.json (Matt Pocock skills) and `specify init` (Spec Kit).
+.agents/skills/
+.claude/skills/
+.claude/worktrees/
+.claude/settings.local.json
+/skills/
+/spec-kit/
+
+# Organizer snapshot: REVIEW_REQUIRED content, cloned separately, never committed
+/tasks/
+
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build artifacts and cache
+dist/
+build/
+.cache/
+.vite/
+*.log
+
+# Test artifacts
+coverage/
+playwright-report/
+blob-report/
+test-results/
+
+# Environment variables — only .env.example is committed
+.env
+.env.*
+!.env.example
+
+# OS files
+Thumbs.db
+Desktop.ini
+.DS_Store
