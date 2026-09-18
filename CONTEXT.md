@@ -50,6 +50,9 @@ Comprehensive domain model and conceptual glossary for the Typing-Race touch-typ
 - **Focus Element (Фокус вправи)**: The weakest key or transition an exercise is built around; it appears in every item of that exercise.
 - **Test Attempt (Залікова спроба)**: An attempt that counts toward mastery, run in Zero-Peek Test Mode — the next-key hint and on-screen keyboard are hidden, errors stay visible.
   _Avoid_: exam, blind mode
+- **Practice Attempt (Тренувальна спроба)**: An attempt with the on-screen keyboard and next-key hint visible; it never counts toward mastery. The learner switches to a test attempt, which becomes the primary action once practice clears the accuracy floor.
+- **Key Unlock (Відкриття клавіші)**: The moment a key joins the learner's unlocked set after the Mastery Rule is met on an exercise focused on it; shown on the result screen together with its finger and first words.
+- **Next Action (Наступна дія)**: The one Actionable Recommendation shown on Today and on every result, with a button that starts it.
 - **Mastery Rule (Правило засвоєння)**: Three consecutive test attempts at or above the level's accuracy floor; speed never gates progression.
 - **Session (Заняття)**: A 15–25 minute practice block of warm-up, one target skill, consolidation and real text.
 - **Diagnostic (Діагностика)**: A short, skippable placement run that sets a learner's starting point and initial confidence.
