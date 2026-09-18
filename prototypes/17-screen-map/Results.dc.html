@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<title>Результат спроби</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;600&amp;family=Source+Sans+3:wght@400;600;700&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap">
+<style>
+body{margin:0;font-family:'Source Sans 3',sans-serif;color:#2D312E;background:#FAF9F5}
+a{color:#2D312E;text-decoration:none}a:hover{color:#316342}
+</style>
+</helmet>
+<div style="width: 1280px; height: 800px; box-sizing: border-box; background: #FAF9F5; display: flex; flex-direction: column; font-family: 'Source Sans 3', sans-serif; color: #2D312E;">
+  <nav style="display: flex; align-items: center; gap: 24px; height: 64px; padding: 0 32px; border-bottom: 1px solid #D9DCD6; background: #FFFFFF; font-size: 16px;">
+    <span style="font-family: 'Source Serif 4', serif; font-weight: 600; font-size: 19px;">Typing-Race</span>
+    <a href="Today.dc.html" style="padding: 20px 0;">Сьогодні</a>
+    <a href="Path.dc.html" style="padding: 20px 0;">Шлях</a>
+    <span style="padding: 20px 0;">Повторення</span>
+    <a href="Race.dc.html" style="padding: 20px 0;">Перегони</a>
+    <span style="padding: 20px 0;">Рейтинги</span>
+    <span style="padding: 20px 0;">Статистика</span>
+    <span style="flex-grow: 1;"></span>
+    <span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; padding: 4px 10px; border: 1px solid #C9CEC6; border-radius: 8px;">Ctrl K</span>
+    <span style="width: 36px; height: 36px; border-radius: 50%; background: #E3EDE5; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #316342; font-size: 14px;">ОК</span>
+  </nav>
+  <main style="display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 24px; padding: 26px 32px; flex-grow: 1;">
+    <section style="display: flex; flex-direction: column; gap: 16px;">
+      <div style="display: flex; align-items: center; gap: 14px;">
+        <h1 style="margin: 0; font-family: 'Source Serif 4', serif; font-weight: 600; font-size: 28px;">Гама 06 · залік пройдено</h1>
+        <span style="font-family: 'JetBrains Mono', monospace; font-size: 14px; color: #316342;">●●● 3 з 3 поспіль</span>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px;">
+        <sc-for list="{{metrics}}" as="m" hint-placeholder-count="5">
+          <div style="display: flex; flex-direction: column; gap: 4px; padding: 14px 16px; background: #FFFFFF; border: 1px solid #C9CEC6; border-radius: 12px;">
+            <span style="font-size: 13px; color: #5F6B63;">{{m.label}}</span>
+            <span style="font-family: 'JetBrains Mono', monospace; font-size: 26px; font-weight: 600;">{{m.value}}</span>
+            <span style="font-size: 12px; color: #5F6B63;">{{m.note}}</span>
+          </div>
+        </sc-for>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px;">
+        <div style="display: flex; flex-direction: column; gap: 8px; padding: 16px; background: #FFFFFF; border: 1px solid #C9CEC6; border-radius: 12px;">
+          <span style="font-weight: 700;">Помилки за символами</span>
+          <div style="height: 120px; border-radius: 8px; background: #EEF0EA; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #5F6B63;">[клавіатура-теплокарта: очікувана → натиснута]</div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px; padding: 16px; background: #FFFFFF; border: 1px solid #C9CEC6; border-radius: 12px;">
+          <span style="font-weight: 700;">Затримки переходів</span>
+          <div style="height: 120px; border-radius: 8px; background: #EEF0EA; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #5F6B63;">[найповільніші переходи, мс, з пальцями]</div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px; padding: 16px; background: #FFFFFF; border: 1px solid #C9CEC6; border-radius: 12px;">
+          <span style="font-weight: 700;">Ритм</span>
+          <div style="height: 80px; border-radius: 8px; background: #EEF0EA; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #5F6B63;">[інтервали між натисканнями, нерівномірність]</div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px; padding: 16px; background: #FFFFFF; border: 1px solid #C9CEC6; border-radius: 12px;">
+          <span style="font-weight: 700;">Проти особистого рекорду</span>
+          <div style="height: 80px; border-radius: 8px; background: #EEF0EA; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #5F6B63;">[SPM і точність: зараз vs рекорд]</div>
+        </div>
+      </div>
+      <div style="display: flex; gap: 18px; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #5F6B63;">
+        <span>Enter — наступна дія</span><span>R — повторити</span><span>P — повтор спроби (replay)</span>
+      </div>
+    </section>
+    <aside style="display: flex; flex-direction: column; gap: 14px;">
+      <div style="display: flex; flex-direction: column; gap: 10px; padding: 20px; background: #316342; color: #FFFFFF; border-radius: 16px;">
+        <span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; opacity: 0.85;">ВІДКРИТО НОВУ КЛАВІШУ</span>
+        <span style="font-family: 'Source Serif 4', serif; font-size: 56px; line-height: 1;">г</span>
+        <span style="font-size: 15px;">Правий вказівний · верхній ряд. Тепер у словах: гора, голова, глава…</span>
+        <a href="Exercise.dc.html" style="align-self: flex-start; padding: 10px 16px; background: #FFFFFF; color: #316342; border-radius: 10px; font-weight: 700;">Слова з відкритих клавіш</a>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 10px; padding: 20px; background: #FFFFFF; border: 1px solid #C9CEC6; border-radius: 16px;">
+        <span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #5F6B63;">НАСТУПНА ДІЯ</span>
+        <span style="font-family: 'Source Serif 4', serif; font-size: 22px; line-height: 1.35;">Повтори перехід «ол» правим вказівним і середнім пальцями</span>
+        <span style="font-size: 14px; color: #5F6B63;">Правило 2 з 4: перехід із найбільшим відхиленням затримки</span>
+        <a href="Exercise.dc.html" style="align-self: flex-start; padding: 10px 16px; background: #316342; color: #FFFFFF; border-radius: 10px; font-weight: 700;">Зробити · Enter</a>
+      </div>
+    </aside>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { metrics: [
+      { label: 'SPM', value: '[118]', note: 'символів за хвилину' },
+      { label: 'WPM', value: '[24]', note: 'WPM = SPM / 5' },
+      { label: 'Точність', value: '[96.4%]', note: 'всі натискання, з виправленими' },
+      { label: 'Помилки', value: '[3]', note: 'в, д, ж' },
+      { label: 'Час', value: '[0:41]', note: 'паузи > N с виключено' }
+    ] };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<title>Шлях учня і демо</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;600&amp;family=Source+Sans+3:wght@400;600;700&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap">
+<style>
+body{margin:0;font-family:'Source Sans 3',sans-serif;color:#2D312E;background:#FAF9F5}
+a{color:#316342}a:hover{color:#1F4A2E}
+</style>
+</helmet>
+<div style="width: 1840px; height: 1240px; box-sizing: border-box; padding: 56px 64px; background: #FAF9F5; display: flex; flex-direction: column; gap: 32px; font-family: 'Source Sans 3', sans-serif; color: #2D312E;">
+  <div style="display: flex; flex-direction: column; gap: 6px;">
+    <div style="font-family: 'JetBrains Mono', monospace; font-size: 14px; color: #5F6B63; letter-spacing: 0.08em;">TICKET 17 · USER JOURNEY</div>
+    <h1 style="margin: 0; font-family: 'Source Serif 4', serif; font-weight: 600; font-size: 44px;">Шлях учня від входу до перегонів</h1>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 16px;">
+    <sc-for list="{{steps}}" as="st" hint-placeholder-count="11">
+      <div style="display: flex; flex-direction: column; gap: 8px; padding: 14px 16px; background: #FFFFFF; border: 1px solid #C9CEC6; border-radius: 12px; min-height: 150px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="width: 30px; height: 30px; border-radius: 50%; background: #316342; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 14px;">{{st.n}}</span>
+          <span style="font-weight: 700; font-size: 17px;">{{st.name}}</span>
+        </div>
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #316342;">{{st.screens}}</div>
+        <div style="font-size: 14px; line-height: 1.4; color: #3E4640;">{{st.note}}</div>
+      </div>
+    </sc-for>
+    <div style="display: flex; flex-direction: column; gap: 8px; padding: 14px 16px; border: 1px dashed #5F6B63; border-radius: 12px; min-height: 150px;">
+      <div style="font-weight: 700; font-size: 17px;">Щоденний цикл</div>
+      <div style="font-size: 14px; line-height: 1.4; color: #3E4640;">L1 Сьогодні → заняття (E1–E6 × 4 блоки) → E4 з однією наступною дією → назад на L1. Будь-коли: L2 для повтору, L5 для слабких місць, R1 для перегонів.</div>
+    </div>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 12px;">
+    <h2 style="margin: 0; font-family: 'Source Serif 4', serif; font-weight: 600; font-size: 28px;">Сценарій демонстрації журі (ТЗ §9) → екрани</h2>
+    <div style="display: flex; flex-direction: column; border: 1px solid #C9CEC6; border-radius: 12px; overflow: hidden; background: #FFFFFF;">
+      <div style="display: grid; grid-template-columns: 60px 420px 360px minmax(0, 1fr); gap: 0; padding: 10px 16px; background: #EEF0EA; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #5F6B63;">
+        <span>§9</span><span>Що вимагає ТЗ</span><span>Маршрут екранами</span><span>Що бачить журі</span>
+      </div>
+      <sc-for list="{{demo}}" as="d" hint-placeholder-count="8">
+        <div style="display: grid; grid-template-columns: 60px 420px 360px minmax(0, 1fr); gap: 0; padding: 12px 16px; border-top: 1px solid #E2E5DF; font-size: 15px; line-height: 1.4; align-items: start;">
+          <span style="font-family: 'JetBrains Mono', monospace; font-weight: 600; color: #A8401F;">{{d.n}}</span>
+          <span style="font-weight: 600; padding-right: 16px;">{{d.req}}</span>
+          <span style="font-family: 'JetBrains Mono', monospace; font-size: 14px; color: #316342; padding-right: 16px;">{{d.route}}</span>
+          <span style="color: #3E4640;">{{d.shows}}</span>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1840,"height":1240}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var steps = [
+      { n: 1, name: 'Вхід', screens: 'P0 → P1 → O1', note: 'Короткий опис продукту, потім email + пароль створює профіль одразу; далі обов’язковий нікнейм.' },
+      { n: 2, name: 'Мова й розкладка', screens: 'O2 → O3', note: 'uk / en, перевірка розкладки натисканням, постановка рук.' },
+      { n: 3, name: 'Діагностика', screens: 'O4 → O5', note: '90 с або «пропустити»; стартова точка й засіяна карта впевненості.' },
+      { n: 4, name: 'Етап 1 і залік', screens: 'L1 → E1 → E2 → E3 → E4', note: 'Гами з підказками, потім залік без підглядання; три заліки поспіль.' },
+      { n: 5, name: 'Відкриття клавіші', screens: 'E4 → E5', note: 'Після третього заліку: нова клавіша, її палець, перші слова з нею.' },
+      { n: 6, name: 'Етап 2 · слова', screens: 'E5 → E1 → E2', note: 'Слова лише з відкритих клавіш; відкривається після перших 8 клавіш.' },
+      { n: 7, name: 'Академія', screens: 'L3 → L4 → E1…E4', note: 'Модулі частотних біграм, триграм, морфем і темпу з критерієм завершення.' },
+      { n: 8, name: 'Результат і порада', screens: 'E4', note: 'Метрики, помилки за символами, одна наступна дія з кнопкою «Зробити».' },
+      { n: 9, name: 'Слабкі місця', screens: 'L5 → E1…E4', note: 'Повторення слабких клавіш і переходів; прогрівання кожного заняття.' },
+      { n: 10, name: 'Перегони й рейтинги', screens: 'R1 → R2 → R3 · G1 → G2', note: 'Швидкий матч або кімната з кодом; групи й дошки.' },
+      { n: 11, name: 'Налаштування й довідка', screens: 'S2 · S3 · P3 · P4 · P5', note: 'Тема, рух, звук, розмір тексту; експорт, видалення; формули й ліцензії.' }
+    ];
+    var demo = [
+      { n: '1', req: 'Новий профіль і вибір української або англійської', route: 'P0 → P1 → O1 → O2', shows: 'Реєстрація без листа; мова набору й перевірка розкладки.' },
+      { n: '2', req: 'Вправа на послідовні клавіші без екранної підказки під час заліку', route: 'L1 → E1 → E3', shows: 'Позначка «Залік», клавіатура й підсвічування наступної клавіші сховані.' },
+      { n: '3', req: 'Відкриття нової клавіші та слова лише з вивчених символів', route: 'E4 → E5 → E2', shows: 'Картка «Відкрито клавішу» на результаті, набір дозволених символів поруч зі словами.' },
+      { n: '4', req: 'Вправа Академії на частотну біграму або триграму', route: 'L3 → L4 → E2', shows: 'Модуль із поступом і критерієм, вправа на n-граму.' },
+      { n: '5', req: 'Навмисна помилка, її облік і рекомендація наступної вправи', route: 'E3 → E4', shows: 'Помилка видима не лише кольором; точність рахує виправлену помилку; одна наступна дія.' },
+      { n: '6', req: 'Відновлення прогресу після перезавантаження', route: 'F5 → L1', shows: 'Екран з’являється з локального кешу; мітка «збережено локально · синхронізовано».' },
+      { n: '7', req: 'Сторінка джерел і ліцензій', route: 'колонтитул → P4', shows: 'Джерела, ліцензії, контрольні суми; поруч Формули.' },
+      { n: '8', req: 'Проходження автоматичних перевірок', route: 'P6 → CI', shows: 'Посилання на останній зелений прогін; локально — одна команда в терміналі.' }
+    ];
+    return { steps: steps, demo: demo };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<title>Шлях</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;600&amp;family=Source+Sans+3:wght@400;600;700&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap">
+<style>
+body{margin:0;font-family:'Source Sans 3',sans-serif;color:#2D312E;background:#FAF9F5}
+a{color:#2D312E;text-decoration:none}a:hover{color:#316342}
+</style>
+</helmet>
+<div style="width: 1280px; height: 800px; box-sizing: border-box; background: #FAF9F5; display: flex; flex-direction: column; font-family: 'Source Sans 3', sans-serif; color: #2D312E;">
+  <nav style="display: flex; align-items: center; gap: 24px; height: 64px; padding: 0 32px; border-bottom: 1px solid #D9DCD6; background: #FFFFFF; font-size: 16px;">
+    <span style="font-family: 'Source Serif 4', serif; font-weight: 600; font-size: 19px;">Typing-Race</span>
+    <a href="Today.dc.html" style="padding: 20px 0;">Сьогодні</a>
+    <a href="Path.dc.html" style="font-weight: 700; color: #316342; padding: 20px 0; border-bottom: 2px solid #316342;">Шлях</a>
+    <span style="padding: 20px 0;">Повторення</span>
+    <a href="Race.dc.html" style="padding: 20px 0;">Перегони</a>
+    <span style="padding: 20px 0;">Рейтинги</span>
+    <span style="padding: 20px 0;">Статистика</span>
+    <span style="flex-grow: 1;"></span>
+    <span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; padding: 4px 10px; border: 1px solid #C9CEC6; border-radius: 8px;">Ctrl K</span>
+    <span style="width: 36px; height: 36px; border-radius: 50%; background: #E3EDE5; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #316342; font-size: 14px;">ОК</span>
+  </nav>
+  <main style="display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 28px; padding: 28px 32px; flex-grow: 1;">
+    <section style="display: flex; flex-direction: column; gap: 16px;">
+      <div style="display: flex; align-items: baseline; gap: 16px;">
+        <h1 style="margin: 0; font-family: 'Source Serif 4', serif; font-weight: 600; font-size: 30px;">Етап 1 · клавіатурні гами</h1>
+        <span style="font-size: 15px; color: #5F6B63;">Українська · ЙЦУКЕН</span>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px; padding: 20px; background: #FFFFFF; border: 1px solid #C9CEC6; border-radius: 14px;">
+        <sc-for list="{{rows}}" as="row" hint-placeholder-count="3">
+          <div style="{{row.pad}}">
+            <sc-for list="{{row.keys}}" as="k" hint-placeholder-count="11">
+              <div style="{{k.box}}"><span>{{k.ch}}</span><span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; opacity: 0.75;">{{k.f}}</span></div>
+            </sc-for>
+          </div>
+        </sc-for>
+        <div style="display: flex; gap: 18px; font-size: 13px; color: #5F6B63; padding-top: 6px;">
+          <span>■ відкрито (відтінок = впевненість)</span><span style="color: #A8401F;">□ поточна</span><span>□ закрито</span><span>Л/П + 1–5 = рука й палець (мізинець = 5)</span>
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <div style="font-weight: 700;">Гами</div>
+        <sc-for list="{{scales}}" as="sc" hint-placeholder-count="4">
+          <a href="Exercise.dc.html" style="display: grid; grid-template-columns: 34px minmax(0, 1fr) 160px 110px; align-items: center; gap: 12px; padding: 12px 16px; background: #FFFFFF; border: 1px solid #C9CEC6; border-radius: 10px;">
+            <span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #5F6B63;">{{sc.n}}</span>
+            <span style="font-weight: 600;">{{sc.name}}</span>
+            <span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #316342;">{{sc.streak}}</span>
+            <span style="font-size: 14px; color: #5F6B63; text-align: right;">{{sc.state}}</span>
+          </a>
+        </sc-for>
+      </div>
+    </section>
+    <aside style="display: flex; flex-direction: column; gap: 14px;">
+      <div style="display: flex; flex-direction: column; gap: 8px; padding: 18px; background: #FFFFFF; border: 1px solid #C9CEC6; border-radius: 14px;">
+        <div style="display: flex; justify-content: space-between;"><span style="font-weight: 700;">Етап 2 · слова</span><span style="font-size: 13px; color: #316342;">відкрито</span></div>
+        <div style="font-size: 14px; color: #3E4640;">Реальні слова лише з відкритих клавіш. Відкривається після перших 8 клавіш.</div>
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #5F6B63;">[слова: 412 · доступні символи: ф і в а п р о л д ж]</div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px; padding: 18px; background: #FFFFFF; border: 1px solid #C9CEC6; border-radius: 14px;">
+        <div style="display: flex; justify-content: space-between;"><span style="font-weight: 700;">Етап 3 · Академія</span><span style="font-size: 13px; color: #5F6B63;">[умова відкриття]</span></div>
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px;">
+          <div style="padding: 10px; border: 1px dashed #C9CEC6; border-radius: 8px; font-size: 14px;">Біграми</div>
+          <div style="padding: 10px; border: 1px dashed #C9CEC6; border-radius: 8px; font-size: 14px;">Триграми</div>
+          <div style="padding: 10px; border: 1px dashed #C9CEC6; border-radius: 8px; font-size: 14px;">Морфеми</div>
+          <div style="padding: 10px; border: 1px dashed #C9CEC6; border-radius: 8px; font-size: 14px;">Темп і ритм</div>
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px; padding: 18px; background: #F8E3DB; border-radius: 14px;">
+        <div style="font-weight: 700; color: #A8401F;">Слабкі місця</div>
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 14px;">[о→л · д→ж · п]</div>
+        <div style="font-size: 14px;">Повторення →</div>
+      </div>
+    </aside>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var open = 'фівапролдж';
+    var current = 'г';
+    var fingers = {
+      'й':'Л5','ц':'Л4','у':'Л3','к':'Л2','е':'Л2','н':'П2','г':'П2','ш':'П3','щ':'П4','з':'П5','х':'П5','ї':'П5',
+      'ф':'Л5','і':'Л4','в':'Л3','а':'Л2','п':'Л2','р':'П2','о':'П2','л':'П3','д':'П4','ж':'П5','є':'П5',
+      'я':'Л5','ч':'Л4','с':'Л3','м':'Л2','и':'Л2','т':'П2','ь':'П2','б':'П3','ю':'П4'
+    };
+    var base = 'width: 58px; height: 58px; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: 20px; ';
+    function key(ch, i) {
+      var st;
+      if (open.indexOf(ch) >= 0) {
+        var a = [1, 0.9, 0.75, 0.55][i % 4];
+        st = 'background: rgba(49, 99, 66, ' + a + '); color: #FFFFFF; border: 1px solid #316342;';
+      } else if (ch === current) {
+        st = 'background: #FFFFFF; color: #A8401F; border: 2px solid #A8401F;';
+      } else {
+        st = 'background: #EEF0EA; color: #5F6B63; border: 1px solid #D9DCD6;';
+      }
+      return { ch: ch, f: fingers[ch], box: base + st };
+    }
+    var rows = ['йцукенгшщзхї', 'фівапролджє', 'ячсмитьбю'].map(function (r, ri) {
+      return { pad: 'display: flex; gap: 8px; padding-left: ' + (ri * 24) + 'px;', keys: r.split('').map(key) };
+    });
+    var scales = [
+      { n: '01', name: 'Домашній ряд: а о', streak: 'залік ●●●', state: 'пройдено' },
+      { n: '02', name: 'Домашній ряд: в л', streak: 'залік ●●●', state: 'пройдено' },
+      { n: '05', name: 'Домашній ряд повністю', streak: 'залік ●●○', state: 'ще 1 залік' },
+      { n: '06', name: 'Нова клавіша: г', streak: 'залік ○○○', state: 'поточна' }
+    ];
+    return { rows: rows, scales: scales };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<title>Карта екранів</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;600&amp;family=Source+Sans+3:wght@400;600;700&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap">
+<style>
+body{margin:0;font-family:'Source Sans 3',sans-serif;color:#2D312E;background:#FAF9F5}
+a{color:#316342}a:hover{color:#1F4A2E}
+</style>
+</helmet>
+<div style="width: 1840px; height: 1340px; box-sizing: border-box; padding: 56px 64px; background: #FAF9F5; display: flex; flex-direction: column; gap: 28px; font-family: 'Source Sans 3', sans-serif; color: #2D312E;">
+  <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 32px;">
+    <div style="display: flex; flex-direction: column; gap: 6px;">
+      <div style="font-family: 'JetBrains Mono', monospace; font-size: 14px; color: #5F6B63; letter-spacing: 0.08em;">TICKET 17 · INFORMATION ARCHITECTURE</div>
+      <h1 style="margin: 0; font-family: 'Source Serif 4', serif; font-weight: 600; font-size: 44px;">Карта екранів Typing-Race</h1>
+    </div>
+    <div style="display: flex; gap: 20px; font-size: 15px; color: #5F6B63;">
+      <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 14px; height: 14px; border-radius: 4px; background: #E3EDE5; border: 1px solid #316342;"></span>Публічний (без входу)</div>
+      <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 14px; height: 14px; border-radius: 4px; background: #FFFFFF; border: 1px solid #C9CEC6;"></span>Після входу</div>
+      <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 14px; height: 14px; border-radius: 4px; background: #F8E3DB; border: 1px solid #A8401F;"></span>Крок демо ТЗ §9</div>
+    </div>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 10px; padding: 18px 22px; background: #FFFFFF; border: 1px solid #C9CEC6; border-radius: 14px;">
+    <div style="font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #5F6B63;">КАРКАС ЗАСТОСУНКУ (після входу, від 1024 px)</div>
+    <div style="display: flex; align-items: center; gap: 28px; font-size: 17px;">
+      <span style="font-family: 'Source Serif 4', serif; font-weight: 600; font-size: 20px;">Typing-Race</span>
+      <span style="font-weight: 700; color: #316342;">Сьогодні</span>
+      <span>Шлях</span>
+      <span>Повторення</span>
+      <span>Перегони</span>
+      <span>Рейтинги</span>
+      <span>Статистика</span>
+      <span style="flex-grow: 1;"></span>
+      <span style="font-family: 'JetBrains Mono', monospace; font-size: 14px; padding: 4px 10px; border: 1px solid #C9CEC6; border-radius: 8px;">Ctrl K</span>
+      <span style="font-size: 15px; color: #5F6B63;">uk / en</span>
+      <span style="width: 36px; height: 36px; border-radius: 50%; background: #E3EDE5; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #316342;">ОК</span>
+    </div>
+    <div style="display: flex; gap: 24px; font-size: 14px; color: #5F6B63;">
+      <span>Меню профілю: Налаштування · Профіль і дані · Вийти</span>
+      <span style="flex-grow: 1;"></span>
+      <span>Нижній колонтитул: Формули · Джерела й ліцензії · Приватність · Про проєкт</span>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 18px; flex-grow: 1;">
+    <sc-for list="{{groups}}" as="g" hint-placeholder-count="6">
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <div style="display: flex; flex-direction: column; gap: 2px; padding-bottom: 8px; border-bottom: 2px solid #2D312E;">
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #5F6B63;">{{g.code}}</div>
+          <div style="font-family: 'Source Serif 4', serif; font-weight: 600; font-size: 22px;">{{g.name}}</div>
+        </div>
+        <sc-for list="{{g.screens}}" as="s" hint-placeholder-count="4">
+          <div style="{{s.box}}">
+            <div style="display: flex; align-items: baseline; gap: 8px;">
+              <span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 600; color: #316342;">{{s.id}}</span>
+              <span style="font-weight: 700; font-size: 16px;">{{s.name}}</span>
+            </div>
+            <div style="font-size: 14px; line-height: 1.4; color: #3E4640;">{{s.desc}}</div>
+            <sc-if value="{{s.hasDemo}}" hint-placeholder-val="{{ false }}">
+              <div style="align-self: flex-start; font-family: 'JetBrains Mono', monospace; font-size: 12px; padding: 2px 8px; border-radius: 6px; background: #F8E3DB; color: #A8401F;">{{s.demo}}</div>
+            </sc-if>
+          </div>
+        </sc-for>
+      </div>
+    </sc-for>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1840,"height":1340}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var pub = 'display: flex; flex-direction: column; gap: 6px; padding: 12px 14px; background: #E3EDE5; border: 1px solid #316342; border-radius: 10px;';
+    var app = 'display: flex; flex-direction: column; gap: 6px; padding: 12px 14px; background: #FFFFFF; border: 1px solid #C9CEC6; border-radius: 10px;';
+    function s(id, name, desc, demo, isPub) {
+      return { id: id, name: name, desc: desc, demo: demo || '', hasDemo: !!demo, box: isPub ? pub : app };
+    }
+    var groups = [
+      { code: 'A · ПУБЛІЧНЕ', name: 'Без входу', screens: [
+        s('P0', 'Про продукт', 'Один короткий екран: що це, три етапи, перегони; кнопки «Увійти» і «Створити профіль».', '§9.1', true),
+        s('P1', 'Вхід і реєстрація', 'Email + пароль (миттєвий профіль), Google, GitHub.', '§9.1', true),
+        s('P2', 'Скидання пароля', 'Лист через Resend; єдине місце, де потрібна пошта.', '', true),
+        s('P3', 'Формули', 'SPM, WPM = SPM / 5, точність, rowChanges, sameFingerTransitions, розбіжність із ТЗ §5.3.', '', true),
+        s('P4', 'Джерела й ліцензії', 'Кожен словник: джерело, ліцензія, контрольна сума, що саме похідне.', '§9.7', true),
+        s('P5', 'Приватність', 'Що збираємо, зокрема інтервали між натисканнями; як видалити профіль.', '', true),
+        s('P6', 'Про проєкт', 'AI-декларація, посилання на репозиторій і останній зелений CI-прогін.', '§9.8', true)
+      ]},
+      { code: 'B · ПЕРШИЙ ЗАПУСК', name: 'Онбординг', screens: [
+        s('O1', 'Нікнейм і мова інтерфейсу', 'Обов’язковий нікнейм (для рейтингів), uk / en інтерфейсу.', '§9.1'),
+        s('O2', 'Мова набору й розкладка', 'Українська (ЙЦУКЕН) або англійська (QWERTY); перевірка розкладки натисканням кількох клавіш.', '§9.1'),
+        s('O3', 'Постановка рук', 'Домашній ряд, палець на клавішу, три етапи. Можна пропустити; потім доступно з довідки.'),
+        s('O4', 'Діагностика 90 с', 'Змішаний текст; можна пропустити. Засіває карту впевненості.'),
+        s('O5', 'Стартова точка', 'Результат діагностики: з якої клавіші починаємо, що вже відкрито.')
+      ]},
+      { code: 'C · НАВЧАННЯ', name: 'Шлях учня', screens: [
+        s('L1', 'Сьогодні', 'Одна наступна дія; «Почати заняття» веде через 4 блоки (15–25 хв); поступ етапів, стан синхронізації.', '§9.6'),
+        s('L2', 'Шлях', 'Етап 1 гами (клавіатура з пальцями), Етап 2 слова, Етап 3 Академія. Будь-яку відкриту вправу можна повторити.', '§9.2'),
+        s('L3', 'Академія', 'Модулі з поступом і критерієм завершення: біграми, триграми, морфеми, темп.', '§9.4'),
+        s('L4', 'Модуль Академії', 'Вправи модуля, правило трьох заліків, точність модуля ≥ 97%.', '§9.4'),
+        s('L5', 'Повторення', 'Слабкі клавіші й переходи; адаптивний генератор за повільними біграмами.')
+      ]},
+      { code: 'D · ВПРАВА', name: 'Один рушій', screens: [
+        s('E1', 'Перед стартом', 'Режим (тренування / залік: учень обирає сам, після тренування вище порогу головна кнопка — «Скласти залік»), символи, перевірка розкладки.'),
+        s('E2', 'Набір · тренування', 'Екранна клавіатура, підсвічування наступної клавіші, підказка пальця.', '§9.3'),
+        s('E3', 'Набір · залік', 'Без підглядання: клавіатуру й підказки сховано, помилки видно.', '§9.2 · §9.5'),
+        s('E4', 'Результат', 'SPM, WPM, точність, помилки, час, помилки за символами, затримки, ритм, порівняння з рекордом, одна наступна дія.', '§9.5'),
+        s('E5', 'Відкриття клавіші', 'Картка на екрані результату з кнопкою «Слова з відкритих клавіш».', '§9.3'),
+        s('E6', 'Між блоками заняття', 'Короткий перехід: що було, що далі, пауза.')
+      ]},
+      { code: 'E · ЗМАГАННЯ', name: 'Перегони й групи', screens: [
+        s('R1', 'Лобі перегонів', 'Швидкий матч (до 5), приватна кімната з кодом, фільтри мови й складності.'),
+        s('R2', 'Кімната', 'Збір 3 с → 3-2-1 → трек; запізнілі й неактивні стають глядачами.'),
+        s('R3', 'Підсумок перегонів', 'Порядок фінішу, рахунок з урахуванням точності, «перевіряється» → «зараховано».'),
+        s('G1', 'Групи', 'Мої групи, створити, приєднатися кодом; ролі власник / учасник.'),
+        s('G2', 'Рейтинги', 'Вкладки: група · тиждень · світ.')
+      ]},
+      { code: 'F · Я', name: 'Дані й налаштування', screens: [
+        s('S1', 'Статистика', 'Історія з графіком по днях, карта помилок, затримки переходів, ритм, повтор спроби.'),
+        s('S2', 'Налаштування', 'Набір: мова, розкладка, режим помилок, текст 24–40 px. Вигляд: тема, рух, звук, low-vision.'),
+        s('S3', 'Профіль і дані', 'Нікнейм, експорт / імпорт, видалення профілю.'),
+        s('K', 'Командна палітра', 'Ctrl K з будь-якого екрана: перейти, почати вправу, змінити налаштування.')
+      ]}
+    ];
+    return { groups: groups };
+  }
+}
+</script>
+</body>
+</html>

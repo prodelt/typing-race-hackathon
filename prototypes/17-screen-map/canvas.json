@@ -1,0 +1,97 @@
+{
+  "v": 3,
+  "attachments": {},
+  "boards": {
+    "Exercise.dc.html": {
+      "h": 800,
+      "is_interactive": true,
+      "title": "E2/E3 Вправа · тренування ↔ залік",
+      "w": 1280,
+      "x": 2720,
+      "y": 1720
+    },
+    "Journey.dc.html": {
+      "h": 1240,
+      "title": "Шлях учня й демо ТЗ §9",
+      "w": 1840,
+      "x": 1920,
+      "y": 0
+    },
+    "Main.dc.html": {
+      "h": 1340,
+      "title": "Карта екранів (IA)",
+      "w": 1840,
+      "x": 0,
+      "y": 0
+    },
+    "Path.dc.html": {
+      "h": 800,
+      "is_interactive": true,
+      "title": "L2 Шлях · Етап 1",
+      "w": 1280,
+      "x": 1360,
+      "y": 1720
+    },
+    "Race.dc.html": {
+      "h": 800,
+      "is_interactive": true,
+      "title": "R2 Кімната перегонів",
+      "w": 1280,
+      "x": 5440,
+      "y": 1720
+    },
+    "Results.dc.html": {
+      "h": 800,
+      "is_interactive": true,
+      "title": "E4 + E5 Результат і відкриття клавіші",
+      "w": 1280,
+      "x": 4080,
+      "y": 1720
+    },
+    "Today.dc.html": {
+      "h": 800,
+      "is_interactive": true,
+      "title": "L1 Сьогодні",
+      "w": 1280,
+      "x": 0,
+      "y": 1720
+    }
+  },
+  "createdOnFiles": {
+    "at": "2026-09-18T06:05:22Z",
+    "v": 1
+  },
+  "designSystems": [],
+  "launch": {
+    "view": "canvas"
+  },
+  "notes": {
+    "t1": {
+      "kind": "title1",
+      "maxW": 3760,
+      "text": "Карта екранів і шлях учня",
+      "w": 240,
+      "x": 0,
+      "y": -280
+    },
+    "t2": {
+      "kind": "title1",
+      "maxW": 6720,
+      "text": "Каркаси ключових екранів (low-fi)",
+      "w": 240,
+      "x": 0,
+      "y": 1440
+    }
+  },
+  "order": [
+    "Main.dc.html",
+    "Journey.dc.html",
+    "Today.dc.html",
+    "Path.dc.html",
+    "Exercise.dc.html",
+    "Results.dc.html",
+    "Race.dc.html"
+  ],
+  "pages": [],
+  "title": "Typing-Race — Screen Map"
+}

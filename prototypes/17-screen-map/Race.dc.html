@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<title>Кімната перегонів</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;600&amp;family=Source+Sans+3:wght@400;600;700&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap">
+<style>
+body{margin:0;font-family:'Source Sans 3',sans-serif;color:#2D312E;background:#FAF9F5}
+a{color:#2D312E;text-decoration:none}a:hover{color:#316342}
+</style>
+</helmet>
+<div style="width: 1280px; height: 800px; box-sizing: border-box; background: #FAF9F5; display: flex; flex-direction: column; font-family: 'Source Sans 3', sans-serif; color: #2D312E;">
+  <nav style="display: flex; align-items: center; gap: 24px; height: 64px; padding: 0 32px; border-bottom: 1px solid #D9DCD6; background: #FFFFFF; font-size: 16px;">
+    <span style="font-family: 'Source Serif 4', serif; font-weight: 600; font-size: 19px;">Typing-Race</span>
+    <a href="Today.dc.html" style="padding: 20px 0;">Сьогодні</a>
+    <a href="Path.dc.html" style="padding: 20px 0;">Шлях</a>
+    <span style="padding: 20px 0;">Повторення</span>
+    <a href="Race.dc.html" style="font-weight: 700; color: #316342; padding: 20px 0; border-bottom: 2px solid #316342;">Перегони</a>
+    <span style="padding: 20px 0;">Рейтинги</span>
+    <span style="padding: 20px 0;">Статистика</span>
+    <span style="flex-grow: 1;"></span>
+    <span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; padding: 4px 10px; border: 1px solid #C9CEC6; border-radius: 8px;">Ctrl K</span>
+    <span style="width: 36px; height: 36px; border-radius: 50%; background: #E3EDE5; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #316342; font-size: 14px;">ОК</span>
+  </nav>
+  <main style="display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 24px; padding: 26px 32px; flex-grow: 1;">
+    <section style="display: flex; flex-direction: column; gap: 16px;">
+      <div style="display: flex; align-items: center; gap: 14px;">
+        <h1 style="margin: 0; font-family: 'Source Serif 4', serif; font-weight: 600; font-size: 28px;">Кімната K7Q2XM</h1>
+        <span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; padding: 4px 10px; border-radius: 6px; background: #E3EDE5; color: #316342;">українська · середня · ~300 символів</span>
+        <span style="flex-grow: 1;"></span>
+        <span style="font-family: 'JetBrains Mono', monospace; font-size: 30px; font-weight: 600; color: #A8401F;">2</span>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 10px; padding: 18px; background: #FFFFFF; border: 1px solid #C9CEC6; border-radius: 14px;">
+        <sc-for list="{{lanes}}" as="l" hint-placeholder-count="5">
+          <div style="display: grid; grid-template-columns: 150px minmax(0, 1fr) 90px; align-items: center; gap: 14px;">
+            <span style="{{l.nameStyle}}">{{l.nick}}</span>
+            <div style="height: 14px; background: #EEF0EA; border-radius: 7px;"><div style="{{l.bar}}"></div></div>
+            <span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #5F6B63; text-align: right;">{{l.spm}}</span>
+          </div>
+        </sc-for>
+      </div>
+      <div style="padding: 24px 28px; background: #FFFFFF; border: 1px solid #C9CEC6; border-radius: 14px; font-family: 'Source Serif 4', serif; font-size: 26px; line-height: 1.5; color: #717971;">
+        <span style="border-bottom: 3px solid #2D312E; color: #2D312E;">Т</span>екст перегону однаковий для всіх: абзац із нашого ліцензованого корпусу, приблизно триста символів…
+      </div>
+      <div style="font-size: 14px; color: #5F6B63;">Поступ суперників — лише для показу. Результат зараховується після перевірки журналу натискань на сервері.</div>
+    </section>
+    <aside style="display: flex; flex-direction: column; gap: 14px;">
+      <div style="display: flex; flex-direction: column; gap: 8px; padding: 18px; background: #FFFFFF; border: 1px solid #C9CEC6; border-radius: 14px;">
+        <span style="font-weight: 700;">Запросити</span>
+        <span style="font-family: 'JetBrains Mono', monospace; font-size: 22px; letter-spacing: 0.12em;">K7Q2XM</span>
+        <span style="font-size: 13px; color: #5F6B63;">[посилання-запрошення]</span>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px; padding: 18px; background: #FFFFFF; border: 1px solid #C9CEC6; border-radius: 14px;">
+        <span style="font-weight: 700;">Глядачі · 2</span>
+        <span style="font-size: 14px; color: #5F6B63;">Запізнілі й неактивні понад 30 с дивляться наживо</span>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 6px; padding: 18px; border: 1px dashed #5F6B63; border-radius: 14px; font-size: 14px;">
+        <span style="font-weight: 700;">Стани кімнати</span>
+        <span>збір 3 с → 3-2-1 → перегони → фініш → перевірка → підсумок</span>
+      </div>
+    </aside>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var me = 'font-weight: 700; color: #316342;';
+    var other = 'color: #2D312E;';
+    function lane(nick, pct, spm, isMe) {
+      return { nick: nick, spm: spm, nameStyle: isMe ? me : other,
+        bar: 'width: ' + pct + '%; height: 14px; border-radius: 7px; background: ' + (isMe ? '#316342' : '#94A3B8') + ';' };
+    }
+    return { lanes: [
+      lane('[ти]', 0, '—', true),
+      lane('[гравець 2]', 0, '—'),
+      lane('[гравець 3]', 0, '—'),
+      lane('[гравець 4]', 0, '—'),
+      lane('[вільне місце]', 0, '')
+    ] };
+  }
+}
+</script>
+</body>
+</html>

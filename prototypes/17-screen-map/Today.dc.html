@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<title>Сьогодні</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;600&amp;family=Source+Sans+3:wght@400;600;700&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap">
+<style>
+body{margin:0;font-family:'Source Sans 3',sans-serif;color:#2D312E;background:#FAF9F5}
+a{color:#2D312E;text-decoration:none}a:hover{color:#316342}
+</style>
+</helmet>
+<div style="width: 1280px; height: 800px; box-sizing: border-box; background: #FAF9F5; display: flex; flex-direction: column; font-family: 'Source Sans 3', sans-serif; color: #2D312E;">
+  <nav style="display: flex; align-items: center; gap: 24px; height: 64px; padding: 0 32px; border-bottom: 1px solid #D9DCD6; background: #FFFFFF; font-size: 16px;">
+    <span style="font-family: 'Source Serif 4', serif; font-weight: 600; font-size: 19px;">Typing-Race</span>
+    <a href="Today.dc.html" style="font-weight: 700; color: #316342; padding: 20px 0; border-bottom: 2px solid #316342;">Сьогодні</a>
+    <a href="Path.dc.html" style="padding: 20px 0;">Шлях</a>
+    <span style="padding: 20px 0;">Повторення</span>
+    <a href="Race.dc.html" style="padding: 20px 0;">Перегони</a>
+    <span style="padding: 20px 0;">Рейтинги</span>
+    <span style="padding: 20px 0;">Статистика</span>
+    <span style="flex-grow: 1;"></span>
+    <span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; padding: 4px 10px; border: 1px solid #C9CEC6; border-radius: 8px;">Ctrl K</span>
+    <span style="width: 36px; height: 36px; border-radius: 50%; background: #E3EDE5; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #316342; font-size: 14px;">ОК</span>
+  </nav>
+  <main style="display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 28px; padding: 32px; flex-grow: 1;">
+    <div style="display: flex; flex-direction: column; gap: 24px;">
+      <section style="display: flex; flex-direction: column; gap: 14px; padding: 28px; background: #FFFFFF; border: 1px solid #C9CEC6; border-radius: 16px;">
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #5F6B63;">НАСТУПНА ДІЯ</div>
+        <div style="font-family: 'Source Serif 4', serif; font-size: 30px; line-height: 1.3;">Повтори перехід «ол» правим вказівним і середнім пальцями</div>
+        <div style="font-size: 15px; color: #5F6B63;">Чому: [найбільше відхилення затримки серед переходів з достатньою кількістю спроб]</div>
+        <div style="display: flex; gap: 12px; align-items: center;">
+          <a href="Exercise.dc.html" style="padding: 12px 22px; background: #316342; color: #FFFFFF; border-radius: 10px; font-weight: 700;">Почати заняття · 18 хв</a>
+          <span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #5F6B63;">Enter</span>
+          <a href="Path.dc.html" style="padding: 12px 18px; border: 1px solid #C9CEC6; border-radius: 10px;">Обрати вправу самому</a>
+        </div>
+      </section>
+      <section style="display: flex; flex-direction: column; gap: 12px;">
+        <div style="font-weight: 700; font-size: 18px;">План заняття</div>
+        <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px;">
+          <div style="display: flex; flex-direction: column; gap: 6px; padding: 16px; background: #FFFFFF; border: 1px solid #C9CEC6; border-radius: 12px;"><span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #5F6B63;">1 · 3 хв</span><span style="font-weight: 700;">Розігрів</span><span style="font-size: 14px; color: #3E4640;">Слабкі переходи минулого заняття</span></div>
+          <div style="display: flex; flex-direction: column; gap: 6px; padding: 16px; background: #E3EDE5; border: 1px solid #316342; border-radius: 12px;"><span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #316342;">2 · 8–12 хв</span><span style="font-weight: 700;">Цільова навичка</span><span style="font-size: 14px; color: #3E4640;">[Клавіша або модуль Академії]</span></div>
+          <div style="display: flex; flex-direction: column; gap: 6px; padding: 16px; background: #FFFFFF; border: 1px solid #C9CEC6; border-radius: 12px;"><span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #5F6B63;">3 · 4 хв</span><span style="font-weight: 700;">Закріплення</span><span style="font-size: 14px; color: #3E4640;">Слова з цільовою навичкою</span></div>
+          <div style="display: flex; flex-direction: column; gap: 6px; padding: 16px; background: #FFFFFF; border: 1px solid #C9CEC6; border-radius: 12px;"><span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #5F6B63;">4 · 3–5 хв</span><span style="font-weight: 700;">Реальний текст</span><span style="font-size: 14px; color: #3E4640;">Зв’язний текст з відкритих клавіш</span></div>
+        </div>
+      </section>
+      <section style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px;">
+        <a href="Path.dc.html" style="display: flex; flex-direction: column; gap: 4px; padding: 16px; border: 1px dashed #5F6B63; border-radius: 12px;"><span style="font-weight: 700;">Повторення слабких місць</span><span style="font-size: 14px; color: #5F6B63;">[3 клавіші · 5 переходів]</span></a>
+        <a href="Race.dc.html" style="display: flex; flex-direction: column; gap: 4px; padding: 16px; border: 1px dashed #5F6B63; border-radius: 12px;"><span style="font-weight: 700;">Швидкі перегони</span><span style="font-size: 14px; color: #5F6B63;">До 5 учасників · ~300 символів</span></a>
+      </section>
+    </div>
+    <aside style="display: flex; flex-direction: column; gap: 16px;">
+      <div style="display: flex; flex-direction: column; gap: 12px; padding: 20px; background: #FFFFFF; border: 1px solid #C9CEC6; border-radius: 14px;">
+        <div style="font-weight: 700;">Поступ</div>
+        <div style="display: flex; flex-direction: column; gap: 4px;"><div style="display: flex; justify-content: space-between; font-size: 14px;"><span>Етап 1 · гами</span><span style="font-family: 'JetBrains Mono', monospace;">[14 / 33]</span></div><div style="height: 8px; background: #E2E5DF; border-radius: 4px;"><div style="width: 42%; height: 8px; background: #316342; border-radius: 4px;"></div></div></div>
+        <div style="display: flex; flex-direction: column; gap: 4px;"><div style="display: flex; justify-content: space-between; font-size: 14px;"><span>Етап 2 · слова</span><span style="font-family: 'JetBrains Mono', monospace;">відкрито</span></div><div style="height: 8px; background: #E2E5DF; border-radius: 4px;"><div style="width: 20%; height: 8px; background: #316342; border-radius: 4px;"></div></div></div>
+        <div style="display: flex; flex-direction: column; gap: 4px;"><div style="display: flex; justify-content: space-between; font-size: 14px;"><span>Етап 3 · Академія</span><span style="font-family: 'JetBrains Mono', monospace;">[0 / 8]</span></div><div style="height: 8px; background: #E2E5DF; border-radius: 4px;"></div></div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px; padding: 20px; background: #FFFFFF; border: 1px solid #C9CEC6; border-radius: 14px;">
+        <div style="font-weight: 700;">Останні спроби</div>
+        <div style="height: 90px; border-radius: 8px; background: repeating-linear-gradient(90deg, #EEF0EA 0 22px, #FFFFFF 22px 30px); display: flex; align-items: center; justify-content: center; font-size: 13px; color: #5F6B63;">[графік SPM і точності]</div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px; padding: 12px 16px; border-radius: 10px; background: #E3EDE5; font-size: 14px; color: #316342;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #316342;"></span>Збережено локально · синхронізовано</div>
+    </aside>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
