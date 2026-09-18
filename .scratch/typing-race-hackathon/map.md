@@ -86,6 +86,7 @@ The package passes `speckit-analyze` with no CRITICAL findings and is approved b
 - [17 Prototype: Screen map & user journeys](issues/17-screen-map-and-user-journeys.md): 32 screens in six groups on a Claude Design canvas with low-fi wireframes. Six-item nav (Today · Path · Review · Races · Leaderboards · Statistics). Formulas, licences, privacy and about pages are public. A single product screen comes before sign-in. Sessions are guided through four blocks. The learner enters a test attempt themselves, prompted once practice clears the floor. The key unlock is a card on the result. Every TZ §9 demo step maps to a screen route.
 
 - [12 Grilling: Dictionary pipeline & exercise generation](issues/12-dictionary-pipeline-and-exercise-generation.md): vendor only the 50k lists, Hunspell, dwyl and LDNOOBW (the full lists add no usable words); an authored, human-reviewed corpus for sentences, paragraphs, phrases, apostrophe words and morphemes; Hunspell plus an authored Russian denylist as filters, proper nouns kept apart for Shift drills; the unlocked set is always a prefix of the unlock order, so each word carries `unlockIndex`; transparent difficulty tiers; generated scales and fixed Academy modules at build time, committed `data/derived/` with a checksum manifest diffed in CI; Stage 2 assembled on the client by a seeded pure function with a labelled pseudo-word fallback that never counts toward an unlock.
+- [21 Grilling: System design, data model & contracts](issues/21-system-design-and-data-model.md): attempts enter only through a `submit-attempt` Edge Function that recomputes metrics with the client's own TS packages ([ADR-0007](../../docs/adr/0007-server-recomputes-metrics-with-shared-packages.md)); progress is a full fold over forever-kept attempt aggregates, so out-of-order outbox arrivals stay correct; keystroke logs in their own prunable table; race rooms as Postgres RPCs with DB-sent start broadcasts and one `finish-race` replay function; leaderboard score from validated races only; a deep client `sync` module with Supabase and in-memory adapters; sign-out clears the IndexedDB cache; delta data chunks per unlock index.
 
 ## Not yet specified
 
@@ -98,7 +99,7 @@ The package passes `speckit-analyze` with no CRITICAL findings and is approved b
 - Outage-hardening against Supabase or Vercel unavailability (SLA analysis, demo fallback stacks): internal hackathon, so not worth the effort.
 
 - Certification with PDF/QR diplomas and public verify URLs ([archived ticket](archive/2026-09-03-map/04-certification-system-and-verification.md)). Not a TZ criterion or bonus, and it competes with pedagogy for effort.
-- Server-side keystroke replay anti-cheat. Only basic plausibility checks on results stay in scope.
+- Server-side keystroke replay anti-cheat for **training** attempts; they get plausibility checks only. Race finishes are replayed ([ADR-0006](../../docs/adr/0006-race-authority-broadcast-for-display-edge-function-for-truth.md), narrowed in [21](issues/21-system-design-and-data-model.md)).
 - Custom course editor, additional keyboard layouts, mechanical-switch sound profiles.
 - Mobile / virtual-keyboard typing. The TZ target is desktop with a physical keyboard, ≥1024px.
 - Camera, microphone or biometric gaze control. Not required, and claiming guaranteed gaze control is forbidden (TZ §3.2, §6).
