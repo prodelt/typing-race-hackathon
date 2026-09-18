@@ -58,6 +58,10 @@ Comprehensive domain model and conceptual glossary for the Typing-Race touch-typ
 - **Diagnostic (Діагностика)**: A short, skippable placement run that sets a learner's starting point and initial confidence.
 - **Pseudo-word (Псевдослово)**: A meaningless letter string, allowed only in explicitly labelled mechanics exercises.
 - **Authored Content (Авторський матеріал)**: Exercise text written by the project itself rather than derived from a licensed dictionary.
+- **Unlock Order (Порядок відкриття)**: The fixed per-layout sequence in which keys are unlocked, following the finger map. A learner's unlocked set is always a prefix of it; the Diagnostic can only move the boundary forward.
+- **Word Bank (Банк слів)**: The filtered, normalised words of one language from which Stage 2 and Academy exercises draw. Proper nouns are kept apart in a separate capitalisation bank used for Shift drills.
+- **Difficulty Tier (Рівень складності слова)**: A 1–5 grade of a word from its frequency rank and length; same-finger transitions and row changes only order words within a tier.
+- **Scale Catalogue (Каталог гам)**: The authored list of Stage 1 scales — type, fingers, size, tempo — whose text is generated from the finger map of each layout.
 
 ## Racing & Multiplayer Concepts
 
