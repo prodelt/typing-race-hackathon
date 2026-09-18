@@ -30,11 +30,11 @@ Which tools and techniques make "every task verified by real E2E tests" achievab
 
 ## Deliverable
 
-`docs/research/06-quality-tooling.md` on branch `research/06-quality-tooling`.
+`docs/research/06-quality-tooling.md` on `main` (folded from its research branch in `2dcaba0`).
 
 ## Answer
 
-Resolved 2026-09-17 by a research subagent. Findings: `docs/research/06-quality-tooling.md` on branch `research/06-quality-tooling` (commit `44e2581`, 672 lines, 7 sections). Verified with real experiments on Playwright 1.63.0 (Chromium 153, Firefox 155, WebKit 26.6); scripts are in the appendix.
+Resolved 2026-09-17 by a research subagent. Findings: `docs/research/06-quality-tooling.md` on `main` (folded from its research branch in `2dcaba0`) (672 lines, 7 sections). Verified with real experiments on Playwright 1.63.0 (Chromium 153, Firefox 155, WebKit 26.6); scripts are in the appendix.
 
 **The decisive result: Cyrillic cannot be typed through the keyboard API.**
 - `press('й')` **throws** `Unknown key`; `type('привіт')` silently falls back to `insertText`, so there is **no keydown/keyup for Cyrillic in any engine**. With nothing focused, Chromium and WebKit emit no events at all. Confirmed in Playwright's `input.ts` (`usKeyboardLayout` lookup) and issues #3989 / #7396.

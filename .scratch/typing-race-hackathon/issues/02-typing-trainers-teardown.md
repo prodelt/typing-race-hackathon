@@ -30,11 +30,11 @@ Output also:
 
 ## Deliverable
 
-`docs/research/02-typing-trainers.md` on branch `research/02-typing-trainers`.
+`docs/research/02-typing-trainers.md` on `main` (folded from its research branch in `2dcaba0`).
 
 ## Answer
 
-Resolved 2026-09-17 by a research subagent. Findings: `docs/research/02-typing-trainers.md` on branch `research/02-typing-trainers` (commit `ec457f7`, 542 lines, all 9 sections).
+Resolved 2026-09-17 by a research subagent. Findings: `docs/research/02-typing-trainers.md` on `main` (folded from its research branch in `2dcaba0`) (542 lines, all 9 sections).
 
 **The gap we can own:** the two open-source leaders split our product between them. keybr is the adaptive *learning engine*; Monkeytype is the *input loop and test*. Neither has a staged finger curriculum, an n-gram Academy, or a "next step" recommendation — which is exactly what the TZ scores 30 points for. Ukrainian ЙЦУКЕН support exists but is shallow everywhere (keybr, Monkeytype, Ratatype 19 lessons, TypingStudy 15, KTouch): nobody combines curriculum + Academy + analytics + races.
 

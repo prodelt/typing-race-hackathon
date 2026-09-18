@@ -31,11 +31,11 @@ What can we legally publish in a public repo, both source snapshots and derived 
 
 ## Deliverable
 
-`docs/research/08-dictionaries-licensing.md` on branch `research/08-dictionaries-licensing`.
+`docs/research/08-dictionaries.md` on `main` (folded from its research branch in `2dcaba0`).
 
 ## Answer
 
-Resolved 2026-09-17 by a research subagent. Findings: `docs/research/08-dictionaries.md` on branch `research/08-dictionaries` (commit `389d74a`, 10 sections), including local measurements and the scripts used.
+Resolved 2026-09-17 by a research subagent. Findings: `docs/research/08-dictionaries.md` on `main` (folded from its research branch in `2dcaba0`) (10 sections), including local measurements and the scripts used.
 
 **Licenses — all four are vendor-able**
 - FrequencyWords: MIT licence file, but the upstream README claims CC-BY-SA-4.0 for the *content*, so derived tables comply with the stricter of the two.

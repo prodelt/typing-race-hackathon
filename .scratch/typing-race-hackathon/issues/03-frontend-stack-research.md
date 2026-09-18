@@ -33,11 +33,11 @@ Also cover:
 
 ## Deliverable
 
-`docs/research/03-frontend-stack.md` on branch `research/03-frontend-stack`: a comparison table plus a proposed recommendation. The decision itself is made in ticket "Stack & architecture".
+`docs/research/03-frontend-stack.md` on `main` (folded from its research branch in `2dcaba0`): a comparison table plus a proposed recommendation. The decision itself is made in ticket "Stack & architecture".
 
 ## Answer
 
-Resolved 2026-09-17 by a research subagent. Findings: `docs/research/03-frontend-stack.md` on branch `research/03-frontend-stack` (commit `88138be`, 445 lines).
+Resolved 2026-09-17 by a research subagent. Findings: `docs/research/03-frontend-stack.md` on `main` (folded from its research branch in `2dcaba0`) (445 lines).
 
 **Proposal** (input for ticket 11, not yet decided): Vite 8 + React 19.3 SPA with the keystroke path kept outside React. Score 91/100 vs Svelte 5 at 85 and Solid at 81; on raw performance alone React, Svelte and Solid tie at 86–87, so the call hinges on how much agent ergonomics and stable versions are worth.
 

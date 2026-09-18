@@ -55,3 +55,8 @@ Still open in this ticket: caching strategy per layer, where exercise generation
 - **Themes and motion:** system / light / dark and system / reduced / off, both honouring `prefers-reduced-motion`.
 
 Resolved 2026-09-17. Supabase feature-level decisions (auth flows, RLS shape, Realtime channel design) belong to tickets 13 and 14.
+
+**Residual — found in the 2026-09-18 audit, not yet decided** (settle in `speckit-plan` or ticket 16, whichever comes first):
+- **Router:** research 03 proposed TanStack Router, but it was never put to the user. Its committed `routeTree.gen.ts` conflicts across parallel worktrees, so the real choice is TanStack Router with code-based routes, TanStack file-based routes with the generated file excluded from review, or React Router.
+- **Styling:** Tailwind CSS 4 is assumed everywhere (CLAUDE.md, research 03) but was never explicitly confirmed.
+- **Versions:** TypeScript 7 (no programmatic API yet) versus 6; Vitest 5 and pnpm 12 versus the previous lines. Research 03 flags all three as brand new.

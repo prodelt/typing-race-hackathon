@@ -29,7 +29,7 @@ Work to do, in order:
 
 <!-- Record: pushed commit SHA, tracked file count, secret-scan summary, restore commands, protection settings recorded. -->
 
-Resolved 2026-09-17. Pushed commit `124c444` to `https://github.com/prodelt/typing-race-hackathon` as branch `main` (75 files).
+Resolved 2026-09-17. Pushed commit `2dcaba0` to `https://github.com/prodelt/typing-race-hackathon` as branch `main` (75 files).
 
 **What was done**
 - History rebuilt as a single clean initial commit on an orphan branch; `master` and the seven `research/*` branches deleted; all agent worktrees removed.

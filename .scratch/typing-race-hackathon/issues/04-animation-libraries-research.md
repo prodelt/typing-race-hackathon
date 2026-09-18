@@ -39,11 +39,11 @@ Map the candidates onto our motion surfaces:
 
 ## Deliverable
 
-`docs/research/04-animation-libraries.md` on branch `research/04-animation-libraries`.
+`docs/research/04-animation-libraries.md` on `main` (folded from its research branch in `2dcaba0`).
 
 ## Answer
 
-Resolved 2026-09-13 by a research subagent. Findings: `docs/research/04-animation-libraries.md` on branch `research/04-animation-libraries` (commit `5dca191`), with sources cited and uncertain items marked UNVERIFIED.
+Resolved 2026-09-13 by a research subagent. Findings: `docs/research/04-animation-libraries.md` on `main` (folded from its research branch in `2dcaba0`), with sources cited and uncertain items marked UNVERIFIED.
 
 **Proposal** (input for ticket 11, not yet decided)
 

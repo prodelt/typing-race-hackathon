@@ -41,11 +41,11 @@ Verified from official docs and pricing as of September 2026: what can we run on
 
 ## Deliverable
 
-`docs/research/05-supabase-vercel.md` on branch `research/05-supabase-vercel`.
+`docs/research/05-supabase-vercel.md` on `main` (folded from its research branch in `2dcaba0`).
 
 ## Answer
 
-Resolved 2026-09-13 by a research subagent. Findings: `docs/research/05-supabase-vercel.md` on branch `research/05-supabase-vercel` (commit `2e05e5a`), with a source for every figure.
+Resolved 2026-09-13 by a research subagent. Findings: `docs/research/05-supabase-vercel.md` on `main` (folded from its research branch in `2dcaba0`), with a source for every figure.
 
 **Supabase Free**
 - 2 active free projects per account. One slot is already used by a project from another effort, so **one slot is left**.

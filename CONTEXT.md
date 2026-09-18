@@ -38,16 +38,43 @@ Comprehensive domain model and conceptual glossary for the Typing-Race touch-typ
 - **Inter-Keystroke Interval (IKI)**: High-resolution timestamp delta (`performance.now()`) between consecutive physical key presses, used to calculate rhythm variance and transition heatmaps.
 - **Rhythm Consistency (%)**: Standard deviation of IKIs normalized to a percentage scale (100% = perfectly uniform metronome rhythm).
 
+## Attempts & Adaptation
+
+- **Attempt (Спроба)**: One run of one exercise by a learner, recorded as an immutable keystroke event log together with its metrics.
+  _Avoid_: session, try, run
+- **Keystroke Event Log (Журнал натискань)**: The append-only, timestamped record of every keystroke in an attempt; every metric is derived from it.
+  _Avoid_: input history
+- **Transition (Перехід)**: The motor move from one key to the next, characterised by the fingers and rows involved. A bigram is the character pair in text; a transition is the movement that types it.
+- **Same-Finger Transition**: A transition in which both keys belong to the same finger.
+- **Confidence (Впевненість)**: How reliably a learner types a given key or transition, judged from its recent timing and miss rate.
+- **Focus Element (Фокус вправи)**: The weakest key or transition an exercise is built around; it appears in every item of that exercise.
+- **Test Attempt (Залікова спроба)**: An attempt that counts toward mastery, run in Zero-Peek Test Mode — the next-key hint and on-screen keyboard are hidden, errors stay visible.
+  _Avoid_: exam, blind mode
+- **Mastery Rule (Правило засвоєння)**: Three consecutive test attempts at or above the level's accuracy floor; speed never gates progression.
+- **Session (Заняття)**: A 15–25 minute practice block of warm-up, one target skill, consolidation and real text.
+- **Diagnostic (Діагностика)**: A short, skippable placement run that sets a learner's starting point and initial confidence.
+- **Pseudo-word (Псевдослово)**: A meaningless letter string, allowed only in explicitly labelled mechanics exercises.
+- **Authored Content (Авторський матеріал)**: Exercise text written by the project itself rather than derived from a licensed dictionary.
+
 ## Racing & Multiplayer Concepts
 
 - **Race**: A real-time competitive typing sprint where multiple typists type identical snippets.
 - **Lobby / Room**: Synchronized room powered by Supabase Realtime Channels.
 - **Race State Machine**:
   - `waiting`: Typists gather in lobby.
-  - `countdown`: Synchronized 5-second countdown.
+  - `countdown`: 3-second gather, then a 3-2-1 countdown anchored to a server timestamp.
   - `active`: Race in progress; keystrokes and progress percentages are broadcasted live.
   - `finished`: All racers completed or timeout reached; verified leaderboard displayed.
 - **Speedometer**: Dynamic visual HUD reflecting real-time instantaneous CPM/WPM during the race.
+
+- **Quick Match (Швидкий заїзд)**: Joining an automatically filled room of up to five racers.
+- **Private Room (Приватна кімната)**: A room joined by its code or an invite link.
+- **Spectator (Глядач)**: Someone in a room who watches without racing — latecomers and racers idle for too long.
+- **Validated Result (Перевірений результат)**: A race result the server has replayed against the race text and accepted; only validated results are ranked.
+  _Avoid_: score, finish time
+- **Group (Група)**: A class or team joined by a code, with an owner, members and its own leaderboard.
+- **Leaderboard (Рейтинг)**: A ranking of validated results with at least 90% accuracy, scoped to a group, a week, or all time.
+  _Avoid_: global rating (unless it is genuinely server-backed)
 
 ## Design System: Serene Script
 

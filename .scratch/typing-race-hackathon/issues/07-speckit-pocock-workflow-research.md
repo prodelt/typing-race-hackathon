@@ -30,11 +30,11 @@ Find:
 
 ## Deliverable
 
-`docs/research/07-speckit-pocock-workflow.md` on branch `research/07-speckit-pocock-workflow`: a workflow diagram, a role/skill matrix, and a proposed recommendation.
+`docs/research/07-speckit-pocock-workflow.md` on `main` (folded from its research branch in `2dcaba0`): a workflow diagram, a role/skill matrix, and a proposed recommendation.
 
 ## Answer
 
-Resolved 2026-09-17 by a research subagent. Findings: `docs/research/07-speckit-pocock-workflow.md` on branch `research/07-speckit-pocock-workflow` (commit `8d227dc`, 351 lines, 11 sections).
+Resolved 2026-09-17 by a research subagent. Findings: `docs/research/07-speckit-pocock-workflow.md` on `main` (folded from its research branch in `2dcaba0`) (351 lines, 11 sections).
 
 **Proposed workflow** (input for ticket 16, not yet decided)
 
