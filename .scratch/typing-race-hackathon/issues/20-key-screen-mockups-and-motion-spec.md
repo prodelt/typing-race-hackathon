@@ -52,3 +52,24 @@ Eleven artboards. Step 1 compared three structurally different typing screens: *
 14. **Mockup copy is Ukrainian** and every exercise string in it obeys the unlock set (а о в л г ф і п р д ж), so the comps double as a check that Stage 1 content reads naturally under that constraint.
 
 Resolved 2026-09-22. Nothing graduates from the fog: the package for `001-typing-core` was already ticket 23, which this unblocks.
+
+## UX addendum — analogue review (2026-09-23)
+
+Four further changes, accepted after checking the decisions above against the teardown in [research 02](../../../docs/research/02-typing-trainers.md). The governing measure is that **the eye must not leave the text**: every element on the screen competes with the line for fixations, and peripheral vision reacts to *change*, not to presence.
+
+15. **The typing surface depends on the text length, not on the product.** One scrolling line for scales and words, up to roughly 60 characters; a **static three-line block** for paragraphs — Academy, real text and races. A 300-character race text on a single line was the original mistake, and the worst place for it, because five lanes already pull the eye. Boards: `Exercise.dc.html` keeps the line; `Academy.dc.html` and the racing state of `Race.dc.html` use the block.
+16. **Live metrics freeze for the duration of an attempt.** The rail shows the last completed exercise and updates between exercises; a real-time counter is opt-in, the way Monkeytype treats its pace caret. Static content in the periphery is cheap, changing numbers are not.
+17. **During an attempt an error is only the in-place mark plus the counter.** The sentence naming the finger appears on Esc (pause) and on the result screen; the same transition missed twice in a row may surface it inline. The explanation sat below and left of the line, so reading it costs a saccade exactly when the learner has already stumbled.
+18. **The guide fades as confidence grows.** Three tiers on the keyboard: confidence at or above 0.9 returns the keycap to plain paper, 0.7 to 0.9 keeps a pale finger tint, below 0.7 keeps the full finger colour, and below 0.5 adds a terracotta ring. The letter stays ink in every tier, so contrast never depends on the tier. No studied product does this; it walks the learner toward zero-peek instead of switching it on at the door.
+
+Behind 15 sits one **unverified** claim: that Monkeytype defaults to a three-line block and keybr to a single advancing line is my own observation, not recorded in research 02. The decision does not rest on it — it rests on reading mechanics — so no research ticket was raised.
+
+**Testable UX invariants** handed to the F1 plan, so this is checked rather than argued:
+
+- between two keystrokes, no DOM node outside the typing line changes;
+- the typing line keeps the same vertical position in every exercise type (bounding-box comparison);
+- with zero-peek on, no guide element is rendered at all, rather than hidden with CSS;
+- p95 keystroke-to-paint at most 16 ms — already a CI gate, and for a typing trainer it outranks every aesthetic decision;
+- proxies from the keystroke log we already keep: the distribution of pauses after an error, recovery time, and how often the learner opened the guide.
+
+Two more boards came with this pass: `ExerciseHiFi.dc.html` (the full-craft E2 — paper grain, the mark, the icon set, keycap bevels, progress moved onto the rule under the text) and `Identity.dc.html` (the mark at three sizes and on dark, ten icons on a 24 grid, button, keycap, chip and field states, the type scale). The mark is a keycap holding a caret; at 22 px it loses its outline and goes solid.

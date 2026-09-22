@@ -39,6 +39,7 @@ Durations are tokens, not literals: the motion flag sets them all to `0.01ms` in
 | Error mark | incorrect keystroke | `color`, `background`, `border-bottom` appear on the awaited character | `--dur-instant` · `--ease-standard` | appears instantly |
 | Error cleared | correct character finally typed (stop-on-letter) or Backspace | the mark fades out | `--dur-instant` · `--ease-exit` | disappears instantly |
 | Stream advance | the line scrolls to keep the caret centred | `transform: translateX()` on the text run | `--dur-quick` · `--ease-standard` | the run jumps |
+| Block line scroll | the caret leaves the last visible line of a three-line block | `transform: translateY()` by exactly one line | `--dur-quick` · `--ease-standard` | the block jumps by a line |
 | Next-key highlight | the awaited key changes | `background`, `border`, ring on one keycap | `--dur-quick` · `--ease-standard` | instant |
 | Finger indicator | the awaited finger changes | `background` on one finger bar | `--dur-quick` · `--ease-standard` | instant |
 
@@ -55,6 +56,7 @@ Caret blink: 1 s step-end, paused while typing, stopped entirely when the flag i
 | Unlock confetti | once, with the unlock card | one burst from the card centre, ~40 particles, sage and cream | `--dur-celebrate` | canvas-confetti | no burst |
 | Path keyboard unlock | L2 after a new key | one keycap goes from locked grey to its finger tint | `--dur-slow` · `--ease-standard` | CSS | instant |
 | Confidence bar change | any screen showing confidence | bar width | `--dur-base` · `--ease-standard` | CSS | instant |
+| Guide tier change | a key's confidence crosses 0.5, 0.7 or 0.9 between attempts | the keycap's background, border and letter colour move to the next tier | `--dur-slow` · `--ease-standard` | CSS | instant |
 | Session block advance | E6 between blocks | the block dot fills, the next label brightens | `--dur-base` · `--ease-standard` | CSS | instant |
 | Sync badge | outbox length changes | fade and 4 px rise | 180 ms · `--ease-enter` | CSS | instant |
 | Leaderboard reorder | new data | FLIP on the moved rows | 300 ms · `--ease-standard` | Motion | re-render in place |
@@ -87,4 +89,4 @@ There is no middle setting. A "reduced" tier that keeps some animation would nee
 
 ## What deliberately has no motion
 
-Focus rings, the typing card itself, the left rail, hover states on keycaps, the on-screen keyboard as a whole, and every number that updates during an attempt (they change text, they do not count up). No parallax, no scroll-driven animation, no skeleton shimmer — a paper surface with a static placeholder is calmer and cheaper.
+Focus rings, the typing card itself, the left rail, hover states on keycaps, the on-screen keyboard as a whole, and the metric tiles in the rail, which are frozen for the duration of an attempt and so have nothing to animate. There are two surfaces, not one: a single scrolling line for scales and words, a static three-line block for paragraphs, Academy text and races. Both animate only the caret and the judged character. No parallax, no scroll-driven animation, no skeleton shimmer — a paper surface with a static placeholder is calmer and cheaper.
