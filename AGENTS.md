@@ -75,8 +75,9 @@ Paper-and-ink tactile ergonomics; a calm, soft-light palette that avoids eye fat
 - Error / attention (gentle terracotta) `#D95D39` / `#BA1A1A`
 - Upcoming / secondary (muted slate) `#94A3B8` / `#717971`
 - Typing area `Source Serif 4`, 28px, line height 1.5; UI `Source Sans 3`; metrics and shortcuts `JetBrains Mono`
+- Three token groups beyond those five, all decided in [ticket 20](.scratch/typing-race-hackathon/issues/20-key-screen-mockups-and-motion-spec.md): **finger colours** (pinky violet, ring sage, middle ochre, index blue, thumbs grey, each as ink / tint / line), the **dark palette** (ground `#191C19`, sage `#7FAE8B`, terracotta `#F08A63`), and the **low-vision preset**, which is a third theme and not a scale factor on the light one.
 
-**Motion rule — expressive frame, calm text.** Rich motion on results, unlocks, the race track and route transitions; only caret glide and subtle character feedback inside the typing line. CSS-only in the typing line, View Transitions for routes, lazy-loaded Motion for celebration moments, canvas-confetti for bursts. One app-level flag disables all motion and sound, which is also what makes screenshot tests deterministic.
+**Motion rule — expressive frame, calm text.** Rich motion on results, unlocks, the race track and route transitions; only caret glide and subtle character feedback inside the typing line. CSS-only in the typing line, View Transitions for routes, lazy-loaded Motion for celebration moments, canvas-confetti for bursts. One app-level flag disables all motion and sound, which is also what makes screenshot tests deterministic. Per-moment triggers, durations, easings and off-behaviour: [`docs/design/motion.md`](docs/design/motion.md).
 
 ## Repository structure
 
@@ -90,6 +91,7 @@ Typing-race/
 │   └── memory/constitution.md
 ├── docs/
 │   ├── adr/             # architecture decision records
+│   ├── design/          # motion specification
 │   ├── agents/          # issue tracker and domain conventions
 │   └── research/        # resolved research tickets
 ├── specs/
