@@ -51,7 +51,7 @@ The package passes `speckit-analyze` with no CRITICAL findings and is approved b
     - a task closes only with a link to a green run.
   - **Git:**
     - `main`, protected from the first code task onward;
-    - one branch per task in its own worktree;
+    - one branch per **user story** in its own worktree (overruled "one branch per task" in ticket 16);
     - PR → CI → Vercel Preview → squash merge;
     - Conventional Commits and pre-commit hooks;
     - research on `research/<slug>` branches, folded into `docs/research/`.
@@ -61,7 +61,7 @@ The package passes `speckit-analyze` with no CRITICAL findings and is approved b
     - motion rule "expressive frame, calm text": rich motion on results, unlocks, race track and transitions; only caret glide and subtle character feedback in the typing line;
     - all motion and sound can be disabled;
     - mockups are made in Claude Design (Stitch screens are reference only).
-  - **Team:** one human plus Claude Code as the primary agent, 3–4 parallel lanes via git worktrees.
+  - **Team:** one human plus Claude Code as the primary agent; **two** parallel lanes via git worktrees by default, three at most (narrowed in ticket 16).
 
 ## Decisions so far
 
@@ -89,10 +89,12 @@ The package passes `speckit-analyze` with no CRITICAL findings and is approved b
 - [21 Grilling: System design, data model & contracts](issues/21-system-design-and-data-model.md): attempts enter only through a `submit-attempt` Edge Function that recomputes metrics with the client's own TS packages ([ADR-0007](../../docs/adr/0007-server-recomputes-metrics-with-shared-packages.md)); progress is a full fold over forever-kept attempt aggregates, so out-of-order outbox arrivals stay correct; keystroke logs in their own prunable table; race rooms as Postgres RPCs with DB-sent start broadcasts and one `finish-race` replay function; leaderboard score from validated races only; a deep client `sync` module with Supabase and in-memory adapters; sign-out clears the IndexedDB cache; delta data chunks per unlock index.
 - [15 Grilling: Testing strategy & CI/CD pipeline](issues/15-testing-strategy-and-cicd.md): property tests plus 100% coverage for the logic packages; one `sync` contract suite across both adapters; full E2E on all three engines against local Supabase, with CDP-only tests tagged; previews use the production project with `is_test` accounts kept off leaderboards; zero-violation axe, Lighthouse ≥ 95/100/95, 150 KB initial-JS budget; `ci`, `preview-smoke`, `deploy-backend`, `nightly`, `keepalive` and `update-snapshots` workflows; squash-only protected `main`; a scenario catalogue checked in CI.
 
+- [16 Grilling: Multi-agent workflow & constitution](issues/16-multi-agent-workflow-and-constitution.md): wayfinder charts, Spec Kit builds, Pocock practice skills run inside it ([ADR-0008](../../docs/adr/0008-canonical-agent-workflow.md), constitution **v2.0.0**); five features re-cut **vertically** so each is demonstrable, with the dictionary pipeline moved inside `003-words-and-curriculum` ([roadmap](../../specs/roadmap.md)); story — not task — is the unit of worktree, branch and PR; hot files belong to a feature's Foundational phase, never a story lane; file ownership derived per feature from `tasks.md` paths instead of the five agent roles, which are dropped; two lanes, ceiling three; no nested agents, no GitHub issue mirror; a `Waived:` escape keeps the CRITICAL gate from deadlocking, and the three-engine E2E rule exempts CDP-only tests; `AGENTS.md` canonical, `CLAUDE.md` imports it, `.gemini/GEMINI.md` deleted.
+
 ## Not yet specified
 
 - **Jury-facing docs outline:** README, `docs/pedagogy.md`, `docs/data-sources.md`, AI-use declaration, privacy page content.
-- **Spec Kit feature split:** one feature vs several. Then `speckit-specify` → `clarify` → `plan` → `tasks` → `analyze`, and the handoff to implementation lanes.
+- **Handoff to implementation lanes:** after ticket 23 delivers the approved package for `001-typing-core`, how the first two lanes actually start — worktree setup, the first PR, and what the first green CI run has to prove.
 
 ## Out of scope
 
