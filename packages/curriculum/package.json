@@ -8,5 +8,8 @@
   "exports": {
     ".": "./src/index.ts"
   },
-  "types": "./src/index.ts"
+  "types": "./src/index.ts",
+  "dependencies": {
+    "@typing-race/domain": "workspace:*"
+  }
 }

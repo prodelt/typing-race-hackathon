@@ -244,6 +244,9 @@ importers:
       '@typing-race/curriculum':
         specifier: workspace:*
         version: link:../../packages/curriculum
+      '@typing-race/domain':
+        specifier: workspace:*
+        version: link:../../packages/domain
       '@typing-race/engine':
         specifier: workspace:*
         version: link:../../packages/engine
@@ -269,15 +272,28 @@ importers:
         specifier: ^5.0.15
         version: 5.0.15(@types/react@19.3.0)(react@19.3.0)(use-sync-external-store@1.7.0(react@19.3.0))
 
-  packages/curriculum: {}
+  packages/curriculum:
+    dependencies:
+      '@typing-race/domain':
+        specifier: workspace:*
+        version: link:../domain
+
+  packages/domain: {}
 
   packages/engine:
     dependencies:
       '@typing-race/curriculum':
         specifier: workspace:*
         version: link:../curriculum
+      '@typing-race/domain':
+        specifier: workspace:*
+        version: link:../domain
 
-  packages/metrics: {}
+  packages/metrics:
+    dependencies:
+      '@typing-race/domain':
+        specifier: workspace:*
+        version: link:../domain
 
   packages/ui:
     dependencies:

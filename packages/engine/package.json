@@ -10,6 +10,7 @@
   },
   "types": "./src/index.ts",
   "dependencies": {
-    "@typing-race/curriculum": "workspace:*"
+    "@typing-race/curriculum": "workspace:*",
+    "@typing-race/domain": "workspace:*"
   }
 }

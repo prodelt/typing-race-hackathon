@@ -19,6 +19,14 @@ export default defineConfig({
     projects: [
       {
         test: {
+          name: 'domain',
+          root: './packages/domain',
+          environment: 'node',
+          setupFiles,
+        },
+      },
+      {
+        test: {
           name: 'metrics',
           root: './packages/metrics',
           environment: 'node',
@@ -74,7 +82,12 @@ export default defineConfig({
       reportsDirectory: './coverage',
       // Principle II asks for full coverage of the logic packages, and only of those: a screen is
       // proved by its Playwright scenario, not by a line counter.
-      include: ['packages/metrics/src/**', 'packages/curriculum/src/**', 'packages/engine/src/**'],
+      include: [
+        'packages/domain/src/**',
+        'packages/metrics/src/**',
+        'packages/curriculum/src/**',
+        'packages/engine/src/**',
+      ],
       thresholds: { lines: 100, functions: 100, branches: 100, statements: 100 },
     },
   },
