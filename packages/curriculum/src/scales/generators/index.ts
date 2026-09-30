@@ -21,6 +21,8 @@ export const generators: Record<ScaleType, Generator> = {
   tempo,
 }
 
-export { tempoSteps } from './tempo'
+export { SPACE } from './modifiers'
+export type { TempoSegment } from './tempo'
+export { paceAt, tempoPlan, tempoSteps } from './tempo'
 export { transitionDrill } from './transition'
 export { homePartners } from './vertical'

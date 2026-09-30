@@ -1,0 +1,83 @@
+/*
+ * The metronome of a tempo scale. Small and calm: one beating dot, the target pace, three ticks.
+ * `--pace-beat` is one character at the target SPM, written by PaceCue.tsx when the step changes.
+ * The beat runs only while the attempt runs, and not at all with motion reduced or off.
+ */
+
+.pace-cue {
+  --pace-beat: 600ms;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: var(--font-ui);
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-muted);
+}
+
+.pace-cue__dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  background-color: var(--color-sage);
+  opacity: 0.45;
+}
+
+.pace-cue[data-state="running"] .pace-cue__dot {
+  animation: pace-cue-beat var(--pace-beat) ease-out infinite;
+}
+
+@keyframes pace-cue-beat {
+  0% {
+    opacity: 1;
+    transform: scale(1.35);
+  }
+  60%,
+  100% {
+    opacity: 0.45;
+    transform: scale(1);
+  }
+}
+
+.pace-cue__label {
+  color: var(--color-ink-soft);
+}
+
+.pace-cue__steps {
+  display: inline-flex;
+  gap: 0.25rem;
+}
+
+.pace-cue__tick {
+  width: 1rem;
+  height: 2px;
+  border-radius: 1px;
+  background-color: var(--color-hairline-strong);
+}
+
+.pace-cue[data-step="1"] .pace-cue__tick[data-step="1"],
+.pace-cue[data-step="2"] .pace-cue__tick:is([data-step="1"], [data-step="2"]),
+.pace-cue[data-step="3"] .pace-cue__tick {
+  background-color: var(--color-sage);
+}
+
+/* Reduced motion keeps the beat as a change of brightness only: the dot never grows. */
+:root[data-motion="reduced"] .pace-cue[data-state="running"] .pace-cue__dot {
+  animation-name: pace-cue-fade;
+}
+
+@keyframes pace-cue-fade {
+  0% {
+    opacity: 1;
+  }
+  60%,
+  100% {
+    opacity: 0.45;
+  }
+}
+
+/* Motion off: a still dot, the pace in words. */
+:root[data-motion="off"] .pace-cue[data-state] .pace-cue__dot {
+  animation: none;
+  opacity: 1;
+}

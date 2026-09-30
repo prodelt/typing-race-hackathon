@@ -1,19 +1,24 @@
 import {
+  introductionLevel,
   levels,
   MASTERY_STREAK,
   STAGE1_ACCURACY_FLOOR,
   STAGE1_WINDOW,
 } from '@typing-race/curriculum'
+import type { Level } from '@typing-race/domain'
 import { Chip } from '@typing-race/ui'
 import { m } from '../../paraglide/messages.js'
+import { getLocale } from '../../paraglide/runtime.js'
 import { Block, Formula, P, Section } from './Formula.js'
 
-const LEVEL_NAMES: Readonly<Record<string, () => string>> = {
-  introduction: () => m.formulas_level_introduction(),
-  basic: () => m.formulas_level_basic(),
-  intermediate: () => m.formulas_level_intermediate(),
-  advanced: () => m.formulas_level_advanced(),
-  expert: () => m.formulas_level_expert(),
+/** The interface language the level config's names and goals are read in. */
+const language = () => (getLocale() === 'en' ? 'en' : 'uk')
+
+/** "без вимог", "100–150 SPM" or "300+ SPM", from the config's benchmark. */
+function speedCell(benchmark: Level['spmBenchmark']): string {
+  if (benchmark === null) return m.formulas_speed_none()
+  if (benchmark.max === null) return m.formulas_speed_open({ min: benchmark.min })
+  return m.formulas_speed_range({ min: benchmark.min, max: benchmark.max })
 }
 
 /** Whole percent, the way the requirements' table prints it. */
@@ -22,8 +27,8 @@ const percent = (fraction: number) => `${Math.round(fraction * 100)} %`
 const CELL = 'px-4 py-2'
 
 /**
- * The level table, straight from the curriculum data so the page cannot drift from the values in
- * force (FR-030), then the Mastery Rule, Stage 1 completion, and the statement that speed gates
+ * The level table, rendered from the curriculum's one level config (`levels.json`) — names, goals,
+ * benchmarks and floors alike — so the page cannot drift from the values in force, then the Mastery Rule, Stage 1 completion, and the statement that speed gates
  * nothing.
  */
 export function Progression() {
@@ -46,32 +51,31 @@ export function Progression() {
                   {m.formulas_col_floor()}
                 </th>
                 <th scope="col" className={`${CELL} font-semibold`}>
+                  {m.formulas_col_goal()}
+                </th>
+                <th scope="col" className={`${CELL} font-semibold`}>
                   {m.formulas_col_status()}
                 </th>
               </tr>
             </thead>
             <tbody>
               {levels.map((level) => {
-                const inForce = level.id === 'introduction'
+                const inForce = level.id === introductionLevel.id
                 return (
                   <tr
                     key={level.id}
                     className="border-t-[length:var(--border-hairline)] border-hairline"
                   >
                     <th scope="row" className={`${CELL} font-semibold`}>
-                      {LEVEL_NAMES[level.id]?.() ?? level.id}
+                      {level.name[language()]}
                     </th>
                     <td className={`${CELL} font-mono text-[0.95rem]`}>
-                      {level.spmBenchmark === null
-                        ? m.formulas_speed_none()
-                        : m.formulas_speed_range({
-                            min: level.spmBenchmark.min,
-                            max: level.spmBenchmark.max,
-                          })}
+                      {speedCell(level.spmBenchmark)}
                     </td>
                     <td className={`${CELL} font-mono text-[0.95rem]`}>
                       {percent(level.accuracyFloor)}
                     </td>
+                    <td className={CELL}>{level.goal[language()]}</td>
                     <td className={CELL}>
                       <Chip tone={inForce ? 'sage' : 'muted'}>
                         {inForce ? m.formulas_status_in_force() : m.formulas_status_informational()}

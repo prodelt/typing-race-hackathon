@@ -1,6 +1,6 @@
 import type { FingerAssignment, Key, Layout, Scale, ScaleType } from '@typing-race/domain'
 import { keyOf, layouts, SHIFT_TOKEN } from '../layout'
-import { homePartners } from './generators'
+import { homePartners, SPACE } from './generators'
 
 /**
  * One message key per type, because the goal is what the *type* teaches (FR-010): "keep each finger
@@ -19,7 +19,8 @@ export const SCALE_GOAL_KEYS: Record<ScaleType, string> = {
 }
 
 const DEFAULT_SIZE = 60
-const TEMPO_SIZE = 48
+/** Nine motifs of eight: three per metronome step, so each step is long enough to settle into. */
+const TEMPO_SIZE = 80
 /** Where the metronome starts for a `tempo` Scale; it steps up from here (research R6). */
 const TEMPO_START_SPM = 100
 
@@ -66,6 +67,15 @@ function anchorScales(layout: Layout): Scale[] {
     scale(layout, 'anchors', 'fingerIsolation', focusAt(7), fingers, []),
     scale(layout, 'anchors', 'tempo', focusAt(3), fingers, []),
   ]
+}
+
+/**
+ * The space bar as a movement of its own (§3.1: "space, Shift, digits and punctuation as separate
+ * movements"). The space bar is unlocked from the first exercise, so this scale needs nothing and
+ * sits with the anchor scales: a letter of each hand either side of the thumb strike.
+ */
+function spaceScale(layout: Layout): Scale {
+  return scale(layout, 'space', 'modifiers', SPACE, [{ hand: 'thumbs', finger: 'thumb' }], [])
 }
 
 /** The key behind an Unlock Order entry. The order is derived from the keys, so a miss is a bug. */
@@ -134,12 +144,12 @@ export function buildCatalogue(layout: Layout): Scale[] {
     const span = spans.get(char)
     return span === undefined ? [unlockScale(layout, char)] : [unlockScale(layout, char), span]
   })
-  return [...anchorScales(layout), ...unlocks]
+  return [...anchorScales(layout), spaceScale(layout), ...unlocks]
 }
 
 /**
- * The Scale Catalogue of each layout, ordered against its Unlock Order: the anchor scales first,
- * then one scale per unlockable key in unlock order, each finger's `fingerSpan` right after the last
+ * The Scale Catalogue of each layout, ordered against its Unlock Order: the anchor scales and the
+ * space-bar scale first, then one scale per unlockable key in unlock order, each finger's `fingerSpan` right after the last
  * of its keys. All eight generator types appear for both layouts (SC-003).
  *
  * Text is never authored here (FR-009). A Scale is metadata over a generator, and its `requires`

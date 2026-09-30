@@ -30,6 +30,7 @@ function fingerLabel(name: string): string {
 }
 
 export function keyLabel(char: string): string {
+  if (char === ' ') return m.path_key_space()
   return char === SHIFT_TOKEN ? m.path_key_shift() : displayChar(char)
 }
 

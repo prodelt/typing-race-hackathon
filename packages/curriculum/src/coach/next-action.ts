@@ -1,23 +1,17 @@
 import type { AttemptSummary, Layout, NextAction, Progress, Scale } from '@typing-race/domain'
-import { parseTransitionKey } from '@typing-race/domain'
 import { levelFor, passes } from '../levels/table'
 import { keyOfChar } from '../progress/order'
+import { weakTransitions } from '../progress/weak-transitions'
+import { transitionScale } from '../scales/transitions'
 import { makeAction, percent, templateKeys } from './templates'
 
-/** A Transition with fewer observations than this is never named — FR-035. */
-export const MIN_TRANSITION_SAMPLES = 5
 /** Rhythm Consistency below this counts as uneven; a tunable, in the same 0–100 unit as R5. */
 export const RHYTHM_FLOOR = 70
-/** Only a Transition less confident than this is worth naming; above it, fall through. */
-export const WEAK_CONFIDENCE_CEILING = 0.8
-/**
- * The multiplier on a same-finger Transition's deficit, per typing language — FR-033. Ukrainian
- * is weighted up because ЙЦУКЕН makes 18.58% of its Transitions same-finger against QWERTY's
- * 5.80% (ticket 08), so they are the likelier cause of a stall there. 1.5 lets a same-finger
- * Transition outrank a non-same-finger one that is up to 1.5 times as deficient, without drowning the
- * timing signal.
- */
-export const SAME_FINGER_WEIGHT = { uk: 1.5, en: 1 } as const
+export {
+  MIN_TRANSITION_SAMPLES,
+  SAME_FINGER_WEIGHT,
+  WEAK_CONFIDENCE_CEILING,
+} from '../progress/weak-transitions'
 
 export interface NextActionArgs {
   readonly progress: Progress
@@ -75,60 +69,23 @@ export function nextAction(args: NextActionArgs): NextAction {
   return nextKeyOrScale(progress, layout, catalogue, startable, unlocked)
 }
 
-/** Whether a Transition's two characters share one finger, read from the layout's own keys. */
-function isSameFinger(layout: Layout, from: string, to: string): boolean {
-  const a = keyOfChar(layout, from)
-  const b = keyOfChar(layout, to)
-  return a !== undefined && b !== undefined && a.hand === b.hand && a.finger === b.finger
-}
-
-/** Observations of a Transition across the whole history, read from aggregates — FR-035. */
-function observations(progress: Progress, key: string): number {
-  return progress.history.reduce(
-    (sum, attempt) => sum + (attempt.aggregates.transitions[key]?.count ?? 0),
-    0,
-  )
-}
-
+/**
+ * Rule 2: the weakest Transition with enough samples, and a drill that starts it. An authored Scale
+ * focused on exactly this Transition wins; otherwise the drill is built for it on demand
+ * (`transitionScale`), which is what lets the rule fire at all — the authored catalogue focuses on
+ * keys. A Transition whose keys are not all unlocked is skipped for the next weakest.
+ */
 function weakestTransition(
   progress: Progress,
   layout: Layout,
   startable: readonly Scale[],
 ): NextAction | undefined {
-  const weight = SAME_FINGER_WEIGHT[layout.language]
-  const ranked: {
-    key: string
-    from: string
-    to: string
-    confidence: number
-    score: number
-  }[] = []
-
-  for (const [key, confidence] of Object.entries(progress.transitionConfidence)) {
-    // Undefined is "unmeasured" (research R4); the history count is a second, independent guard so
-    // a caller-supplied confidence can never make an under-sampled Transition nameable — FR-035.
-    if (confidence === undefined || confidence >= WEAK_CONFIDENCE_CEILING) continue
-    if (observations(progress, key) < MIN_TRANSITION_SAMPLES) continue
-    const pair = parseTransitionKey(key)
-    if (!pair) continue
-    const multiplier = isSameFinger(layout, pair.from, pair.to) ? weight : 1
-    ranked.push({
-      key,
-      ...pair,
-      confidence,
-      score: (1 - confidence) * multiplier,
-    })
-  }
-
-  // Highest weighted deficit first; the key breaks ties so the choice is deterministic.
-  ranked.sort((a, b) => b.score - a.score || (a.key < b.key ? -1 : 1))
-
-  for (const candidate of ranked) {
-    // Only name what the button can start: a Scale focused on exactly this Transition.
-    const scale = startable.find(
-      (s) => s.focus.kind === 'transition' && s.focus.value === candidate.key,
-    )
-    if (scale) {
+  const unlocked = new Set(progress.unlockedSet)
+  for (const candidate of weakTransitions(progress, layout)) {
+    const scale =
+      startable.find((s) => s.focus.kind === 'transition' && s.focus.value === candidate.key) ??
+      transitionScale(layout, candidate.key)
+    if (scale?.requires.every((char) => unlocked.has(char))) {
       return makeAction(
         'weakTransition',
         templateKeys.weakTransition,

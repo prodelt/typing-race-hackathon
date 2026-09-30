@@ -83,5 +83,6 @@
   "path_review_finger": "{hand}, {finger}",
   "path_review_practise": "Practise",
   "path_review_no_drill": "no drill of its own yet",
-  "path_review_threshold": "A transition is only named after {samples} observations."
+  "path_review_threshold": "A transition is only named after {samples} observations.",
+  "path_key_space": "space"
 }

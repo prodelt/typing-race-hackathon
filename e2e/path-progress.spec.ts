@@ -58,6 +58,7 @@ const YQ_SCALES = [
   'yq.alternate.anchors',
   'yq.fingerIsolation.anchors',
   'yq.tempo.anchors',
+  'yq.modifiers.space',
   'yq.run.KeyG',
   'yq.run.KeyH',
   'yq.run.Quote',

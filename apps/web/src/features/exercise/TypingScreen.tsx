@@ -2,6 +2,7 @@ import type { AttemptMode, AttemptSummary, Layout, Scale } from '@typing-race/do
 import type { Engine } from '@typing-race/engine'
 import { KeyboardGuide } from './KeyboardGuide.js'
 import { FingerDiagram, NextKeyCard } from './NextKey.js'
+import { PaceCue } from './PaceCue.js'
 import { Rail } from './Rail.js'
 import { TypingLine } from './TypingLine.js'
 
@@ -54,6 +55,7 @@ export function TypingScreen({
       <div className="flex min-w-0 flex-col gap-10">
         <div className="pt-4">
           <TypingLine engine={engine} text={text} sizePx={sizePx} />
+          <PaceCue engine={engine} scale={scale} text={text} />
         </div>
 
         {mode === 'practice' ? (

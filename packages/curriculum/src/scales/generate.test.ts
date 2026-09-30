@@ -54,7 +54,12 @@ describe.each(both)('generateText on $id', (layout) => {
           })
           if (text === REQUIREMENTS_UNMET) return
           for (const char of text) expect(isAllowed(scale, unlocked, char)).toBe(true)
-          for (const item of text.split(' ')) expect(hasFocus(scale, item)).toBe(true)
+          if (scale.focus.value === ' ') {
+            // The space-bar scale: the space is the move, so every character alternates with one.
+            expect(text).toMatch(/^[^ ]( [^ ])+$/u)
+          } else {
+            for (const item of text.split(' ')) expect(hasFocus(scale, item)).toBe(true)
+          }
         },
       ),
     )

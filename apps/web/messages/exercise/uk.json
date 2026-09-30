@@ -68,5 +68,6 @@
   "exercise_pause_last_error": "Востаннє замість «{expected}» натиснуто «{got}». Цю клавішу натискає {finger}.",
   "exercise_pause_resume": "Продовжити",
   "exercise_pause_leave": "Залишити спробу",
-  "exercise_pause_leave_note": "Залишена спроба не записується."
+  "exercise_pause_leave_note": "Залишена спроба не записується.",
+  "exercise_pace_label": "Темп {spm} SPM · крок {step} з {steps}"
 }

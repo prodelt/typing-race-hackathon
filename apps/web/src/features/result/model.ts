@@ -3,6 +3,7 @@ import {
   deriveProgress,
   layouts,
   nextAction,
+  scaleById,
   templateKeys,
 } from '@typing-race/curriculum'
 import {
@@ -150,7 +151,7 @@ function unlockOn(
       scale.requires.every((char) => nowOpen.has(char)) &&
       !scale.requires.every((char) => had.has(char)),
   )
-  const firstDrill = opens[0] ?? scales.find((scale) => scale.id === next.startsScaleId)
+  const firstDrill = opens[0] ?? scaleById(layout, next.startsScaleId)
   return { key, finger: fingerOfChar(layout, key), opens, firstDrill }
 }
 
@@ -220,7 +221,7 @@ function namedTempo(spm: number): number {
  * the speed just typed) and the two fingers of a weak Transition.
  */
 export function coachSentence(model: ResultModel): string {
-  const { next, attempt, layout, scales } = model
+  const { next, attempt, layout } = model
   const values = next.values
   const text = (name: string): string => String(values[name] ?? '')
 
@@ -252,7 +253,7 @@ export function coachSentence(model: ResultModel): string {
       })
     }
     default: {
-      const scale = scales.find((candidate) => candidate.id === next.startsScaleId)
+      const scale = scaleById(layout, next.startsScaleId)
       return m.result_coach_nextScale({
         scale: scale === undefined ? text('scale') : scaleName(scale),
       })

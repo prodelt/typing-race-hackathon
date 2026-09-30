@@ -145,23 +145,24 @@ test.describe('US4 the public Formulas page', () => {
     const table = progression.getByRole('table', {
       name: 'Рівні, їхні швидкісні орієнтири та планки точності',
     })
-    // The published accuracy floors: 95 / 96 / 97 / 97 / 98 %.
-    for (const [level, floor] of [
-      ['Вступ', '95 %'],
-      ['Базовий', '96 %'],
-      ['Середній', '97 %'],
-      ['Просунутий', '97 %'],
-      ['Експерт', '98 %'],
+    // The requirements' table, read from the level config: names, benchmarks and floors.
+    for (const [level, speed, floor] of [
+      ['Ознайомлення', 'без вимог', '95 %'],
+      ['Базовий', '100–150 SPM', '96 %'],
+      ['Впевнений', '150–225 SPM', '97 %'],
+      ['Робочий', '225–300 SPM', '97 %'],
+      ['Швидкісний', '300+ SPM', '98 %'],
     ] as const) {
       const row = table
         .getByRole('row')
         .filter({ has: page.getByRole('rowheader', { name: level }) })
+      await expect(row, `${level} row`).toContainText(speed)
       await expect(row, `${level} row`).toContainText(floor)
     }
     // Introduction sets no speed requirement, and is the only band in force.
     const intro = table
       .getByRole('row')
-      .filter({ has: page.getByRole('rowheader', { name: 'Вступ' }) })
+      .filter({ has: page.getByRole('rowheader', { name: 'Ознайомлення' }) })
     await expect(intro).toContainText('без вимог')
     await expect(intro).toContainText('діє для всього Етапу 1')
 

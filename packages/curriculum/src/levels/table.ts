@@ -1,52 +1,63 @@
 import type { Level, Progress } from '@typing-race/domain'
+import config from './levels.json'
 
-/** The one band Stage 1 is judged against — FR-080. */
-export const introductionLevel: Level = {
-  id: 'introduction',
-  // No speed requirement: speed never gates progression — FR-040.
-  spmBenchmark: null,
-  accuracyFloor: 0.95,
-  goal: 'level.introduction.goal',
+/**
+ * Reads the level config and refuses a malformed one loudly, at import time, rather than letting a
+ * typo in `levels.json` turn into a floor of `undefined` that every attempt silently passes.
+ * Exported so the tests can feed it broken input.
+ */
+export function parseLevels(raw: unknown): Level[] {
+  const list = (raw as { levels?: unknown } | null)?.levels
+  if (!Array.isArray(list) || list.length === 0) {
+    throw new TypeError('level config: `levels` must be a non-empty array')
+  }
+  return list.map((entry: unknown, index): Level => {
+    const level = entry as Record<string, unknown>
+    const where = `level config entry ${index}`
+    const text = (value: unknown, field: string): { uk: string; en: string } => {
+      const pair = value as Record<string, unknown> | null
+      if (typeof pair?.['uk'] !== 'string' || typeof pair['en'] !== 'string') {
+        throw new TypeError(`${where}: \`${field}\` needs a uk and an en string`)
+      }
+      return { uk: pair['uk'], en: pair['en'] }
+    }
+    const id = level['id']
+    const floor = level['accuracyFloor']
+    if (typeof id !== 'string' || id === '') throw new TypeError(`${where}: missing id`)
+    if (typeof floor !== 'number' || !(floor > 0 && floor <= 1)) {
+      throw new TypeError(`${where}: accuracyFloor must be a fraction in (0, 1]`)
+    }
+    const spm = level['spm'] as { min?: unknown; max?: unknown } | null | undefined
+    let spmBenchmark: Level['spmBenchmark'] = null
+    if (spm !== null && spm !== undefined) {
+      const { min, max } = spm
+      if (typeof min !== 'number' || (max !== null && typeof max !== 'number')) {
+        throw new TypeError(`${where}: spm needs a numeric min and a numeric or null max`)
+      }
+      if (max !== null && max < min) throw new TypeError(`${where}: spm.max is below spm.min`)
+      spmBenchmark = { min, max }
+    }
+    return {
+      id,
+      name: text(level['name'], 'name'),
+      spmBenchmark,
+      accuracyFloor: floor,
+      goal: text(level['goal'], 'goal'),
+    }
+  })
 }
 
 /**
- * The requirements' level table, as data so it can change without touching anything that reads it
- * (FR-030). The accuracy floors are the published 95 / 96 / 97 / 97 / 98 % column.
+ * The requirements' level table, loaded from `levels.json` — the one place its values live. The
+ * accuracy floors, the SPM benchmarks, the names and the goals are all edited there.
  *
- * Only `introduction` is ever in force in F1, because the level follows the stage (FR-080). The
- * later bands are here so that F3 and F4 inherit them rather than invent them.
- *
- * The speed benchmarks of the later bands are informational placeholders, contiguous from the 150
- * SPM Basic floor that research R4 names as its reference. They gate nothing — FR-040 — and are
- * to be replaced by the values the Formulas page publishes.
+ * Only the first band is ever in force today, because the level follows the stage (FR-080); the
+ * later bands are published on the Formulas page as benchmarks. Speed gates nothing.
  */
-export const levels: readonly Level[] = [
-  introductionLevel,
-  {
-    id: 'basic',
-    spmBenchmark: { min: 150, max: 199 },
-    accuracyFloor: 0.96,
-    goal: 'level.basic.goal',
-  },
-  {
-    id: 'intermediate',
-    spmBenchmark: { min: 200, max: 249 },
-    accuracyFloor: 0.97,
-    goal: 'level.intermediate.goal',
-  },
-  {
-    id: 'advanced',
-    spmBenchmark: { min: 250, max: 299 },
-    accuracyFloor: 0.97,
-    goal: 'level.advanced.goal',
-  },
-  {
-    id: 'expert',
-    spmBenchmark: { min: 300, max: 400 },
-    accuracyFloor: 0.98,
-    goal: 'level.expert.goal',
-  },
-]
+export const levels: readonly Level[] = parseLevels(config)
+
+/** The first band of the table: the one Stage 1 is judged against. */
+export const introductionLevel: Level = levels[0] as Level
 
 /**
  * The level in force for a stage. It takes the **stage**, never a speed, so no gain in speed can

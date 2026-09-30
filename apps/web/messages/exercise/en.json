@@ -68,5 +68,6 @@
   "exercise_pause_last_error": "Last time you pressed “{got}” instead of “{expected}”. That key is pressed by the {finger}.",
   "exercise_pause_resume": "Resume",
   "exercise_pause_leave": "Leave the attempt",
-  "exercise_pause_leave_note": "A left attempt is not recorded."
+  "exercise_pause_leave_note": "A left attempt is not recorded.",
+  "exercise_pace_label": "Pace {spm} SPM · step {step} of {steps}"
 }

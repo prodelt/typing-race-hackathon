@@ -1,4 +1,5 @@
 import { useParams, useSearch } from '@tanstack/react-router'
+import { scaleById } from '@typing-race/curriculum'
 import type { AttemptMode } from '@typing-race/domain'
 import { useDerived } from '../../app/state/index.js'
 import { m } from '../../paraglide/messages.js'
@@ -14,11 +15,12 @@ import { BackToPath, ExerciseSession } from './ExerciseSession.js'
 export function ExerciseScreen() {
   const params = useParams({ strict: false })
   const search = useSearch({ strict: false })
-  const { catalogue } = useDerived()
+  const { layout } = useDerived()
 
   // `mode` arrives already narrowed by the route's `validateSearch`; this only narrows the type.
   const mode: AttemptMode = search.mode === 'test' ? 'test' : 'practice'
-  const scale = catalogue.find((candidate) => candidate.id === params.scaleId)
+  // An authored scale, or a Transition drill the coach built for this learner.
+  const scale = scaleById(layout, params.scaleId ?? '')
 
   if (scale === undefined) {
     return (

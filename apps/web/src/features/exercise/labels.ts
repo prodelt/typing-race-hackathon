@@ -54,7 +54,7 @@ export function glyphFor(char: string): string {
 
 export function focusLabel(focus: FocusElement): string {
   if (focus.kind === 'key') {
-    const key = focus.value === SHIFT_TOKEN ? 'Shift' : displayChar(focus.value)
+    const key = focus.value === SHIFT_TOKEN ? 'Shift' : glyphFor(focus.value)
     return m.exercise_focus_key({ key })
   }
   const parsed = parseTransitionKey(focus.value)

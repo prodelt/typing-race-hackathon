@@ -37,12 +37,39 @@ function columnPairs(context: GeneratorContext): [Key, Key][] {
 }
 
 /**
+ * The three-row chains: for each home key, its top-row and bottom-row partners on the same finger,
+ * provided all three are available. `фйфяф` is the ф column walked home → top → home → bottom →
+ * home, one finger leaving the home row upward, coming back, leaving downward and coming back.
+ */
+function columnChains(context: GeneratorContext): string[] {
+  const pairs = columnPairs(context)
+  const reachOf = (home: Key, row: Key['row']) =>
+    pairs.find(([h, reach]) => h === home && reach.row === row)?.[1]
+  const homes = [...new Set(pairs.map(([home]) => home))]
+  return homes.flatMap((home) => {
+    const top = reachOf(home, 'top')
+    const bottom = reachOf(home, 'bottom')
+    if (top === undefined || bottom === undefined) return []
+    const h = home.plain
+    return [`${h}${top.plain}${h}${bottom.plain}${h}`]
+  })
+}
+
+/**
  * `vertical` — each home key paired with the key above it on the same finger, then with the one
- * below (R6). Punctuation keys on the top and bottom rows are left to `modifiers`. With no top- or
- * bottom-row key available there is no pair at all, so the pool is empty and the scale is not
- * offered, as R6 requires.
+ * below (R6), and, once a column's top and bottom keys are both open, the whole column as one
+ * home → top → bottom chain. Punctuation keys on the top and bottom rows are left to `modifiers`.
+ * With no top- or bottom-row key available there is no pair at all, so the pool is empty and the
+ * scale is not offered, as R6 requires.
+ *
+ * A chain that already contains the Focus Element is used as it is; any other chain carries the
+ * Focus Element on its end, like the pairs do, so every item still exercises it.
  */
 export const vertical: Generator = (context) => {
   const pairs = columnPairs(context).map(([home, reach]) => `${home.plain}${reach.plain}`)
-  return context.forms.flatMap((form) => pairs.map((pair) => `${pair}${pair}${form}`))
+  const chains = columnChains(context)
+  return context.forms.flatMap((form) => [
+    ...pairs.map((pair) => `${pair}${pair}${form}`),
+    ...chains.map((chain) => (chain.includes(form) ? chain : `${chain}${form}`)),
+  ])
 }

@@ -11,6 +11,7 @@ import {
   toSummary,
   transitionAggregates,
 } from '../progress/fixtures'
+import { transitionScale } from '../scales/transitions'
 import { nextAction } from './next-action'
 import { renderReference, substitute } from './templates'
 
@@ -159,9 +160,20 @@ describe('priority 2: the weakest Transition with enough samples', () => {
     })
   })
 
-  it('falls through when no scale can be started for any weak Transition', () => {
+  it('builds the drill on demand when no authored scale focuses on the weak Transition', () => {
     const noTransitionScales = catalogue.filter((s) => s.focus.kind === 'key')
-    expect(run([withFG(4)], 'uk', noTransitionScales).rule).toBe('nextKey')
+    const action = run([withFG(4)], 'uk', noTransitionScales)
+    expect(action.rule).toBe('weakTransition')
+    expect(action.startsScaleId).toBe(transitionScale(makeLayout('uk'), 'f>g')?.id)
+    expect(action.startsScaleId).toBe('yq.transition.KeyF-KeyG')
+  })
+
+  it('falls through when a weak Transition uses a key that is still locked', () => {
+    const noTransitionScales = catalogue.filter((s) => s.focus.kind === 'key')
+    const locked = toSummary(makeAttempt({ aggregates: transitionAggregates('g', ';', 6, 4) }))
+    const { progress } = setup('uk', [locked], noTransitionScales)
+    expect(progress.unlockedSet).not.toContain(';')
+    expect(run([locked], 'uk', noTransitionScales).rule).toBe('nextKey')
   })
 
   it('weights same-finger Transitions up for Ukrainian, not for English (FR-033)', () => {

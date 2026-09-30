@@ -30,7 +30,7 @@
   "path_where_stage": "Стадія",
   "path_where_stage_value": "Стадія {n}: гами на відкритих клавішах",
   "path_where_level": "Рівень",
-  "path_level_introduction": "Вступ",
+  "path_level_introduction": "Ознайомлення",
   "path_where_keys": "Відкрито клавіш",
   "path_where_keys_value": "{unlocked} з {total}",
   "path_where_streak": "Серія цієї вправи",
@@ -83,5 +83,6 @@
   "path_review_finger": "{hand}, {finger}",
   "path_review_practise": "Потренувати",
   "path_review_no_drill": "окремої вправи ще немає",
-  "path_review_threshold": "Перехід називається лише після {samples} спостережень."
+  "path_review_threshold": "Перехід називається лише після {samples} спостережень.",
+  "path_key_space": "пробіл"
 }

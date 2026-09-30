@@ -129,11 +129,17 @@ export interface Scale {
 
 export interface Level {
   readonly id: string
-  /** `null` in the Introduction band: no speed requirement, and speed never gates — FR-040. */
-  readonly spmBenchmark: { readonly min: number; readonly max: number } | null
+  /** The band's name in each interface language, straight from the level config. */
+  readonly name: Readonly<Record<Language, string>>
+  /**
+   * `null` in the Introduction band: no speed benchmark. `max: null` is an open-ended top band
+   * ("300+"). A benchmark only — speed never gates mastery.
+   */
+  readonly spmBenchmark: { readonly min: number; readonly max: number | null } | null
   /** A fraction in [0, 1]. Introduction is `0.95`. */
   readonly accuracyFloor: number
-  readonly goal: string
+  /** The band's main goal in each interface language. */
+  readonly goal: Readonly<Record<Language, string>>
 }
 
 // ---------------------------------------------------------------------------------------------

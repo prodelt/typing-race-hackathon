@@ -3,5 +3,6 @@ export {
   levelFor,
   levelForStage,
   levels,
+  parseLevels,
   passes,
 } from './table'

@@ -1,0 +1,43 @@
+{
+  "$comment": "The requirements' level table. Edit values here and nowhere else: the Mastery Rule, the coach and the Formulas page all read this file. `spm: null` means no speed benchmark; `spm.max: null` means open-ended (300+). Speed is a benchmark and never gates mastery.",
+  "levels": [
+    {
+      "id": "introduction",
+      "name": { "uk": "Ознайомлення", "en": "Introduction" },
+      "spm": null,
+      "accuracyFloor": 0.95,
+      "goal": {
+        "uk": "правильний палець і повернення на домашній ряд",
+        "en": "the right finger and a return to the home row"
+      }
+    },
+    {
+      "id": "basic",
+      "name": { "uk": "Базовий", "en": "Basic" },
+      "spm": { "min": 100, "max": 150 },
+      "accuracyFloor": 0.96,
+      "goal": { "uk": "стабільна механіка", "en": "steady mechanics" }
+    },
+    {
+      "id": "confident",
+      "name": { "uk": "Впевнений", "en": "Confident" },
+      "spm": { "min": 150, "max": 225 },
+      "accuracyFloor": 0.97,
+      "goal": { "uk": "слова й типові переходи", "en": "words and common transitions" }
+    },
+    {
+      "id": "working",
+      "name": { "uk": "Робочий", "en": "Working" },
+      "spm": { "min": 225, "max": 300 },
+      "accuracyFloor": 0.97,
+      "goal": { "uk": "зв’язний текст і рівний ритм", "en": "connected text and an even rhythm" }
+    },
+    {
+      "id": "fast",
+      "name": { "uk": "Швидкісний", "en": "Fast" },
+      "spm": { "min": 300, "max": null },
+      "accuracyFloor": 0.98,
+      "goal": { "uk": "темп без втрати точності", "en": "pace without losing accuracy" }
+    }
+  ]
+}

@@ -50,7 +50,7 @@
   "formulas_speed_range": "{min}–{max} SPM",
   "formulas_status_in_force": "in force for all of Stage 1",
   "formulas_status_informational": "informational",
-  "formulas_levels_note": "Only the Introduction level is in force today: the level follows the stage, not the speed, so no gain in speed raises the accuracy floor. The benchmarks of the later levels are informational: they gate nothing and will be refined when their stages exist.",
+  "formulas_levels_note": "The table is read from one config file (packages/curriculum/src/levels/levels.json), so its values change without touching code. Only the Introduction level is in force today: the level follows the stage, not the speed, so no gain in speed raises the accuracy floor. The speed benchmarks are informational and gate nothing.",
   "formulas_mastery_title": "The Mastery Rule",
   "formulas_mastery_body": "An exercise is mastered when three test attempts in a row reach at least the level’s accuracy floor. An attempt below the floor resets the count to zero. A practice attempt never counts.",
   "formulas_stage1_title": "Completing Stage 1",
@@ -70,5 +70,7 @@
   "formulas_conf_timing": "Timing comes from correct keystrokes only: the interval before a wrong key measures hesitation, which the miss already counts. A mean interval of zero gets the full speed factor.",
   "formulas_conf_unmeasured": "Fewer than {min} weighted observations means there is no value, not a value of zero: a key never pressed is not “zero confident”, it is simply unmeasured.",
   "formulas_conf_gates_head": "Confidence gates nothing.",
-  "formulas_conf_gates_body": "It only chooses what to practise and how much guidance the keyboard shows. Mastery is accuracy alone and speed never gates progression, so the speed factor inside confidence smuggles in no speed requirement."
+  "formulas_conf_gates_body": "It only chooses what to practise and how much guidance the keyboard shows. Mastery is accuracy alone and speed never gates progression, so the speed factor inside confidence smuggles in no speed requirement.",
+  "formulas_col_goal": "Main goal",
+  "formulas_speed_open": "{min}+ SPM"
 }
