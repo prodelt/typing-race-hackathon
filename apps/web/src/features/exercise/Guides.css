@@ -1,0 +1,56 @@
+/*
+ * The Practice Attempt's guides (T088, T089). Written to by KeyboardGuide and NextKey through
+ * `data-*` attributes, the same imperative way the typing line is (FR-069).
+ *
+ * None of this exists in a Test Attempt: those components are not rendered at all (FR-037).
+ */
+
+/* Unlayered, so it beats the Tailwind utilities on Keycap without !important. The awaited keycap: a ring in the finger's own ink, which is the keycap's text colour. */
+.kb-key[data-awaited="true"] {
+  opacity: 1;
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+  transform: scale(1.06);
+}
+
+.finger-bar {
+  background-color: var(--finger-tint);
+  border: 1px solid var(--finger-line);
+  border-radius: 999px;
+  transition: background-color var(--dur-quick) var(--ease-standard);
+}
+
+.finger-bar[data-active="true"] {
+  background-color: var(--finger-ink);
+  border-color: var(--finger-ink);
+}
+
+.finger-bar[data-kind="pinky"] {
+  --finger-ink: var(--color-finger-pinky-ink);
+  --finger-tint: var(--color-finger-pinky-tint);
+  --finger-line: var(--color-finger-pinky-line);
+}
+
+.finger-bar[data-kind="ring"] {
+  --finger-ink: var(--color-finger-ring-ink);
+  --finger-tint: var(--color-finger-ring-tint);
+  --finger-line: var(--color-finger-ring-line);
+}
+
+.finger-bar[data-kind="middle"] {
+  --finger-ink: var(--color-finger-middle-ink);
+  --finger-tint: var(--color-finger-middle-tint);
+  --finger-line: var(--color-finger-middle-line);
+}
+
+.finger-bar[data-kind="index"] {
+  --finger-ink: var(--color-finger-index-ink);
+  --finger-tint: var(--color-finger-index-tint);
+  --finger-line: var(--color-finger-index-line);
+}
+
+.finger-bar[data-kind="thumb"] {
+  --finger-ink: var(--color-finger-thumb-ink);
+  --finger-tint: var(--color-finger-thumb-tint);
+  --finger-line: var(--color-finger-thumb-line);
+}

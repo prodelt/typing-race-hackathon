@@ -6,7 +6,6 @@ import { createRoot } from 'react-dom/client'
 import { buildRouteTree } from './app/router.js'
 import { DEFAULT_SETTINGS, useAppStore } from './app/state/index.js'
 import { applyPresentation, readEnvironment, watchSystemPreferences } from './app/theme.js'
-import { FormulasPage } from './features/formulas/index.js'
 import { ProductPage } from './features/product/index.js'
 import { installLatencyProbe } from './instrument/latency.js'
 
@@ -34,7 +33,7 @@ watchSystemPreferences((next) => {
 installLatencyProbe()
 
 const router = createRouter({
-  routeTree: buildRouteTree({ product: ProductPage, formulas: FormulasPage }),
+  routeTree: buildRouteTree({ product: ProductPage }),
   defaultPreload: 'intent',
 })
 

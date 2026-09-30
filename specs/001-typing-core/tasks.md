@@ -194,15 +194,15 @@ the first and absent in the second, and both attempts reach completion.
 - [X] T081 [US1] `ignored`-event handling in `packages/engine/src/machine.ts` for modifiers, input-method events and dead keys — recorded in the log, consuming nothing, counting nothing (FR-020)
 - [X] T082 [US1] Focus-loss and pause time accounting in `packages/engine/src/clock-accounting.ts`, so `elapsedMs` excludes time away
 - [X] T083 [US1] Keystroke Event Log encoding into parallel arrays in `packages/engine/src/log.ts`, with `formatVersion` — append-only, and the sole source every metric is derived from (FR-019)
-- [ ] T084 [US1] The pre-start screen E1 in `apps/web/src/features/exercise/PreStart.tsx` — the layout and character check with the required layout named (FR-021), and **the one goal this scale serves shown to the learner** (FR-010); repeating any unlocked exercise starts here (FR-045)
-- [ ] T085 [US1] The typing screen in `apps/web/src/features/exercise/TypingScreen.tsx`: the 276 px left rail plus a single scrolling line at the configured size, the line vertically centred with edge fades and the same vertical position in every exercise type (FR-058)
-- [ ] T086 [US1] The typing line in `apps/web/src/features/exercise/TypingLine.tsx`: in-place error mark — colour, tint, 3 px underline on the awaited character, caret held, nothing moving; CSS-only animation of caret and judged character; shake and nudge forbidden (FR-015, FR-016, FR-065)
-- [ ] T087 [US1] The rail in `apps/web/src/features/exercise/Rail.tsx`: session blocks, the one next action, and the 2×2 live-metric grid **frozen for the duration of an attempt**, showing the last completed exercise (FR-059) — including what it shows when there is no previous exercise
-- [ ] T088 [US1] The on-screen keyboard guide in `apps/web/src/features/exercise/KeyboardGuide.tsx`: the full layout in finger colours, fading across confidence tiers, the letter staying full-contrast ink in every tier, and colour never the sole carrier of a finger's identity (FR-060, FR-061)
-- [ ] T089 [US1] The next-key card and the finger diagram in `apps/web/src/features/exercise/NextKey.tsx` — the only element that names the finger without naming a key
-- [ ] T090 [US1] Zero-peek in `apps/web/src/features/exercise/TypingScreen.tsx`: in a Test Attempt the four guides of FR-037 are **not rendered at all**, while time, error count and progress remain
-- [ ] T091 [US1] The Escape pause in `apps/web/src/features/exercise/PauseOverlay.tsx`, naming the finger for the last error — never shown inline while the attempt runs (FR-022)
-- [ ] T092 [US1] Mode switching in `apps/web/src/features/exercise/ModeToggle.tsx`: the Test Attempt becomes the primary action once a Practice Attempt clears the floor (FR-036)
+- [X] T084 [US1] The pre-start screen E1 in `apps/web/src/features/exercise/PreStart.tsx` — the layout and character check with the required layout named (FR-021), and **the one goal this scale serves shown to the learner** (FR-010); repeating any unlocked exercise starts here (FR-045)
+- [X] T085 [US1] The typing screen in `apps/web/src/features/exercise/TypingScreen.tsx`: the 276 px left rail plus a single scrolling line at the configured size, the line vertically centred with edge fades and the same vertical position in every exercise type (FR-058)
+- [X] T086 [US1] The typing line in `apps/web/src/features/exercise/TypingLine.tsx`: in-place error mark — colour, tint, 3 px underline on the awaited character, caret held, nothing moving; CSS-only animation of caret and judged character; shake and nudge forbidden (FR-015, FR-016, FR-065)
+- [X] T087 [US1] The rail in `apps/web/src/features/exercise/Rail.tsx`: session blocks, the one next action, and the 2×2 live-metric grid **frozen for the duration of an attempt**, showing the last completed exercise (FR-059) — including what it shows when there is no previous exercise
+- [X] T088 [US1] The on-screen keyboard guide in `apps/web/src/features/exercise/KeyboardGuide.tsx`: the full layout in finger colours, fading across confidence tiers, the letter staying full-contrast ink in every tier, and colour never the sole carrier of a finger's identity (FR-060, FR-061)
+- [X] T089 [US1] The next-key card and the finger diagram in `apps/web/src/features/exercise/NextKey.tsx` — the only element that names the finger without naming a key
+- [X] T090 [US1] Zero-peek in `apps/web/src/features/exercise/TypingScreen.tsx`: in a Test Attempt the four guides of FR-037 are **not rendered at all**, while time, error count and progress remain
+- [X] T091 [US1] The Escape pause in `apps/web/src/features/exercise/PauseOverlay.tsx`, naming the finger for the last error — never shown inline while the attempt runs (FR-022)
+- [X] T092 [US1] Mode switching in `apps/web/src/features/exercise/ModeToggle.tsx`: the Test Attempt becomes the primary action once a Practice Attempt clears the floor (FR-036)
 
 **Checkpoint**: a learner can type a Stage 1 scale in both languages, in both modes, and the CDP
 layout check passes. This alone is a demonstrable MVP.
@@ -332,7 +332,7 @@ abandoning mid-block keeps the attempts already recorded.
 - [ ] T142 [P] Confirm the 150 KB initial-JS budget holds on the production build, and that the latency gate still passes with every feature merged
 - [ ] T143 [P] Confirm the requirements' §8 checks each have a named passing test, and record the mapping in `quickstart.md`
 - [ ] T144 [P] Walk the §9 demo route end to end on the production build and fix anything that breaks the sequence
-- [ ] T145 [P] Confirm the 1024 px minimum width and the message shown below it (FR-067)
+- [X] T145 [P] Confirm the 1024 px minimum width and the message shown below it (FR-067)
 - [ ] T146 [P] Confirm every F1 PR body carried `Waived: VII — authentication arrives in F2`
 - [ ] T147 Tick the reviewer-owned items in `checklists/core.md` that the merged work has satisfied, and open a ticket for anything still unresolved
 - [ ] T148 Audit every learner-facing and juror-facing string in the product — product page, Path, the typing screen, Formulas — for any claim that the program verifies the learner did not look at the keyboard, and confirm nothing requests camera, microphone or biometric access (FR-038). The requirements forbid claiming technically guaranteed gaze control, and §11 makes a misrepresented capability grounds for rejection
