@@ -65,6 +65,35 @@ Comprehensive domain model and conceptual glossary for the Typing-Race touch-typ
 - **Difficulty Tier (Рівень складності слова)**: A 1–5 grade of a word from its frequency rank and length; same-finger transitions and row changes only order words within a tier.
 - **Scale Catalogue (Каталог гам)**: The authored list of Stage 1 scales — type, fingers, size, tempo — whose text is generated from the finger map of each layout.
 
+## Curriculum Data Model
+
+The five nouns the code uses for the shipped curriculum data. Field-level detail lives in
+[`specs/001-typing-core/data-model.md`](specs/001-typing-core/data-model.md); this is the naming.
+
+- **Layout (Розкладка)**: One keyboard layout as data — its keys, its eight home anchors and its
+  Unlock Order. Two exist: `yq` (ЙЦУКЕН, Ukrainian) and `qwerty` (English). A Layout is generated
+  and shipped, never written at runtime.
+  _Avoid_: keymap, keyboard, locale
+- **Key (Клавіша)**: One physical key in a Layout, carrying its row, hand, exactly one finger, the
+  character it produces plain and shifted, and its kind (letter, digit, punctuation, space,
+  modifier). "Key" is always the physical key; the thing on screen is a **character**.
+  _Avoid_: button, keycap (a keycap is the UI primitive that draws a Key)
+- **Scale (Гама)**: One authored Stage 1 exercise definition — its generator type, Focus Element,
+  fingers, size, optional tempo target and stated goal. **A Scale is not text**: text is produced
+  from `(scale, unlocked set, seed)` by a pure function, so the same three inputs always give the
+  same characters. The set of Scales for one Layout is the [Scale Catalogue](#attempts--adaptation).
+  _Avoid_: lesson, drill, exercise (an *exercise* is a Scale already turned into text)
+- **Level (Рівень)**: A band of the requirements' level table, holding an accuracy floor, an optional
+  speed benchmark and a goal. The Level follows the **stage**, never the learner's speed, and speed
+  never gates progression. In F1 only the `introduction` band is ever in force, so its floor — 95% —
+  is the single threshold the Mastery Rule uses.
+  _Avoid_: rank, tier (a *Difficulty Tier* grades a word, not a learner), grade
+- **Settings (Налаштування)**: The learner's own preferences, stored with their progress: theme,
+  motion, sound, typing text size, error mode, typing language, layout and interface language. The
+  interface language is independent of the typing language — a learner may practise Ukrainian with
+  an English interface.
+  _Avoid_: preferences, config, options
+
 ## Racing & Multiplayer Concepts
 
 - **Race**: A real-time competitive typing sprint where multiple typists type identical snippets.
