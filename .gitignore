@@ -24,6 +24,7 @@ dist/
 build/
 .cache/
 .vite/
+.rolldown/
 *.log
 
 # Test artifacts
@@ -31,6 +32,10 @@ coverage/
 playwright-report/
 blob-report/
 test-results/
+*.tsbuildinfo
+
+# Playwright's downloaded browsers, if ever pointed inside the repository
+.playwright/
 
 # Environment variables — only .env.example is committed
 .env
