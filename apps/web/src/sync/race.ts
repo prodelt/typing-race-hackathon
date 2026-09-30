@@ -8,8 +8,12 @@ import type { KeystrokeEventLog, Language } from '@typing-race/domain'
  * reaches the initial bundle and training never waits on, or breaks because of, the backend.
  *
  * Identity is an anonymous Supabase user with a chosen display name. The session lives in
- * `sessionStorage`, so every tab is its own racer (two windows can race each other), while the
- * chosen name is remembered in `localStorage` and a new tab signs in with it silently.
+ * `localStorage`, because groups and leaderboards need the same learner tomorrow: a group owner who
+ * closed the tab must still own the group, and "my row" must still be theirs. Two racers on one
+ * machine therefore need two browser profiles (or a private window), not two tabs.
+ *
+ * A browser that carries the `typing-race:test-account` flag (the e2e fixtures set it) signs up as
+ * a test account: it races normally and never appears on a board real learners see.
  */
 
 export type RoomState = 'gathering' | 'countdown' | 'running' | 'finished'
@@ -145,30 +149,51 @@ async function reachable(url: string, key: string): Promise<boolean> {
   }
 }
 
-let pending: Promise<RaceBackend | null> | null = null
+let pending: Promise<SupabaseClient | null> | null = null
+let client: SupabaseClient | null = null
 
-/** `null` when the backend is not configured or cannot be reached. Resolved once per page. */
-export function raceBackend(): Promise<RaceBackend | null> {
+/**
+ * The one Supabase client of the page, shared by races, groups and boards, or `null` when the
+ * backend is not configured or cannot be reached. One client, because two would each run their
+ * own session refresh against the same stored session.
+ */
+export function supabaseClient(): Promise<SupabaseClient | null> {
+  if (client !== null) return Promise.resolve(client)
   pending ??= (async () => {
     const env = configured()
     if (env === null || !(await reachable(env.url, env.key))) return null
-    return createBackend(
-      createClient(env.url, env.key, {
-        auth: {
-          storage: safeStorage('session'),
-          storageKey: 'typing-race:race-auth',
-          persistSession: true,
-          autoRefreshToken: true,
-        },
-      }),
-    )
+    client ??= createClient(env.url, env.key, {
+      auth: {
+        storage: safeStorage('local'),
+        storageKey: 'typing-race:race-auth',
+        persistSession: true,
+        autoRefreshToken: true,
+      },
+    })
+    return client
   })()
   const current = pending
   // A failed probe is retried on the next visit rather than remembered for the whole page.
-  void current.then((backend) => {
-    if (backend === null && pending === current) pending = null
+  void current.then((found) => {
+    if (found === null && pending === current) pending = null
   })
   return current
+}
+
+let backend: RaceBackend | null = null
+
+/** `null` when the backend is not configured or cannot be reached. */
+export async function raceBackend(): Promise<RaceBackend | null> {
+  const found = await supabaseClient()
+  if (found === null) return null
+  backend ??= createBackend(found)
+  return backend
+}
+
+const TEST_ACCOUNT_KEY = 'typing-race:test-account'
+
+function testAccount(): boolean {
+  return safeStorage('local')?.getItem(TEST_ACCOUNT_KEY) === '1'
 }
 
 function createBackend(client: SupabaseClient): RaceBackend {
@@ -201,7 +226,7 @@ function createBackend(client: SupabaseClient): RaceBackend {
 
     async signIn(nickname) {
       const { data, error } = await client.auth.signInAnonymously({
-        options: { data: { nickname } },
+        options: { data: testAccount() ? { nickname, is_test: true } : { nickname } },
       })
       if (error || !data.user) fail(error, 'network')
       safeStorage('local')?.setItem(NAME_KEY, nickname)

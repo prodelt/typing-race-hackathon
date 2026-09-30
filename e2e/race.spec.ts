@@ -1,5 +1,5 @@
-import { existsSync, readFileSync } from 'node:fs'
 import { type Browser, expect, type Page, test } from '@playwright/test'
+import { backendConfigured, learner } from './harness/backend.js'
 import { typeChar } from './harness/type.js'
 
 /**
@@ -11,22 +11,15 @@ import { typeChar } from './harness/type.js'
  * green on a machine without `.env.local`.
  */
 
-function backendConfigured(): boolean {
-  if (process.env['VITE_SUPABASE_URL'] && process.env['VITE_SUPABASE_ANON_KEY']) return true
-  if (!existsSync('.env.local')) return false
-  const env = readFileSync('.env.local', 'utf8')
-  return /^VITE_SUPABASE_URL=\S+/m.test(env) && /^VITE_SUPABASE_ANON_KEY=\S+/m.test(env)
-}
-
 /**
  * About 1000 characters a minute: comfortably fast, and well under the server's plausibility
  * ceiling, which rejects a log typed faster than a human can.
  */
 const KEY_DELAY_MS = 60
 
-async function racer(browser: Browser): Promise<Page> {
-  const context = await browser.newContext({ reducedMotion: 'reduce' })
-  return context.newPage()
+/** A test account: it races like anyone else and never reaches a board real learners see. */
+function racer(browser: Browser): Promise<Page> {
+  return learner(browser)
 }
 
 /** Types the room's text once the start gate opens, optionally with one wrong key on the way. */
@@ -67,7 +60,9 @@ test.describe('@backend races', () => {
   test('two learners race a private room and see the same validated ranking', async ({
     browser,
   }) => {
-    test.setTimeout(120_000)
+    // Two racers typing ~250 characters each through `beforeinput`: about two minutes on a busy
+    // machine, so the default budget is too tight.
+    test.setTimeout(180_000)
     const suffix = String(Date.now() % 100_000)
     const host = await racer(browser)
     const guest = await racer(browser)

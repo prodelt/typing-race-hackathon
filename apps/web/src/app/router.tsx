@@ -137,6 +137,44 @@ const raceJoinRoute = createRoute({
   component: lazyRouteComponent(() => import('../features/race/index.js'), 'JoinScreen'),
 })
 
+/** Groups and leaderboards. Lazy, and sharing the races' Supabase client and identity. */
+const groupsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/groups',
+  component: lazyRouteComponent(() => import('../features/groups/index.js'), 'GroupsScreen'),
+})
+
+const groupRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/groups/$groupId',
+  component: lazyRouteComponent(() => import('../features/groups/index.js'), 'GroupScreen'),
+})
+
+const groupJoinRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/groups/join/$code',
+  component: lazyRouteComponent(() => import('../features/groups/index.js'), 'GroupJoinScreen'),
+})
+
+const leaderboardsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/leaderboards',
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): { scope?: 'group' | 'week' | 'all'; layout?: 'yq' | 'qwerty'; group?: string } => {
+    const { scope, layout, group } = search
+    return {
+      ...(scope === 'group' || scope === 'week' || scope === 'all' ? { scope } : {}),
+      ...(layout === 'yq' || layout === 'qwerty' ? { layout } : {}),
+      ...(typeof group === 'string' && /^[0-9a-f-]{36}$/.test(group) ? { group } : {}),
+    }
+  },
+  component: lazyRouteComponent(
+    () => import('../features/leaderboards/index.js'),
+    'LeaderboardsScreen',
+  ),
+})
+
 /**
  * The public pages are reachable without a learner. Everything else is behind sign-in from F2
  * onward; in F1 there is no sign-in, and `plan.md`'s waiver records why.
@@ -172,6 +210,10 @@ export function buildRouteTree(pages: { readonly product: FunctionComponent }) {
     racesRoute,
     raceRoomRoute,
     raceJoinRoute,
+    groupsRoute,
+    groupRoute,
+    groupJoinRoute,
+    leaderboardsRoute,
   ])
 }
 

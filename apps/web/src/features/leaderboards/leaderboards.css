@@ -1,0 +1,459 @@
+/*
+ * Leaderboards, read like a race results board: a live red panel names the board and holds its
+ * switches; below it the places are set in huge Unbounded numerals, the podium is given weight by
+ * size alone (first in red, the next two in ink), and the learner's own row is the one red row.
+ * Colours are tokens only; motion is transform and opacity on token durations.
+ */
+
+.lb {
+  display: grid;
+  gap: clamp(24px, 3vw, 40px);
+  padding-block: 8px 64px;
+  color: var(--color-ink);
+}
+
+@keyframes lb-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ---- The panel ---------------------------------------------------------------------------- */
+
+.lb-panel {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: grid;
+  gap: 22px;
+  padding: clamp(24px, 2.6vw, 36px) clamp(24px, 3.4vw, 48px);
+  border-radius: 0 var(--radius-panel) 0 0;
+  color: var(--color-on-accent);
+  background: var(--color-accent-deep);
+  animation: lb-rise var(--dur-reveal) var(--ease-enter) both;
+}
+
+.lb-panel::before {
+  content: "";
+  position: absolute;
+  inset: -20%;
+  z-index: -1;
+  background:
+    radial-gradient(50% 60% at 88% 12%, var(--color-accent) 0%, transparent 70%),
+    radial-gradient(45% 55% at 8% 92%, var(--color-accent) 0%, transparent 75%);
+  animation: lb-drift 16s var(--ease-in-out) infinite alternate;
+}
+
+@keyframes lb-drift {
+  to {
+    transform: translate3d(-8%, 6%, 0) scale(1.1);
+  }
+}
+
+:root[data-motion="reduced"] .lb-panel::before {
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lb-panel::before {
+    animation: none;
+  }
+}
+
+.lb-panel__top {
+  display: grid;
+  grid-template-columns: minmax(0, auto) minmax(0, 1fr);
+  align-items: end;
+  gap: 16px clamp(24px, 4vw, 64px);
+}
+
+.lb-panel__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(48px, 5.6vw, 96px);
+  font-weight: 700;
+  line-height: 0.9;
+  letter-spacing: -0.05em;
+}
+
+.lb-panel__lede {
+  display: grid;
+  gap: 4px;
+  max-width: 40ch;
+  margin: 0;
+  padding-bottom: 8px;
+  font-family: var(--font-ui);
+  font-size: clamp(15px, 1.2vw, 18px);
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.lb-panel__since {
+  font-size: 0.875rem;
+  opacity: 0.8;
+}
+
+.lb-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 20px;
+}
+
+/* Segmented pills on red: outlined white, filled white when chosen. */
+.lb-seg {
+  min-width: 0;
+  margin: 0;
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 4px;
+  border: var(--border-hairline) solid color-mix(in srgb, var(--color-on-accent) 45%, transparent);
+  border-radius: var(--radius-pill);
+}
+
+.lb-seg__btn {
+  min-height: 40px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-on-accent);
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color var(--dur-base) var(--ease-enter),
+    color var(--dur-base) var(--ease-enter);
+}
+
+.lb-seg__btn:hover {
+  background: color-mix(in srgb, var(--color-on-accent) 14%, transparent);
+}
+
+.lb-seg__btn[aria-pressed="true"] {
+  background: var(--color-on-accent);
+  color: var(--color-accent-deep);
+}
+
+.lb-seg--layout .lb-seg__btn {
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+}
+
+.lb-seg__btn:focus-visible,
+.lb-select select:focus-visible {
+  outline: 3px solid var(--color-on-accent);
+  outline-offset: 2px;
+}
+
+.lb-select select {
+  min-height: 48px;
+  max-width: 280px;
+  padding: 0 40px 0 18px;
+  border: var(--border-hairline) solid var(--color-on-accent);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-on-accent);
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.lb-select option {
+  color: var(--color-ink);
+  background: var(--color-paper-raised);
+}
+
+/* The group this board belongs to, beside the switches; it opens the group page. */
+.lb-context {
+  font-family: var(--font-display);
+  font-size: clamp(16px, 1.4vw, 20px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--color-on-accent);
+  text-decoration: none;
+  border-bottom: 2px solid color-mix(in srgb, var(--color-on-accent) 60%, transparent);
+}
+
+.lb-context:hover {
+  border-bottom-color: var(--color-on-accent);
+}
+
+.lb-context:focus-visible {
+  outline: 3px solid var(--color-on-accent);
+  outline-offset: 3px;
+}
+
+/* ---- The board ---------------------------------------------------------------------------- */
+
+.lb-boardwrap {
+  display: grid;
+}
+
+.lb-heads,
+.lb-row {
+  display: grid;
+  grid-template-columns: clamp(88px, 11vw, 168px) minmax(0, 1fr) 132px 112px 88px;
+  align-items: center;
+  gap: 20px;
+}
+
+.lb-heads {
+  padding: 0 16px 10px 0;
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-muted);
+}
+
+.lb-heads__num {
+  text-align: right;
+}
+
+.lb-board {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 2px solid var(--color-ink);
+}
+
+.lb-row {
+  position: relative;
+  min-height: 84px;
+  padding: 12px 16px 12px 0;
+  border-bottom: var(--border-hairline) solid var(--color-hairline);
+  font-family: var(--font-ui);
+  animation: lb-rise var(--dur-slow) var(--ease-enter) both;
+  animation-delay: calc(var(--stagger-tile) * var(--i, 0));
+}
+
+.lb-row__place {
+  font-family: var(--font-display);
+  font-size: 48px;
+  font-weight: 800;
+  line-height: 0.85;
+  letter-spacing: -0.06em;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-ink-faint);
+}
+
+.lb-row__who {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.lb-row__name {
+  font-family: var(--font-display);
+  font-size: clamp(18px, 1.8vw, 24px);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lb-row__sub {
+  display: flex;
+  gap: 10px;
+  font-size: 0.8rem;
+  color: var(--color-muted);
+}
+
+.lb-row__you {
+  font-weight: 700;
+  color: var(--color-terracotta-ink);
+}
+
+.lb-row__fig {
+  display: grid;
+  justify-items: end;
+}
+
+.lb-row__fig strong {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.lb-row__fig span {
+  font-size: 0.75rem;
+  color: var(--color-muted);
+}
+
+.lb-row__fig--spm strong {
+  font-size: 30px;
+}
+
+.lb-row__date {
+  font-size: 0.875rem;
+  text-align: right;
+  color: var(--color-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The podium: weight by size. First in red, the next two in ink. */
+.lb-row--p1,
+.lb-row--p2,
+.lb-row--p3 {
+  min-height: 112px;
+}
+
+.lb-row--p1 {
+  min-height: 148px;
+}
+
+.lb-row--p1 .lb-row__place {
+  font-size: clamp(96px, 9.5vw, 144px);
+  color: var(--color-accent);
+}
+
+.lb-row--p2 .lb-row__place,
+.lb-row--p3 .lb-row__place {
+  font-size: clamp(68px, 6.5vw, 96px);
+  color: var(--color-ink);
+}
+
+.lb-row--p1 .lb-row__name {
+  font-size: clamp(26px, 3vw, 44px);
+  letter-spacing: -0.04em;
+}
+
+.lb-row--p2 .lb-row__name,
+.lb-row--p3 .lb-row__name {
+  font-size: clamp(22px, 2.3vw, 32px);
+}
+
+.lb-row--p1 .lb-row__fig--spm strong {
+  font-size: clamp(36px, 3.4vw, 52px);
+}
+
+.lb-row--p2 .lb-row__fig--spm strong,
+.lb-row--p3 .lb-row__fig--spm strong {
+  font-size: clamp(30px, 2.6vw, 40px);
+}
+
+/* The learner's own row: the one red row on the board. */
+.lb-row--me {
+  border-bottom-color: transparent;
+  border-radius: 0 var(--radius-card) 0 0;
+  color: var(--color-on-accent);
+  background: linear-gradient(100deg, var(--color-accent-deep), var(--color-accent));
+}
+
+.lb-row--me .lb-row__place,
+.lb-row--me .lb-row__you,
+.lb-row--me .lb-row__sub,
+.lb-row--me .lb-row__fig span,
+.lb-row--me .lb-row__date {
+  color: var(--color-on-accent);
+}
+
+.lb-row--me .lb-row__sub,
+.lb-row--me .lb-row__fig span,
+.lb-row--me .lb-row__date {
+  opacity: 0.85;
+}
+
+.lb-skeleton {
+  height: 84px;
+  margin-top: 10px;
+  border-radius: var(--radius-card);
+  background: var(--color-paper-deep);
+}
+
+.lb-empty {
+  display: grid;
+  justify-items: start;
+  gap: 20px;
+  padding: 40px 0 16px;
+  border-top: 2px solid var(--color-ink);
+}
+
+.lb-empty p {
+  max-width: 56ch;
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: clamp(17px, 1.4vw, 21px);
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+.lb-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.lb-honest {
+  max-width: 76ch;
+  margin: 0;
+  padding-left: 16px;
+  border-left: 4px solid var(--color-accent);
+  font-family: var(--font-ui);
+  line-height: 1.5;
+  color: var(--color-ink-soft);
+}
+
+@media (max-width: 900px) {
+  .lb-panel__top {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .lb-heads,
+  .lb-row {
+    grid-template-columns: 72px minmax(0, 1fr) 88px 84px;
+    gap: 12px;
+  }
+
+  .lb-heads__date,
+  .lb-row__date {
+    display: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .lb-heads {
+    display: none;
+  }
+
+  .lb-row {
+    grid-template-columns: 56px minmax(0, 1fr) auto;
+  }
+
+  .lb-row > .lb-row__fig:not(.lb-row__fig--spm) {
+    display: none;
+  }
+
+  .lb-row--p1 .lb-row__place {
+    font-size: 72px;
+  }
+
+  .lb-row--p2 .lb-row__place,
+  .lb-row--p3 .lb-row__place {
+    font-size: 56px;
+  }
+}
+
+/* The column heads carry the units where they are shown; the rows repeat them only on phones. */
+@media (min-width: 561px) {
+  .lb-row__fig span {
+    display: none;
+  }
+}

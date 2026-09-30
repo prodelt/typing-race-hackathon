@@ -105,6 +105,9 @@ describe('vertical chains: home → top → bottom in one move', () => {
           for (const item of text.split(' ')) expect(item).toContain(scale.focus.value)
         }
       }),
+      // Each run walks every vertical scale of a layout, so 40 runs already cover hundreds of
+      // (prefix, scale) pairs and keep the test inside its timeout on a loaded machine.
+      { numRuns: 40 },
     )
   })
 

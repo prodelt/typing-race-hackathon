@@ -35,7 +35,7 @@ const DESTINATIONS: Destination[] = [
   { to: '/academy', label: m.academy_nav },
   { to: '/review', label: m.nav_review, later: true },
   { to: '/races', label: m.nav_races },
-  { to: '/leaderboards', label: m.nav_leaderboards, later: true },
+  { to: '/leaderboards', label: m.nav_leaderboards },
   { to: '/statistics', label: m.nav_statistics, later: true },
 ]
 

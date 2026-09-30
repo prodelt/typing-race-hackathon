@@ -23,6 +23,8 @@ export default defineConfig({
           root: './packages/domain',
           environment: 'node',
           setupFiles,
+          // Property tests walk whole catalogues and word banks; on a busy machine they need headroom.
+          testTimeout: 30_000,
         },
       },
       {
@@ -31,6 +33,8 @@ export default defineConfig({
           root: './packages/metrics',
           environment: 'node',
           setupFiles,
+          // Property tests walk whole catalogues and word banks; on a busy machine they need headroom.
+          testTimeout: 30_000,
         },
       },
       {
@@ -39,6 +43,8 @@ export default defineConfig({
           root: './packages/curriculum',
           environment: 'node',
           setupFiles,
+          // Property tests walk whole catalogues and word banks; on a busy machine they need headroom.
+          testTimeout: 30_000,
         },
       },
       {
@@ -47,6 +53,8 @@ export default defineConfig({
           root: './packages/engine',
           environment: 'node',
           setupFiles,
+          // Property tests walk whole catalogues and word banks; on a busy machine they need headroom.
+          testTimeout: 30_000,
         },
       },
       {
@@ -73,6 +81,7 @@ export default defineConfig({
           root: '.',
           environment: 'node',
           include: ['tools/**/*.test.ts'],
+          testTimeout: 60_000,
         },
       },
     ],

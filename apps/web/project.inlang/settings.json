@@ -16,7 +16,8 @@
       "./messages/settings/{locale}.json",
       "./messages/session/{locale}.json",
       "./messages/races/{locale}.json",
-      "./messages/academy/{locale}.json"
+      "./messages/academy/{locale}.json",
+      "./messages/community/{locale}.json"
     ]
   }
 }
