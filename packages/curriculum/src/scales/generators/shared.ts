@@ -13,6 +13,33 @@ export function anchorKeys(context: GeneratorContext): Key[] {
 }
 
 /**
+ * The available home-row characters in physical left-to-right order: the anchors plus whichever
+ * home-row letters the learner has opened. This is why a learner who has unlocked `g` gets `dfgh`
+ * without a generator of their own.
+ */
+export function homeRowChars(context: GeneratorContext): string[] {
+  const { layout } = context
+  return layout.keys
+    .filter(
+      (key) =>
+        key.row === 'home' &&
+        (key.kind === 'letter' || layout.homeAnchors.includes(key.plain)) &&
+        isAvailable(context, key),
+    )
+    .map((key) => key.plain)
+}
+
+/**
+ * Every window of `size` consecutive characters, in order. Empty when the list is shorter than the
+ * window, so a caller never has to check a length before sliding.
+ */
+export function windowsOf(chars: readonly string[], size: number): string[] {
+  return Array.from({ length: Math.max(0, chars.length - (size - 1)) }, (_, start) =>
+    chars.slice(start, start + size).join(''),
+  )
+}
+
+/**
  * The anchor pairs that share a finger name across the hands, outermost first: the two pinkies,
  * then the two rings, the two middles and the two indexes. Keys are in physical order, so the left
  * hand reads pinky → index and the right hand, read backwards, reads pinky → index too.

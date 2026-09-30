@@ -1,5 +1,8 @@
 import type { Generator } from '../types'
-import { isAvailable, reverse } from './shared'
+import { homeRowChars, reverse, windowsOf } from './shared'
+
+/** How many home-row keys one sweep covers. */
+export const RUN_WINDOW = 4
 
 /**
  * `run` — the home row in groups of four, left to right and then right to left (R6). The Focus
@@ -9,18 +12,7 @@ import { isAvailable, reverse } from './shared'
  * gets `dfgh` without a different generator. Fewer than four keys yield nothing.
  */
 export const run: Generator = (context) => {
-  const { layout } = context
-  const row = layout.keys
-    .filter(
-      (key) =>
-        key.row === 'home' &&
-        (key.kind === 'letter' || layout.homeAnchors.includes(key.plain)) &&
-        isAvailable(context, key),
-    )
-    .map((key) => key.plain)
-  const windows = Array.from({ length: Math.max(0, row.length - 3) }, (_, start) =>
-    row.slice(start, start + 4).join(''),
-  )
+  const windows = windowsOf(homeRowChars(context), RUN_WINDOW)
   return context.forms.flatMap((form) =>
     windows.flatMap((window) => [`${window}${form}`, `${form}${reverse(window)}`]),
   )

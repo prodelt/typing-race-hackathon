@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest'
 import { layouts, SHIFT_TOKEN } from '../../layout'
 import type { GeneratorContext } from '../types'
 import { SCALE_TYPES } from '../types'
-import { generators, homePartners, tempoSteps } from './index'
+import { generators, homePartners, tempoSteps, transitionDrill } from './index'
 import { pairUp, reverse } from './shared'
 
 const { qwerty, yq } = layouts
@@ -236,5 +236,28 @@ describe('homePartners', () => {
   it('falls back to the finger anchor past the end of the home row', () => {
     expect(homePartners(yq, keyByChar(yq, 'ї')).map((k) => k.plain)).toEqual(['ж'])
     expect(homePartners(yq, keyByChar(yq, 'х')).map((k) => k.plain)).toEqual(['є'])
+  })
+})
+
+describe('the transition drill', () => {
+  it('repeats the move in every item, starts and ends on the home row, and uses only open keys', () => {
+    for (const [layout, move, opened] of [
+      [yq, 'ол', ['о', 'л']],
+      [qwerty, 'kl', ['k', 'l']],
+    ] as const) {
+      const ctx = {
+        ...context(layout, opened, move),
+        available: new Set([...layout.homeAnchors, ...opened]),
+      }
+      const home = new Set(layout.keys.filter((key) => key.row === 'home').map((key) => key.plain))
+      const pool = transitionDrill(ctx)
+      expect(pool.length).toBeGreaterThan(0)
+      for (const item of pool) {
+        expect(item).toContain(move)
+        expect(home.has([...item][0] ?? '')).toBe(true)
+        expect(home.has([...item].at(-1) ?? '')).toBe(true)
+        for (const char of item) expect(ctx.available.has(char)).toBe(true)
+      }
+    }
   })
 })

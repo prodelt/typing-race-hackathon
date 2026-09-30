@@ -22,4 +22,5 @@ export const generators: Record<ScaleType, Generator> = {
 }
 
 export { tempoSteps } from './tempo'
+export { transitionDrill } from './transition'
 export { homePartners } from './vertical'

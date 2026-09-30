@@ -1,7 +1,7 @@
 import type { FocusElement, Layout, Random, Scale } from '@typing-race/domain'
 import { parseTransitionKey } from '@typing-race/domain'
 import { SHIFT_TOKEN } from '../layout'
-import { generators } from './generators'
+import { generators, transitionDrill } from './generators'
 import type { GeneratorContext } from './types'
 import { REQUIREMENTS_UNMET } from './types'
 
@@ -59,7 +59,11 @@ export function generateText(args: {
     forms: focusForms(layout, chars, available),
     shiftOn: available.has(SHIFT_TOKEN),
   }
-  const pool = generators[scale.type](context)
+  // A Transition Focus Element selects its own generator, because it is not one of the eight
+  // Stage 1 types: the Scale's `type` stays the one the move's geometry already answers to (it is
+  // what names the goal the learner reads), and `transitionDrill` is what builds the pool.
+  const generator = scale.focus.kind === 'transition' ? transitionDrill : generators[scale.type]
+  const pool = generator(context)
 
   const first = pick(pool, random)
   if (first === undefined) return REQUIREMENTS_UNMET
