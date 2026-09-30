@@ -406,6 +406,12 @@ export interface StoredEnvelope {
   readonly writtenAt: number
   readonly progressByLanguage: Readonly<Partial<Record<Language, Progress>>>
   readonly settings: Settings
+  /**
+   * The learner's answer to FR-048, per typing language, kept apart from `progressByLanguage`
+   * because it survives an empty history: a learner who chooses a starting level and then closes
+   * the tab before their first attempt must not be asked again.
+   */
+  readonly startingLevelByLanguage: Readonly<Partial<Record<Language, StartingLevelChoice>>>
   /** Kept forever. */
   readonly attempts: readonly AttemptSummary[]
   /** Keyed by attempt id. Only the 20 most recent survive — FR-081. */

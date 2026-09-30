@@ -254,6 +254,40 @@ for (const adapter of adapters) {
       expect(loaded.attempts.map((a) => a.id).sort()).toEqual(['from-a', 'from-b'])
     })
 
+    it('records the starting-level choice before any attempt exists', async () => {
+      // The whole reason it is its own field: a learner who answers and closes the tab before
+      // typing anything must not be asked again (FR-048).
+      await store.saveStartingLevel('uk', 'knowsHomeRow')
+
+      const loaded = await store.load()
+      if (typeof loaded === 'string') throw new Error('expected an envelope')
+      expect(loaded.startingLevelByLanguage['uk']).toBe('knowsHomeRow')
+      expect(loaded.attempts).toEqual([])
+    })
+
+    it('keeps the starting-level choice forward-only (FR-073)', async () => {
+      // Re-answering may open more keys and may never close one. The rule lives in the store so
+      // every caller inherits it, including F2's server adapter.
+      await store.saveStartingLevel('uk', 'touchTypesWantsAccuracy')
+      await store.saveStartingLevel('uk', 'neverTouchTyped')
+
+      const loaded = await store.load()
+      if (typeof loaded === 'string') throw new Error('expected an envelope')
+      expect(loaded.startingLevelByLanguage['uk']).toBe('touchTypesWantsAccuracy')
+    })
+
+    it('keeps one starting-level choice per language (FR-051)', async () => {
+      await store.saveStartingLevel('uk', 'knowsHomeRow')
+      await store.saveStartingLevel('en', 'neverTouchTyped')
+
+      const loaded = await store.load()
+      if (typeof loaded === 'string') throw new Error('expected an envelope')
+      expect(loaded.startingLevelByLanguage).toEqual({
+        uk: 'knowsHomeRow',
+        en: 'neverTouchTyped',
+      })
+    })
+
     it('clear() returns the store to empty', async () => {
       await store.appendAttempts([attempt('a1', 1_000)])
       await store.clear()

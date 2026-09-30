@@ -18,7 +18,7 @@ export interface AppStore extends AppState {
   readonly dispatch: (action: AppAction) => void
   /** Reads local storage and resolves the four outcomes — FR-052, FR-083. */
   readonly boot: () => Promise<void>
-  readonly chooseStartingLevel: (choice: StartingLevelChoice) => void
+  readonly chooseStartingLevel: (choice: StartingLevelChoice) => Promise<void>
   readonly changeSettings: (patch: Partial<Settings>) => Promise<void>
   readonly beginAttempt: () => void
   readonly finishAttempt: (attempt: Attempt) => Promise<void>
@@ -54,8 +54,18 @@ export const useAppStore = create<AppStore>()((set, get) => ({
     else dispatch({ type: 'store/loaded', envelope: loaded })
   },
 
-  chooseStartingLevel(choice) {
+  async chooseStartingLevel(choice) {
     get().dispatch({ type: 'startingLevel/chosen', choice })
+    // Persisted through the seam, which applies FR-073's forward-only rule and then reports what
+    // it actually kept — so a backwards answer is corrected in one place rather than guarded in
+    // every screen that offers the question.
+    await progressStore.saveStartingLevel(get().settings.typingLanguage, choice)
+    const stored = await progressStore.load()
+    if (typeof stored === 'string') return
+    const kept = stored.startingLevelByLanguage[get().settings.typingLanguage]
+    if (kept !== undefined && kept !== get().startingLevelChoice) {
+      get().dispatch({ type: 'startingLevel/chosen', choice: kept })
+    }
   },
 
   async changeSettings(patch) {

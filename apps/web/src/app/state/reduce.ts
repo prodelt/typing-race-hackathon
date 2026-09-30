@@ -90,16 +90,18 @@ export function reduce(state: AppState, action: AppAction): AppState {
   switch (action.type) {
     case 'store/loaded': {
       const { envelope } = action
-      const progress = envelope.progressByLanguage[envelope.settings.typingLanguage]
+      const language = envelope.settings.typingLanguage
       return {
         ...state,
         status: 'ready',
         settings: envelope.settings,
         attempts: envelope.attempts,
-        // An envelope that already holds attempts implies the question was answered, even if the
-        // stored progress snapshot is gone: re-asking a returning learner would be a bug.
+        // The choice is stored in its own field precisely so it survives an empty history: a
+        // learner who answered and then closed the tab before their first attempt is not asked
+        // again. The attempt-count fallback covers an envelope written before that field existed.
         startingLevelChoice:
-          progress?.startingLevelChoice ??
+          envelope.startingLevelByLanguage[language] ??
+          envelope.progressByLanguage[language]?.startingLevelChoice ??
           (envelope.attempts.length > 0 ? 'neverTouchTyped' : null),
       }
     }

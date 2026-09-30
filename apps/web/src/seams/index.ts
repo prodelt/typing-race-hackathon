@@ -14,7 +14,13 @@
  * `ProgressStore` and `AssetCache` are declared here: nothing outside the app uses them.
  */
 
-import type { Attempt, Settings, StoredEnvelope } from '@typing-race/domain'
+import type {
+  Attempt,
+  Language,
+  Settings,
+  StartingLevelChoice,
+  StoredEnvelope,
+} from '@typing-race/domain'
 
 export type {
   Clock,
@@ -38,6 +44,15 @@ export interface ProgressStore {
   /** Idempotent on `attempt.id`, so a retry cannot double-count. */
   appendAttempts(attempts: readonly Attempt[]): Promise<void>
   saveSettings(settings: Settings): Promise<void>
+  /**
+   * FR-048's answer, per typing language. Separate from `appendAttempts` because it is recorded
+   * *before* the first attempt exists, and separate from `saveSettings` because it is progress
+   * rather than a preference — F2 will move it to the server with the rest of the fold.
+   *
+   * **Forward only** (FR-073): an implementation must keep whichever choice opens more keys, so
+   * re-answering the question can never take away what a learner has already been given.
+   */
+  saveStartingLevel(language: Language, choice: StartingLevelChoice): Promise<void>
   clear(): Promise<void>
 }
 

@@ -228,14 +228,14 @@ seeded at the mastery threshold the Key Unlock card appears.
 
 ### Implementation for User Story 2
 
-- [ ] T098 [US2] The result screen E4 in `apps/web/src/features/result/ResultScreen.tsx` with the four metric tiles
-- [ ] T099 [US2] The full metric readout in `apps/web/src/features/result/Metrics.tsx`: SPM/CPM, WPM, accuracy, errors, time, errors by character, average delay per key and per Transition, rhythm consistency
-- [ ] T100 [US2] Comparison with the learner's previous best on the same exercise in `apps/web/src/features/result/Comparison.tsx`, including the case where there is no previous result (FR-027)
-- [ ] T101 [US2] The rhythm chart as hand-written SVG in `apps/web/src/features/result/RhythmChart.tsx` — no chart library; intervals over 400 ms in terracotta; accessible without colour
-- [ ] T102 [US2] The named error list with per-error weight in `apps/web/src/features/result/ErrorList.tsx`
-- [ ] T103 [US2] The single Next Action in `apps/web/src/features/result/NextActionCard.tsx`, rendered from `coach` with a button that starts it (FR-031)
-- [ ] T104 [US2] The Key Unlock card E5 (FR-043) in `apps/web/src/features/result/UnlockCard.tsx` — a deep sage card in the right column with the new key on a cream keycap, its finger and one button to its first drill; rendered from **store data**, so this lane does not depend on US3's rule
-- [ ] T105 [US2] The pruned-log path in `apps/web/src/features/result/ResultScreen.tsx`: metrics still shown from aggregates, with the keystroke-level detail stated as no longer kept
+- [X] T098 [US2] The result screen E4 in `apps/web/src/features/result/ResultScreen.tsx` with the four metric tiles
+- [X] T099 [US2] The full metric readout in `apps/web/src/features/result/Metrics.tsx`: SPM/CPM, WPM, accuracy, errors, time, errors by character, average delay per key and per Transition, rhythm consistency
+- [X] T100 [US2] Comparison with the learner's previous best on the same exercise in `apps/web/src/features/result/Comparison.tsx`, including the case where there is no previous result (FR-027)
+- [X] T101 [US2] The rhythm chart as hand-written SVG in `apps/web/src/features/result/RhythmChart.tsx` — no chart library; intervals over 400 ms in terracotta; accessible without colour
+- [X] T102 [US2] The named error list with per-error weight in `apps/web/src/features/result/ErrorList.tsx`
+- [X] T103 [US2] The single Next Action in `apps/web/src/features/result/NextActionCard.tsx`, rendered from `coach` with a button that starts it (FR-031)
+- [X] T104 [US2] The Key Unlock card E5 (FR-043) in `apps/web/src/features/result/UnlockCard.tsx` — a deep sage card in the right column with the new key on a cream keycap, its finger and one button to its first drill; rendered from **store data**, so this lane does not depend on US3's rule
+- [X] T105 [US2] The pruned-log path in `apps/web/src/features/result/ResultScreen.tsx`: metrics still shown from aggregates, with the keystroke-level detail stated as no longer kept
 
 ---
 
@@ -259,11 +259,11 @@ history and the Next Action are unchanged and still usable.
 
 ### Implementation for User Story 3
 
-- [ ] T111 [US3] The Path screen L2 in `apps/web/src/features/path/PathScreen.tsx`: the Stage 1 keyboard with finger colours, open and locked scales with the condition that opens each, and Stage 2 and the Academy shown as arriving later
-- [ ] T112 [US3] Today L1 in `apps/web/src/features/path/TodayScreen.tsx`: exactly one Next Action with its button, the current stage, and the unlocked key count
-- [ ] T113 [US3] The starting-level choice in `apps/web/src/features/path/StartingLevel.tsx` — three options, forward-only effect on the unlocked boundary, changeable later without losing attempts (FR-048, FR-073)
-- [ ] T114 [US3] Wire the attempt-completion flow in `apps/web/src/features/path/progress-flow.ts` so a completed attempt is appended and progress re-derived through the Foundational fold
-- [ ] T115 [US3] The restore path in `apps/web/src/features/path/restore.ts`, including the unavailable-storage and unrecognised-version outcomes with their learner-facing screens (FR-052, FR-083)
+- [X] T111 [US3] The Path screen L2 in `apps/web/src/features/path/PathScreen.tsx`: the Stage 1 keyboard with finger colours, open and locked scales with the condition that opens each, and Stage 2 and the Academy shown as arriving later
+- [X] T112 [US3] Today L1 in `apps/web/src/features/path/TodayScreen.tsx`: exactly one Next Action with its button, the current stage, and the unlocked key count
+- [X] T113 [US3] The starting-level choice in `apps/web/src/features/path/StartingLevel.tsx` — three options, forward-only effect on the unlocked boundary, changeable later without losing attempts (FR-048, FR-073)
+- [X] T114 [US3] Wire the attempt-completion flow in `apps/web/src/features/path/progress-flow.ts` so a completed attempt is appended and progress re-derived through the Foundational fold **Done 2026-09-30 in the Foundational store rather than a lane file: `finishAttempt` appends through the seam and `useDerived` re-folds, so there is no separate flow module to own — a second one would be a second truth (FR-050)**
+- [X] T115 [US3] The restore path in `apps/web/src/features/path/restore.ts`, including the unavailable-storage and unrecognised-version outcomes with their learner-facing screens (FR-052, FR-083) **Done 2026-09-30 in `apps/web/src/app/BootGate.tsx`, which gives all four `load` outcomes their learner-facing screens (FR-052, FR-083). It lives in the shell because it must wrap every route, not only Path**
 - [ ] T116 [US3] The weak keys and Transitions review entry in `apps/web/src/features/path/Review.tsx` (FR-047)
 
 ---
@@ -293,14 +293,14 @@ confirm each is still in force.
 
 - [ ] T123 [P] [US5] `e2e/settings.spec.ts` named after the Independent Test above, covering all eight acceptance scenarios
 - [ ] T124 [P] [US5] A keyboard-only traversal test plus an axe audit across every F1 screen in `e2e/settings.spec.ts` (FR-066, SC-011)
-- [ ] T125 [US5] The Settings screen S2 in `apps/web/src/features/settings/SettingsScreen.tsx`
-- [ ] T126 [US5] Theme control in `apps/web/src/features/settings/Theme.tsx` — system, light, dark, low-vision, light the default, applied immediately
-- [ ] T127 [US5] Motion and sound control in `apps/web/src/features/settings/Motion.tsx` — system, reduced, off; sound off by default; the off state kills every animation and every sound
-- [ ] T128 [US5] Exercise text size 24–40 px in `apps/web/src/features/settings/TextSize.tsx`, applied to the typing line immediately (FR-063)
-- [ ] T129 [US5] Error-mode control in `apps/web/src/features/settings/ErrorMode.tsx` — stop-on-letter the Stage 1 default
-- [ ] T130 [US5] Typing language and layout control in `apps/web/src/features/settings/Language.tsx`, switching Path and the Catalogue without discarding progress in the other language (FR-051)
-- [ ] T131 [US5] Interface language control in `apps/web/src/features/settings/Interface.tsx`, independent of the typing language
-- [ ] T132 [US5] Persist every setting through the store seam and restore it on boot (FR-049)
+- [X] T125 [US5] The Settings screen S2 in `apps/web/src/features/settings/SettingsScreen.tsx`
+- [X] T126 [US5] Theme control in `apps/web/src/features/settings/Theme.tsx` — system, light, dark, low-vision, light the default, applied immediately
+- [X] T127 [US5] Motion and sound control in `apps/web/src/features/settings/Motion.tsx` — system, reduced, off; sound off by default; the off state kills every animation and every sound
+- [X] T128 [US5] Exercise text size 24–40 px in `apps/web/src/features/settings/TextSize.tsx`, applied to the typing line immediately (FR-063)
+- [X] T129 [US5] Error-mode control in `apps/web/src/features/settings/ErrorMode.tsx` — stop-on-letter the Stage 1 default
+- [X] T130 [US5] Typing language and layout control in `apps/web/src/features/settings/Language.tsx`, switching Path and the Catalogue without discarding progress in the other language (FR-051)
+- [X] T131 [US5] Interface language control in `apps/web/src/features/settings/Interface.tsx`, independent of the typing language
+- [X] T132 [US5] Persist every setting through the store seam and restore it on boot (FR-049)
 
 ---
 
@@ -317,12 +317,12 @@ abandoning mid-block keeps the attempts already recorded.
 
 - [ ] T133 [P] [US6] `e2e/session.spec.ts` named after the Independent Test above, covering all seven acceptance scenarios, plus an axe audit
 - [ ] T134 [P] [US6] A test that a session interrupted by a browser restart resumes or ends deliberately, never leaving the learner stuck (FR-078)
-- [ ] T135 [US6] The session state machine implementing the three blocks of FR-075, in `apps/web/src/features/session/machine.ts` — three blocks, resumable, abandonable, attempts already recorded always kept
-- [ ] T136 [US6] Block composition in `apps/web/src/features/session/compose.ts`: warm-up on the previous session's weakest Transitions, with a defined fallback to the current target skill when there is no previous session
-- [ ] T137 [US6] Session sizing in `apps/web/src/features/session/sizing.ts` so a full run lands between 15 and 25 minutes at the learner's current speed, with the expected length stated before the first block (FR-077)
-- [ ] T138 [US6] The between-blocks screen E6 in `apps/web/src/features/session/BetweenBlocks.tsx`, naming the block just finished and the one coming next
-- [ ] T139 [US6] The real-text placeholder in `apps/web/src/features/session/RealTextPending.tsx` — naming real text as arriving with the word curriculum, and offering no pseudo-word substitute (FR-076)
-- [ ] T140 [US6] The session entry point on Today in `apps/web/src/features/session/StartSession.tsx`; any unlocked exercise still starts on its own from Path (FR-079)
+- [X] T135 [US6] The session state machine implementing the three blocks of FR-075, in `apps/web/src/features/session/machine.ts` — three blocks, resumable, abandonable, attempts already recorded always kept
+- [X] T136 [US6] Block composition in `apps/web/src/features/session/compose.ts`: warm-up on the previous session's weakest Transitions, with a defined fallback to the current target skill when there is no previous session
+- [X] T137 [US6] Session sizing in `apps/web/src/features/session/sizing.ts` so a full run lands between 15 and 25 minutes at the learner's current speed, with the expected length stated before the first block (FR-077)
+- [X] T138 [US6] The between-blocks screen E6 in `apps/web/src/features/session/BetweenBlocks.tsx`, naming the block just finished and the one coming next
+- [X] T139 [US6] The real-text placeholder in `apps/web/src/features/session/RealTextPending.tsx` — naming real text as arriving with the word curriculum, and offering no pseudo-word substitute (FR-076)
+- [X] T140 [US6] The session entry point on Today in `apps/web/src/features/session/StartSession.tsx`; any unlocked exercise still starts on its own from Path (FR-079)
 
 ---
 

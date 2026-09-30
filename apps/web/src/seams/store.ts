@@ -1,10 +1,13 @@
+import { boundaryFor, layouts } from '@typing-race/curriculum'
 import {
   type Attempt,
   type AttemptSummary,
   type KeystrokeEventLog,
+  type Language,
   LOG_RETENTION_COUNT,
   type Settings,
   STORE_VERSION,
+  type StartingLevelChoice,
   type StoredEnvelope,
 } from '@typing-race/domain'
 import { type DBSchema, type IDBPDatabase, openDB } from 'idb'
@@ -39,6 +42,7 @@ export function emptyEnvelope(writtenAt = 0): StoredEnvelope {
     storeVersion: STORE_VERSION,
     writtenAt,
     progressByLanguage: {},
+    startingLevelByLanguage: {},
     settings: DEFAULT_SETTINGS,
     attempts: [],
     logs: {},
@@ -100,6 +104,24 @@ function mergeAttempts(current: StoredEnvelope, incoming: readonly Attempt[]): S
 
   const attempts = [...byId.values()].sort((a, b) => a.completedAt - b.completedAt)
   return { ...current, attempts, logs: pruneLogs(attempts, logs) }
+}
+
+/**
+ * FR-073, enforced in the store rather than only in the screen that asks the question.
+ *
+ * A learner may re-answer the starting-level question at any time, and the answer may not take a
+ * key away — so the stored value is whichever choice opens more of the Unlock Order. Putting the
+ * rule here means every caller inherits it, including F2's server adapter when it replaces this
+ * file: a rule that lives in a form control is a rule one screen enforces.
+ */
+function forwardOnlyChoice(
+  language: Language,
+  current: StartingLevelChoice | undefined,
+  incoming: StartingLevelChoice,
+): StartingLevelChoice {
+  if (current === undefined) return incoming
+  const layout = language === 'uk' ? layouts.yq : layouts.qwerty
+  return boundaryFor(layout, incoming) >= boundaryFor(layout, current) ? incoming : current
 }
 
 /** Monotonic, so two writes in the same millisecond still order. */
@@ -180,6 +202,20 @@ export function indexedDbStore(options: IndexedDbStoreOptions = {}): ProgressSto
       await mutate((current) => ({ ...current, settings }))
     },
 
+    async saveStartingLevel(language, choice) {
+      await mutate((current) => ({
+        ...current,
+        startingLevelByLanguage: {
+          ...current.startingLevelByLanguage,
+          [language]: forwardOnlyChoice(
+            language,
+            current.startingLevelByLanguage[language],
+            choice,
+          ),
+        },
+      }))
+    },
+
     async clear() {
       const database = await db()
       await database.clear(STORE_NAME)
@@ -231,6 +267,21 @@ export function memoryStore(
 
     saveSettings(settings) {
       mutate((current) => ({ ...current, settings }))
+      return Promise.resolve()
+    },
+
+    saveStartingLevel(language, choice) {
+      mutate((current) => ({
+        ...current,
+        startingLevelByLanguage: {
+          ...current.startingLevelByLanguage,
+          [language]: forwardOnlyChoice(
+            language,
+            current.startingLevelByLanguage[language],
+            choice,
+          ),
+        },
+      }))
       return Promise.resolve()
     },
 
