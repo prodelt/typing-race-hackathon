@@ -10,8 +10,8 @@ export interface ChipProps extends HTMLAttributes<HTMLSpanElement> {
 
 const TONES: Record<ChipTone, string> = {
   neutral: 'bg-paper text-ink border-hairline-strong',
-  sage: 'bg-sage-tint text-sage border-sage',
-  terracotta: 'bg-terracotta-tint text-terracotta border-terracotta',
+  sage: 'bg-sage-tint text-sage-ink border-sage',
+  terracotta: 'bg-terracotta-tint text-terracotta-ink border-terracotta',
   muted: 'bg-transparent text-muted border-hairline',
 }
 

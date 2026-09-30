@@ -24,13 +24,31 @@
   --color-ink: #2d312e;
   --color-sage: #4a7c59;
   --color-terracotta: #d95d39;
-  --color-muted: #94a3b8;
+  /*
+   * Ticket 20 named the secondary slate #94A3B8. Measured against the paper ground that is
+   * 2.3:1 — it fails WCAG AA for text, which Lighthouse caught on the muted `Chip`, and zero axe
+   * violations is a gate rather than an aspiration (ticket 15). Darkened to the lightest slate
+   * that clears 4.5:1 on #FAF9F5, so the token still reads as "secondary" and now also reads.
+   *
+   * The typing line is unaffected: its upcoming characters derive their colour from `--color-ink`
+   * directly, so the "text that recedes" effect the design wanted is still there and still large.
+   */
+  --color-muted: #67707c;
 
   /* Derived surfaces. Ticket 20: a 1px border plus a two-layer shadow is the whole paper effect. */
   --color-hairline: #e6e4da;
   --color-hairline-strong: #d5d2c4;
   --color-sage-tint: #e9f0ea;
   --color-terracotta-tint: #fbe9e3;
+
+  /*
+   * Text *on* a tint needs its own value. The brand sage reads 4.19:1 against its own tint at
+   * 12px, which fails WCAG AA — so small text on a tint uses the darker half of the pair
+   * `AGENTS.md` already names (#316342 and #BA1A1A). The brand colours themselves are unchanged:
+   * this is about legibility at chip size, not about the palette.
+   */
+  --color-sage-ink: #316342;
+  --color-terracotta-ink: #ba1a1a;
   --color-nav-dimmed: #a3aaa4;
 
   /* ---- Finger colours: ink / tint / line, one triple per finger (ticket 20) ------------

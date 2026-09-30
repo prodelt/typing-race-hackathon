@@ -1,0 +1,16 @@
+# Typing-Race. Everything a crawler may usefully index is public and needs no account:
+# the product page, the formulas, the licences, the privacy statement and the about page.
+# Every other route is a learner's own practice, which is behind sign-in from F2 onward and
+# has nothing in it for a search engine.
+User-agent: *
+Allow: /$
+Allow: /formulas
+Allow: /licences
+Allow: /privacy
+Allow: /about
+Disallow: /today
+Disallow: /path
+Disallow: /exercise/
+Disallow: /result/
+Disallow: /session
+Disallow: /settings

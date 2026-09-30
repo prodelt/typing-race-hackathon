@@ -29,6 +29,9 @@
   --color-hairline-strong: #3c423b;
   --color-sage-tint: #223026;
   --color-terracotta-tint: #3a2318;
+  /* On a dark tint the readable ink is the *light* half of the pair. */
+  --color-sage-ink: #7fae8b;
+  --color-terracotta-ink: #f08a63;
   --color-nav-dimmed: #6c746b;
 
   /* Finger inks lift and tints darken; the line stays the mid value so a keycap still reads as
@@ -80,6 +83,8 @@
   --color-hairline-strong: #101310;
   --color-sage-tint: #d3e6d8;
   --color-terracotta-tint: #f6d9d1;
+  --color-sage-ink: #14361f;
+  --color-terracotta-ink: #6d1400;
   --color-nav-dimmed: #4a544c;
 
   --color-finger-pinky-ink: #3d2f66;
