@@ -84,7 +84,9 @@
   font-family: var(--font-mono);
   font-size: 0.5em;
   font-style: normal;
-  color: var(--color-terracotta);
+  /* The ink half of the pair: the brand terracotta reads 3.76:1 on paper, which fails AA at this
+     size. Reserved for the large error mark above, where the 3:1 threshold applies. */
+  color: var(--color-terracotta-ink);
   animation: specimen-rise var(--dur-quick) var(--ease-enter) both;
 }
 
@@ -95,7 +97,7 @@
   margin-top: 1.75rem;
   font-family: var(--font-mono);
   font-size: 0.8125rem;
-  color: var(--color-terracotta);
+  color: var(--color-terracotta-ink);
 }
 
 .specimen__readout b {

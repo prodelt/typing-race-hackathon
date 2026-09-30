@@ -33,7 +33,10 @@
    * The typing line is unaffected: its upcoming characters derive their colour from `--color-ink`
    * directly, so the "text that recedes" effect the design wanted is still there and still large.
    */
-  --color-muted: #67707c;
+  /* Darkened from #67707c on 2026-09-30: the old value read 4.32:1 against `--color-sage-tint`,
+     which fails AA for 12–14px text, and muted labels do sit on a tint on the Path screen. This
+     value clears 4.85:1 there and 5.33:1 on paper. */
+  --color-muted: #5f6874;
 
   /* Derived surfaces. Ticket 20: a 1px border plus a two-layer shadow is the whole paper effect. */
   --color-hairline: #e6e4da;

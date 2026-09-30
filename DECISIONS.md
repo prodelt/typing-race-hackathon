@@ -4,6 +4,27 @@ Everything below is settled and binding. One line of reasoning each — the long
 git tag `archive/process-harness-2026-09-30` (`git show <tag>:docs/adr/0004-...md`). Do not relitigate
 these; change one only by editing this file first.
 
+## Scope, decided 2026-09-30
+
+The requirements make this unambiguous and it overrides anything below that disagrees.
+
+**§11 refuses a submission that has no complete route through all three stages.** §10 lists a group
+leaderboard, a real-time race mode, export/import and offline/PWA as *bonuses*, "counted only after
+every mandatory requirement is met". §6 says progress is stored locally by default. So:
+
+- **In scope, and the whole of it**: Stage 1 scales (done), **Stage 2 words built only from unlocked
+  keys**, **Stage 3 Academy** with visible modules, progress and a completion criterion, the
+  **dictionary pipeline** with reproducible derived data, the weak-key repetition mode, the session's
+  fourth "real text" block, the sources-and-licences page naming what we actually use, and a
+  deployed URL.
+- **Out of scope for the demo**: accounts, Supabase, the sync outbox, races, leaderboards. Worth
+  zero points until the three stages exist, and §11 separately refuses work whose mandatory
+  functionality depends on a service that is unavailable during the demo. The code for these
+  (`supabase/`, `apps/web/src/sync/`) **stays in the tree, dormant and untouched** — it is the only
+  written version, and races become the first bonus if the mandatory work lands early.
+- Progress is therefore **local only**, and "a new profile" in the jury script §9.1 means a clean
+  local state plus a visible "start over", not an account.
+
 ## Product
 
 1. **Accuracy is correct character keystrokes ÷ all character keystrokes.** An incorrect keystroke
@@ -19,9 +40,9 @@ these; change one only by editing this file first.
 6. **Key unlock follows the finger map, not letter frequency** — the order is pedagogical.
    Confidence is tracked per key *and* per transition; Ukrainian ЙЦУКЕН has 18.6% same-finger
    transitions against QWERTY's 5.8%, so transitions weigh more there.
-7. **Every screen is behind sign-in** except the product page, formulas, licences, privacy and about.
-   There is no guest mode. A local copy of progress still lives in the browser, because progress must
-   survive a browser restart and must work offline.
+7. ~~**Every screen is behind sign-in.**~~ Superseded by the scope decision above: there are no
+   accounts for the demo, and progress lives in the browser. It must survive a browser restart,
+   which is a graded automatic check (§8.9).
 8. **Formulas are published in the app.** Our definitions differ from the requirements' example in one
    place (`rowChanges` counts adjacent row-changing pairs, not distinct rows touched), so the page
    states what we compute.

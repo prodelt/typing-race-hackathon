@@ -75,7 +75,9 @@ function PrimaryNavigation({ dimmed }: { readonly dimmed: boolean }) {
         const className = cx(
           'inline-flex items-center gap-2 h-9 px-3 font-ui text-sm rounded-[var(--radius-chip)]',
           'transition-colors duration-[var(--dur-base)] ease-[var(--ease-standard)]',
-          active ? 'bg-sage-tint text-sage font-semibold' : 'text-ink hover:bg-sage-tint',
+          // `text-sage-ink`, not `text-sage`: the brand sage reads 4.19:1 on its own tint, which
+          // fails AA at this size. That pair is exactly what the ink half of the token exists for.
+          active ? 'bg-sage-tint text-sage-ink font-semibold' : 'text-ink hover:bg-sage-tint',
           disabled && 'pointer-events-none text-nav-dimmed',
         )
 
