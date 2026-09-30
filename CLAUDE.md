@@ -7,7 +7,7 @@ Browser touch-typing trainer for Ukrainian (ЙЦУКЕН) and English (QWERTY). 
 `tasks/Typing-Race-2026-Hackathon/docs/TECHNICAL_SPECIFICATION.md`; the dictionaries are in
 `tasks/Typing-Race-2026-Hackathon/dictionaries/`. Nothing under `tasks/` is ever committed.
 
-**Design: top quality, taken wholesale from `E:\Ametrin projects\Ametrin_website5\variants\b-red`** —
+**Design: top quality, taken wholesale from `E:\Ametrin projects\Ametrin_website5\variants\v4\b-red` (the 2026-09-25 version, not the older `variants\b-red`)** —
 its fonts (Unbounded + Onest), palette, tokens, spacing and motion. Adapt it to an app, don't dilute it.
 A screen is done when it has been looked at running, not when its tests pass.
 
