@@ -158,10 +158,10 @@ another lane's unmerged code, so none of this can live in a lane.
 
 ### End-to-end harness
 
-- [ ] T068 The text-input driver in `e2e/harness/type.ts` driving `beforeinput` and `compositionend`, because the keyboard API cannot type Cyrillic at all
-- [ ] T069 [P] The CDP physical-layout driver in `e2e/harness/cdp-layout.ts` for simulating ЙЦУКЕН — Chromium only, used by exactly one scenario in F1
-- [ ] T070 [P] Store seeding and motion-off fixtures in `e2e/harness/fixtures.ts`, plus an axe helper asserting zero violations
-- [ ] T071 `e2e/latency.spec.ts` — 200 keystrokes, p95 ≤ 16 ms, in the `latency` project; a regression fails the build (FR-070, SC-002)
+- [X] T068 The text-input driver in `e2e/harness/type.ts` driving `beforeinput` and `compositionend`, because the keyboard API cannot type Cyrillic at all
+- [X] T069 [P] The CDP physical-layout driver in `e2e/harness/cdp-layout.ts` for simulating ЙЦУКЕН — Chromium only, used by exactly one scenario in F1
+- [X] T070 [P] Store seeding and motion-off fixtures in `e2e/harness/fixtures.ts`, plus an axe helper asserting zero violations
+- [X] T071 `e2e/latency.spec.ts` — 200 keystrokes, p95 ≤ 16 ms, in the `latency` project; a regression fails the build (FR-070, SC-002)
 
 **Checkpoint**: every package has green unit and property tests; the shell renders; CI is green;
 the latency gate runs. **Six lanes may now open, two at a time.**

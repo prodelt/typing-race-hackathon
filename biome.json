@@ -89,7 +89,7 @@
       "linter": { "rules": { "suspicious": { "noConsole": "off" } } }
     },
     {
-      "includes": ["apps/web/src/seams/**", "apps/web/src/sw/**"],
+      "includes": ["apps/web/src/seams/**", "apps/web/src/sw/**", "e2e/harness/**"],
       "linter": { "rules": { "style": { "noRestrictedGlobals": "off" } } }
     },
     {
