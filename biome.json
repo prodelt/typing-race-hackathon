@@ -27,12 +27,24 @@
     "enabled": true,
     "rules": {
       "preset": "recommended",
+      "complexity": {
+        "useLiteralKeys": "off"
+      },
       "correctness": {
         "noUnusedImports": "error",
         "noUnusedVariables": "error"
       },
       "style": {
         "noParameterAssign": "error",
+        "noRestrictedGlobals": {
+          "level": "error",
+          "options": {
+            "deniedGlobals": {
+              "indexedDB": "IndexedDB is behind the ProgressStore seam — apps/web/src/seams/store.ts (Constitution III).",
+              "caches": "The Cache API is behind the AssetCache seam — apps/web/src/seams/cache.ts (Constitution III)."
+            }
+          }
+        },
         "useConsistentArrayType": {
           "level": "error",
           "options": { "syntax": "shorthand" }
@@ -72,6 +84,10 @@
     {
       "includes": ["e2e/**", "**/*.test.ts", "**/*.test.tsx"],
       "linter": { "rules": { "suspicious": { "noConsole": "off" } } }
+    },
+    {
+      "includes": ["apps/web/src/seams/**", "apps/web/src/sw/**"],
+      "linter": { "rules": { "style": { "noRestrictedGlobals": "off" } } }
     }
   ]
 }

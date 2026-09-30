@@ -10,5 +10,11 @@
     "lib": ["ES2024", "DOM", "DOM.Iterable"],
     "types": ["node"]
   },
-  "include": ["*.config.ts", "vitest.setup.ts", "vitest.setup.dom.ts", "e2e/**/*.ts"]
+  "include": [
+    "*.config.ts",
+    "vitest.setup.ts",
+    "vitest.setup.dom.ts",
+    "e2e/**/*.ts",
+    "tools/**/*.ts"
+  ]
 }

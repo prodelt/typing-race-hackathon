@@ -57,6 +57,16 @@ export default defineConfig({
           setupFiles: domSetupFiles,
         },
       },
+      {
+        // Architecture checks that read the source tree rather than import it. Rooted at the
+        // repository, so they see every package at once.
+        test: {
+          name: 'arch',
+          root: '.',
+          environment: 'node',
+          include: ['tools/**/*.test.ts'],
+        },
+      },
     ],
     coverage: {
       provider: 'v8',
