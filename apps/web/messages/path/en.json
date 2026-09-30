@@ -74,5 +74,14 @@
   "path_finger_index": "index finger",
   "path_finger_thumb": "thumb",
   "path_key_shift": "Shift",
-  "path_start_lower_disabled": "This would open fewer keys than you already have"
+  "path_start_lower_disabled": "This would open fewer keys than you already have",
+  "path_review_title": "Weak spots",
+  "path_review_intro": "The keys and transitions that give you the most trouble. This is not the next action — it is a list to look through and choose from yourself.",
+  "path_review_not_enough": "Not enough observations yet. Confidence is only computed after {samples} keystrokes on an element, and calling something weak on the strength of two sightings is noise, not feedback.",
+  "path_review_key": "key",
+  "path_review_transition": "transition",
+  "path_review_finger": "{hand}, {finger}",
+  "path_review_practise": "Practise",
+  "path_review_no_drill": "no drill of its own yet",
+  "path_review_threshold": "A transition is only named after {samples} observations."
 }

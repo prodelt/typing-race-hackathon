@@ -5,6 +5,7 @@ import { m } from '../../paraglide/messages.js'
 import { PathKeyboard } from './Keyboard.js'
 import { keyLabel, scaleName } from './labels.js'
 import { MASTERY_STREAK, type ScaleState, scaleRows } from './model.js'
+import { Review } from './Review.js'
 import { StartingLevel } from './StartingLevel.js'
 
 /**
@@ -119,6 +120,11 @@ export function PathScreen() {
           ))}
         </ul>
       </Card>
+
+      {/* FR-047: a way to practise weak keys and Transitions specifically. It sits below the
+          ladder rather than on Today, because Today carries the one next action and a second
+          list there would be two answers to the same question (SC-010). */}
+      <Review progress={progress} layout={layout} catalogue={catalogue} />
 
       <StartingLevel mode="change" />
     </div>

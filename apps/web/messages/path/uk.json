@@ -74,5 +74,14 @@
   "path_finger_index": "вказівний",
   "path_finger_thumb": "великий",
   "path_key_shift": "Shift",
-  "path_start_lower_disabled": "Вже відкрито більше, ніж дасть цей варіант"
+  "path_start_lower_disabled": "Вже відкрито більше, ніж дасть цей варіант",
+  "path_review_title": "Слабкі місця",
+  "path_review_intro": "Клавіші та переходи, які даються найважче. Це не «наступна дія» — це список, який можна переглянути й обрати самому.",
+  "path_review_not_enough": "Поки замало спостережень. Впевненість рахується лише після {samples} натискань на елемент, а називати слабким те, що бачили двічі, — це шум, а не зворотний зв’язок.",
+  "path_review_key": "клавіша",
+  "path_review_transition": "перехід",
+  "path_review_finger": "{hand}, {finger}",
+  "path_review_practise": "Потренувати",
+  "path_review_no_drill": "окремої вправи ще немає",
+  "path_review_threshold": "Перехід називається лише після {samples} спостережень."
 }

@@ -63,8 +63,20 @@ interface Rejection {
  * attempt gets these checks and nothing heavier, because the cost of a false accusation against a
  * learner practising alone is far higher than the cost of an inflated personal number.
  */
-const MIN_PLAUSIBLE_IKI_MS = 12
-const MAX_PLAUSIBLE_SPM = 1200
+/**
+ * Ticket 09's window, not numbers invented here: 40 ms to 12 s between keystrokes.
+ *
+ * 40 ms is about 1500 characters a minute sustained, which no hand reaches and a script reaches
+ * trivially. 12 s is the other end — an interval longer than that is someone who walked away, and
+ * `packages/metrics` already excludes it from rhythm at the 3 s break rule, so counting it toward
+ * speed here would contradict the client's own arithmetic.
+ */
+const MIN_PLAUSIBLE_IKI_MS = 40
+const MAX_PLAUSIBLE_IKI_MS = 12_000
+/** The CPM cap of the same ticket. Well above any human record, so it catches only automation. */
+const MAX_PLAUSIBLE_SPM = 1000
+/** An attempt shorter than this cannot have been typed at all. */
+const MIN_PLAUSIBLE_DURATION_MS = 500
 
 function checkPlausibility(
   submission: Submission,
@@ -83,10 +95,22 @@ function checkPlausibility(
   // characters in the log, which is the whole point of counting it (FR-024).
   if (typed.length < [...text].length) return 'text_mismatch'
 
-  // A human hand cannot reliably beat this; a script trivially can. Only consecutive correct
-  // keystrokes count, so a burst inside a composition event does not look like cheating.
-  const fast = log.dt.filter((delta, i) => i > 0 && log.kind[i] === 'char' && delta < MIN_PLAUSIBLE_IKI_MS)
-  if (fast.length > log.dt.length / 4) return 'implausible_interval'
+  if (attempt.elapsedMs < MIN_PLAUSIBLE_DURATION_MS) return 'too_fast'
+
+  // A quarter of the keystrokes below 40 ms, not a single one: an input method committing a
+  // composition produces several characters at one timestamp, and a learner whose keyboard did
+  // that should not be accused of cheating. The first event is skipped because its delta is the
+  // delay before typing began, not an interval.
+  const tooFast = log.dt.filter(
+    (delta, i) => i > 0 && log.kind[i] === 'char' && delta < MIN_PLAUSIBLE_IKI_MS,
+  )
+  if (tooFast.length > log.dt.length / 4) return 'implausible_interval'
+
+  // An interval past the upper bound is someone who walked away. It is not grounds for rejecting
+  // the attempt — that would punish a learner for answering the door — but an attempt made
+  // entirely of them is not an attempt.
+  const walkedAway = log.dt.filter((delta) => delta > MAX_PLAUSIBLE_IKI_MS).length
+  if (walkedAway > log.dt.length / 2) return 'implausible_interval'
 
   const characters = log.kind.filter((kind) => kind === 'char').length
   const spm = attempt.elapsedMs > 0 ? (characters / attempt.elapsedMs) * 60_000 : 0
@@ -194,9 +218,32 @@ Deno.serve(async (request) => {
   // Progress is re-derived from the learner's **whole** history rather than advanced from the
   // attempts just accepted. That is what makes an outbox draining a week of offline work in an
   // arbitrary order land on the same answer as if it had arrived live (FR-050, ADR-0005).
-  const language = (submissions[0]?.attempt.language ?? 'uk') as Language
-  const layoutId = (submissions[0]?.attempt.layoutId ?? 'yq') as LayoutId
+  //
+  // Once per language present in the batch, not once for the batch: a learner who practises both
+  // Ukrainian and English has two ladders (FR-051), and an outbox flushed after a long spell
+  // offline will routinely carry both. Deriving only the first attempt's language would leave the
+  // other one silently stale until the next submission happened to lead with it.
+  const languages = [...new Set(submissions.map((s) => s.attempt.language))] as Language[]
+  const progressByLanguage: Record<string, unknown> = {}
 
+  for (const language of languages) {
+    const layoutId = (submissions.find((s) => s.attempt.language === language)?.attempt.layoutId ??
+      'yq') as LayoutId
+    progressByLanguage[language] = await deriveAndStore(service, userId, language, layoutId)
+  }
+
+  await service.rpc('prune_keystroke_logs', { keep_per_user: 20 })
+
+  return json({ accepted, rejected, progress: progressByLanguage })
+})
+
+/** One language's fold, read back and written. Extracted so the loop above reads as the rule. */
+async function deriveAndStore(
+  service: ReturnType<typeof createClient>,
+  userId: string,
+  language: Language,
+  layoutId: LayoutId,
+) {
   const { data: history } = await service
     .from('attempts')
     .select('*')
@@ -244,7 +291,5 @@ Deno.serve(async (request) => {
     { onConflict: 'user_id,language' },
   )
 
-  await service.rpc('prune_keystroke_logs', { keep_per_user: 20 })
-
-  return json({ accepted, rejected, progress })
-})
+  return progress
+}
