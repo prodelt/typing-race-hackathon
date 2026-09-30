@@ -10,13 +10,18 @@ import { PreStart } from './PreStart.js'
 import { type ExercisePlan, planExercise } from './plan.js'
 import { TypingScreen } from './TypingScreen.js'
 import { useAttempt } from './useAttempt.js'
+import { type ExerciseTarget, type ExerciseWording, scaleWording } from './wording.js'
 
 export interface ExerciseSessionProps {
   readonly scale: Scale
   readonly mode: AttemptMode
 }
 
-interface RunProps extends ExerciseSessionProps {
+/** Everything one run needs, decided before it starts. Stage 2 word drills render this directly. */
+export interface RunProps {
+  readonly scale: ExerciseTarget
+  readonly wording: ExerciseWording
+  readonly mode: AttemptMode
   readonly plan: ExercisePlan
   readonly layout: Layout
   readonly last: Parameters<typeof TypingScreen>[0]['last']
@@ -61,7 +66,16 @@ export function ExerciseSession({ scale, mode }: ExerciseSessionProps) {
 
   if (plan === null) return <Locked />
 
-  return <ExerciseRun scale={scale} mode={mode} plan={plan} layout={derived.layout} {...frozen} />
+  return (
+    <ExerciseRun
+      scale={scale}
+      wording={scaleWording(scale)}
+      mode={mode}
+      plan={plan}
+      layout={derived.layout}
+      {...frozen}
+    />
+  )
 }
 
 function Locked() {
@@ -82,8 +96,9 @@ export function BackToPath() {
   )
 }
 
-function ExerciseRun({
+export function ExerciseRun({
   scale,
+  wording,
   mode,
   plan,
   layout,
@@ -164,6 +179,7 @@ function ExerciseRun({
       {!started && input !== null ? (
         <PreStart
           scale={scale}
+          wording={wording}
           mode={mode}
           layout={layout}
           input={input}
@@ -177,6 +193,7 @@ function ExerciseRun({
           <TypingScreen
             engine={engine}
             scale={scale}
+            wording={wording}
             mode={mode}
             layout={layout}
             text={plan.text}

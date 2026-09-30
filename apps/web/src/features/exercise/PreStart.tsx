@@ -1,14 +1,16 @@
 import { Link } from '@tanstack/react-router'
 import { keyOf } from '@typing-race/curriculum'
-import type { AttemptMode, InputSource, Layout, Scale } from '@typing-race/domain'
+import type { AttemptMode, InputSource, Layout } from '@typing-race/domain'
 import { Button, Card, Chip } from '@typing-race/ui'
 import { useCallback, useEffect, useState } from 'react'
 import { m } from '../../paraglide/messages.js'
-import { focusLabel, GOAL_MESSAGES, LAYOUT_NAMES } from './labels.js'
+import { LAYOUT_NAMES } from './labels.js'
 import { ModeToggle } from './ModeToggle.js'
+import type { ExerciseTarget, ExerciseWording } from './wording.js'
 
 export interface PreStartProps {
-  readonly scale: Scale
+  readonly scale: ExerciseTarget
+  readonly wording: ExerciseWording
   readonly mode: AttemptMode
   readonly layout: Layout
   readonly input: InputSource
@@ -31,7 +33,15 @@ type Probe = 'checking' | 'ok' | 'mismatch'
  *
  * Repeating any unlocked exercise starts here too (FR-045).
  */
-export function PreStart({ scale, mode, layout, input, testIsPrimary, onStart }: PreStartProps) {
+export function PreStart({
+  scale,
+  wording,
+  mode,
+  layout,
+  input,
+  testIsPrimary,
+  onStart,
+}: PreStartProps) {
   const [probe, setProbe] = useState<Probe>('checking')
   const [typedMismatch, setTypedMismatch] = useState(false)
 
@@ -64,16 +74,16 @@ export function PreStart({ scale, mode, layout, input, testIsPrimary, onStart }:
     <section aria-labelledby="exercise-title" className="mx-auto w-full max-w-2xl">
       <Card raised className="p-8">
         <h1 id="exercise-title" className="font-ui text-3xl font-semibold">
-          {m.exercise_title({ focus: focusLabel(scale.focus) })}
+          {wording.title}
         </h1>
 
-        <p className="mt-6 font-ui text-xs text-ink/70">{m.exercise_goal_label()}</p>
+        <p className="mt-6 font-ui text-xs text-ink/70">{wording.goalLabel}</p>
         <p data-testid="scale-goal" className="mt-1 max-w-[60ch] font-ui text-lg leading-relaxed">
-          {GOAL_MESSAGES[scale.type]()}
+          {wording.goal}
         </p>
 
         <div className="mt-5 flex flex-wrap items-center gap-2">
-          <Chip tone="neutral">{focusLabel(scale.focus)}</Chip>
+          <Chip tone="neutral">{wording.focus}</Chip>
           <Chip tone={mode === 'test' ? 'terracotta' : 'sage'}>
             {mode === 'test' ? m.exercise_mode_test() : m.exercise_mode_practice()}
           </Chip>

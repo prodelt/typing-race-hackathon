@@ -8,7 +8,7 @@ import './PaceCue.css'
 
 export interface PaceCueProps {
   readonly engine: Engine
-  readonly scale: Scale
+  readonly scale: Pick<Scale, 'targetSpm'>
   readonly text: string
 }
 

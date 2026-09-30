@@ -1,24 +1,18 @@
 import { useNavigate } from '@tanstack/react-router'
-import type {
-  Attempt,
-  AttemptMode,
-  ErrorMode,
-  InputSource,
-  Layout,
-  Scale,
-} from '@typing-race/domain'
+import type { Attempt, AttemptMode, ErrorMode, InputSource, Layout } from '@typing-race/domain'
 import { createEngine, type Engine } from '@typing-race/engine'
 import { computeAggregates, computeMetrics } from '@typing-race/metrics'
 import { useEffect, useRef, useState } from 'react'
 import { useAppStore } from '../../app/state/index.js'
 import { systemClock } from '../../seams/index.js'
 import { newAttemptId } from './plan.js'
+import type { ExerciseTarget } from './wording.js'
 
 export interface AttemptConfig {
   /** `false` on the pre-start screen: no engine exists, so nothing can start by accident. */
   readonly active: boolean
   readonly input: InputSource | null
-  readonly scale: Scale
+  readonly scale: ExerciseTarget
   readonly mode: AttemptMode
   readonly layout: Layout
   readonly errorMode: ErrorMode

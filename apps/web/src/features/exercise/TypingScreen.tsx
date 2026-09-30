@@ -1,14 +1,16 @@
-import type { AttemptMode, AttemptSummary, Layout, Scale } from '@typing-race/domain'
+import type { AttemptMode, AttemptSummary, Layout } from '@typing-race/domain'
 import type { Engine } from '@typing-race/engine'
 import { KeyboardGuide } from './KeyboardGuide.js'
 import { FingerDiagram, NextKeyCard } from './NextKey.js'
 import { PaceCue } from './PaceCue.js'
 import { Rail } from './Rail.js'
 import { TypingLine } from './TypingLine.js'
+import type { ExerciseTarget, ExerciseWording } from './wording.js'
 
 export interface TypingScreenProps {
   readonly engine: Engine
-  readonly scale: Scale
+  readonly scale: ExerciseTarget
+  readonly wording: ExerciseWording
   readonly mode: AttemptMode
   readonly layout: Layout
   readonly text: string
@@ -39,6 +41,7 @@ export interface TypingScreenProps {
 export function TypingScreen({
   engine,
   scale,
+  wording,
   mode,
   layout,
   text,
@@ -50,7 +53,7 @@ export function TypingScreen({
 }: TypingScreenProps) {
   return (
     <div className="grid grid-cols-[276px_minmax(0,1fr)] items-start gap-8">
-      <Rail scale={scale} mode={mode} last={last} thisScaleIsNext={thisScaleIsNext} />
+      <Rail wording={wording} mode={mode} last={last} thisScaleIsNext={thisScaleIsNext} />
 
       <div className="flex min-w-0 flex-col gap-10">
         <div className="pt-4">

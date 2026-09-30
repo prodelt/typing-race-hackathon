@@ -2,6 +2,7 @@ import { useNavigate } from '@tanstack/react-router'
 import { Button, Card, Chip, type ChipTone } from '@typing-race/ui'
 import { useDerived } from '../../app/state/index.js'
 import { m } from '../../paraglide/messages.js'
+import { WordsSection } from '../words/WordsSection.js'
 import { PathKeyboard } from './Keyboard.js'
 import { keyLabel, scaleName } from './labels.js'
 import { MASTERY_STREAK, type ScaleState, scaleRows } from './model.js'
@@ -107,12 +108,14 @@ export function PathScreen() {
         </ol>
       </Card>
 
+      <WordsSection layout={layout} progress={progress} />
+
       <Card className="p-6" role="region" aria-labelledby="path-later-title">
         <h2 id="path-later-title" className="font-ui text-lg font-bold">
           {m.path_later_title()}
         </h2>
         <ul className="mt-3 grid gap-2">
-          {[m.path_later_stage2(), m.path_later_stage3()].map((label) => (
+          {[m.path_later_stage3()].map((label) => (
             <li key={label} className="flex flex-wrap items-center gap-3 text-muted">
               <span className="font-ui">{label}</span>
               <Chip tone="muted">{m.path_later_body()}</Chip>

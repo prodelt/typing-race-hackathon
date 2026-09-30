@@ -1,4 +1,11 @@
-import { catalogue, deriveProgress, layouts, levelFor, nextAction } from '@typing-race/curriculum'
+import {
+  catalogue,
+  deriveProgress,
+  focusDrillFor,
+  layouts,
+  levelFor,
+  nextAction,
+} from '@typing-race/curriculum'
 import type { Layout, NextAction, Progress, Scale } from '@typing-race/domain'
 import { confidenceOf, foldConfidence } from '@typing-race/metrics'
 import type { AppState } from './reduce.js'
@@ -57,7 +64,13 @@ export function derive(state: AppState): DerivedState {
     layout,
     catalogue: scales,
     progress,
-    nextAction: nextAction({ progress, lastAttempt, layout, catalogue: scales }),
+    nextAction: nextAction({
+      progress,
+      lastAttempt,
+      layout,
+      catalogue: scales,
+      focusDrill: focusDrillFor(layout, progress.unlockedSet),
+    }),
     accuracyFloor: levelFor(1, progress).accuracyFloor,
   }
 }

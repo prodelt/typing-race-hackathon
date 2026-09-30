@@ -1,4 +1,11 @@
-import type { AttemptSummary, Layout, NextAction, Progress, Scale } from '@typing-race/domain'
+import type {
+  AttemptSummary,
+  FocusElement,
+  Layout,
+  NextAction,
+  Progress,
+  Scale,
+} from '@typing-race/domain'
 import { levelFor, passes } from '../levels/table'
 import { keyOfChar } from '../progress/order'
 import { weakTransitions } from '../progress/weak-transitions'
@@ -20,6 +27,12 @@ export interface NextActionArgs {
   readonly layout: Layout
   /** The Scale Catalogue for `layout`. */
   readonly catalogue: readonly Scale[]
+  /**
+   * The Stage 2 word drill built around a weak element, when Stage 2 is open. Given, a weak
+   * Transition is trained in real words rather than in a Stage 1 drill (requirements §3.2: word
+   * choice adapts to the learner's slow transitions).
+   */
+  readonly focusDrill?: (focus: FocusElement) => string | undefined
 }
 
 /**
@@ -54,7 +67,7 @@ export function nextAction(args: NextActionArgs): NextAction {
     }
   }
 
-  const weak = weakestTransition(progress, layout, startable)
+  const weak = weakestTransition(progress, layout, startable, args.focusDrill)
   if (weak) return weak
 
   if (lastAttempt && lastAttempt.metrics.rhythmConsistency.value < RHYTHM_FLOOR) {
@@ -79,9 +92,20 @@ function weakestTransition(
   progress: Progress,
   layout: Layout,
   startable: readonly Scale[],
+  focusDrill?: (focus: FocusElement) => string | undefined,
 ): NextAction | undefined {
   const unlocked = new Set(progress.unlockedSet)
   for (const candidate of weakTransitions(progress, layout)) {
+    const values = {
+      transition: candidate.key,
+      from: candidate.from,
+      to: candidate.to,
+      confidence: percent(candidate.confidence),
+    }
+    const words = focusDrill?.({ kind: 'transition', value: candidate.key })
+    if (words !== undefined) {
+      return makeAction('weakTransition', templateKeys.weakTransition, values, words)
+    }
     const scale =
       startable.find((s) => s.focus.kind === 'transition' && s.focus.value === candidate.key) ??
       transitionScale(layout, candidate.key)

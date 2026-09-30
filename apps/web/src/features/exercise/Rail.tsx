@@ -1,11 +1,12 @@
-import type { AttemptMode, AttemptSummary, Scale } from '@typing-race/domain'
+import type { AttemptMode, AttemptSummary } from '@typing-race/domain'
 import { Card, Chip } from '@typing-race/ui'
 import { memo } from 'react'
 import { m } from '../../paraglide/messages.js'
-import { focusLabel, formatElapsed, GOAL_MESSAGES } from './labels.js'
+import { formatElapsed } from './labels.js'
+import type { ExerciseWording } from './wording.js'
 
 export interface RailProps {
-  readonly scale: Scale
+  readonly wording: ExerciseWording
   readonly mode: AttemptMode
   /** The last completed exercise, read **once** when the screen opened (FR-059). */
   readonly last: AttemptSummary | null
@@ -46,7 +47,7 @@ function Tile({
  * In a Test Attempt the grid is not rendered at all — it would be live speed and accuracy readouts
  * of a kind (FR-037, 4) — and a line of text says why the rail is quiet.
  */
-function RailBase({ scale, mode, last, thisScaleIsNext }: RailProps) {
+function RailBase({ wording, mode, last, thisScaleIsNext }: RailProps) {
   return (
     <aside aria-label={m.exercise_rail_label()} className="flex w-[276px] flex-col gap-4">
       <Card className="p-4">
@@ -58,10 +59,10 @@ function RailBase({ scale, mode, last, thisScaleIsNext }: RailProps) {
         </p>
         <p className="mt-3 font-ui text-xs text-ink/70">{m.exercise_focus_label()}</p>
         <p className="mt-1">
-          <Chip tone="neutral">{focusLabel(scale.focus)}</Chip>
+          <Chip tone="neutral">{wording.focus}</Chip>
         </p>
-        <p className="mt-3 font-ui text-xs text-ink/70">{m.exercise_goal_label()}</p>
-        <p className="mt-1 font-ui text-sm leading-relaxed">{GOAL_MESSAGES[scale.type]()}</p>
+        <p className="mt-3 font-ui text-xs text-ink/70">{wording.goalLabel}</p>
+        <p className="mt-1 font-ui text-sm leading-relaxed">{wording.goal}</p>
       </Card>
 
       {mode === 'practice' ? (

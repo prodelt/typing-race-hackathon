@@ -4,6 +4,7 @@ import { Button, Card, Chip } from '@typing-race/ui'
 import { useMemo } from 'react'
 import { useAppStore } from '../../app/state/index.js'
 import { m } from '../../paraglide/messages.js'
+import { UnlockWords } from '../words/UnlockWords.js'
 import { Comparison } from './Comparison.js'
 import { ErrorList } from './ErrorList.js'
 import { duration, number } from './format.js'
@@ -128,6 +129,13 @@ export function ResultScreen() {
         <aside className="space-y-6 lg:sticky lg:top-6 lg:self-start">
           {model.unlock === null ? null : (
             <UnlockCard unlock={model.unlock} attemptId={attempt.id} />
+          )}
+          {model.unlock === null ? null : (
+            <UnlockWords
+              layoutId={attempt.layoutId}
+              unlockKey={model.unlock.key}
+              unlocked={model.unlock.unlockedAfter}
+            />
           )}
           <NextActionCard model={model} />
         </aside>

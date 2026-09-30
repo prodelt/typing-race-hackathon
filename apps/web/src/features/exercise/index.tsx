@@ -1,8 +1,9 @@
 import { useParams, useSearch } from '@tanstack/react-router'
-import { scaleById } from '@typing-race/curriculum'
+import { isWordDrillId, scaleById } from '@typing-race/curriculum'
 import type { AttemptMode } from '@typing-race/domain'
 import { useDerived } from '../../app/state/index.js'
 import { m } from '../../paraglide/messages.js'
+import { WordExercise } from '../words/WordExercise.js'
 import { BackToPath, ExerciseSession } from './ExerciseSession.js'
 
 /**
@@ -19,6 +20,10 @@ export function ExerciseScreen() {
 
   // `mode` arrives already narrowed by the route's `validateSearch`; this only narrows the type.
   const mode: AttemptMode = search.mode === 'test' ? 'test' : 'practice'
+  // Stage 2 word drills share this route, so a Next Action or a mode switch reaches them unchanged.
+  if (params.scaleId !== undefined && isWordDrillId(params.scaleId)) {
+    return <WordExercise drillId={params.scaleId} mode={mode} />
+  }
   // An authored scale, or a Transition drill the coach built for this learner.
   const scale = scaleById(layout, params.scaleId ?? '')
 

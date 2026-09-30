@@ -124,6 +124,47 @@ export interface Scale {
 }
 
 // ---------------------------------------------------------------------------------------------
+// Word Drill — authored Stage 2 metadata. Like a Scale, a Word Drill is not text: its words are
+// drawn from the Word Bank at plan time, from the learner's unlocked set only.
+// ---------------------------------------------------------------------------------------------
+
+/**
+ * What one Stage 2 drill trains, after the requirements' §3.2 list. `focus` is the drill a Next
+ * Action builds around one weak key or transition; it is not in any catalogue, its id carries its
+ * Focus Element.
+ */
+export type WordDrillKind =
+  | 'firstWords'
+  | 'newKey'
+  | 'length'
+  | 'repeat'
+  | 'sameFinger'
+  | 'alternation'
+  | 'apostrophe'
+  | 'hyphen'
+  | 'capitals'
+  | 'ukLetter'
+  | 'weak'
+  | 'focus'
+
+export interface WordDrill {
+  /** Stable. Attempts reference it through `Attempt.scaleId` forever. */
+  readonly id: string
+  readonly layoutId: LayoutId
+  readonly kind: WordDrillKind
+  /** The key or transition every word contains, or `null` for a drill over a whole property. */
+  readonly focus: FocusElement | null
+  /** For `length`: the inclusive word-length band. */
+  readonly lengths: { readonly min: number; readonly max: number } | null
+  /** Characters (and the Shift token) that must be unlocked before the drill opens. */
+  readonly requires: readonly string[]
+  /** A drill that must be complete first — how the length ladder goes short, medium, long. */
+  readonly after: string | null
+  /** Target character count of the generated text. */
+  readonly size: number
+}
+
+// ---------------------------------------------------------------------------------------------
 // Level — the requirements' level table, as data
 // ---------------------------------------------------------------------------------------------
 

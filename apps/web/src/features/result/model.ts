@@ -1,6 +1,7 @@
 import {
   catalogue as catalogues,
   deriveProgress,
+  focusDrillFor,
   layouts,
   nextAction,
   scaleById,
@@ -39,6 +40,8 @@ export interface Unlock {
   readonly opens: readonly Scale[]
   /** What the card's button starts. */
   readonly firstDrill: Scale | undefined
+  /** The unlocked set right after this attempt: what Stage 2 may now draw words from. */
+  readonly unlockedAfter: readonly string[]
 }
 
 export interface ResultModel {
@@ -88,7 +91,13 @@ export function buildResultModel(input: ModelInput): ResultModel | null {
   const before = foldTo(index)
   const after = foldTo(index + 1)
 
-  const next = nextAction({ progress: after, lastAttempt: attempt, layout, catalogue: scales })
+  const next = nextAction({
+    progress: after,
+    lastAttempt: attempt,
+    layout,
+    catalogue: scales,
+    focusDrill: focusDrillFor(layout, after.unlockedSet),
+  })
 
   return {
     attempt,
@@ -152,7 +161,7 @@ function unlockOn(
       !scale.requires.every((char) => had.has(char)),
   )
   const firstDrill = opens[0] ?? scaleById(layout, next.startsScaleId)
-  return { key, finger: fingerOfChar(layout, key), opens, firstDrill }
+  return { key, finger: fingerOfChar(layout, key), opens, firstDrill, unlockedAfter: after }
 }
 
 export function fingerOfChar(layout: Layout, char: string): Finger | undefined {

@@ -262,9 +262,12 @@ test.describe('US3 the path and mastery', () => {
       page.getByRole('button', { name: 'Почати вправу Вертикальний рух · е' }),
     ).toHaveCount(0)
 
-    // Stage 2 and the Academy are shown as arriving later, not offered.
+    // Stage 2 is on the Path but closed until the home row is open, and says which keys it needs.
+    await expect(
+      region(page, 'Слова з відкритих клавіш').getByTestId('words-closed'),
+    ).toContainText('Бракує клавіш: п р є')
+    // The Academy is shown as arriving later, not offered.
     const later = region(page, 'Далі')
-    await expect(later).toContainText('Стадія 2: слова з відкритих клавіш')
     await expect(later).toContainText('Стадія 3: Академія')
     await expect(later).toContainText('З’явиться в наступному випуску.')
     await expect(later.getByRole('button')).toHaveCount(0)
