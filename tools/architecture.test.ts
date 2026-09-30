@@ -34,6 +34,11 @@ const EXEMPT = [
   'apps/web/src/instrument/',
   // Paraglide compiler output.
   'apps/web/src/paraglide/',
+  // The command palette's Ctrl+K accelerator. The rule exists so that the *attempt's* input path
+  // has exactly one reader; a window-level shortcut reads no character, feeds no engine and runs
+  // only while no attempt is in progress. Routing it through InputSource would mean giving the
+  // typing seam a second job, which is the opposite of what Constitution III asks for.
+  'apps/web/src/app/CommandPalette.tsx',
 ]
 
 interface Rule {

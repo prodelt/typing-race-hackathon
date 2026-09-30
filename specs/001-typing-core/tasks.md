@@ -146,15 +146,15 @@ another lane's unmerged code, so none of this can live in a lane.
 
 ### `apps/web` shell, service worker, instrumentation
 
-- [ ] T059 TanStack Router with **code-based routes** registering every route FR-054 requires in `apps/web/src/app/router.tsx` — no generated route tree, per [research.md R1](./research.md#r1-router--tanstack-router-with-code-based-routes)
-- [ ] T060 The app shell in `apps/web/src/app/Shell.tsx`: the six-item primary navigation with out-of-F1 items present and disabled (FR-055), the footer, and the dimmed-during-attempt state with its mono note (FR-057)
-- [ ] T061 [P] Theme and motion application at boot in `apps/web/src/app/theme.ts`, seeded by `prefers-reduced-motion` (FR-064)
+- [X] T059 TanStack Router with **code-based routes** registering every route FR-054 requires in `apps/web/src/app/router.tsx` — no generated route tree, per [research.md R1](./research.md#r1-router--tanstack-router-with-code-based-routes)
+- [X] T060 The app shell in `apps/web/src/app/Shell.tsx`: the six-item primary navigation with out-of-F1 items present and disabled (FR-055), the footer, and the dimmed-during-attempt state with its mono note (FR-057)
+- [X] T061 [P] Theme and motion application at boot in `apps/web/src/app/theme.ts`, seeded by `prefers-reduced-motion` (FR-064)
 - [X] T062 [P] Paraglide set up in `apps/web/project.inlang/settings.json` with uk and en catalogues under `apps/web/messages/`, `modules` pointing at local node_modules paths so the build never fetches, and the generated `apps/web/src/paraglide/` gitignored; interface language independent of typing language (FR-068). **Done 2026-09-30 with T006, and the open question is settled: `pathPattern` in the installed `@inlang/plugin-message-format` 4.4.4 is a `Union([String, Array(String)])` — the array form works, the documentation simply does not show it. So R9's fallback is not needed. Eight catalogues per locale, one per area (`app`, `exercise`, `result`, `path`, `formulas`, `settings`, `session`, `races`), which removes the shared-file ownership problem outright. Verified end to end: the compiler emits `messages/app_name.js` from `messages/app/uk.json`. Language switching left to T130; the strategy chain is `localStorage` then `preferredLanguage` then `baseLocale`**
-- [ ] T063 The Ctrl+K command palette in `apps/web/src/app/CommandPalette.tsx`, reachable from every screen (FR-056)
-- [ ] T064 Zustand store with hand-written typed reducers in `apps/web/src/app/state/`, wired to the `ProgressStore` seam; the four `load` outcomes each get a learner-facing path (FR-052, FR-083)
-- [ ] T065 [P] The product page P0 in `apps/web/src/features/product/ProductPage.tsx` — what the app is, the three stages, and the entry into practice
-- [ ] T066 The service worker in `apps/web/src/sw/` precaching the shell, the fonts and the Stage 1 data, so practice runs with the network away after the first load (FR-074); include a stale-shell invalidation on deploy
-- [ ] T067 The latency probe in `apps/web/src/instrument/latency.ts` per [research.md R8](./research.md#r8-measuring-keystroke-to-paint) — `t0` at `beforeinput`, `t1` in the task after the next animation frame — dead in production builds
+- [X] T063 The Ctrl+K command palette in `apps/web/src/app/CommandPalette.tsx`, reachable from every screen (FR-056)
+- [X] T064 Zustand store with hand-written typed reducers in `apps/web/src/app/state/`, wired to the `ProgressStore` seam; the four `load` outcomes each get a learner-facing path (FR-052, FR-083)
+- [X] T065 [P] The product page P0 in `apps/web/src/features/product/ProductPage.tsx` — what the app is, the three stages, and the entry into practice
+- [X] T066 The service worker in `apps/web/src/sw/` precaching the shell, the fonts and the Stage 1 data, so practice runs with the network away after the first load (FR-074); include a stale-shell invalidation on deploy
+- [X] T067 The latency probe in `apps/web/src/instrument/latency.ts` per [research.md R8](./research.md#r8-measuring-keystroke-to-paint) — `t0` at `beforeinput`, `t1` in the task after the next animation frame — dead in production builds
 
 ### End-to-end harness
 

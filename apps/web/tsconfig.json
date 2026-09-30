@@ -5,7 +5,11 @@
     "lib": ["ES2024", "DOM", "DOM.Iterable"],
     "types": ["vite/client"],
     "jsx": "react-jsx",
-    "rootDir": "src"
+    "rootDir": "src",
+    // Paraglide compiles to JSDoc-typed JavaScript with no .d.ts alongside it, so the message
+    // functions are only visible to TypeScript with this on. `checkJs` stays off: the generated
+    // output is not ours to fix.
+    "allowJs": true
   },
   "include": ["src"]
 }

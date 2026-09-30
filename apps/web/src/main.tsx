@@ -1,8 +1,54 @@
+import { createRouter, RouterProvider } from '@tanstack/react-router'
+import '@typing-race/ui/tokens.css'
+import '@typing-race/ui/themes.css'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import { buildRouteTree } from './app/router.js'
+import { DEFAULT_SETTINGS, useAppStore } from './app/state/index.js'
+import { applyPresentation, readEnvironment, watchSystemPreferences } from './app/theme.js'
+import { FormulasPage } from './features/formulas/index.js'
+import { ProductPage } from './features/product/index.js'
+import { installLatencyProbe } from './instrument/latency.js'
+
+/**
+ * The application entry point.
+ *
+ * Order matters here. The theme is applied to `<html>` **before** React mounts, so no frame of the
+ * wrong theme is ever painted — a flash of the light theme on the way to the dark one is the sort
+ * of thing a learner notices at 7am and no test would ever catch.
+ */
+
+const environment = readEnvironment()
+applyPresentation(DEFAULT_SETTINGS, environment)
+
+// Re-applies whenever the reducer changes settings, and whenever the operating system does.
+useAppStore.subscribe((state) => {
+  applyPresentation(state.settings, readEnvironment())
+})
+watchSystemPreferences((next) => {
+  applyPresentation(useAppStore.getState().settings, next)
+})
+
+// Dead in production: the body is behind `import.meta.env.DEV`, which the build constant-folds
+// away (research R8, and the note in instrument/latency.ts about why dot access matters).
+installLatencyProbe()
+
+const router = createRouter({
+  routeTree: buildRouteTree({ product: ProductPage, formulas: FormulasPage }),
+  defaultPreload: 'intent',
+})
+
+declare module '@tanstack/react-router' {
+  interface Register {
+    router: typeof router
+  }
+}
 
 const rootElement = document.getElementById('root')
 if (!rootElement) throw new Error('#root is missing from index.html')
 
-// T059-T064 replace this placeholder with the router, the shell and the boot sequence.
-createRoot(rootElement).render(<StrictMode />)
+createRoot(rootElement).render(
+  <StrictMode>
+    <RouterProvider router={router} />
+  </StrictMode>,
+)

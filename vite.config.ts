@@ -1,9 +1,11 @@
+import { createHash } from 'node:crypto'
+import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { gzipSync } from 'node:zlib'
 import { paraglideVitePlugin } from '@inlang/paraglide-js'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
-import { defineConfig, type Plugin } from 'vite'
+import { defineConfig, type Plugin, transformWithOxc } from 'vite'
 
 const appRoot = fileURLToPath(new URL('./apps/web', import.meta.url))
 
@@ -52,6 +54,46 @@ function initialJsBudget(limitBytes: number): Plugin {
   }
 }
 
+/**
+ * T066, FR-074. Emits `/sw.js` with the precache manifest written into it.
+ *
+ * The worker source (`src/sw/worker.ts`) has no imports, so it is compiled on its own and never
+ * joins the app's chunk graph, which keeps it out of the initial-JS budget. `enforce: 'post'`
+ * puts this after Vite's HTML plugin, so `index.html` is already in the bundle when we read it.
+ * Source maps are not precached; everything else the build emitted is, which covers the hashed JS
+ * and CSS, the bundled woff2 fonts and the HTML shell.
+ */
+function serviceWorker(): Plugin {
+  const source = fileURLToPath(new URL('./apps/web/src/sw/worker.ts', import.meta.url))
+  return {
+    name: 'typing-race:service-worker',
+    apply: 'build',
+    enforce: 'post',
+    async generateBundle(_options, bundle) {
+      const files = Object.values(bundle)
+        .filter((output) => !output.fileName.endsWith('.map'))
+        .sort((a, b) => a.fileName.localeCompare(b.fileName))
+      const hash = createHash('sha256')
+      for (const output of files) {
+        hash.update(output.fileName)
+        if (output.type === 'asset' && output.fileName.endsWith('.html')) {
+          hash.update(String(output.source))
+        }
+      }
+      const manifest = {
+        version: hash.digest('hex').slice(0, 16),
+        urls: ['/', ...files.map((output) => `/${output.fileName}`)],
+      }
+      const compiled = await transformWithOxc(readFileSync(source, 'utf-8'), source, { lang: 'ts' })
+      this.emitFile({
+        type: 'asset',
+        fileName: 'sw.js',
+        source: compiled.code.replaceAll('__PRECACHE_MANIFEST__', JSON.stringify(manifest)),
+      })
+    },
+  }
+}
+
 export default defineConfig({
   root: appRoot,
   // Environment files stay at the repository root, next to .env.example.
@@ -65,6 +107,7 @@ export default defineConfig({
       strategy: ['localStorage', 'preferredLanguage', 'baseLocale'],
     }),
     initialJsBudget(INITIAL_JS_BUDGET_BYTES),
+    serviceWorker(),
   ],
   build: {
     target: 'es2023',
