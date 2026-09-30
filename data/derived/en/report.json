@@ -1,0 +1,356 @@
+{
+  "format": "typing-race/data-report@1",
+  "language": "en",
+  "layout": "qwerty",
+  "algorithmVersion": "1.0.0",
+  "inputs": [
+    {
+      "path": "english/wordlists/frequencywords-2018/en_50k.txt",
+      "sha256": "5351ff405b1126ef555791dd4d9798a48e3e9a501a9fc481a9da957752cfb458",
+      "bytes": 622749,
+      "dataset": "frequencywords-en",
+      "license": "CC BY-SA 4.0 (content, per upstream README); MIT (code, vendored LICENSE)"
+    },
+    {
+      "path": "english/wordlists/hunspell-en/index.aff",
+      "sha256": "8ae1f19d4840d957728ad90555d5a8dff6cc5c046279c95ff0c00fc0a0136c7b",
+      "bytes": 3086,
+      "dataset": "hunspell-en",
+      "license": "SCOWL (c) Kevin Atkinson, permissive with notice; packaging MIT (wooorm/dictionaries)"
+    },
+    {
+      "path": "english/wordlists/hunspell-en/index.dic",
+      "sha256": "f0b1a234bd178bdd01875b2a392a9647f888b8fe879f79c52aae62c2759b3647",
+      "bytes": 551762,
+      "dataset": "hunspell-en",
+      "license": "SCOWL (c) Kevin Atkinson, permissive with notice; packaging MIT (wooorm/dictionaries)"
+    },
+    {
+      "path": "english/wordlists/dwyl-english-words/words_alpha.txt",
+      "sha256": "3ed0c94610d8bcf7c11bbb49c56aa49c7234d32b66824df91f554169e572da48",
+      "bytes": 4234910,
+      "dataset": "dwyl-english-words",
+      "license": "Unlicense"
+    }
+  ],
+  "rules": {
+    "unicode": "Strict UTF-8 decoding (an invalid byte aborts the run), then NFC. Never NFKC. і ї є ґ are never mapped to other letters.",
+    "case": "Lower-cased. Sources are all lower case already; words the spelling dictionary knows only capitalised are proper nouns and are dropped.",
+    "apostrophe": "U+2019, U+02BC, U+0060, U+2018 and U+00B4 fold to U+0027. An apostrophe must sit between two letters. Ukrainian: when a word is not in the dictionary but the same word with an apostrophe inserted before я/ю/є/ї after a consonant is (пять -> п'ять), the apostrophised form is kept and flagged apostrophe-restored.",
+    "hyphen": "A hyphen must sit between two letters, never doubled. A hyphenated word is kept only if the dictionary lists the whole form, or (Ukrainian) it is a word plus the particle -небудь or -таки.",
+    "stress": "Combining acute accents (U+0301) are removed.",
+    "charset": "a-z plus apostrophe and hyphen; digits, non-ASCII letters and other symbols are dropped.",
+    "singleLetters": "Only one-letter real words are kept: uk а в є ж з і й о у я; en a.",
+    "dedupe": "Raw tokens that normalise to the same word are merged and their counts summed. Sorted by frequency, then by UTF-16 code units (never locale collation).",
+    "dictionary": "uk: must be produced by hunspell-uk (reverse affix lookup, lower case). en: must be produced by hunspell-en in lower case AND, unless it has an apostrophe or hyphen (which dwyl never has), be listed in dwyl words_alpha. The dictionaries only answer yes/no; no word is taken from them.",
+    "properNouns": "A token the dictionary produces only in capitalised form (джон -> Джон, english -> English) is a proper noun and dropped.",
+    "stoplists": "uk: residual Russian that shares a spelling with a rare Ukrainian form. en: contraction halves (don, didn, isn…). Both: an authored profanity list (roots and exact words); en also drops anything hunspell-en marks NOSUGGEST. Hyphenated reduplications (ха-ха) and single-letter parts (е-е, м-р; з and о excepted) are dropped as noise, and so are words of two or more letters with no vowel (хм, ll, tv).",
+    "ranking": "Most frequent 20000 words are written. N-grams are counted over every surviving word, each word counted once, weighted by its frequency; the 4000 heaviest trigrams are written.",
+    "difficulty": "sameFingerTransitions: adjacent pairs typed by the same finger, repeated keys included. rowChanges: adjacent pairs on different rows. tier 1-5: ceil((rank band + length band) / 2) with rank bands 500/2000/5000/10000 and length bands 3/5/7/9."
+  },
+  "steps": [
+    {
+      "step": "read",
+      "kept": 50000,
+      "removed": {}
+    },
+    {
+      "step": "normalise, character rules, single letters",
+      "kept": 48424,
+      "removed": {
+        "bad-apostrophe": 300,
+        "bad-hyphen": 341,
+        "digit": 305,
+        "foreign-letter": 252,
+        "other-character": 353,
+        "single-letter": 25
+      },
+      "examples": {
+        "bad-apostrophe": [
+          "'s",
+          "'t",
+          "'m",
+          "'re",
+          "'ll",
+          "'ve",
+          "'d",
+          "'cause",
+          "'am",
+          "'ii",
+          "'all",
+          "'clock",
+          "'mon",
+          "'you",
+          "'i"
+        ],
+        "bad-hyphen": [
+          "i-",
+          "you-",
+          "just-",
+          "uh-",
+          "and-",
+          "that-",
+          "but-",
+          "to-",
+          "the-",
+          "it-",
+          "is-",
+          "a-",
+          "me-",
+          "this-",
+          "know-"
+        ],
+        "digit": [
+          "2nd",
+          "1st",
+          "3rd",
+          "20th",
+          "4th",
+          "80s",
+          "5th",
+          "ch00ffff",
+          "18th",
+          "19th",
+          "21st",
+          "10th",
+          "15th",
+          "70s",
+          "7th"
+        ],
+        "foreign-letter": [
+          "yöu",
+          "fiancé",
+          "fiancée",
+          "señor",
+          "café",
+          "yοu",
+          "josé",
+          "nköö",
+          "tο",
+          "françois",
+          "é",
+          "sí",
+          "andré",
+          "führer",
+          "sátur"
+        ],
+        "other-character": [
+          "mr.",
+          "dr.",
+          "mrs.",
+          "ms.",
+          "i.",
+          "st.",
+          "u.s.",
+          "a.m.",
+          "no.",
+          "l.a.",
+          "p.m.",
+          "b.",
+          "a.",
+          "i.d.",
+          "m."
+        ],
+        "single-letter": [
+          "i",
+          "l",
+          "s",
+          "o",
+          "t",
+          "d",
+          "y",
+          "m",
+          "c",
+          "e",
+          "h",
+          "n",
+          "b",
+          "f",
+          "g"
+        ]
+      }
+    },
+    {
+      "step": "dedupe",
+      "kept": 48424,
+      "removed": {
+        "merged-duplicate": 0
+      }
+    },
+    {
+      "step": "dictionary (hunspell-en)",
+      "kept": 31145,
+      "removed": {
+        "not-in-dictionary": 12246,
+        "proper-noun": 5033
+      },
+      "examples": {
+        "not-in-dictionary": [
+          "didn",
+          "doesn",
+          "isn",
+          "ok",
+          "wasn",
+          "wouldn",
+          "couldn",
+          "aren",
+          "ain",
+          "shouldn",
+          "weren",
+          "tv",
+          "hasn",
+          "mm-hmm",
+          "i-i"
+        ],
+        "proper-noun": [
+          "mr",
+          "jesus",
+          "sam",
+          "michael",
+          "christmas",
+          "george",
+          "david",
+          "joe",
+          "york",
+          "american",
+          "america",
+          "paul",
+          "mary",
+          "ben",
+          "english"
+        ],
+        "apostrophe-restored": []
+      }
+    },
+    {
+      "step": "apostrophe restoration",
+      "kept": 31145,
+      "removed": {
+        "restored": 0
+      }
+    },
+    {
+      "step": "word list (dwyl-english-words)",
+      "kept": 30788,
+      "removed": {
+        "not-in-word-list": 357
+      },
+      "examples": {
+        "not-in-word-list": [
+          "hmm",
+          "kinda",
+          "nah",
+          "outta",
+          "oi",
+          "cellphone",
+          "nigga",
+          "hiya",
+          "gotcha",
+          "website",
+          "rehab",
+          "motherfuckers",
+          "barbie",
+          "innit",
+          "texting"
+        ]
+      }
+    },
+    {
+      "step": "stoplists",
+      "kept": 30644,
+      "removed": {
+        "contraction-fragment": 2,
+        "no-vowel": 75,
+        "profanity": 67
+      },
+      "examples": {
+        "contraction-fragment": [
+          "don",
+          "haven"
+        ],
+        "no-vowel": [
+          "mm",
+          "shh",
+          "ls",
+          "ll",
+          "st",
+          "pm",
+          "ms",
+          "jr",
+          "rs",
+          "dc",
+          "sh",
+          "rm",
+          "pr",
+          "km",
+          "psst"
+        ]
+      }
+    },
+    {
+      "step": "dedupe after restoration",
+      "kept": 30644,
+      "removed": {
+        "merged-duplicate": 0
+      }
+    },
+    {
+      "step": "keep the 20000 most frequent",
+      "kept": 20000,
+      "removed": {
+        "below-cut": 10644
+      }
+    }
+  ],
+  "counts": {
+    "before": 50000,
+    "afterFiltering": 30644,
+    "written": 20000,
+    "bigrams": 534,
+    "trigramsCounted": 5113,
+    "trigramsWritten": 4000
+  },
+  "written": {
+    "byLength": {
+      "1": 1,
+      "2": 76,
+      "3": 588,
+      "4": 1773,
+      "5": 2626,
+      "6": 3313,
+      "7": 3408,
+      "8": 2932,
+      "9": 2205,
+      "10": 1464,
+      "11": 860,
+      "12": 448,
+      "13": 204,
+      "14": 75,
+      "15": 21,
+      "16": 4,
+      "17": 2
+    },
+    "byTier": {
+      "1": 116,
+      "2": 1205,
+      "3": 4146,
+      "4": 8786,
+      "5": 5747
+    },
+    "flags": {
+      "apostrophe": 17,
+      "apostrophe-restored": 0,
+      "hyphen": 0,
+      "double-letter": 3921,
+      "uk-letter": 0
+    }
+  },
+  "outputs": {
+    "words.json": {
+      "sha256": "7d555b4f67e0b88c11f88d979cbea77eedf558409ff1ac0d5b4e9fe6bceb204e"
+    },
+    "ngrams.json": {
+      "sha256": "d99a4d92ff2e82662ad98897bc0982d7b6edd08c3101f57610a623f7cf667d5b"
+    }
+  }
+}

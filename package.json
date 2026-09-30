@@ -25,7 +25,9 @@
     "test:e2e:input": "playwright test --grep @input --project=chromium --project=firefox --project=webkit",
     "test:e2e:cdp": "playwright test --project=cdp",
     "test:latency": "playwright test --project=latency",
-    "check": "pnpm typecheck && pnpm lint && pnpm test"
+    "check": "pnpm typecheck && pnpm lint && pnpm test",
+    "data": "node --import ./tools/data/register.mjs tools/data/cli.ts",
+    "data:check": "node --import ./tools/data/register.mjs tools/data/cli.ts --check"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",

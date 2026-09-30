@@ -48,7 +48,6 @@ apps/web/src/paraglide/
 supabase/.branches/
 supabase/.temp/
 
-# Vercel CLI link
+# Vercel CLI link, local secrets
 .vercel
-
-.vercel
+*.local

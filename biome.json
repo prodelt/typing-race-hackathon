@@ -12,6 +12,7 @@
       "!.claude",
       "!tasks",
       "!.scratch",
+      "!data/derived",
       "!supabase/functions",
       "!**/paraglide",
       "!**/*.gen.ts"

@@ -1,0 +1,359 @@
+{
+  "format": "typing-race/data-report@1",
+  "language": "uk",
+  "layout": "yq",
+  "algorithmVersion": "1.0.0",
+  "inputs": [
+    {
+      "path": "ukrainian/wordlists/frequencywords-2018/uk_50k.txt",
+      "sha256": "881686fe66a168b79f6a9ee2f6cbbf944cfb12bfb7040913ef535cb29bd86ec9",
+      "bytes": 887259,
+      "dataset": "frequencywords-uk",
+      "license": "CC BY-SA 4.0 (content, per upstream README); MIT (code, vendored LICENSE)"
+    },
+    {
+      "path": "ukrainian/wordlists/hunspell-uk/index.aff",
+      "sha256": "4243327a3aa19c6db5a4fb2e0c4e3eba6ad26e7ccb8a3f4e634c28d9a2d18956",
+      "bytes": 203292,
+      "dataset": "hunspell-uk",
+      "license": "GPL-3.0 as packaged (brown-uk/dict_uk via wooorm/dictionaries); build-time filter only"
+    },
+    {
+      "path": "ukrainian/wordlists/hunspell-uk/index.dic",
+      "sha256": "48cbe32567a2c3c98f83d437bcd84ad3c11310e9df4d6c15d888b1e67654be31",
+      "bytes": 8493094,
+      "dataset": "hunspell-uk",
+      "license": "GPL-3.0 as packaged (brown-uk/dict_uk via wooorm/dictionaries); build-time filter only"
+    }
+  ],
+  "rules": {
+    "unicode": "Strict UTF-8 decoding (an invalid byte aborts the run), then NFC. Never NFKC. і ї є ґ are never mapped to other letters.",
+    "case": "Lower-cased. Sources are all lower case already; words the spelling dictionary knows only capitalised are proper nouns and are dropped.",
+    "apostrophe": "U+2019, U+02BC, U+0060, U+2018 and U+00B4 fold to U+0027. An apostrophe must sit between two letters. Ukrainian: when a word is not in the dictionary but the same word with an apostrophe inserted before я/ю/є/ї after a consonant is (пять -> п'ять), the apostrophised form is kept and flagged apostrophe-restored.",
+    "hyphen": "A hyphen must sit between two letters, never doubled. A hyphenated word is kept only if the dictionary lists the whole form, or (Ukrainian) it is a word plus the particle -небудь or -таки.",
+    "stress": "Combining acute accents (U+0301) are removed.",
+    "charset": "абвгґдеєжзиіїйклмнопрстуфхцчшщьюя plus apostrophe and hyphen; tokens with ы э ъ ё are Russian and dropped; Latin letters, digits and other symbols are dropped.",
+    "singleLetters": "Only one-letter real words are kept: uk а в є ж з і й о у я; en a.",
+    "dedupe": "Raw tokens that normalise to the same word are merged and their counts summed. Sorted by frequency, then by UTF-16 code units (never locale collation).",
+    "dictionary": "uk: must be produced by hunspell-uk (reverse affix lookup, lower case). en: must be produced by hunspell-en in lower case AND, unless it has an apostrophe or hyphen (which dwyl never has), be listed in dwyl words_alpha. The dictionaries only answer yes/no; no word is taken from them.",
+    "properNouns": "A token the dictionary produces only in capitalised form (джон -> Джон, english -> English) is a proper noun and dropped.",
+    "stoplists": "uk: residual Russian that shares a spelling with a rare Ukrainian form. en: contraction halves (don, didn, isn…). Both: an authored profanity list (roots and exact words); en also drops anything hunspell-en marks NOSUGGEST. Hyphenated reduplications (ха-ха) and single-letter parts (е-е, м-р; з and о excepted) are dropped as noise, and so are words of two or more letters with no vowel (хм, ll, tv).",
+    "ranking": "Most frequent 20000 words are written. N-grams are counted over every surviving word, each word counted once, weighted by its frequency; the 4000 heaviest trigrams are written.",
+    "difficulty": "sameFingerTransitions: adjacent pairs typed by the same finger, repeated keys included. rowChanges: adjacent pairs on different rows. tier 1-5: ceil((rank band + length band) / 2) with rank bands 500/2000/5000/10000 and length bands 3/5/7/9."
+  },
+  "steps": [
+    {
+      "step": "read",
+      "kept": 50000,
+      "removed": {}
+    },
+    {
+      "step": "normalise, character rules, single letters",
+      "kept": 44705,
+      "removed": {
+        "bad-hyphen": 5,
+        "digit": 63,
+        "foreign-letter": 1972,
+        "other-character": 36,
+        "russian-letter": 3196,
+        "single-letter": 23
+      },
+      "examples": {
+        "bad-hyphen": [
+          "я-",
+          "але-",
+          "це-",
+          "просто-",
+          "ти-"
+        ],
+        "digit": [
+          "3chffffff",
+          "плавець-1",
+          "2012-му",
+          "2ch00ff00ff",
+          "3ch00000000",
+          "4-х",
+          "4ch00000000",
+          "1-й",
+          "3ch1a1242",
+          "3chd5d3f6",
+          "2-й",
+          "18-го",
+          "3-х",
+          "7-й",
+          "80-х"
+        ],
+        "foreign-letter": [
+          "i",
+          "you",
+          "the",
+          "to",
+          "s",
+          "a",
+          "it",
+          "b1",
+          "chffffff",
+          "fntahoma",
+          "i0",
+          "fs52",
+          "a2",
+          "that",
+          "and"
+        ],
+        "other-character": [
+          "так.",
+          "ні.",
+          "гаразд.",
+          "добре.",
+          "оу.",
+          "да.",
+          "знаю.",
+          "прим.",
+          "дякую.",
+          "т.",
+          "о.бі.",
+          "нет.",
+          "привіт.",
+          "и.п.",
+          "чудово."
+        ],
+        "russian-letter": [
+          "ты",
+          "это",
+          "мы",
+          "вы",
+          "бы",
+          "чтобы",
+          "всё",
+          "был",
+          "было",
+          "быть",
+          "была",
+          "этого",
+          "её",
+          "этом",
+          "ещё"
+        ],
+        "single-letter": [
+          "и",
+          "с",
+          "п",
+          "б",
+          "к",
+          "ю",
+          "м",
+          "х",
+          "ї",
+          "е",
+          "н",
+          "л",
+          "р",
+          "д",
+          "ч"
+        ]
+      }
+    },
+    {
+      "step": "dedupe",
+      "kept": 44705,
+      "removed": {
+        "merged-duplicate": 0
+      }
+    },
+    {
+      "step": "dictionary (hunspell-uk)",
+      "kept": 27221,
+      "removed": {
+        "not-in-dictionary": 14938,
+        "proper-noun": 2546
+      },
+      "examples": {
+        "not-in-dictionary": [
+          "что",
+          "да",
+          "как",
+          "нет",
+          "тебя",
+          "она",
+          "если",
+          "они",
+          "хорошо",
+          "есть",
+          "здесь",
+          "когда",
+          "из",
+          "может",
+          "почему"
+        ],
+        "proper-noun": [
+          "меня",
+          "только",
+          "много",
+          "чарлі",
+          "нужна",
+          "джон",
+          "уж",
+          "пойду",
+          "джо",
+          "теде",
+          "вон",
+          "гаррі",
+          "майкл",
+          "боб",
+          "чжун"
+        ],
+        "apostrophe-restored": [
+          "п'ять",
+          "пам'ять",
+          "дев'ять",
+          "м'ясо",
+          "п'яти",
+          "м'яса",
+          "м'яч",
+          "здоров'як",
+          "п'є",
+          "м'ясом",
+          "пам'ятаєш",
+          "м'ясник",
+          "п'ятам",
+          "п'ятеро",
+          "дев'яти"
+        ]
+      }
+    },
+    {
+      "step": "apostrophe restoration",
+      "kept": 27221,
+      "removed": {
+        "restored": 27
+      }
+    },
+    {
+      "step": "stoplists",
+      "kept": 27071,
+      "removed": {
+        "hyphen-noise": 37,
+        "no-vowel": 25,
+        "profanity": 25,
+        "residual-russian": 63
+      },
+      "examples": {
+        "hyphen-noise": [
+          "е-е",
+          "так-так",
+          "ні-ні",
+          "а-а",
+          "ні-ні-ні",
+          "ха-ха",
+          "м-р",
+          "д-р",
+          "о-о",
+          "ось-ось",
+          "а-а-а",
+          "па-па",
+          "ой-ой",
+          "дуже-дуже",
+          "ну-ну"
+        ],
+        "no-vowel": [
+          "хм",
+          "мм",
+          "гм",
+          "ммм",
+          "хмм",
+          "нм",
+          "км",
+          "смс",
+          "тсс",
+          "кг",
+          "см",
+          "грн",
+          "зп",
+          "кхм",
+          "хммм"
+        ],
+        "residual-russian": [
+          "он",
+          "мне",
+          "но",
+          "его",
+          "ладно",
+          "ее",
+          "потому",
+          "ему",
+          "надо",
+          "конечно",
+          "после",
+          "во",
+          "потом",
+          "парень",
+          "найти"
+        ]
+      }
+    },
+    {
+      "step": "dedupe after restoration",
+      "kept": 27071,
+      "removed": {
+        "merged-duplicate": 0
+      }
+    },
+    {
+      "step": "keep the 20000 most frequent",
+      "kept": 20000,
+      "removed": {
+        "below-cut": 7071
+      }
+    }
+  ],
+  "counts": {
+    "before": 50000,
+    "afterFiltering": 27071,
+    "written": 20000,
+    "bigrams": 758,
+    "trigramsCounted": 6127,
+    "trigramsWritten": 4000
+  },
+  "written": {
+    "byLength": {
+      "1": 10,
+      "2": 89,
+      "3": 492,
+      "4": 1533,
+      "5": 2849,
+      "6": 3447,
+      "7": 3538,
+      "8": 2995,
+      "9": 2303,
+      "10": 1473,
+      "11": 752,
+      "12": 313,
+      "13": 141,
+      "14": 48,
+      "15": 7,
+      "16": 10
+    },
+    "byTier": {
+      "1": 132,
+      "2": 1105,
+      "3": 4105,
+      "4": 9254,
+      "5": 5404
+    },
+    "flags": {
+      "apostrophe": 14,
+      "apostrophe-restored": 14,
+      "hyphen": 73,
+      "double-letter": 673,
+      "uk-letter": 6727
+    }
+  },
+  "outputs": {
+    "words.json": {
+      "sha256": "9a6c63c1a51ec2349e29718f1fb243287cf3dad68c1e4322f32ab3cb6733c94d"
+    },
+    "ngrams.json": {
+      "sha256": "56e0a6063e154c04a72b1e778fa4045439225039e05706ec9781248d024989a3"
+    }
+  }
+}
