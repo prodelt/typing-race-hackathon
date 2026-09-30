@@ -1,0 +1,158 @@
+/*
+ * The live gradient behind an emphasis panel (b-red v4 grad.css, scheme B). See grad.tsx.
+ *
+ * `.gp-host` is the panel; its own background is the static picture (what motion `off`, a
+ * browser without the layer, and the first paint all show), and the layer fades in over it.
+ */
+
+.gp-host {
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
+}
+
+.gp-host.gp-host--bright {
+  background:
+    radial-gradient(60% 70% at 12% 10%, rgb(240 172 164 / 80%), rgb(240 172 164 / 0%) 70%),
+    radial-gradient(50% 60% at 88% 90%, rgb(234 148 138 / 60%), rgb(234 148 138 / 0%) 70%), #fbe8e5;
+  /* The panel's text colours are redefined for its own ground, in every theme: on the blush the
+     secondary grey darkens (the brand site darkens --mute on its bright panels the same way). */
+  --color-ink: #141414;
+  --color-ink-soft: #2e2e2e;
+  --color-muted: #574443;
+  --color-ink-faint: #6b5654;
+  --color-hairline: rgb(20 20 20 / 16%);
+  color: var(--color-ink);
+}
+
+.gp-host.gp-host--ember {
+  background:
+    radial-gradient(60% 70% at 85% 15%, rgb(194 31 19 / 95%), rgb(194 31 19 / 0%) 70%),
+    radial-gradient(55% 65% at 10% 85%, rgb(110 15 8 / 85%), rgb(110 15 8 / 0%) 70%), #8f150c;
+  /* On the red only light text: white, and the pale blush for secondary text and red accents. */
+  --color-ink: #ffffff;
+  --color-ink-soft: #fbe3e0;
+  --color-muted: #fbe3e0;
+  --color-ink-faint: #f7d0cb;
+  --color-terracotta: #fbe3e0;
+  --color-terracotta-ink: #fbe3e0;
+  --color-hairline: rgb(255 255 255 / 28%);
+  color: #ffffff;
+}
+
+.gp-host--ember :focus-visible {
+  outline-color: #ffffff;
+}
+
+.gp-layer {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+  contain: strict;
+  animation: gp-in var(--dur-reveal) var(--ease-standard) both;
+}
+
+.gp-blob {
+  position: absolute;
+  display: block;
+  aspect-ratio: 1 / 0.76;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+  animation-fill-mode: both;
+}
+
+/* Out of view or in a background tab: every blob holds its phase. */
+.gp-sleep .gp-blob {
+  animation-play-state: paused;
+}
+
+/* Motion reduced: a still frame, no animation at all (the brand site's "static frame"). */
+:root[data-motion="reduced"] .gp-blob {
+  animation: none;
+}
+
+/* Motion off: no layer at all; the host's static gradient is the picture. */
+:root[data-motion="off"] .gp-layer {
+  display: none;
+}
+
+/* Low vision: a gradient under text reads as a smudge, so the panel is one flat colour. */
+:root[data-theme="low-vision"] .gp-layer {
+  display: none;
+}
+
+:root[data-theme="low-vision"] .gp-host--bright {
+  background: #fbe3e0;
+}
+
+:root[data-theme="low-vision"] .gp-host--ember {
+  background: #a3170d;
+}
+
+.gp-grain {
+  position: absolute;
+  inset: 0;
+  display: block;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+}
+
+@keyframes gp-drift-0 {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg) scale(1);
+  }
+  50% {
+    transform: translate(-37%, -60%) rotate(34deg) scale(1.12);
+  }
+  100% {
+    transform: translate(-58%, -42%) rotate(68deg) scale(0.94);
+  }
+}
+
+@keyframes gp-drift-1 {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg) scale(1.05);
+  }
+  50% {
+    transform: translate(-63%, -41%) rotate(-30deg) scale(0.92);
+  }
+  100% {
+    transform: translate(-44%, -57%) rotate(-58deg) scale(1.1);
+  }
+}
+
+@keyframes gp-drift-2 {
+  0% {
+    transform: translate(-50%, -50%) rotate(18deg) scale(0.95);
+  }
+  50% {
+    transform: translate(-42%, -38%) rotate(-12deg) scale(1.14);
+  }
+  100% {
+    transform: translate(-60%, -58%) rotate(40deg) scale(1);
+  }
+}
+
+@keyframes gp-drift-3 {
+  0% {
+    transform: translate(-50%, -50%) rotate(-14deg) scale(1.1);
+  }
+  50% {
+    transform: translate(-56%, -63%) rotate(24deg) scale(0.9);
+  }
+  100% {
+    transform: translate(-40%, -47%) rotate(-40deg) scale(1.04);
+  }
+}
+
+@keyframes gp-in {
+  from {
+    opacity: 0;
+  }
+}

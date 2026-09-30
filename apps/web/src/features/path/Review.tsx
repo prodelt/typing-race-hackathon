@@ -3,23 +3,22 @@ import { fingerOf, MIN_TRANSITION_SAMPLES, WEAK_CONFIDENCE_CEILING } from '@typi
 import type { Layout, Progress, Scale } from '@typing-race/domain'
 import { parseTransitionKey } from '@typing-race/domain'
 import { CONFIDENCE_MIN_SAMPLES } from '@typing-race/metrics'
-import { Card, Chip } from '@typing-race/ui'
+import { buttonClass, Index } from '@typing-race/ui'
 import { m } from '../../paraglide/messages.js'
 import { displayChar } from './model.js'
 
 /**
- * T116, FR-047: a way to practise the learner's weak keys and Transitions specifically.
+ * A way to practise the learner's weak keys and Transitions specifically.
  *
  * Separate from the Next Action, and deliberately so. The Next Action names **one** thing and is
- * the product's answer to "what now" (FR-031); this is the answer to a different question — "what
- * am I actually bad at" — which a learner is entitled to ask and to browse. Collapsing the two
- * would either give the coach a list, which SC-010 forbids, or leave the learner with no way to
- * see their own weaknesses at all.
+ * the product's answer to "what now"; this is the answer to a different question, "what am I
+ * actually bad at", which a learner is entitled to ask and to browse. Collapsing the two would
+ * either give the coach a list or leave the learner with no way to see their own weaknesses.
  *
  * **Nothing under-observed is named.** An element with fewer than five observations has no
- * confidence value at all (research R4), and a Transition below `MIN_TRANSITION_SAMPLES` is never
- * named to a learner (FR-035). Telling someone their weakest transition on the strength of two
- * keystrokes is not feedback, it is noise wearing feedback's clothes.
+ * confidence value at all, and a Transition below `MIN_TRANSITION_SAMPLES` is never named to a
+ * learner. Telling someone their weakest transition on the strength of two keystrokes is not
+ * feedback, it is noise wearing feedback's clothes.
  */
 
 interface WeakElement {
@@ -76,54 +75,54 @@ export function Review({ progress, layout, catalogue }: ReviewProps) {
   const weak = weakest(progress, catalogue)
 
   return (
-    <Card aria-labelledby="path-review" role="region" className="p-5">
-      <h2 id="path-review" className="font-ui text-lg font-bold">
+    <section
+      id="weak"
+      data-section={m.path_review_title()}
+      aria-labelledby="path-review"
+      className="path-sec"
+    >
+      <Index n={5} />
+      <h2 id="path-review" className="path-sec__title">
         {m.path_review_title()}
       </h2>
-      <p className="mt-1 font-ui text-sm text-muted">{m.path_review_intro()}</p>
+      <p className="path-sec__lede">{m.path_review_intro()}</p>
 
       {weak.length === 0 ? (
         // Not an empty state to apologise for. Below five observations there is genuinely nothing
-        // to say, and saying it plainly is better than inventing a weakness (FR-035, research R4).
-        <p className="mt-4 font-ui text-sm text-ink">
+        // to say, and saying it plainly is better than inventing a weakness.
+        <p className="path-sec__lede">
           {m.path_review_not_enough({ samples: String(CONFIDENCE_MIN_SAMPLES) })}
         </p>
       ) : (
-        <ul className="mt-4 flex flex-col gap-2">
+        <ul className="weak">
           {weak.map((element) => {
             const finger = element.kind === 'key' ? fingerOf(layout, element.key) : undefined
             return (
-              <li
-                key={element.key}
-                className="flex items-center gap-3 rounded-[var(--radius-field)] border-[length:var(--border-hairline)] border-hairline px-3 py-2"
-              >
-                <span className="font-mono text-base text-ink">{element.label}</span>
-                <Chip tone="muted">
+              <li key={element.key}>
+                <span className="weak__top">
+                  <span className="weak__glyph">{element.label}</span>
+                  {/* The number is shown, not just the ranking: a learner comparing two weak
+                      elements deserves to see how far apart they are. */}
+                  <span className="num weak__pct">{Math.round(element.confidence * 100)}%</span>
+                </span>
+                <span className="weak__meta">
                   {element.kind === 'key' ? m.path_review_key() : m.path_review_transition()}
-                </Chip>
-                {finger && (
-                  <span className="font-ui text-xs text-muted">
-                    {m.path_review_finger({ finger: finger.finger, hand: finger.hand })}
-                  </span>
-                )}
-                {/* The number is shown, not just the ranking: a learner comparing two weak
-                    elements deserves to see how far apart they are. */}
-                <span className="ml-auto font-mono text-xs text-muted">
-                  {Math.round(element.confidence * 100)}%
+                  {finger !== undefined &&
+                    `, ${m.path_review_finger({ finger: finger.finger, hand: finger.hand })}`}
                 </span>
                 {element.scaleId ? (
                   <Link
                     to="/exercise/$scaleId"
                     params={{ scaleId: element.scaleId }}
                     search={{ mode: 'practice' }}
-                    className="inline-flex h-9 items-center rounded-[var(--radius-field)] border-[length:var(--border-hairline)] border-hairline-strong bg-paper-raised px-3 font-ui text-sm font-semibold text-ink hover:bg-sage-tint"
+                    className={`${buttonClass('secondary', 'sm')} self-start`}
                   >
                     {m.path_review_practise()}
                   </Link>
                 ) : (
-                  // F1's catalogue focuses every scale on a key, so a weak Transition often has no
-                  // drill of its own yet. Saying so is better than a button that goes nowhere.
-                  <span className="font-ui text-xs text-muted">{m.path_review_no_drill()}</span>
+                  // A weak Transition often has no drill of its own yet. Saying so is better than
+                  // a button that goes nowhere.
+                  <span className="weak__meta">{m.path_review_no_drill()}</span>
                 )}
               </li>
             )
@@ -131,9 +130,9 @@ export function Review({ progress, layout, catalogue }: ReviewProps) {
         </ul>
       )}
 
-      <p className="mt-4 font-mono text-xs text-muted">
+      <p className="note mt-6">
         {m.path_review_threshold({ samples: String(MIN_TRANSITION_SAMPLES) })}
       </p>
-    </Card>
+    </section>
   )
 }

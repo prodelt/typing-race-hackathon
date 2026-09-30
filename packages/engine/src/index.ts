@@ -77,6 +77,7 @@ export function createEngine(options: EngineOptions): Engine {
     state: machine.phase,
     cursor: machine.cursor,
     markedAt: machine.markedAt,
+    wrong: machine.wrong,
     errorCount: machine.errorCount,
     elapsedMs: watch.elapsed(),
     lastError: machine.lastError,

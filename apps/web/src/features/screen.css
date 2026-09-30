@@ -1,0 +1,420 @@
+/*
+ * The patterns every learning screen shares, taken from the brand site (b-red) by measuring its
+ * computed styles at 1440 px. DESIGN_SOURCES.md records each number and where it came from.
+ *
+ * The rule of the system: Unbounded only for display (titles, the one hero number), Onest for
+ * everything read; flat surfaces separated by lightness, never by a border or a shadow; one large
+ * rounded corner (top-right) on the one block a screen wants read first; pills for single-line
+ * controls, square blocks for anything that wraps; red for the primary action, the awaited key and
+ * one number, nothing else.
+ */
+
+/* ---- Screen head: [01] label, huge title, lede ------------------------------------------- */
+
+.screen {
+  display: flex;
+  flex-direction: column;
+}
+
+.screen-head {
+  padding-top: clamp(16px, 2.2vw, 32px);
+}
+
+/* b-red `h2.display`: Unbounded 700, line-height 0.95, tight tracking. Sized for an app screen
+   (the brand site's sections run to 104 px; a screen still has to show its content above the fold). */
+.screen-title {
+  margin: 18px 0 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(44px, 5.2vw, 76px);
+  line-height: 0.95;
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+}
+
+.screen-title--sm {
+  font-size: clamp(36px, 3.9vw, 56px);
+}
+
+/* The full stop drawn as a red dot, as in the brand's "Залиште заявку." */
+.red-dot {
+  display: inline-block;
+  width: 0.2em;
+  height: 0.2em;
+  margin-left: 0.06em;
+  border-radius: 50%;
+  background: var(--color-accent);
+  vertical-align: baseline;
+}
+
+/* b-red `.process__lede`: 20 px, 500, line-height 1.4, ink-soft. */
+.screen-lede {
+  margin: 20px 0 0;
+  max-width: 44ch;
+  font-size: clamp(17px, 1.4vw, 20px);
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+  color: var(--color-ink-soft);
+  text-wrap: pretty;
+}
+
+/* ---- Small text roles ---------------------------------------------------------------------- */
+
+/* b-red `.step__params dt`: 13 px, 700. The label above a value. */
+.label {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--color-ink);
+}
+
+/* b-red `.flabel`: 14 px, 600. A section's own small heading. */
+.flabel {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+}
+
+.note {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-muted);
+  text-wrap: pretty;
+}
+
+/* b-red `.manifesto`: Onest 38 px, 500, line-height 1.12, -0.025em. The sentence a screen says. */
+.statement {
+  margin: 0;
+  font-size: clamp(26px, 2.6vw, 38px);
+  font-weight: 500;
+  line-height: 1.14;
+  letter-spacing: -0.025em;
+  text-wrap: pretty;
+}
+
+/* ---- Passport: a definition list of label / value pairs (b-red `.passport`) --------------- */
+
+.passport {
+  display: grid;
+  grid-template-columns: minmax(96px, max-content) minmax(0, 1fr);
+  gap: 15px 28px;
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.passport > div {
+  display: contents;
+}
+
+.passport dt {
+  color: var(--color-muted);
+}
+
+.passport dd {
+  margin: 0;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- Numbers ------------------------------------------------------------------------------- */
+
+/* b-red `.cell__num`: Unbounded 500, -0.05em, line-height 0.95. */
+.num {
+  font-family: var(--font-display);
+  font-weight: 500;
+  line-height: 0.95;
+  letter-spacing: -0.05em;
+  font-variant-numeric: tabular-nums;
+}
+
+.num--red {
+  color: var(--color-terracotta);
+}
+
+/* b-red `.point__n`: a 72 px disc in the red tint with the number in red. */
+.disc {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--color-accent-tint);
+  color: var(--color-terracotta-ink);
+  font-size: 19px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.disc--empty {
+  background: transparent;
+  box-shadow: inset 0 0 0 var(--border-hairline) var(--color-hairline-strong);
+  color: var(--color-muted);
+}
+
+.disc--sm {
+  width: 44px;
+  height: 44px;
+  font-size: 15px;
+}
+
+/* ---- Surfaces -------------------------------------------------------------------------------- */
+
+/* b-red `.cell` / `.aud__card`: a flat near-white block, no border, no radius. */
+.panel {
+  background: var(--color-paper-raised);
+  padding: clamp(24px, 2.4vw, 36px);
+}
+
+/* The one block a screen wants read first takes the brand's top-right corner. */
+.panel--corner {
+  border-radius: 0 72px 0 0;
+}
+
+.panel--red {
+  background: var(--color-accent);
+  color: #ffffff;
+}
+
+.panel--red :focus-visible {
+  outline-color: #ffffff;
+}
+
+/* ---- The poster CTA: b-red `.submit`, scaled for a screen ---------------------------------- */
+
+.poster {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  width: 100%;
+  min-height: clamp(72px, 6.4vw, 96px);
+  padding: 0 clamp(24px, 2.6vw, 40px);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--color-accent);
+  color: #ffffff;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(18px, 1.6vw, 24px);
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color var(--dur-base) var(--ease-enter),
+    transform var(--dur-base) var(--ease-enter);
+}
+
+/* A call to action never wraps (the label is short by rule; the pill grows instead). */
+.poster > span {
+  white-space: nowrap;
+}
+
+.poster svg {
+  flex: none;
+  transition: transform calc(var(--dur-base) * 1.3) var(--ease-enter);
+}
+
+.poster:hover {
+  background: var(--color-ink);
+  color: var(--color-paper);
+}
+
+.poster:hover svg {
+  transform: translateX(8px);
+}
+
+.poster:active {
+  transform: scale(0.985);
+}
+
+.poster:disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* ---- Choice pills: b-red `.pills` ------------------------------------------------------------ */
+
+.pills {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.pill {
+  position: relative;
+  display: block;
+  cursor: pointer;
+}
+
+.pill input {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.pill__face {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 52px;
+  padding: 0 16px;
+  border-radius: var(--radius-pill);
+  background: var(--color-paper-raised);
+  box-shadow: inset 0 0 0 var(--border-hairline) var(--color-hairline);
+  font-size: 16px;
+  font-weight: 500;
+  text-align: center;
+  transition:
+    color var(--dur-base) var(--ease-standard),
+    background-color var(--dur-base) var(--ease-standard),
+    box-shadow var(--dur-base) var(--ease-standard);
+}
+
+/* Blocks for options that carry a hint: they wrap, so they are square, as b-red's fields are. */
+.pill--block .pill__face {
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 4px;
+  height: 100%;
+  padding: 16px 18px 18px;
+  border-radius: 0;
+  text-align: left;
+}
+
+.pill__hint {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.45;
+  color: var(--color-muted);
+}
+
+.pill:hover .pill__face {
+  box-shadow: inset 0 0 0 var(--border-hairline) var(--color-ink);
+}
+
+/* The chosen option: filled ink, and a check mark, so the state is never colour alone. The red
+   stays reserved for the one action and the awaited key. */
+.pill input:checked + .pill__face {
+  background: var(--color-ink);
+  box-shadow: inset 0 0 0 var(--border-hairline) var(--color-ink);
+  color: var(--color-paper);
+}
+
+.pill input:checked + .pill__face .pill__hint {
+  color: color-mix(in srgb, var(--color-paper) 78%, var(--color-ink));
+}
+
+.pill__check {
+  display: none;
+  flex: none;
+}
+
+.pill input:checked + .pill__face .pill__check {
+  display: inline-block;
+}
+
+.pill input:focus-visible + .pill__face {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+.pill input:disabled + .pill__face {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+:root[data-theme="dark"] .pill input:focus-visible + .pill__face {
+  outline-color: var(--color-terracotta);
+}
+
+/* ---- The form-step layout: b-red `.fstep` ("(1) Хто ви" on the left, the fields on the right) */
+
+.fsteps {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(72px, 7vw, 112px);
+}
+
+.fstep {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: 32px 40px;
+  align-items: start;
+}
+
+/* b-red `.fstep__h`: Onest 56 px, 500, line-height 1, -0.045em, sticky under the header. */
+.fstep__h {
+  position: sticky;
+  top: 32px;
+  display: flex;
+  gap: 0.45em;
+  margin: 0;
+  font-size: clamp(30px, 3.4vw, 50px);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.045em;
+}
+
+.fstep__n {
+  font-variant-numeric: tabular-nums;
+  color: var(--color-ink-faint);
+}
+
+.fstep__body {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  min-width: 0;
+}
+
+/* ---- Reveal on arrival (every delay a token, so motion off stills it) ---------------------- */
+
+@keyframes screen-rise {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+}
+
+.rise {
+  animation: screen-rise var(--dur-reveal) var(--ease-enter) both;
+  animation-delay: calc(var(--i, 0) * var(--stagger-tile));
+}
+
+/* ---- Prose (the small public pages) ---------------------------------------------------------- */
+
+.prose {
+  max-width: 60ch;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--color-ink);
+}
+
+.prose p {
+  margin: 0;
+}
+
+.prose p + p {
+  margin-top: 1em;
+}
+
+@media (max-width: 1180px) {
+  .fstep {
+    grid-template-columns: minmax(0, 4fr) minmax(0, 7fr);
+  }
+}

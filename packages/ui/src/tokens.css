@@ -1,10 +1,10 @@
 /*
  * The design system as CSS custom properties.
  *
- * The look is a cool grey canvas, near-white surfaces, near-black ink and one accent, a brand red
- * used sparingly and boldly: the primary call to action, the key the learner is being asked for,
- * one large geometric shape. Display type is Unbounded (heavy, huge, tight); everything else,
- * the typing line included, is Onest.
+ * The look is the brand site's v4: a white canvas, blush paper blocks, neutral black ink and one
+ * hue, a brand red used sparingly and boldly: the primary call to action, the key the learner is
+ * being asked for, one hero number, and the live red gradient on the few emphasis panels. Display
+ * type is Unbounded (heavy, huge, tight); everything else, the typing line included, is Onest.
  *
  * Why custom properties rather than Tailwind variants: there are three themes, and the low-vision
  * one is a third theme rather than a scale factor. It redefines borders, shadows, fills, tracking
@@ -15,8 +15,8 @@
  * of the previous look, and every screen refers to them by name. They are kept as *roles* so the
  * screens inherit the new look without being rewritten:
  *
- * - `sage` is the calm, cool secondary: progress, typed text, links, the selected option.
- *   It is now a deep steel blue, which keeps it clearly apart from the red.
+ * - `sage` is the calm secondary: progress, typed text, links, the selected option. It is now
+ *   graphite on a neutral tint, which keeps it clearly apart from the red.
  * - `terracotta` is the error role, now the brand red. An error is never colour alone (it always
  *   carries an underline and a count), so sharing the hue with the accent costs nothing.
  * - `accent` is the brand red as an *accent*: the one filled button, the current key.
@@ -33,40 +33,45 @@
 
 @theme static {
   /* ---- Canvas, surfaces, ink (light theme, the default) -------------------------------- */
-  --color-paper: #e7ebee;
-  --color-paper-deep: #dce2e6;
-  --color-paper-raised: #f9fafb;
-  --color-ink: #0f1418;
-  --color-ink-soft: #26303a;
-  /* 5.3:1 on the canvas, 6.1:1 on a surface, 4.65:1 on the steel tint. */
-  --color-muted: #56616b;
-  /* Display-size text only (3.5:1 on a surface): the grey half of a two-tone headline. */
-  --color-ink-faint: #7b8690;
+  /* The brand site's v4 palette (variants/v4/b-red, style.css :root): a white canvas, blush
+   * paper blocks, neutral black and graphite ink, and only the red with its steps. No blue. */
+  --color-paper: #ffffff;
+  --color-paper-deep: #f9e6e3;
+  --color-paper-raised: #fcf1ef;
+  --color-ink: #141414;
+  --color-ink-soft: #2e2e2e;
+  /* 5.7:1 on white, 5.1:1 on the blush paper, 4.8:1 on the deeper blush. */
+  --color-muted: #666666;
+  /* Display-size text only (3.4:1 on white): the grey half of a two-tone headline. */
+  --color-ink-faint: #8a8a8a;
+  --color-graphite: #171717;
 
-  --color-hairline: #d5dce1;
-  --color-hairline-strong: #b6c0c8;
+  --color-hairline: #f2dcd9;
+  --color-hairline-strong: #d9bdb8;
 
   /* ---- The accent: brand red and its steps ---------------------------------------------
-   * White on the red is 6.0:1, the red on the canvas 5.0:1, so it may carry text either way.
-   * `accent-pale` is for small text *on* red (4.9:1). */
+   * White on the red is 6.0:1, the red on white 5.9:1, so it may carry text either way.
+   * `accent-pale` is for small text *on* red (4.9:1); `accent-dark` is the ember's shadow. */
   --color-accent: #c21f13;
   --color-accent-deep: #9c170d;
+  --color-accent-dark: #6e0f08;
   --color-accent-tint: #f2dcd9;
   --color-accent-soft: #f7d0cb;
   --color-accent-pale: #fbe3e0;
   --color-on-accent: #ffffff;
 
-  /* ---- Roles kept from the previous palette (see the header) --------------------------- */
-  --color-sage: #1f4257;
-  --color-sage-tint: #d5e0e8;
-  --color-sage-ink: #173447;
-  --color-steel: #1d2a34;
+  /* ---- Roles kept from the previous palette (see the header) ---------------------------
+   * v4 has no second hue, so the calm secondary is now graphite on a neutral tint. */
+  --color-sage: #2e2e2e;
+  --color-sage-tint: #eeeeee;
+  --color-sage-ink: #141414;
+  --color-steel: #171717;
 
   --color-terracotta: #c21f13;
   --color-terracotta-tint: #fbe3e0;
   --color-terracotta-ink: #9c170d;
 
-  --color-nav-dimmed: #8b959e;
+  --color-nav-dimmed: #8a8a8a;
 
   /* ---- Finger colours: ink / tint / line, one triple per finger -------------------------
    * A keycap glyph takes its finger's *ink*, so the colour never carries meaning alone: the
@@ -115,7 +120,7 @@
   --radius-chip: 999px;
   --radius-pill: 999px;
   /* Fields, option cards, formula boxes: blocks that may wrap to several lines, so never a pill. */
-  --radius-field: 14px;
+  --radius-field: 0px;
 
   --border-hairline: 1px;
   /* The 2px inset bottom bevel on a keycap is the entire "tactile" budget. No gradients. */
@@ -128,6 +133,8 @@
   /* ---- Layout ---------------------------------------------------------------------------- */
   --gutter: clamp(24px, 5.2vw, 75px);
   --head-h: 72px;
+  /* The fixed bottom bar with the section indices (b-red v4 `--bar-h`). */
+  --bar-h: 56px;
 
   /* ---- Motion ---------------------------------------------------------------------------
    * Durations are tokens, never literals, so the motion flag turns everything off in one place

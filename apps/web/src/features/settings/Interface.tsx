@@ -29,7 +29,7 @@ export function Interface() {
   }
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="setting">
       <ChoiceGroup<Language>
         legend={m.settings_ui_legend()}
         hint={m.settings_ui_hint()}
@@ -40,7 +40,7 @@ export function Interface() {
         ]}
         onChange={(value) => void choose(value)}
       />
-      <p className="font-ui text-sm font-semibold text-ink">
+      <p className="setting__status">
         {m.settings_ui_current({
           interface: LANGUAGE_NAME[interfaceLanguage](),
           typing: LANGUAGE_NAME[typingLanguage](),

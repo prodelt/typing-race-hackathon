@@ -51,11 +51,33 @@ export async function typeChar(page: Page, char: string): Promise<void> {
   await dispatchBeforeInput(typingSurface(page), 'insertText', char)
 }
 
+/**
+ * Types a whole string, still one `beforeinput` per character, from **inside** the page.
+ *
+ * One Playwright round trip per character made a 60-character exercise cost 60 CDP calls, and under
+ * a parallel full-suite run each call queues behind every other worker's: that, not the app, was
+ * what pushed the long scenarios past their timeout. The loop yields a macrotask between characters
+ * (`gapMs`, 8 ms by default, close to the old per-call cadence) so the engine, React and the router
+ * see the same sequence of separate keystrokes a learner produces, just without the transport cost.
+ */
 export async function typeText(page: Page, text: string, delayMs = 0): Promise<void> {
-  for (const char of text) {
-    await typeChar(page, char)
-    if (delayMs > 0) await page.waitForTimeout(delayMs)
-  }
+  if (text.length === 0) return
+  await typingSurface(page).evaluate(
+    async (element, payload) => {
+      for (const char of payload.chars) {
+        element.dispatchEvent(
+          new InputEvent('beforeinput', {
+            inputType: 'insertText',
+            data: char,
+            bubbles: true,
+            cancelable: true,
+          }),
+        )
+        await new Promise((resolve) => setTimeout(resolve, payload.gapMs))
+      }
+    },
+    { chars: [...text], gapMs: Math.max(delayMs, 8) },
+  )
 }
 
 export async function pressBackspace(page: Page): Promise<void> {
@@ -93,11 +115,8 @@ export async function typeWithCorrectedError(
   wrongChar = 'ъ',
 ): Promise<void> {
   const characters = [...text]
-  for (const [index, char] of characters.entries()) {
-    if (index === wrongAt) {
-      await typeChar(page, wrongChar)
-      await pressBackspace(page)
-    }
-    await typeChar(page, char)
-  }
+  await typeText(page, characters.slice(0, wrongAt).join(''))
+  await typeChar(page, wrongChar)
+  await pressBackspace(page)
+  await typeText(page, characters.slice(wrongAt).join(''))
 }

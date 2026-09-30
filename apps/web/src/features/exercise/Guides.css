@@ -1,23 +1,77 @@
 /*
- * The Practice Attempt's guides (T088, T089). Written to by KeyboardGuide and NextKey through
- * `data-*` attributes, the same imperative way the typing line is (FR-069).
+ * The Practice Attempt's guides. Written to by KeyboardGuide and NextKey through `data-*`
+ * attributes, the same imperative way the typing line is.
  *
- * None of this exists in a Test Attempt: those components are not rendered at all (FR-037).
+ * None of this exists in a Test Attempt: those components are not rendered at all.
  */
 
-/* Unlayered, so it beats the Tailwind utilities on Keycap without !important. The awaited keycap: a ring in the finger's own ink, which is the keycap's text colour. */
-.kb-key[data-awaited="true"] {
-  opacity: 1;
-  outline: 2px solid currentColor;
-  outline-offset: 2px;
-  transform: scale(1.06);
+.guide {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
 }
 
+/* The awaited key is the brand red, solid, and ringed in the same red a step out. `Keycap` sets
+   its finger colours inline as custom properties and reads `--kc-state-*` first, which nothing
+   inline defines; so this state, written to the DOM between keystrokes rather than through a
+   render, wins by defining those. Unlayered, so it beats the Tailwind opacity tier as well. */
+.kb-key[data-awaited="true"] {
+  --kc-state-ink: var(--color-on-accent);
+  --kc-state-bg: var(--color-accent);
+  --kc-state-line: var(--color-accent);
+  --kc-state-bevel: rgb(0 0 0 / 18%);
+  opacity: 1;
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  transform: translateY(-1px);
+}
+
+/* The next-key card: the glyph on a keycap-sized block, and the finger in words beside it. */
+.next-key {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.next-key__glyph {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 64px;
+  height: 64px;
+  padding: 0 14px;
+  border-radius: var(--radius-keycap);
+  background: var(--color-paper-raised);
+  box-shadow:
+    inset 0 0 0 var(--border-hairline) var(--color-hairline-strong),
+    inset 0 calc(-1 * var(--keycap-bevel) - 1px) 0 0 var(--color-hairline-strong);
+  font-family: var(--font-typing);
+  font-size: 30px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.next-key__finger {
+  margin: 4px 0 0;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+
+.next-key__shift {
+  margin: 2px 0 0;
+  font-size: 14px;
+  color: var(--color-muted);
+}
+
+/* The hand: ten bars, lengths after real fingers; the active one fills with its finger ink. */
 .finger-bar {
   background-color: var(--finger-tint);
   border: 1px solid var(--finger-line);
   border-radius: 999px;
-  transition: background-color var(--dur-quick) var(--ease-standard);
+  transition:
+    background-color var(--dur-quick) var(--ease-standard),
+    border-color var(--dur-quick) var(--ease-standard);
 }
 
 .finger-bar[data-active="true"] {

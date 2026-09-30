@@ -5,13 +5,16 @@ import {
   currentMotion,
   Index,
   type ResolvedMotion,
+  Wordmark,
   watchMotion,
 } from '@typing-race/ui'
 import { type CSSProperties, useEffect, useRef, useState } from 'react'
 import { m } from '../../paraglide/messages.js'
+import { GradLayer } from '../grad.js'
 import type { HeroShader } from './heroShader.js'
 import { Reveal } from './Reveal.js'
 import { TypingSpecimen } from './TypingSpecimen.js'
+import './hero.css'
 import './product.css'
 
 /** Where "Start practising" leads: Today asks a new learner where to begin. */
@@ -167,39 +170,53 @@ export function ProductPage() {
             )}
           </div>
 
-          <div className="hero__content">
-            <h1 id="product-title" className="hero__title">
-              <span className="hero__line">
-                <span style={order(0)}>{m.product_hero_line1()}</span>
-              </span>{' '}
-              <span className="hero__line">
-                <span style={order(1)}>
-                  <em className="hero__outline">{m.product_hero_line2()}</em>
-                  {/* The full stop is a drawn red dot, not a glyph: a red character on the
-                      dark frame would be text below contrast, a shape is not text. */}
-                  <span className="dot" aria-hidden="true" />
-                </span>
-              </span>
-            </h1>
+          {/* The brand's hero: the wordmark set across nearly the whole frame, white on the red
+              duotone. Decorative: the h1 below carries the words. */}
+          <div className="hero__mark" aria-hidden="true">
+            <span className="hero__mark-line">
+              <Wordmark className="hero__wordmark" />
+            </span>
+          </div>
 
-            <div className="hero__aside">
-              <TypingSpecimen playing={playing && animated} still={motion === 'off'} />
+          <div className="hero__content">
+            <div className="hero__text">
+              <h1 id="product-title" className="hero__title">
+                <span className="hero__line">
+                  <span style={order(2)}>{m.product_hero_line1()}</span>
+                </span>{' '}
+                <span className="hero__line">
+                  <span style={order(3)}>
+                    {m.product_hero_line2()}
+                    <span className="dot dot--white" aria-hidden="true" />
+                  </span>
+                </span>
+              </h1>
               <p className="hero__lede">{m.product_lead()}</p>
               <div className="hero__cta">
-                <Link to={PRACTICE} className={buttonClass('primary', 'lg')}>
+                <Link to={PRACTICE} className={`${buttonClass('primary', 'lg')} hero__cta-white`}>
                   {m.product_cta_start()}
                 </Link>
-                <a href="#method" className={`${buttonClass('secondary', 'lg')} hero__cta-light`}>
+                <a href="#method" className={`${buttonClass('secondary', 'lg')} hero__cta-veil`}>
                   {m.product_cta_how()}
                 </a>
               </div>
+            </div>
+
+            <div className="hero__aside">
+              <TypingSpecimen playing={playing && animated} still={motion === 'off'} />
             </div>
           </div>
         </div>
       </section>
 
       {/* ---- [01] Method: three stage cells, the live one in red ---------------------------- */}
-      <Reveal as="section" id="method" aria-labelledby="method-title" className="sec">
+      <Reveal
+        as="section"
+        id="method"
+        data-section={m.product_section_method()}
+        aria-labelledby="method-title"
+        className="sec"
+      >
         <div className="sec__head">
           <div data-reveal="" style={order(0)}>
             <Index n={1}>{m.product_section_method()}</Index>
@@ -241,7 +258,14 @@ export function ProductPage() {
       </Reveal>
 
       {/* ---- [02] Accuracy: a manifesto beside offset number cells ------------------------ */}
-      <Reveal as="section" aria-labelledby="accuracy-title" className="sec sec--accuracy">
+      <Reveal
+        as="section"
+        id="accuracy"
+        data-section={m.product_section_accuracy()}
+        aria-labelledby="accuracy-title"
+        className="sec sec--accuracy gp-host gp-host--ember"
+      >
+        <GradLayer tone="ember" seed={1} count={5} />
         <div className="accuracy">
           <div className="accuracy__text" data-reveal="" style={order(0)}>
             <Index n={2}>{m.product_section_accuracy()}</Index>
@@ -278,8 +302,15 @@ export function ProductPage() {
       </Reveal>
 
       {/* ---- [03] Principles: a torn headline and circled points ------------------------- */}
-      <Reveal as="section" aria-labelledby="principles-title" className="sec sec--card">
-        <div className="card">
+      <Reveal
+        as="section"
+        id="principles"
+        data-section={m.product_section_principles()}
+        aria-labelledby="principles-title"
+        className="sec sec--card"
+      >
+        <div className="card gp-host gp-host--bright">
+          <GradLayer tone="bright" seed={2} count={5} />
           <Index n={3} className="card__index">
             {m.product_section_principles()}
           </Index>
@@ -313,8 +344,14 @@ export function ProductPage() {
       </Reveal>
 
       {/* ---- [04] Start: a poster headline and one enormous red pill -------------------- */}
-      <Reveal as="section" aria-labelledby="start-title" className="sec sec--lead">
-        <div className="lead__bg" aria-hidden="true" />
+      <Reveal
+        as="section"
+        id="start"
+        data-section={m.product_section_start()}
+        aria-labelledby="start-title"
+        className="sec sec--lead gp-host gp-host--bright"
+      >
+        <GradLayer tone="bright" seed={7} count={4} />
         <div className="lead__top">
           <div data-reveal="" style={order(0)}>
             <Index n={4}>{m.product_section_start()}</Index>

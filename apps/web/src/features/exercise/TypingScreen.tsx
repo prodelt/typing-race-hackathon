@@ -6,6 +6,7 @@ import { PaceCue } from './PaceCue.js'
 import { Rail } from './Rail.js'
 import { TypingLine } from './TypingLine.js'
 import type { ExerciseTarget, ExerciseWording } from './wording.js'
+import './exercise.css'
 
 export interface TypingScreenProps {
   readonly engine: Engine
@@ -22,18 +23,18 @@ export interface TypingScreenProps {
 }
 
 /**
- * T085 and T090. The typing screen: a 276 px rail, and beside it the typing line with, in a
- * Practice Attempt, the guides underneath.
+ * The typing screen: a quiet rail of plain type, and beside it the typing line on its own panel
+ * with, in a Practice Attempt, the guides underneath.
  *
  * **Zero-peek is decided here, by not rendering.** In a Test Attempt the keyboard, the next-key
- * card, the finger diagram and the speed/accuracy grid (inside the rail) do not exist in the
+ * card, the finger diagram and the speed/accuracy figures (inside the rail) do not exist in the
  * document: `mode === 'practice' && ...` yields no node, rather than a node that CSS hides. A hidden
  * element is still in the accessibility tree, still in the DOM for an extension to read, and still
- * one `display` toggle from a learner's curiosity; absence is the only form FR-037 and SC-007 accept.
+ * one `display` toggle from a learner's curiosity; absence is the only form zero-peek accepts.
  *
  * The typing line is the first child of a column whose top is fixed, and its own box has a height
  * that depends on the text size alone, so it sits at the same vertical position in a Practice
- * Attempt, where guides follow it, and in a Test Attempt, where nothing does (FR-058).
+ * Attempt, where guides follow it, and in a Test Attempt, where nothing does.
  *
  * Every child below is `memo`-ed and takes only values that cannot change during an attempt, so
  * the parent re-rendering on pause cannot reach a DOM node either.
@@ -52,17 +53,17 @@ export function TypingScreen({
   thisScaleIsNext,
 }: TypingScreenProps) {
   return (
-    <div className="grid grid-cols-[276px_minmax(0,1fr)] items-start gap-8">
+    <div className="attempt">
       <Rail wording={wording} mode={mode} last={last} thisScaleIsNext={thisScaleIsNext} />
 
-      <div className="flex min-w-0 flex-col gap-10">
-        <div className="pt-4">
+      <div className="attempt__main">
+        <div>
           <TypingLine engine={engine} text={text} sizePx={sizePx} />
           <PaceCue engine={engine} scale={scale} text={text} />
         </div>
 
         {mode === 'practice' ? (
-          <div className="flex flex-col gap-6">
+          <div className="attempt__guides">
             <KeyboardGuide
               engine={engine}
               text={text}
@@ -70,7 +71,7 @@ export function TypingScreen({
               unlocked={unlocked}
               keyConfidence={keyConfidence}
             />
-            <div className="flex flex-wrap items-end gap-6">
+            <div className="attempt__hands">
               <NextKeyCard engine={engine} text={text} layout={layout} />
               <FingerDiagram engine={engine} text={text} layout={layout} />
             </div>

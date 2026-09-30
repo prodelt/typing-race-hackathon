@@ -4,8 +4,8 @@ import {
   REFERENCE_IKI_MS,
   RHYTHM_BREAK_MS,
 } from '@typing-race/metrics'
-import { Card } from '@typing-race/ui'
 import { m } from '../../paraglide/messages.js'
+import { GradLayer } from '../grad.js'
 import { Block, Formula, P, Section } from './Formula.js'
 
 /** Inter-keystroke interval, rhythm consistency and Confidence — research R4 and R5. */
@@ -44,12 +44,11 @@ export function Rhythm() {
         <P>{m.formulas_conf_decay({ half: CONFIDENCE_HALF_LIFE })}</P>
         <P>{m.formulas_conf_timing()}</P>
         <P>{m.formulas_conf_unmeasured({ min: CONFIDENCE_MIN_SAMPLES })}</P>
-        <Card className="border-sage p-5">
-          <h4 className="mb-1 font-ui text-base font-semibold text-sage">
-            {m.formulas_conf_gates_head()}
-          </h4>
+        <div className="fnote gp-host gp-host--bright">
+          <GradLayer tone="bright" seed={9} count={3} />
+          <h4 className="fnote__title">{m.formulas_conf_gates_head()}</h4>
           <P>{m.formulas_conf_gates_body()}</P>
-        </Card>
+        </div>
       </Block>
     </Section>
   )

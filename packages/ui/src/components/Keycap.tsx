@@ -1,5 +1,5 @@
 import type { Finger } from '@typing-race/domain'
-import type { HTMLAttributes } from 'react'
+import type { CSSProperties, HTMLAttributes } from 'react'
 import { cx } from '../cx.js'
 
 /**
@@ -22,8 +22,8 @@ export interface KeycapProps extends HTMLAttributes<HTMLSpanElement> {
 }
 
 /**
- * Tier fades the *tint*, not the glyph. The letter stays at full finger ink at every tier,
- * because the guide is supposed to become less eye-catching, not less readable.
+ * Tier fades the whole keycap: the guide is supposed to become less eye-catching as a key is
+ * learned. The letter is plain ink, so even a faded keycap stays readable.
  */
 const TIERS: Record<GuideTier, string> = {
   locked: 'opacity-35',
@@ -62,9 +62,13 @@ export function Keycap({
         'inline-flex items-center justify-center select-none',
         'h-11 font-ui font-medium text-[0.95rem] leading-none',
         'rounded-[var(--radius-keycap)] border-[length:var(--border-hairline)]',
-        // The 2px inset bottom bevel: the entire tactile budget. An inset shadow rather than a
+        // The colours are read from custom properties set inline below, never set inline
+        // themselves, so a state written to the DOM between keystrokes (the guide's awaited key)
+        // can override them from a stylesheet.
+        'text-[color:var(--kc-state-ink,var(--kc-ink))] bg-[color:var(--kc-state-bg,var(--kc-bg))] border-[color:var(--kc-state-line,var(--kc-line))]',
+        // The inset bottom bevel: the entire tactile budget. An inset shadow rather than a
         // gradient, so it survives the low-vision theme, where gradients read as smudges.
-        'shadow-[inset_0_calc(-1*var(--keycap-bevel))_0_0_rgb(0_0_0/8%)]',
+        'shadow-[inset_0_calc(-1*var(--keycap-bevel)_-_1px)_0_0_var(--kc-state-bevel,var(--kc-bevel))]',
         'transition-[background-color,border-color,color,opacity,transform]',
         'duration-[var(--dur-quick)] ease-[var(--ease-enter)]',
         // The awaited key is the one place the keyboard uses the brand red, at full strength
@@ -74,17 +78,28 @@ export function Keycap({
         className,
       )}
       style={
-        awaited
+        (awaited
           ? {
-              color: 'var(--color-on-accent)',
-              backgroundColor: 'var(--color-accent)',
-              borderColor: 'var(--color-accent-deep)',
+              '--kc-ink': 'var(--color-on-accent)',
+              '--kc-bg': 'var(--color-accent)',
+              '--kc-line': 'var(--color-accent-deep)',
+              '--kc-bevel': 'rgb(0 0 0 / 18%)',
             }
-          : {
-              color: locked ? 'var(--color-muted)' : ink,
-              backgroundColor: locked ? 'var(--color-paper)' : tint,
-              borderColor: locked ? 'var(--color-hairline)' : line,
-            }
+          : locked
+            ? {
+                '--kc-ink': 'var(--color-muted)',
+                '--kc-bg': 'var(--color-paper)',
+                '--kc-line': 'var(--color-hairline)',
+                '--kc-bevel': 'rgb(0 0 0 / 6%)',
+              }
+            : {
+                // The finger is a legend, not a fill: a pale wash of its tint and a stripe of its
+                // ink along the bevel. The letter stays in plain ink, the most legible it can be.
+                '--kc-ink': 'var(--color-ink)',
+                '--kc-bg': `color-mix(in srgb, ${tint} 72%, var(--color-paper-raised))`,
+                '--kc-line': line,
+                '--kc-bevel': ink,
+              }) as CSSProperties
       }
       {...rest}
     >

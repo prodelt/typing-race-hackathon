@@ -156,7 +156,21 @@ function minutesStated(text: string): number {
 async function audit(page: Page): Promise<void> {
   await page.evaluate(() =>
     Promise.all(
-      document.getAnimations().map((animation) => animation.finished.then(() => undefined)),
+      document
+        .getAnimations()
+        // A deliberately endless animation (the live gradient, a caret) never finishes.
+        .filter(
+          (animation) =>
+            animation.effect?.getComputedTiming().iterations !== Number.POSITIVE_INFINITY &&
+            // Nor does one inside unrendered content (a closed <details>): it never runs.
+            ((animation.effect as KeyframeEffect | null)?.target?.checkVisibility() ?? true),
+        )
+        .map((animation) =>
+          animation.finished.then(
+            () => undefined,
+            () => undefined,
+          ),
+        ),
     ),
   )
   await expectNoAxeViolations(page)
@@ -236,6 +250,8 @@ test.describe('US6 a guided session', () => {
   test('it runs through all three blocks, with the between-blocks screen twice and real text named, not faked (scenarios 4 and 6, Independent Test)', async ({
     page,
   }) => {
+    // Genuinely long: six typed attempts across three blocks and the screens between them.
+    test.setTimeout(60_000)
     await seedLearner(page, SLOW)
     await openSessionFromToday(page)
     await audit(page)

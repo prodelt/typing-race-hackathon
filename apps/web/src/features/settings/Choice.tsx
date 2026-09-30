@@ -1,4 +1,6 @@
+import { cx } from '@typing-race/ui'
 import { useId } from 'react'
+import { Check } from '../screen.js'
 
 export interface ChoiceOption<T extends string> {
   readonly value: T
@@ -15,12 +17,15 @@ interface ChoiceGroupProps<T extends string> {
 }
 
 /**
- * One native radio group: a fieldset with a legend, real radios, real labels. A native group gives
- * arrow-key traversal and a visible focus ring for free (FR-066), and the checked state is carried
- * by the radio dot as well as by the tint, so selection is never colour alone.
+ * One native radio group, drawn as the brand's pills: a fieldset with a legend, real radios, real
+ * labels. A native group gives arrow-key traversal and a visible focus ring for free, and the
+ * chosen pill is filled ink **and** carries a check mark, so selection is never colour alone.
+ *
+ * Options that carry a hint wrap to two lines, so they are square blocks rather than pills (the
+ * brand's rule: pills for one line, blocks for anything that wraps).
  *
  * `value` comes from the store on every render and no copy is kept here, so the control cannot
- * drift from what `theme.ts` is applying (FR-049).
+ * drift from what `theme.ts` is applying.
  */
 export function ChoiceGroup<T extends string>({
   legend,
@@ -31,37 +36,32 @@ export function ChoiceGroup<T extends string>({
 }: ChoiceGroupProps<T>) {
   const name = useId()
   const hintId = `${name}-hint`
+  const blocks = options.some((option) => option.hint !== undefined)
 
   return (
-    <fieldset
-      className="m-0 border-0 p-0"
-      aria-describedby={hint === undefined ? undefined : hintId}
-    >
-      <legend className="mb-1 font-ui text-base font-semibold text-ink">{legend}</legend>
+    <fieldset className="choice" aria-describedby={hint === undefined ? undefined : hintId}>
+      <legend className="choice__legend">{legend}</legend>
       {hint !== undefined && (
-        <p id={hintId} className="mb-3 font-ui text-sm text-ink/80">
+        <p id={hintId} className="choice__hint">
           {hint}
         </p>
       )}
-      <div className="flex flex-wrap gap-3">
+      <div className={cx('pills', blocks && 'pills--blocks')}>
         {options.map((option) => (
-          <label
-            key={option.value}
-            className="flex min-w-44 max-w-80 flex-1 cursor-pointer items-start gap-3 rounded-[var(--radius-field)] border-[length:var(--border-hairline)] border-hairline-strong bg-paper-raised p-3 has-[:checked]:border-sage has-[:checked]:bg-sage-tint"
-          >
+          <label key={option.value} className={cx('pill', blocks && 'pill--block')}>
             <input
               type="radio"
               name={name}
               value={option.value}
               checked={value === option.value}
               onChange={() => onChange(option.value)}
-              className="mt-1 size-4 accent-[var(--color-sage)]"
             />
-            <span className="flex flex-col gap-0.5">
-              <span className="font-ui font-semibold text-ink">{option.label}</span>
-              {option.hint !== undefined && (
-                <span className="font-ui text-sm text-ink/80">{option.hint}</span>
-              )}
+            <span className="pill__face">
+              <span className="pill__label">
+                <Check />
+                {option.label}
+              </span>
+              {option.hint !== undefined && <span className="pill__hint">{option.hint}</span>}
             </span>
           </label>
         ))}

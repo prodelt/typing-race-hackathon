@@ -4,6 +4,7 @@ import { type KeyboardEvent, useEffect, useRef, useState } from 'react'
 import { useAppStore, useDerived } from '../../app/state/index.js'
 import { m } from '../../paraglide/messages.js'
 import { domInputSource, systemClock } from '../../seams/index.js'
+import { ScreenHead } from '../screen.js'
 import { useEnginePaused } from './engineHooks.js'
 import { PauseOverlay } from './PauseOverlay.js'
 import { PreStart } from './PreStart.js'
@@ -80,19 +81,26 @@ export function ExerciseSession({ scale, mode }: ExerciseSessionProps) {
 
 function Locked() {
   return (
-    <section className="mx-auto max-w-xl py-16 text-center">
-      <h1 className="font-ui text-2xl font-bold">{m.exercise_locked_title()}</h1>
-      <p className="mt-3 font-ui leading-relaxed">{m.exercise_locked_body()}</p>
-      <BackToPath />
+    <section className="screen">
+      <ScreenHead
+        n={2}
+        label={m.exercise_back_to_path()}
+        title={m.exercise_locked_title()}
+        lede={m.exercise_locked_body()}
+      >
+        <BackToPath />
+      </ScreenHead>
     </section>
   )
 }
 
 export function BackToPath() {
   return (
-    <Link to="/path" className="mt-6 inline-block font-ui text-sage underline underline-offset-4">
-      {m.exercise_back_to_path()}
-    </Link>
+    <p className="mt-8">
+      <Link to="/path" className="ulink">
+        {m.exercise_back_to_path()}
+      </Link>
+    </p>
   )
 }
 
@@ -165,6 +173,7 @@ export function ExerciseRun({
     <div onKeyDown={onKeyDown}>
       <textarea
         ref={textareaRef}
+        data-testid="typing-input"
         className="sr-only"
         aria-label={m.exercise_input_label()}
         tabIndex={-1}

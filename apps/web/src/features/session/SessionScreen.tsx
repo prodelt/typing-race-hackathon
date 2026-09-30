@@ -1,13 +1,16 @@
 import { useNavigate } from '@tanstack/react-router'
-import { Button, Card, Chip } from '@typing-race/ui'
+import { Button, cx } from '@typing-race/ui'
 import { useMemo } from 'react'
 import { useAppStore, useDerived } from '../../app/state/index.js'
 import { m } from '../../paraglide/messages.js'
+import { GradLayer } from '../grad.js'
+import { Arrow, order, ScreenHead } from '../screen.js'
 import { BetweenBlocks } from './BetweenBlocks.js'
 import { type Block, composeSession, type SessionPlan } from './compose.js'
 import { completedBlocks, positionOf, sessionAttempts } from './machine.js'
 import { RealTextPending } from './RealTextPending.js'
 import { useSessionStore } from './store.js'
+import './session.css'
 
 const BLOCK_NAMES: readonly (() => string)[] = [
   () => m.session_block_warmUp(),
@@ -29,11 +32,31 @@ function blockBody(block: Block): string {
     : m.session_block_consolidation_body()
 }
 
+/** The four blocks as four discs, the current one filled: where the learner is, at a glance. */
+function Track({ current }: { readonly current: number }) {
+  return (
+    <ol className="track" aria-hidden="true">
+      {BLOCK_NAMES.map((name, index) => (
+        <li
+          key={name()}
+          className={cx('track__step', index < current && 'is-done', index === current && 'is-now')}
+        >
+          <span className="disc disc--sm">{String(index + 1).padStart(2, '0')}</span>
+          <span className="track__name">{name()}</span>
+        </li>
+      ))}
+    </ol>
+  )
+}
+
 /**
- * T135 to T140 composed. The session runs the exercise screen for each block without importing
- * it: the plan lives in `store.ts`, and this screen links out with `navigate` to
- * `/exercise/$scaleId`, carrying only the scale and the typed `mode` search the route already has.
- * Coming back, it counts attempts from the history to know where the learner is (FR-078).
+ * The guided session. It runs the exercise screen for each block without importing it: the plan
+ * lives in `store.ts`, and this screen links out with `navigate` to `/exercise/$scaleId`,
+ * carrying only the scale and the typed `mode` search the route already has. Coming back, it
+ * counts attempts from the history to know where the learner is.
+ *
+ * The intro is laid out like the brand site's "how it works" section: the expected length as the
+ * one big number, then the four blocks as numbered points in discs, then the poster button.
  */
 export function SessionScreen() {
   const navigate = useNavigate()
@@ -71,27 +94,29 @@ export function SessionScreen() {
     dispatch({ type: 'abandon' })
   }
 
-  const header = <h1 className="font-ui text-2xl font-bold text-ink">{m.session_title()}</h1>
-
   if (session.status === 'finished') {
     return (
-      <section className="flex max-w-3xl flex-col gap-6">
-        {header}
-        <Card raised className="flex flex-col gap-4 p-6">
-          <h2 className="font-ui text-xl font-bold text-ink">{m.session_finished_title()}</h2>
-          <p className="font-ui text-ink">{m.session_finished_body({ count: session.recorded })}</p>
-          <div>
-            <Button
-              variant="primary"
-              onClick={() => {
-                dispatch({ type: 'reset' })
-                void navigate({ to: '/today' })
-              }}
-            >
-              {m.session_finished_today()}
-            </Button>
-          </div>
-        </Card>
+      <section className="screen">
+        <ScreenHead n={3} label={m.session_title()} title={m.session_title()} small />
+        <div className="session-done panel gp-host gp-host--bright panel--corner rise">
+          <GradLayer tone="bright" seed={8} count={4} />
+          <h2 className="session-done__title">
+            {m.session_finished_title()}
+            <span className="red-dot" aria-hidden="true" />
+          </h2>
+          <p className="screen-lede">{m.session_finished_body({ count: session.recorded })}</p>
+          <button
+            type="button"
+            className="poster session__poster"
+            onClick={() => {
+              dispatch({ type: 'reset' })
+              void navigate({ to: '/today' })
+            }}
+          >
+            <span>{m.session_finished_today()}</span>
+            <Arrow size={40} />
+          </button>
+        </div>
       </section>
     )
   }
@@ -100,10 +125,18 @@ export function SessionScreen() {
     const position = positionOf(session, attempts)
     const recorded = sessionAttempts(session, attempts).length
     const current = position.kind === 'block' ? session.plan.blocks[position.blockIndex] : undefined
+    const trackAt =
+      position.kind === 'block'
+        ? position.blockIndex
+        : position.kind === 'between'
+          ? position.nextIndex
+          : 3
 
     return (
-      <section className="flex max-w-3xl flex-col gap-6">
-        {header}
+      <section className="screen">
+        <ScreenHead n={3} label={m.session_title()} title={m.session_title()} small />
+        <Track current={trackAt} />
+
         {position.kind === 'between' && (
           <BetweenBlocks
             finished={blockName(position.finishedIndex)}
@@ -124,90 +157,104 @@ export function SessionScreen() {
           />
         )}
         {position.kind === 'block' && current !== undefined && (
-          <Card raised className="flex flex-col gap-4 p-6">
-            <p className="font-ui text-sm font-semibold text-ink/80">
-              {m.session_progress_block({
-                n: position.blockIndex + 1,
-                block: blockName(position.blockIndex),
-              })}
-            </p>
-            <p className="font-ui text-ink">{blockBody(current)}</p>
-            <p className="font-mono text-sm text-ink">
-              {m.session_progress_attempt({ done: position.doneInBlock, total: position.reps })}
-            </p>
+          <div className="session-block rise">
             <div>
-              <Button
-                variant="primary"
-                size="lg"
-                onClick={() => launchBlock(position.blockIndex, session.plan)}
-              >
-                {m.session_next_attempt({ n: position.doneInBlock + 1, total: position.reps })}
-              </Button>
+              <p className="flabel">
+                {m.session_progress_block({
+                  n: position.blockIndex + 1,
+                  block: blockName(position.blockIndex),
+                })}
+              </p>
+              <p className="statement session-block__body">{blockBody(current)}</p>
+              <p className="session-block__count">
+                {m.session_progress_attempt({ done: position.doneInBlock, total: position.reps })}
+              </p>
             </div>
-          </Card>
-        )}
-        <div className="flex flex-col gap-2">
-          <div>
-            <Button variant="quiet" onClick={abandon}>
-              {m.session_abandon()}
-            </Button>
+            <button
+              type="button"
+              className="poster session__poster"
+              onClick={() => launchBlock(position.blockIndex, session.plan)}
+            >
+              <span>
+                {m.session_next_attempt({ n: position.doneInBlock + 1, total: position.reps })}
+              </span>
+              <Arrow size={40} />
+            </button>
           </div>
-          <p className="font-ui text-sm text-ink/80">{m.session_abandon_note()}</p>
+        )}
+
+        <div className="session-leave">
+          <Button variant="quiet" onClick={abandon}>
+            {m.session_abandon()}
+          </Button>
+          <p className="note">{m.session_abandon_note()}</p>
         </div>
       </section>
     )
   }
 
-  // Idle: the intro. The expected length is stated here, before anything starts (FR-077).
+  // Idle: the intro. The expected length is stated here, before anything starts.
   return (
-    <section className="flex max-w-3xl flex-col gap-6">
-      {header}
-      <p className="font-ui text-ink/80">{m.session_lead()}</p>
+    <section className="screen">
+      <ScreenHead
+        n={3}
+        label={m.session_blocks_heading()}
+        title={m.session_title()}
+        lede={m.session_lead()}
+        dot
+      />
       {plan === null ? (
-        <p role="status" className="font-ui text-ink">
+        <p role="status" className="statement session-needs">
           {m.session_needs_level()}
         </p>
       ) : (
-        <>
-          <Card raised className="flex flex-col gap-2 p-6">
-            <p className="font-ui text-xl font-bold text-ink" data-testid="expected-length">
+        <div className="session-intro">
+          <div className="session-intro__length rise" style={order(1)}>
+            <p className="num num--red session-intro__minutes" aria-hidden="true">
+              {plan.expectedMinutes}
+            </p>
+            <p className="session-intro__stated" data-testid="expected-length">
               {m.session_expected_length({ minutes: plan.expectedMinutes })}
             </p>
-            <p className="font-ui text-sm text-ink/80">{m.session_expected_note()}</p>
-          </Card>
-          <section aria-labelledby="session-blocks" className="flex flex-col gap-3">
-            <h2 id="session-blocks" className="font-ui text-lg font-bold text-ink">
+            <p className="note">{m.session_expected_note()}</p>
+            <button type="button" className="poster session__poster" onClick={() => start(plan)}>
+              <span>{m.session_start()}</span>
+              <Arrow size={40} />
+            </button>
+          </div>
+
+          <section aria-labelledby="session-blocks" className="session-intro__blocks">
+            <h2 id="session-blocks" className="sr-only">
               {m.session_blocks_heading()}
             </h2>
-            <ol className="flex flex-col gap-3">
+            <ol className="blocks">
               {plan.blocks.map((block, index) => (
-                <li key={block.kind}>
-                  <Card className="flex flex-col gap-2 p-4">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="font-ui font-semibold text-ink">{blockName(index)}</span>
-                      <Chip>{m.session_block_attempts({ count: block.reps })}</Chip>
-                      <Chip tone="muted">
-                        {m.session_block_focus({ focus: block.focus.value })}
-                      </Chip>
-                    </div>
-                    <p className="font-ui text-sm text-ink/80">{blockBody(block)}</p>
-                  </Card>
+                <li key={block.kind} className="blocks__item rise" style={order(index + 2)}>
+                  <span className="disc" aria-hidden="true">
+                    {String(index + 1).padStart(2, '0')}
+                  </span>
+                  <div>
+                    <h3 className="blocks__name">{blockName(index)}</h3>
+                    <p className="blocks__meta">
+                      <span>{m.session_block_attempts({ count: block.reps })}</span>
+                      <span>{m.session_block_focus({ focus: block.focus.value })}</span>
+                    </p>
+                    <p className="blocks__body">{blockBody(block)}</p>
+                  </div>
                 </li>
               ))}
-              <li>
-                <Card className="flex flex-col gap-2 p-4">
-                  <span className="font-ui font-semibold text-ink">{blockName(3)}</span>
-                  <p className="font-ui text-sm text-ink/80">{m.session_block_realText_body()}</p>
-                </Card>
+              <li className="blocks__item blocks__item--later rise" style={order(6)}>
+                <span className="disc disc--empty" aria-hidden="true">
+                  04
+                </span>
+                <div>
+                  <h3 className="blocks__name">{blockName(3)}</h3>
+                  <p className="blocks__body">{m.session_block_realText_body()}</p>
+                </div>
               </li>
             </ol>
           </section>
-          <div>
-            <Button variant="primary" size="lg" onClick={() => start(plan)}>
-              {m.session_start()}
-            </Button>
-          </div>
-        </>
+        </div>
       )}
     </section>
   )

@@ -1,44 +1,46 @@
 import { useNavigate } from '@tanstack/react-router'
-import { Button, Card, Chip, type ChipTone } from '@typing-race/ui'
+import { buttonClass, Index } from '@typing-race/ui'
 import { useDerived } from '../../app/state/index.js'
 import { m } from '../../paraglide/messages.js'
 import { AcademyStageLink } from '../academy/StageLink.js'
+import { order, ScreenHead } from '../screen.js'
 import { WordsSection } from '../words/WordsSection.js'
 import { PathKeyboard } from './Keyboard.js'
 import { keyLabel, scaleName } from './labels.js'
 import { MASTERY_STREAK, type ScaleState, scaleRows } from './model.js'
 import { Review } from './Review.js'
 import { StartingLevel } from './StartingLevel.js'
+import './path.css'
 
 /**
- * T111. Path, L2 — the Stage 1 ladder: the keyboard, then the scales in Unlock Order.
+ * Path — the Stage 1 ladder: the keyboard, then the scales in Unlock Order.
  *
  * Everything shown is read from derived `Progress`. The unlocked set is always a prefix of the
- * layout's Unlock Order (FR-042) because the fold builds it so; drawing from it rather than from
- * any local list is what keeps this screen unable to disagree.
+ * layout's Unlock Order because the fold builds it so; drawing from it rather than from any local
+ * list is what keeps this screen unable to disagree.
+ *
+ * Laid out as numbered sections of one long page, the way the brand site is: a board with its one
+ * big number, a two-column ladder, the stages still to come, the weak spots, the starting level.
  */
 
-function stateChip(state: ScaleState): { tone: ChipTone; label: string } {
+/** Locked rows shown after the last open one, so the learner sees what comes next. */
+const LOCKED_SHOWN = 6
+/** Never fold a ladder shorter than this: two even columns of the first rungs. */
+const MIN_SHOWN = 12
+
+function stateText(state: ScaleState): string {
   switch (state.kind) {
     case 'complete':
-      return { tone: 'sage', label: m.path_scale_state_complete() }
+      return m.path_scale_state_complete()
     case 'inProgress':
-      return {
-        tone: 'neutral',
-        label: m.path_scale_state_inProgress({ count: state.count, target: MASTERY_STREAK }),
-      }
+      return m.path_scale_state_inProgress({ count: state.count, target: MASTERY_STREAK })
     case 'notStarted':
-      return { tone: 'neutral', label: m.path_scale_state_notStarted() }
+      return m.path_scale_state_notStarted()
     case 'locked':
-      return { tone: 'muted', label: m.path_scale_state_locked() }
+      return state.reason.kind === 'requires'
+        ? m.path_scale_lock_requires({ keys: state.reason.keys.map(keyLabel).join(' ') })
+        : m.path_scale_lock_focus({ key: keyLabel(state.reason.key) })
   }
-}
-
-function lockText(state: ScaleState): string | null {
-  if (state.kind !== 'locked') return null
-  return state.reason.kind === 'requires'
-    ? m.path_scale_lock_requires({ keys: state.reason.keys.map(keyLabel).join(' ') })
-    : m.path_scale_lock_focus({ key: keyLabel(state.reason.key) })
 }
 
 export function PathScreen() {
@@ -48,83 +50,118 @@ export function PathScreen() {
   if (progress === null) return <StartingLevel mode="first" />
 
   const rows = scaleRows(layout, catalogue, progress)
+  const lastOpen = rows.findLastIndex(({ state }) => state.kind !== 'locked')
+  const cut = Math.max(lastOpen + 1 + LOCKED_SHOWN, MIN_SHOWN)
+  const shown = rows.slice(0, cut)
+  const folded = rows.slice(cut)
+
+  const row = ({ scale, state }: (typeof rows)[number], index: number) => {
+    const name = scaleName(scale)
+    return (
+      <li key={scale.id} data-state={state.kind} className="ladder__row">
+        <span
+          className={state.kind === 'locked' ? 'disc disc--sm disc--empty' : 'disc disc--sm'}
+          aria-hidden="true"
+        >
+          {String(index + 1).padStart(2, '0')}
+        </span>
+        <span className="min-w-0">
+          <span className="ladder__name">{name}</span>
+          <span className="ladder__state">{stateText(state)}</span>
+        </span>
+        {state.kind !== 'locked' && (
+          <button
+            type="button"
+            className={`${buttonClass(state.kind === 'complete' ? 'quiet' : 'secondary', 'sm')} ladder__go`}
+            aria-label={m.path_scale_start_named({ name })}
+            onClick={() =>
+              void navigate({
+                to: '/exercise/$scaleId',
+                params: { scaleId: scale.id },
+                search: { mode: 'practice' },
+              })
+            }
+          >
+            {m.path_scale_start()}
+          </button>
+        )}
+      </li>
+    )
+  }
 
   return (
-    <div className="grid gap-6">
-      <header>
-        <h1 className="font-ui text-2xl font-bold">{m.path_path_title()}</h1>
-        <p className="mt-1 font-ui text-muted">{m.path_path_lead()}</p>
-      </header>
+    <div className="screen">
+      <ScreenHead
+        n={2}
+        label={m.path_where_stage_value({ n: progress.stage.current })}
+        title={m.path_path_title()}
+        lede={m.path_path_lead()}
+        dot
+      />
 
-      <Card className="p-6" role="region" aria-labelledby="path-keyboard-title">
-        <h2 id="path-keyboard-title" className="font-ui text-lg font-bold">
+      <section
+        id="keyboard"
+        data-section={m.path_keyboard_title()}
+        className="path-sec rise"
+        style={order(1)}
+        aria-labelledby="path-keyboard-title"
+      >
+        <Index n={1}>{m.path_keyboard_title()}</Index>
+        <h2 id="path-keyboard-title" className="sr-only">
           {m.path_keyboard_title()}
         </h2>
-        <div className="mt-3">
-          <PathKeyboard layout={layout} progress={progress} />
-        </div>
-      </Card>
+        <PathKeyboard layout={layout} progress={progress} />
+      </section>
 
-      <Card className="p-6" role="region" aria-labelledby="path-scales-title">
-        <h2 id="path-scales-title" className="font-ui text-lg font-bold">
-          {m.path_scales_title()}
-        </h2>
-        <p className="mt-1 font-ui text-sm text-muted">{m.path_scales_lead()}</p>
-        <ol className="mt-4 grid gap-2">
-          {rows.map(({ scale, state }) => {
-            const chip = stateChip(state)
-            const lock = lockText(state)
-            const name = scaleName(scale)
-            return (
-              <li
-                key={scale.id}
-                data-state={state.kind}
-                className="flex flex-wrap items-center gap-3 rounded-[var(--radius-field)] border-[length:var(--border-hairline)] border-hairline px-4 py-2"
-              >
-                <span className="min-w-40 flex-1">
-                  <span className="font-ui font-semibold">{name}</span>
-                  {lock !== null && (
-                    <span className="block font-ui text-sm text-muted">{lock}</span>
-                  )}
-                </span>
-                <Chip tone={chip.tone}>{chip.label}</Chip>
-                {state.kind !== 'locked' && (
-                  <Button
-                    size="md"
-                    aria-label={m.path_scale_start_named({ name })}
-                    onClick={() =>
-                      void navigate({
-                        to: '/exercise/$scaleId',
-                        params: { scaleId: scale.id },
-                        search: { mode: 'practice' },
-                      })
-                    }
-                  >
-                    {m.path_scale_start()}
-                  </Button>
-                )}
-              </li>
-            )
-          })}
-        </ol>
-      </Card>
+      <section
+        id="scales"
+        data-section={m.path_scales_title()}
+        className="path-sec"
+        aria-labelledby="path-scales-title"
+      >
+        <div className="path-sec__head">
+          <div>
+            <Index n={2}>{m.path_scales_lead()}</Index>
+            <h2 id="path-scales-title" className="path-sec__title">
+              {m.path_scales_title()}
+            </h2>
+          </div>
+        </div>
+        <ol className="ladder">{shown.map(row)}</ol>
+        {folded.length > 0 && (
+          // The far end of the ladder is many locked rows that all say the same kind of thing.
+          // They stay in the document (and in reach), folded under one line that counts them.
+          <details className="ladder-more">
+            <summary>{m.path_scales_more({ count: folded.length })}</summary>
+            <ol className="ladder" start={shown.length + 1}>
+              {folded.map((entry, i) => row(entry, shown.length + i))}
+            </ol>
+          </details>
+        )}
+      </section>
 
       <WordsSection layout={layout} progress={progress} />
 
-      <Card className="p-6" role="region" aria-labelledby="path-later-title">
-        <h2 id="path-later-title" className="font-ui text-lg font-bold">
+      <section
+        id="later"
+        data-section={m.path_later_title()}
+        className="path-sec"
+        aria-labelledby="path-later-title"
+      >
+        <Index n={4} />
+        <h2 id="path-later-title" className="path-sec__title">
           {m.path_later_title()}
         </h2>
-        <ul className="mt-3 grid gap-2">
+        <ul className="later later--one">
           <li>
             <AcademyStageLink />
           </li>
         </ul>
-      </Card>
+      </section>
 
-      {/* FR-047: a way to practise weak keys and Transitions specifically. It sits below the
-          ladder rather than on Today, because Today carries the one next action and a second
-          list there would be two answers to the same question (SC-010). */}
+      {/* A way to practise weak keys and Transitions specifically. It sits below the ladder rather
+          than on Today, because Today carries the one next action and a second list there would
+          be two answers to the same question. */}
       <Review progress={progress} layout={layout} catalogue={catalogue} />
 
       <StartingLevel mode="change" />

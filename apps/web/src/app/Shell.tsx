@@ -5,6 +5,7 @@ import { m } from '../paraglide/messages.js'
 import { setLocale } from '../paraglide/runtime.js'
 import { BootGate } from './BootGate.js'
 import { CommandPalette } from './CommandPalette.js'
+import { SectionBar } from './SectionBar.js'
 import { useAppStore } from './state/index.js'
 import './shell.css'
 
@@ -124,8 +125,8 @@ function LanguageSwitch({ disabled }: { readonly disabled: boolean }) {
 export function Shell() {
   const attemptInProgress = useAppStore((state) => state.attemptInProgress)
   const pathname = useRouterState({ select: (state) => state.location.pathname })
-  // The product page is a full-bleed landing page; every other screen is an app column.
-  const landing = pathname === '/'
+  // The product page and About are full-bleed pages; every other screen is an app column.
+  const landing = pathname === '/' || pathname === '/about'
 
   return (
     <div className="shell" data-landing={landing || undefined}>
@@ -206,6 +207,8 @@ export function Shell() {
       </main>
 
       <CommandPalette />
+
+      <SectionBar pathname={pathname} dimmed={attemptInProgress} />
 
       <footer className="shell-foot">
         <div className="shell-foot__inner shell-container">

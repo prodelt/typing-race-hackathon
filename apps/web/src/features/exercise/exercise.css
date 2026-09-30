@@ -1,0 +1,352 @@
+/*
+ * The exercise screen: pre-start, the attempt, the pause. The typing line's own states are in
+ * TypingLine.css; the guides' in Guides.css. Shared patterns come from ../screen.css.
+ */
+
+/* ---- Pre-start --------------------------------------------------------------------------- */
+
+.prestart {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 340px);
+  gap: 48px clamp(40px, 5vw, 88px);
+  align-items: start;
+  margin-top: clamp(32px, 3.4vw, 48px);
+}
+
+.prestart__main {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.prestart__goal {
+  max-width: 24em;
+  font-size: clamp(21px, 1.9vw, 28px);
+  line-height: 1.2;
+}
+
+.prestart__mode {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.prestart__status {
+  max-width: 56ch;
+}
+
+.prestart__alert {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+  max-width: 56ch;
+  padding: 20px 22px;
+  background: var(--color-terracotta-tint);
+  box-shadow: inset 3px 0 0 var(--color-terracotta);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+.prestart__alert p {
+  margin: 0;
+}
+
+.prestart__go {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px 32px;
+  margin-top: 8px;
+}
+
+.prestart__go .poster {
+  width: auto;
+  min-width: min(100%, 380px);
+}
+
+.prestart__aside {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.prestart__glyph {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  aspect-ratio: 1;
+  padding: 24px 28px 20px;
+  container-type: inline-size;
+}
+
+.prestart__glyph-n {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-accent-pale);
+}
+
+.prestart__glyph-char {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 62cqi;
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+}
+
+.prestart__glyph-char[data-size="long"] {
+  font-size: 34cqi;
+}
+
+/* A word drill names what it drills rather than one key: a line of display type. */
+.prestart__glyph-char[data-size="text"] {
+  font-size: 11cqi;
+  line-height: 1.05;
+  text-wrap: balance;
+}
+
+/* ---- The mode toggle: two pills, the current one filled ink -------------------------------- */
+
+.mode {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.mode__option {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 52px;
+  padding: 0 22px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--color-paper-raised);
+  box-shadow: inset 0 0 0 var(--border-hairline) var(--color-hairline-strong);
+  color: var(--color-ink);
+  font: inherit;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background-color var(--dur-base) var(--ease-enter),
+    box-shadow var(--dur-base) var(--ease-enter),
+    color var(--dur-base) var(--ease-enter),
+    transform var(--dur-base) var(--ease-enter);
+}
+
+.mode__option:hover {
+  box-shadow: inset 0 0 0 var(--border-hairline) var(--color-ink);
+}
+
+.mode__option:active {
+  transform: scale(0.98);
+}
+
+.mode__option[aria-pressed="true"] {
+  background: var(--color-ink);
+  box-shadow: none;
+  color: var(--color-paper);
+  cursor: default;
+}
+
+.mode__option[aria-pressed="true"] .pill__check {
+  display: inline-block;
+}
+
+/* Practice has cleared the floor: the test is now the thing to press. */
+.mode__option--call {
+  background: var(--color-accent);
+  box-shadow: none;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.mode__option--call:hover {
+  background: var(--color-accent-deep);
+  box-shadow: none;
+}
+
+/* ---- The attempt -------------------------------------------------------------------------- */
+
+.attempt {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: 40px clamp(32px, 3.6vw, 56px);
+  align-items: start;
+  padding-top: 8px;
+}
+
+.attempt__main {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  min-width: 0;
+}
+
+.attempt__main .pace-cue {
+  margin-top: 16px;
+}
+
+.attempt__guides {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+}
+
+.attempt__hands {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 20px 48px;
+}
+
+/* ---- The rail: plain type, no boxes ------------------------------------------------------- */
+
+.rail {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  padding-top: 12px;
+}
+
+.rail__block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rail__focus {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 26px;
+  line-height: 1.05;
+  letter-spacing: -0.045em;
+}
+
+.rail__text {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-ink-soft);
+  text-wrap: pretty;
+}
+
+.rail__figures {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 12px;
+  margin: 4px 0 0;
+}
+
+.rail__figures dt {
+  font-size: 13px;
+  color: var(--color-muted);
+}
+
+.rail__figures dd {
+  margin: 2px 0 0;
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.rail__unit {
+  margin-left: 4px;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--color-muted);
+}
+
+.rail__rule {
+  height: var(--border-hairline);
+  background: var(--color-hairline);
+}
+
+/* ---- Pause --------------------------------------------------------------------------------- */
+
+.pause {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: color-mix(in srgb, var(--color-paper-deep) 82%, transparent);
+  backdrop-filter: blur(6px);
+  animation: pause-fade var(--dur-base) var(--ease-standard) both;
+}
+
+.pause__card {
+  width: min(100%, 620px);
+  padding: clamp(32px, 3.4vw, 48px);
+  border-radius: 0 72px 0 0;
+  background: var(--color-paper);
+  box-shadow: var(--shadow-raised);
+  animation: pause-rise var(--dur-slow) var(--ease-enter) both;
+}
+
+.pause__note {
+  margin-top: 20px;
+}
+
+.pause__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(40px, 4vw, 56px);
+  line-height: 0.95;
+  letter-spacing: -0.045em;
+}
+
+.pause__sentence {
+  margin: 20px 0 0;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: -0.015em;
+  text-wrap: pretty;
+}
+
+.pause__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 32px;
+}
+
+@keyframes pause-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes pause-rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+
+@media (max-width: 1180px) {
+  .attempt {
+    grid-template-columns: 208px minmax(0, 1fr);
+  }
+  .prestart {
+    grid-template-columns: minmax(0, 1fr) minmax(260px, 320px);
+  }
+}

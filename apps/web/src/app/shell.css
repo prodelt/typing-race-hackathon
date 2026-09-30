@@ -235,7 +235,132 @@ a.shell-head__settings:hover {
 /* ---- Footer ------------------------------------------------------------------------------ */
 
 .shell-foot {
+  /* Clear of the fixed bottom bar, so the footer's last line is never under it. */
+  padding-bottom: var(--bar-h);
   border-top: var(--border-hairline) solid var(--color-hairline);
+}
+
+/* ---- The bottom bar: b-red v4 `.pbar` (56 px, 14 px 500, space-between, white) ------------ */
+
+/* Anything scrolled into view (a section anchor, a focused link) stops clear of the bar. */
+:root {
+  scroll-padding-bottom: calc(var(--bar-h) + 16px);
+}
+
+.pbar {
+  position: fixed;
+  inset: auto 0 0 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  height: var(--bar-h);
+  padding: 0 var(--gutter);
+  background: var(--color-paper);
+  font-size: 14px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  transition: opacity var(--dur-base) var(--ease-standard);
+}
+
+/* On an app screen the bar lines up with the column, as the header does. */
+.shell:not([data-landing]) .pbar {
+  padding-inline: max(var(--gutter), calc((100% - 72rem) / 2));
+}
+
+.pbar__cur {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.pbar__cur b {
+  margin-right: 0.5em;
+  font-weight: 600;
+  color: var(--color-terracotta-ink);
+}
+
+.pbar__right {
+  display: flex;
+  align-items: center;
+  gap: clamp(16px, 2.4vw, 36px);
+}
+
+.pbar__list {
+  display: flex;
+  gap: clamp(8px, 1.9vw, 28px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pbar__list a {
+  position: relative;
+  display: block;
+  padding: 8px 2px;
+  color: var(--color-muted);
+  text-decoration: none;
+  transition: color var(--dur-base) var(--ease-enter);
+}
+
+.pbar__list a:hover,
+.pbar__list a.is-on {
+  color: var(--color-terracotta-ink);
+}
+
+.pbar__list a.is-on {
+  font-weight: 700;
+}
+
+/* The section's name in a dark pill above the index, on hover and on keyboard focus. */
+.pbar__tip {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  padding: 6px 12px;
+  border-radius: var(--radius-pill);
+  background: var(--color-ink);
+  color: var(--color-paper);
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 6px);
+  transition:
+    opacity var(--dur-base) var(--ease-enter),
+    transform var(--dur-base) var(--ease-enter);
+}
+
+.pbar__list li:last-child .pbar__tip {
+  left: auto;
+  right: 0;
+  transform: translate(0, 6px);
+}
+
+.pbar__list a:hover .pbar__tip,
+.pbar__list a:focus-visible .pbar__tip {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.pbar__list li:last-child a:hover .pbar__tip,
+.pbar__list li:last-child a:focus-visible .pbar__tip {
+  transform: translate(0, 0);
+}
+
+/* During an attempt the bar steps away below the fold (b-red v4 `.pbar.is-away`), so nothing
+   fixed sits over the guides. It moves once, when the attempt starts, never between keystrokes. */
+.pbar[data-dimmed] {
+  transform: translateY(100%);
+  transition: transform var(--dur-slow) var(--ease-enter);
+}
+
+@media (max-width: 1023px) {
+  .pbar {
+    display: none;
+  }
 }
 
 .shell-foot__inner {

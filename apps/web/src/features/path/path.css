@@ -1,0 +1,520 @@
+/*
+ * Today, the starting-level question and Path. Shared patterns (head, panel, pills, passport) are
+ * in ../screen.css; this file only lays them out.
+ */
+
+/* ---- Today ---------------------------------------------------------------------------------- */
+
+.today {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 400px);
+  gap: 48px clamp(40px, 5vw, 88px);
+  align-items: start;
+  margin-top: clamp(40px, 4.4vw, 64px);
+}
+
+.today__next {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-top: 8px;
+}
+
+.today__sentence {
+  max-width: 20em;
+}
+
+.today__cta {
+  margin-top: clamp(20px, 2.4vw, 36px);
+  max-width: 560px;
+}
+
+.today__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 28px;
+  margin: 4px 0 0;
+}
+
+.today__where {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.today__keys {
+  margin: 0;
+}
+
+.today__keys dd {
+  margin: 10px 0 0;
+}
+
+.today__keys-n {
+  display: inline-block;
+  font-size: clamp(72px, 7vw, 104px);
+  color: var(--color-terracotta);
+}
+
+.today__keys-of {
+  color: var(--color-ink-faint);
+  font-size: 0.5em;
+  letter-spacing: -0.04em;
+}
+
+.today__streak {
+  display: inline-flex;
+  gap: 6px;
+  vertical-align: middle;
+}
+
+.today__done {
+  color: var(--color-sage);
+}
+
+/* ---- Starting level: three stage cells, the chosen one in red -------------------------------- */
+
+.start {
+  margin-top: clamp(40px, 4.4vw, 64px);
+}
+
+.start__options {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr) minmax(0, 1fr);
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.start__option {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: clamp(300px, 30vw, 400px);
+  padding: 24px 24px 28px;
+  container-type: inline-size;
+  background: var(--color-paper-raised);
+  cursor: pointer;
+  transition:
+    background-color var(--dur-base) var(--ease-enter),
+    color var(--dur-base) var(--ease-enter),
+    border-radius var(--dur-slow) var(--ease-enter);
+}
+
+.start__option:hover {
+  background: #ffffff;
+}
+
+:root[data-theme="dark"] .start__option:hover {
+  background: var(--color-paper-raised);
+  box-shadow: inset 0 0 0 1px var(--color-hairline-strong);
+}
+
+.start__option input {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.start__option:has(input:focus-visible) {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+.start__option[data-lower] {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.start__option[data-lower]:hover {
+  background: var(--color-paper-raised);
+}
+
+.start__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-muted);
+}
+
+.start__mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  padding: 0 12px;
+  border-radius: var(--radius-pill);
+  box-shadow: inset 0 0 0 1px var(--color-hairline-strong);
+  font-size: 13px;
+  font-weight: 600;
+  visibility: hidden;
+}
+
+.start__count {
+  margin-top: clamp(32px, 4vw, 64px);
+  font-size: min(112px, 30cqi);
+}
+
+.start__count-label {
+  margin: 8px 0 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-muted);
+}
+
+.start__title {
+  margin: 28px 0 0;
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+
+.start__body {
+  margin: 8px 0 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--color-muted);
+  text-wrap: pretty;
+}
+
+.start__note {
+  margin: 10px 0 0;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* Chosen: the brand's live-stage block, red with the rounded top-right corner. */
+.start__option:has(input:checked) {
+  background: var(--color-accent);
+  color: #ffffff;
+  border-radius: 0 72px 0 0;
+}
+
+.start__option:has(input:checked) .start__top,
+.start__option:has(input:checked) .start__body,
+.start__option:has(input:checked) .start__count-label {
+  color: var(--color-accent-pale);
+}
+
+.start__option:has(input:checked) .start__mark {
+  visibility: visible;
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 60%);
+}
+
+.start__option:has(input:checked):has(input:focus-visible) {
+  outline-color: var(--color-ink);
+}
+
+.start__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px 28px;
+  margin-top: 32px;
+}
+
+.start__actions .poster {
+  width: auto;
+  min-width: min(100%, 420px);
+}
+
+/* The compact variant on Path: the same cells, shorter. */
+.start--change .start__option {
+  min-height: 0;
+}
+
+.start--change .start__count {
+  font-size: min(64px, 20cqi);
+}
+
+/* ---- Path ------------------------------------------------------------------------------------ */
+
+.path-sec {
+  margin-top: clamp(72px, 7vw, 112px);
+}
+
+.screen-head + .path-sec {
+  margin-top: clamp(48px, 4.4vw, 64px);
+}
+
+.path-sec__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px 32px;
+}
+
+.path-sec__title {
+  margin: 14px 0 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(30px, 3vw, 44px);
+  line-height: 1;
+  letter-spacing: -0.045em;
+}
+
+.path-sec__lede {
+  margin: 12px 0 0;
+  max-width: 48ch;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.45;
+  color: var(--color-ink-soft);
+}
+
+/* The keyboard block: the summary as a big number beside the board. */
+.path-board {
+  display: grid;
+  grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+  gap: 32px clamp(32px, 4vw, 64px);
+  align-items: start;
+  margin-top: 36px;
+}
+
+.path-board__count {
+  font-size: clamp(72px, 7vw, 104px);
+}
+
+.path-board__of {
+  color: var(--color-ink-faint);
+  font-size: 0.5em;
+}
+
+.path-board__summary {
+  margin: 16px 0 0;
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+}
+
+.path-board__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  margin: 20px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+  color: var(--color-muted);
+}
+
+.path-board__legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.path-board__swatch {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+}
+
+.path-board__swatch--next {
+  background: var(--color-accent);
+}
+
+.path-board__swatch--locked {
+  box-shadow: inset 0 0 0 1px var(--color-hairline-strong);
+  opacity: 0.6;
+}
+
+.path-board__keys {
+  display: flex;
+  justify-content: center;
+  overflow-x: auto;
+  padding: 32px 28px;
+  background: var(--color-paper-raised);
+}
+
+/* The ladder: numbered rows, grouped visually by the disc, one hairline between rows. */
+.ladder {
+  margin: 32px 0 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: ladder;
+  columns: 2;
+  column-gap: clamp(32px, 4vw, 64px);
+}
+
+.ladder__row {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) auto;
+  gap: 4px 16px;
+  align-items: center;
+  padding: 14px 0;
+  break-inside: avoid;
+  box-shadow: inset 0 -1px 0 var(--color-hairline);
+}
+
+.ladder__name {
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+
+.ladder__state {
+  display: block;
+  margin-top: 2px;
+  font-size: 13px;
+  color: var(--color-muted);
+}
+
+.ladder__row[data-state="complete"] .disc {
+  background: var(--color-sage-tint);
+  color: var(--color-sage-ink);
+}
+
+.ladder__row[data-state="locked"] {
+  color: var(--color-muted);
+}
+
+.ladder__row[data-state="locked"] .ladder__name {
+  font-weight: 500;
+}
+
+.ladder__go {
+  min-height: 36px;
+  padding: 0 16px;
+  font-size: 14px;
+}
+
+.ladder-more {
+  margin-top: 8px;
+}
+
+.ladder-more > summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  margin-top: 16px;
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+  cursor: pointer;
+  list-style: none;
+  transition:
+    color var(--dur-base) var(--ease-enter),
+    text-underline-offset var(--dur-base) var(--ease-enter);
+}
+
+.ladder-more > summary::-webkit-details-marker {
+  display: none;
+}
+
+.ladder-more > summary::after {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: translateY(-2px) rotate(45deg);
+  transition: transform var(--dur-base) var(--ease-enter);
+}
+
+.ladder-more[open] > summary::after {
+  transform: translateY(2px) rotate(-135deg);
+}
+
+.ladder-more > summary:hover {
+  color: var(--color-terracotta-ink);
+  text-underline-offset: 7px;
+}
+
+.ladder-more .ladder {
+  margin-top: 8px;
+}
+
+/* The later stages: two quiet cells, stated rather than hidden. */
+.later {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 32px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.later li {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 32px;
+  min-height: 180px;
+  padding: 24px;
+  background: var(--color-paper-raised);
+  color: var(--color-muted);
+}
+
+.later__name {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(26px, 2.4vw, 36px);
+  line-height: 1;
+  letter-spacing: -0.045em;
+  color: var(--color-ink-faint);
+}
+
+/* Weak spots: a short list of glyphs, each with its confidence. */
+.weak {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 8px;
+  margin: 32px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.weak li {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px 22px 22px;
+  background: var(--color-paper-raised);
+}
+
+.weak__top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.weak__glyph {
+  font-family: var(--font-typing);
+  font-size: 40px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.weak__pct {
+  font-size: 32px;
+}
+
+.weak__meta {
+  font-size: 13px;
+  color: var(--color-muted);
+}
+
+@media (max-width: 1180px) {
+  .today {
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 360px);
+  }
+  .path-board {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

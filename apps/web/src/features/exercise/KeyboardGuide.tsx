@@ -105,7 +105,7 @@ function KeyboardGuideBase({ engine, text, layout, unlocked, keyConfidence }: Ke
       data-testid="keyboard-guide"
       role="img"
       aria-label={m.exercise_guide_label()}
-      className="flex flex-col gap-1"
+      className="guide"
     >
       {ROWS.map((row) => {
         const rowKeys = keys.filter((key) => key.row === row && key.kind !== 'space')

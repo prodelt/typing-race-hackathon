@@ -1,5 +1,5 @@
 import type { AttemptMode, AttemptSummary } from '@typing-race/domain'
-import { Card, Chip } from '@typing-race/ui'
+import { Index } from '@typing-race/ui'
 import { memo } from 'react'
 import { m } from '../../paraglide/messages.js'
 import { formatElapsed } from './labels.js'
@@ -8,13 +8,16 @@ import type { ExerciseWording } from './wording.js'
 export interface RailProps {
   readonly wording: ExerciseWording
   readonly mode: AttemptMode
-  /** The last completed exercise, read **once** when the screen opened (FR-059). */
+  /** The last completed exercise, read **once** when the screen opened. */
   readonly last: AttemptSummary | null
   /** `null` when the learner has no Next Action yet. */
   readonly thisScaleIsNext: boolean | null
 }
 
-function Tile({
+/** Shown where a figure has no value yet (no finished exercise to read it from). */
+const NONE = '—'
+
+function Figure({
   label,
   value,
   unit,
@@ -26,88 +29,82 @@ function Tile({
   readonly testId: string
 }) {
   return (
-    <div className="rounded-[var(--radius-field)] bg-paper px-3 py-2">
-      <dt className="font-ui text-xs text-ink/70">{label}</dt>
-      <dd className="m-0 font-mono text-lg tabular-nums" data-testid={testId}>
+    <div>
+      <dt>{label}</dt>
+      <dd data-testid={testId}>
         {value}
-        {unit === undefined ? null : <span className="ml-1 text-xs text-ink/70">{unit}</span>}
+        {unit === undefined ? null : <span className="rail__unit">{unit}</span>}
       </dd>
     </div>
   )
 }
 
 /**
- * T087. The 276 px left rail (ticket 20, decision 1).
+ * The rail beside the typing line: plain type on the canvas, no boxes, so nothing in it competes
+ * with the line for the eye.
  *
  * It is a pure function of props that are **frozen for the whole attempt**: `last` is the last
- * completed exercise, captured when the screen opened, so the 2x2 grid cannot change while the
- * learner types (FR-059, ticket 20 item 16). Nothing here subscribes to the engine. Together with
- * `memo`, that is what keeps the rail out of FR-069: no keystroke can reach it.
+ * completed exercise, captured when the screen opened, so the figures cannot change while the
+ * learner types. Nothing here subscribes to the engine. Together with `memo`, that is what keeps
+ * the rail out of the keystroke path: no keystroke can reach it.
  *
- * In a Test Attempt the grid is not rendered at all — it would be live speed and accuracy readouts
- * of a kind (FR-037, 4) — and a line of text says why the rail is quiet.
+ * In a Test Attempt the figures are not rendered at all (they would be live speed and accuracy
+ * readouts of a kind) and a line of text says why the rail is quiet.
  */
 function RailBase({ wording, mode, last, thisScaleIsNext }: RailProps) {
   return (
-    <aside aria-label={m.exercise_rail_label()} className="flex w-[276px] flex-col gap-4">
-      <Card className="p-4">
-        <p className="font-ui text-xs text-ink/70">{m.exercise_mode_label()}</p>
-        <p className="mt-1">
-          <Chip tone={mode === 'test' ? 'terracotta' : 'sage'}>
-            {mode === 'test' ? m.exercise_mode_test() : m.exercise_mode_practice()}
-          </Chip>
-        </p>
-        <p className="mt-3 font-ui text-xs text-ink/70">{m.exercise_focus_label()}</p>
-        <p className="mt-1">
-          <Chip tone="neutral">{wording.focus}</Chip>
-        </p>
-        <p className="mt-3 font-ui text-xs text-ink/70">{wording.goalLabel}</p>
-        <p className="mt-1 font-ui text-sm leading-relaxed">{wording.goal}</p>
-      </Card>
+    <aside aria-label={m.exercise_rail_label()} className="rail">
+      <div className="rail__block">
+        <Index n={2}>{mode === 'test' ? m.exercise_mode_test() : m.exercise_mode_practice()}</Index>
+        <p className="sr-only">{m.exercise_focus_label()}</p>
+        <p className="rail__focus">{wording.focus}</p>
+        <p className="sr-only">{wording.goalLabel}</p>
+        <p className="rail__text">{wording.goal}</p>
+      </div>
+
+      <div className="rail__rule" aria-hidden="true" />
 
       {mode === 'practice' ? (
-        <Card className="p-4">
-          <h2 className="font-ui text-sm font-semibold">{m.exercise_rail_last_title()}</h2>
-          {last === null ? (
-            <p className="mt-2 font-ui text-sm text-ink/70">{m.exercise_rail_last_none()}</p>
-          ) : null}
-          <dl data-testid="live-metrics" className="mt-3 grid grid-cols-2 gap-2">
-            <Tile
+        <div className="rail__block">
+          <h2 className="label">{m.exercise_rail_last_title()}</h2>
+          {last === null ? <p className="rail__text">{m.exercise_rail_last_none()}</p> : null}
+          <dl data-testid="live-metrics" className="rail__figures">
+            <Figure
               label={m.exercise_metric_speed()}
-              value={last === null ? '—' : String(Math.round(last.metrics.spm))}
+              value={last === null ? NONE : String(Math.round(last.metrics.spm))}
               {...(last === null ? {} : { unit: m.exercise_metric_speed_unit() })}
               testId="live-speed"
             />
-            <Tile
+            <Figure
               label={m.exercise_metric_accuracy()}
-              value={last === null ? '—' : `${Math.round(last.metrics.accuracy * 100)}%`}
+              value={last === null ? NONE : `${Math.round(last.metrics.accuracy * 100)}%`}
               testId="live-accuracy"
             />
-            <Tile
+            <Figure
               label={m.exercise_metric_errors()}
-              value={last === null ? '—' : String(last.metrics.errorCount)}
+              value={last === null ? NONE : String(last.metrics.errorCount)}
               testId="live-errors"
             />
-            <Tile
+            <Figure
               label={m.exercise_metric_time()}
-              value={last === null ? '—' : formatElapsed(last.elapsedMs)}
+              value={last === null ? NONE : formatElapsed(last.elapsedMs)}
               testId="live-time"
             />
           </dl>
-          <p className="mt-3 font-ui text-xs text-ink/70">{m.exercise_rail_last_frozen()}</p>
-        </Card>
+          <p className="note">{m.exercise_rail_last_frozen()}</p>
+        </div>
       ) : (
-        <Card className="p-4">
-          <p className="font-ui text-sm leading-relaxed">{m.exercise_rail_zero_peek()}</p>
-        </Card>
+        <p className="rail__text">{m.exercise_rail_zero_peek()}</p>
       )}
 
-      <Card className="p-4">
-        <h2 className="font-ui text-sm font-semibold">{m.exercise_rail_next_title()}</h2>
-        <p className="mt-2 font-ui text-sm leading-relaxed">
+      <div className="rail__rule" aria-hidden="true" />
+
+      <div className="rail__block">
+        <h2 className="label">{m.exercise_rail_next_title()}</h2>
+        <p className="rail__text">
           {thisScaleIsNext === true ? m.exercise_rail_next_this() : m.exercise_rail_next_later()}
         </p>
-      </Card>
+      </div>
     </aside>
   )
 }

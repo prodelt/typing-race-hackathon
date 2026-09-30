@@ -114,7 +114,10 @@ async function navigate(request: Request): Promise<Response> {
 }
 
 async function assetFirst(request: Request): Promise<Response> {
-  const cached = await (await caches.open(CACHE_NAME)).match(request)
+  // `ignoreVary`: the precache was filled by plain requests, but the page loads its scripts with
+  // `crossorigin`, which adds an `Origin` header. A server that answers `Vary: Origin` would make
+  // every cached asset miss, and offline the fallback fetch cannot succeed.
+  const cached = await (await caches.open(CACHE_NAME)).match(request, { ignoreVary: true })
   return cached ?? fetch(request)
 }
 

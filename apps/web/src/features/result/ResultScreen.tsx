@@ -1,11 +1,12 @@
 import { useNavigate, useParams } from '@tanstack/react-router'
 import { isAcademyExerciseId } from '@typing-race/curriculum'
 import type { AttemptSummary } from '@typing-race/domain'
-import { Button, Card, Chip } from '@typing-race/ui'
+import { Button } from '@typing-race/ui'
 import { useMemo } from 'react'
 import { useAppStore } from '../../app/state/index.js'
 import { m } from '../../paraglide/messages.js'
 import { AcademyNextCard } from '../academy/NextCard.js'
+import { order, ScreenHead } from '../screen.js'
 import { UnlockWords } from '../words/UnlockWords.js'
 import { Comparison } from './Comparison.js'
 import { ErrorList } from './ErrorList.js'
@@ -18,59 +19,43 @@ import { UnlockCard } from './UnlockCard.js'
 import './result.css'
 
 /**
- * T098, T105. The result screen, E4. The route gives it `{ attemptId }`; everything else comes
- * from the stored attempt list, so a reload or a link to an old result renders the same page.
+ * The result screen. The route gives it `{ attemptId }`; everything else comes from the stored
+ * attempt list, so a reload or a link to an old result renders the same page.
+ *
+ * One hero number, speed, with accuracy right beside it (speed never counts without it), the two
+ * smaller figures after them, and then the one next action as the screen's poster button. The
+ * detail (errors per character, rhythm, the comparison, every figure) follows as numbered
+ * sections, the way the brand site continues below its hero.
  */
 
-function Tile({
-  index,
-  label,
-  hint,
-  value,
-}: {
-  readonly index: number
-  readonly label: string
-  readonly hint: string
-  readonly value: string
-}) {
-  return (
-    <Card className="result-tile p-4" style={{ ['--i' as string]: index }}>
-      <dt className="font-ui text-sm font-semibold text-muted">{label}</dt>
-      <dd className="mt-1 font-mono text-3xl font-bold text-ink">{value}</dd>
-      <dd className="mt-1 font-ui text-xs text-muted">{hint}</dd>
-    </Card>
-  )
-}
-
-function Tiles({ attempt }: { readonly attempt: AttemptSummary }) {
+function Hero({ attempt }: { readonly attempt: AttemptSummary }) {
   const { metrics } = attempt
   return (
-    <section aria-label={m.result_tiles_label()}>
-      <dl className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <Tile
-          index={0}
-          label={m.result_tile_spm()}
-          hint={m.result_tile_spm_hint()}
-          value={number(metrics.spm)}
-        />
-        <Tile
-          index={1}
-          label={m.result_tile_accuracy()}
-          hint={m.result_tile_accuracy_hint()}
-          value={`${number(metrics.accuracy * 100, 1)} %`}
-        />
-        <Tile
-          index={2}
-          label={m.result_tile_errors()}
-          hint={m.result_tile_errors_hint()}
-          value={number(metrics.errorCount)}
-        />
-        <Tile
-          index={3}
-          label={m.result_tile_time()}
-          hint={m.result_tile_time_hint()}
-          value={duration(attempt.elapsedMs)}
-        />
+    <section aria-label={m.result_tiles_label()} className="rhero">
+      <dl className="rhero__list">
+        <div className="rhero__spm result-tile" style={order(0)}>
+          <dt className="rhero__label">{m.result_tile_spm()}</dt>
+          <dd className="num num--red rhero__big">{number(metrics.spm)}</dd>
+          <dd className="rhero__hint">{m.result_tile_spm_hint()}</dd>
+        </div>
+        <div className="rhero__acc result-tile" style={order(1)}>
+          <dt className="rhero__label">{m.result_tile_accuracy()}</dt>
+          <dd className="num rhero__mid">
+            {number(metrics.accuracy * 100, 1)}
+            <span className="rhero__pct"> %</span>
+          </dd>
+          <dd className="rhero__hint">{m.result_tile_accuracy_hint()}</dd>
+        </div>
+        <div className="rhero__small result-tile" style={order(2)}>
+          <dt className="rhero__label">{m.result_tile_errors()}</dt>
+          <dd className="rhero__value">{number(metrics.errorCount)}</dd>
+          <dd className="rhero__hint">{m.result_tile_errors_hint()}</dd>
+        </div>
+        <div className="rhero__small result-tile" style={order(3)}>
+          <dt className="rhero__label">{m.result_tile_time()}</dt>
+          <dd className="rhero__value">{duration(attempt.elapsedMs)}</dd>
+          <dd className="rhero__hint">{m.result_tile_time_hint()}</dd>
+        </div>
       </dl>
     </section>
   )
@@ -91,65 +76,68 @@ export function ResultScreen() {
 
   if (model === null) {
     return (
-      <section className="mx-auto max-w-xl">
-        <h1 className="font-ui text-2xl font-bold">{m.result_not_found_title()}</h1>
-        <p className="mt-3 font-ui leading-relaxed">{m.result_not_found_body()}</p>
-        <Button
-          variant="primary"
-          className="mt-5"
-          onClick={() => {
-            void navigate({ to: '/today' })
-          }}
+      <section className="screen">
+        <ScreenHead
+          n={2}
+          label={m.result_title()}
+          title={m.result_not_found_title()}
+          lede={m.result_not_found_body()}
         >
-          {m.result_go_today()}
-        </Button>
+          <Button
+            variant="primary"
+            size="lg"
+            className="mt-8"
+            onClick={() => {
+              void navigate({ to: '/today' })
+            }}
+          >
+            {m.result_go_today()}
+          </Button>
+        </ScreenHead>
       </section>
     )
   }
 
   const { attempt } = model
   return (
-    <section className="mx-auto max-w-6xl">
-      <header className="flex flex-wrap items-center gap-3">
-        <h1 className="font-ui text-2xl font-bold">{m.result_title()}</h1>
-        <Chip tone={attempt.mode === 'test' ? 'sage' : 'neutral'}>
-          {attempt.mode === 'test' ? m.result_mode_test() : m.result_mode_practice()}
-        </Chip>
-      </header>
+    <section className="screen result">
+      <ScreenHead
+        n={2}
+        label={attempt.mode === 'test' ? m.result_mode_test() : m.result_mode_practice()}
+        title={m.result_title()}
+        small
+      />
 
-      <div className="mt-5 grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
-        <div className="space-y-6">
-          <Tiles attempt={attempt} />
-          <Comparison attempt={attempt} previous={model.previousBest} />
-          <RhythmChart attempt={attempt} />
-          <ErrorList attempt={attempt} />
-          <Metrics attempt={attempt} />
-          {model.logPruned ? (
-            <p className="font-ui text-sm text-muted" data-testid="pruned-note">
-              {m.result_pruned_note()}
-            </p>
-          ) : null}
-        </div>
-        <aside className="space-y-6 lg:sticky lg:top-6 lg:self-start">
+      <Hero attempt={attempt} />
+
+      {model.unlock === null ? null : <UnlockCard unlock={model.unlock} attemptId={attempt.id} />}
+
+      {isAcademyExerciseId(attempt.scaleId) ? (
+        <AcademyNextCard attempt={attempt} />
+      ) : (
+        <>
           {model.unlock === null ? null : (
-            <UnlockCard unlock={model.unlock} attemptId={attempt.id} />
+            <UnlockWords
+              layoutId={attempt.layoutId}
+              unlockKey={model.unlock.key}
+              unlocked={model.unlock.unlockedAfter}
+            />
           )}
-          {isAcademyExerciseId(attempt.scaleId) ? (
-            <AcademyNextCard attempt={attempt} />
-          ) : (
-            <>
-              {model.unlock === null ? null : (
-                <UnlockWords
-                  layoutId={attempt.layoutId}
-                  unlockKey={model.unlock.key}
-                  unlocked={model.unlock.unlockedAfter}
-                />
-              )}
-              <NextActionCard model={model} />
-            </>
-          )}
-        </aside>
+          <NextActionCard model={model} />
+        </>
+      )}
+
+      <div className="result__grid">
+        <ErrorList attempt={attempt} />
+        <Comparison attempt={attempt} previous={model.previousBest} />
       </div>
+      <RhythmChart attempt={attempt} />
+      <Metrics attempt={attempt} />
+      {model.logPruned ? (
+        <p className="note mt-8" data-testid="pruned-note">
+          {m.result_pruned_note()}
+        </p>
+      ) : null}
     </section>
   )
 }

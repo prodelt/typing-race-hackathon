@@ -1,13 +1,384 @@
 /*
- * The result screen's expressive frame (docs/design/motion.md). Every duration, delay and stagger
- * is a token, and tokens.css sets them to ~0 under data-motion="off", so the one app-level flag
- * turns all of this into a static, complete page without a line of script (FR-064).
+ * The result screen. Every duration, delay and stagger is a token, and tokens.css sets them to
+ * ~0 under data-motion="off", so the one app-level flag turns all of this into a static, complete
+ * page without a line of script.
  */
+
+/* ---- The hero: one red number, accuracy beside it, two small figures ------------------------ */
+
+.rhero {
+  margin-top: clamp(28px, 3vw, 44px);
+}
+
+.rhero__list {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr) minmax(150px, 0.45fr);
+  grid-template-rows: auto auto;
+  gap: 8px;
+  margin: 0;
+}
+
+.rhero__list > div {
+  display: flex;
+  flex-direction: column;
+  padding: 24px 28px 26px;
+  background: var(--color-paper-raised);
+}
+
+.rhero__spm {
+  grid-row: span 2;
+  border-radius: 0 72px 0 0;
+}
+
+.rhero__acc {
+  grid-row: span 2;
+}
+
+.rhero__label {
+  order: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.rhero__big,
+.rhero__mid,
+.rhero__value {
+  order: 1;
+  margin: auto 0 0;
+  padding-top: 24px;
+}
+
+.rhero__big {
+  font-size: clamp(120px, 13vw, 200px);
+  line-height: 0.82;
+}
+
+.rhero__mid {
+  font-size: clamp(52px, 5.4vw, 88px);
+  white-space: nowrap;
+  line-height: 0.9;
+}
+
+.rhero__pct {
+  font-size: 0.5em;
+  color: var(--color-ink-faint);
+}
+
+.rhero__value {
+  font-size: 32px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.rhero__hint {
+  order: 2;
+  margin: 10px 0 0;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--color-muted);
+}
+
+/* ---- The next action: the sentence and the poster button ------------------------------------ */
+
+.next {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 420px);
+  gap: 24px clamp(32px, 4vw, 64px);
+  align-items: end;
+  margin-top: clamp(48px, 5vw, 72px);
+}
+
+.next__text {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.next__sentence {
+  max-width: 24em;
+  font-size: clamp(22px, 2.1vw, 30px);
+  line-height: 1.2;
+}
+
+/* ---- The unlock: the red block ------------------------------------------------------------------ */
+
+.unlock {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 24px clamp(32px, 4vw, 64px);
+  align-items: center;
+  margin-top: 8px;
+  padding: clamp(28px, 3vw, 44px) clamp(28px, 3.4vw, 52px);
+}
+
+.unlock__glyph {
+  display: grid;
+  place-items: center;
+  width: clamp(140px, 13vw, 200px);
+  aspect-ratio: 1;
+  border-radius: 12px;
+  background: #ffffff;
+  color: var(--color-accent);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(88px, 8vw, 128px);
+  line-height: 1;
+  letter-spacing: -0.04em;
+  box-shadow: inset 0 -6px 0 rgb(15 20 24 / 12%);
+}
+
+.unlock__heading {
+  color: var(--color-accent-pale);
+}
+
+.unlock__key {
+  margin: 10px 0 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(32px, 3.4vw, 52px);
+  line-height: 1;
+  letter-spacing: -0.045em;
+}
+
+.unlock__line {
+  margin: 12px 0 0;
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.unlock__reason {
+  margin: 8px 0 0;
+  font-size: 14px;
+  color: var(--color-accent-pale);
+}
+
+.unlock__cta {
+  margin-top: 20px;
+  border-color: transparent;
+}
+
+/* ---- Detail sections -------------------------------------------------------------------------- */
+
+.result__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  gap: 0 clamp(40px, 5vw, 88px);
+  align-items: start;
+}
+
+.result-sec {
+  margin-top: clamp(72px, 7vw, 104px);
+}
+
+.result-sec__title {
+  margin: 14px 0 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(26px, 2.4vw, 34px);
+  line-height: 1.02;
+  letter-spacing: -0.045em;
+}
+
+.result-sec__lede {
+  margin: 14px 0 0;
+  max-width: 56ch;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.45;
+  color: var(--color-ink-soft);
+  text-wrap: pretty;
+}
+
+/* Errors per character: the glyph, its tally, its sentence. */
+.errs {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 8px;
+  margin: 28px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.errs__item {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 18px 20px;
+  background: var(--color-paper-raised);
+}
+
+.errs__glyph {
+  min-width: 1.1em;
+  font-family: var(--font-typing);
+  font-size: 44px;
+  font-weight: 500;
+  line-height: 1;
+  text-align: center;
+  color: var(--color-terracotta);
+}
+
+.errs__body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.errs__text {
+  font-size: 13px;
+  color: var(--color-muted);
+}
+
+.tally {
+  display: block;
+  overflow: visible;
+}
+
+/* The comparison: the difference, big, then what it is measured against. */
+.compare__delta {
+  margin: 24px 0 0;
+  font-size: clamp(22px, 2vw, 28px);
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+/* Rhythm. */
+.rhythm {
+  margin-top: 28px;
+  padding: 28px 28px 20px;
+  background: var(--color-paper-raised);
+}
+
+.rhythm__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  font-family: var(--font-ui);
+  font-variant-numeric: tabular-nums;
+}
+
+.rhythm__foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 24px;
+  margin-top: 12px;
+}
+
+.rhythm__summary {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.rhythm__legend {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 13px;
+  color: var(--color-muted);
+}
+
+.rhythm__swatch {
+  display: inline-block;
+  width: 10px;
+  height: 18px;
+  border: 1.5px solid var(--color-terracotta);
+  border-radius: 5px;
+  background: repeating-linear-gradient(
+    45deg,
+    var(--color-terracotta) 0 1.5px,
+    var(--color-terracotta-tint) 1.5px 4px
+  );
+}
+
+/* Every figure: a passport list and two interval tables side by side. */
+.figs {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr);
+  gap: 32px clamp(32px, 4vw, 56px);
+  align-items: start;
+  margin-top: 28px;
+}
+
+.figs__list {
+  margin: 0;
+}
+
+.figs__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 0;
+  box-shadow: inset 0 -1px 0 var(--color-hairline);
+}
+
+.figs__row dt {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.figs__hint {
+  display: block;
+  margin-top: 2px;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--color-muted);
+}
+
+.figs__row dd {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.iki {
+  width: 100%;
+  margin-top: 10px;
+  border-collapse: collapse;
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+}
+
+.iki th,
+.iki td {
+  padding: 9px 0;
+  text-align: left;
+  font-weight: 400;
+}
+
+.iki .iki__ms {
+  text-align: right;
+}
+
+.iki thead th {
+  font-size: 13px;
+  color: var(--color-muted);
+}
+
+.iki tbody tr {
+  box-shadow: inset 0 1px 0 var(--color-hairline);
+}
+
+.iki tbody th {
+  font-family: var(--font-typing);
+  font-weight: 500;
+}
+
+/* ---- Motion ----------------------------------------------------------------------------------- */
 
 @keyframes result-rise {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(16px);
   }
 }
 
@@ -20,18 +391,19 @@
 @keyframes result-pop {
   from {
     opacity: 0;
-    transform: scale(0.96);
+    transform: scale(0.97);
   }
 }
 
 @keyframes result-fade {
   from {
     opacity: 0;
+    transform: scale(0.6) rotate(-8deg);
   }
 }
 
 .result-tile {
-  animation: result-rise var(--dur-base) var(--ease-enter) both;
+  animation: result-rise var(--dur-slow) var(--ease-enter) both;
   animation-delay: calc(var(--stagger-tile) * var(--i, 0));
 }
 
@@ -39,14 +411,7 @@
   transform-box: fill-box;
   transform-origin: bottom;
   animation: result-grow var(--dur-slow) var(--ease-enter) both;
-  /* After the tiles have landed: four tiles' worth of stagger plus one tile's own duration. */
-  animation-delay: calc(
-    var(--stagger-tile) *
-    4 +
-    var(--dur-base) +
-    var(--stagger-bar) *
-    var(--i, 0)
-  );
+  animation-delay: calc(var(--stagger-tile) * 4 + var(--stagger-bar) * var(--i, 0));
 }
 
 .result-unlock {
@@ -56,4 +421,16 @@
 .result-unlock-glyph {
   animation: result-fade var(--dur-slow) var(--ease-enter) both;
   animation-delay: calc(var(--dur-slow) * 0.43);
+}
+
+@media (max-width: 1180px) {
+  .rhero__list {
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(140px, 0.5fr);
+  }
+  .figs {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .figs > :first-child {
+    grid-column: 1 / -1;
+  }
 }

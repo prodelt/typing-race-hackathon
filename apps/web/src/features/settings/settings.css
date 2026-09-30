@@ -1,0 +1,156 @@
+/* Settings: the brand's form steps, pills for choices, a flat block for the text-size preview. */
+
+.settings {
+  margin-top: clamp(56px, 6vw, 96px);
+}
+
+.choice {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+/* b-red `.flabel`: 14 px, 600. */
+.choice__legend,
+.setting__label {
+  padding: 0;
+  margin: 0 0 6px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+}
+
+.choice__hint,
+.setting__hint {
+  margin: 0 0 16px;
+  max-width: 60ch;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-muted);
+}
+
+.pills--blocks {
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+}
+
+.pill__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pill--block .pill__label {
+  font-weight: 600;
+}
+
+.setting {
+  display: flex;
+  flex-direction: column;
+}
+
+.setting__status {
+  margin: 12px 0 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* The sound switch: a checkbox drawn as a small pill track. */
+.check {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.check input {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  margin: 2px 0 0;
+  accent-color: var(--color-ink);
+}
+
+.check__label {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.check__hint {
+  margin: 2px 0 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-muted);
+}
+
+/* The text-size slider and its preview. */
+.size__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.size__value {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 22px;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+}
+
+.size__range {
+  width: 100%;
+  margin: 18px 0 8px;
+  accent-color: var(--color-ink);
+}
+
+.size__preview {
+  margin-top: 16px;
+  padding: 24px 28px;
+  background: var(--color-paper-raised);
+  border-radius: 0 40px 0 0;
+}
+
+.size__preview-label {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.size__preview-text {
+  margin: 0;
+  font-family: var(--font-typing);
+  font-weight: 500;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+/* Clearing data: a quiet red outline pill, then an inline confirmation. */
+.clear__confirm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px 22px;
+  background: var(--color-terracotta-tint);
+  box-shadow: inset 3px 0 0 var(--color-terracotta);
+}
+
+.clear__confirm p {
+  margin: 0;
+}
+
+.clear__title {
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.clear__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}

@@ -18,34 +18,37 @@
 :root[data-theme="dark"] {
   color-scheme: dark;
 
-  --color-paper: #11171c;
-  --color-paper-deep: #0b1014;
-  --color-paper-raised: #19212a;
-  --color-ink: #e7ebee;
-  --color-ink-soft: #c9d1d7;
-  --color-muted: #9aa5ae;
-  --color-ink-faint: #7d8993;
+  /* Graphite, as the brand site's dark blocks are: neutral, never blue. */
+  --color-paper: #141414;
+  --color-paper-deep: #0e0e0e;
+  --color-paper-raised: #1f1d1d;
+  --color-ink: #f2f2f2;
+  --color-ink-soft: #d6d6d6;
+  --color-muted: #a8a8a8;
+  --color-ink-faint: #8a8a8a;
+  --color-graphite: #0e0e0e;
 
-  --color-hairline: #26313b;
-  --color-hairline-strong: #3a4753;
+  --color-hairline: #2e2a2a;
+  --color-hairline-strong: #4a4242;
 
   --color-accent: #c21f13;
   --color-accent-deep: #9c170d;
+  --color-accent-dark: #6e0f08;
   --color-accent-tint: #3a1714;
   --color-accent-soft: #4a1a15;
   --color-accent-pale: #fbe3e0;
   --color-on-accent: #ffffff;
 
-  --color-sage: #8fb4cc;
-  --color-sage-tint: #1e2c37;
-  --color-sage-ink: #a9c7da;
-  --color-steel: #c9d6df;
+  --color-sage: #d6d6d6;
+  --color-sage-tint: #2c2c2c;
+  --color-sage-ink: #f2f2f2;
+  --color-steel: #e6e6e6;
 
   --color-terracotta: #ff7a6e;
   --color-terracotta-tint: #3a1714;
   --color-terracotta-ink: #ff8c80;
 
-  --color-nav-dimmed: #5d6872;
+  --color-nav-dimmed: #6e6e6e;
 
   /* Finger inks lift and tints darken; the line stays the mid value so a keycap still reads as
    * a keycap rather than as a filled block. */
@@ -98,14 +101,15 @@
 
   --color-accent: #a3170d;
   --color-accent-deep: #7a1008;
+  --color-accent-dark: #5a0c06;
   --color-accent-tint: #f6d9d5;
   --color-accent-soft: #f6d9d5;
   --color-accent-pale: #ffffff;
   --color-on-accent: #ffffff;
 
-  --color-sage: #0f3347;
-  --color-sage-tint: #cfdde8;
-  --color-sage-ink: #0b2536;
+  --color-sage: #1a1a1a;
+  --color-sage-tint: #dedede;
+  --color-sage-ink: #0b0b0b;
   --color-steel: #0b0f12;
 
   --color-terracotta: #a3170d;

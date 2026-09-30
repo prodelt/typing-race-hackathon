@@ -1,14 +1,14 @@
 import type { AttemptSummary } from '@typing-race/domain'
-import { Card } from '@typing-race/ui'
+import { Index } from '@typing-race/ui'
 import type { ReactNode } from 'react'
 import { m } from '../../paraglide/messages.js'
 import { duration, number } from './format.js'
 import { displayChar, transitionLabel } from './model.js'
 
 /**
- * T099. Every metric the requirements list, read from the stored `AttemptMetrics` and never
- * recomputed here (FR-023, FR-025, FR-026). The figures are identical to the tiles above on
- * purpose: the tiles are the glance, this is the record.
+ * Every metric the requirements list, read from the stored `AttemptMetrics` and never recomputed
+ * here. The figures are identical to the hero above on purpose: the hero is the glance, this is
+ * the record.
  */
 
 function Row({
@@ -21,12 +21,12 @@ function Row({
   readonly children: ReactNode
 }) {
   return (
-    <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 py-2">
-      <dt className="font-ui text-ink">
+    <div className="figs__row">
+      <dt>
         {label}
-        {hint === undefined ? null : <span className="ml-2 text-sm text-muted">{hint}</span>}
+        {hint === undefined ? null : <span className="figs__hint">{hint}</span>}
       </dt>
-      <dd className="font-mono text-ink">{children}</dd>
+      <dd>{children}</dd>
     </div>
   )
 }
@@ -45,29 +45,25 @@ function IntervalTable({
 }) {
   return (
     <div>
-      <h3 className="font-ui text-base font-semibold">{heading}</h3>
+      <h3 className="label">{heading}</h3>
       {rows.length === 0 ? (
-        <p className="mt-2 font-ui text-sm text-muted">{m.result_iki_empty()}</p>
+        <p className="note mt-2">{m.result_iki_empty()}</p>
       ) : (
-        <table className="mt-2 w-full font-mono text-sm">
+        <table className="iki">
           <caption className="sr-only">{heading}</caption>
           <thead>
-            <tr className="text-left text-muted">
-              <th scope="col" className="py-1 font-medium">
-                {column}
-              </th>
-              <th scope="col" className="py-1 text-right font-medium">
+            <tr>
+              <th scope="col">{column}</th>
+              <th scope="col" className="iki__ms">
                 {m.result_col_ms()}
               </th>
             </tr>
           </thead>
           <tbody>
             {rows.map(([label, ms]) => (
-              <tr key={label} className="border-t border-hairline">
-                <th scope="row" className="py-1 text-left font-normal">
-                  {label}
-                </th>
-                <td className="py-1 text-right">{m.result_ms({ ms: number(ms) })}</td>
+              <tr key={label}>
+                <th scope="row">{label}</th>
+                <td className="iki__ms">{m.result_ms({ ms: number(ms) })}</td>
               </tr>
             ))}
           </tbody>
@@ -91,32 +87,41 @@ export function Metrics({ attempt }: { readonly attempt: AttemptSummary }) {
     .sort(slowestFirst)
 
   return (
-    <Card aria-labelledby="result-metrics" role="region" className="p-5">
-      <h2 id="result-metrics" className="font-ui text-lg font-bold">
+    <section
+      id="figures"
+      data-section={m.result_metrics_heading()}
+      aria-labelledby="result-metrics"
+      className="result-sec"
+    >
+      <Index n={4} />
+      <h2 id="result-metrics" className="result-sec__title">
         {m.result_metrics_heading()}
       </h2>
-      <dl className="mt-2 divide-y divide-hairline">
-        <Row label={m.result_tile_spm()} hint={m.result_tile_spm_hint()}>
-          {number(metrics.spm, 1)}
-        </Row>
-        <Row label={m.result_metric_wpm()} hint={m.result_metric_wpm_hint()}>
-          {number(metrics.wpm, 1)}
-        </Row>
-        <Row label={m.result_tile_accuracy()}>{number(metrics.accuracy * 100, 1)} %</Row>
-        <Row label={m.result_tile_errors()}>{number(metrics.errorCount)}</Row>
-        <Row label={m.result_tile_time()}>{duration(attempt.elapsedMs)}</Row>
-        <Row label={m.result_metric_rhythm()} hint={m.result_metric_rhythm_hint()}>
-          {number(rhythmConsistency.value, 1)}
-        </Row>
-      </dl>
-      <p className="mt-2 font-ui text-sm text-muted">{m.result_metric_accuracy_note()}</p>
-      {/* A smooth figure must not hide what it left out, so the exclusion is stated even at zero. */}
-      <p className="mt-2 font-ui text-sm text-ink" data-testid="breaks-excluded">
-        {rhythmConsistency.breaksExcluded > 0
-          ? m.result_metric_breaks({ count: rhythmConsistency.breaksExcluded })
-          : m.result_metric_breaks_none()}
-      </p>
-      <div className="mt-6 grid gap-6 sm:grid-cols-2">
+      <div className="figs">
+        <div>
+          <dl className="figs__list">
+            <Row label={m.result_tile_spm()} hint={m.result_tile_spm_hint()}>
+              {number(metrics.spm, 1)}
+            </Row>
+            <Row label={m.result_metric_wpm()} hint={m.result_metric_wpm_hint()}>
+              {number(metrics.wpm, 1)}
+            </Row>
+            <Row label={m.result_tile_accuracy()}>{number(metrics.accuracy * 100, 1)} %</Row>
+            <Row label={m.result_tile_errors()}>{number(metrics.errorCount)}</Row>
+            <Row label={m.result_tile_time()}>{duration(attempt.elapsedMs)}</Row>
+            <Row label={m.result_metric_rhythm()} hint={m.result_metric_rhythm_hint()}>
+              {number(rhythmConsistency.value, 1)}
+            </Row>
+          </dl>
+          <p className="note mt-4">{m.result_metric_accuracy_note()}</p>
+          {/* A smooth figure must not hide what it left out, so the exclusion is stated even at
+              zero. */}
+          <p className="note mt-2" data-testid="breaks-excluded">
+            {rhythmConsistency.breaksExcluded > 0
+              ? m.result_metric_breaks({ count: rhythmConsistency.breaksExcluded })
+              : m.result_metric_breaks_none()}
+          </p>
+        </div>
         <IntervalTable
           heading={m.result_iki_key_heading()}
           column={m.result_col_key()}
@@ -128,6 +133,6 @@ export function Metrics({ attempt }: { readonly attempt: AttemptSummary }) {
           rows={transitionRows}
         />
       </div>
-    </Card>
+    </section>
   )
 }

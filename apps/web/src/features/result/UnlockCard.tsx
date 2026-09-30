@@ -1,29 +1,25 @@
 import { useNavigate } from '@tanstack/react-router'
-import {
-  allowsCelebration,
-  Button,
-  Keycap,
-  prefersReducedMotion,
-  resolveMotion,
-} from '@typing-race/ui'
+import { allowsCelebration, Button, prefersReducedMotion, resolveMotion } from '@typing-race/ui'
 import { useEffect, useRef } from 'react'
 import { useAppStore } from '../../app/state/index.js'
 import { m } from '../../paraglide/messages.js'
+import { GradLayer } from '../grad.js'
 import { displayChar, fingerName, scaleName, type Unlock } from './model.js'
 
 /** How many opened scales the card names before saying "and N more". */
 const NAMED_SCALES = 3
 
 /**
- * The confetti palette. Canvas cannot read CSS custom properties, so these repeat two tokens from
- * `tokens.css`: sage and cream paper.
+ * The confetti palette. Canvas cannot read CSS custom properties, so these repeat three tokens
+ * from `tokens.css`: the brand red, the near-white surface and the dark steel of the hero frame.
  */
-const CONFETTI_COLOURS = ['#4a7c59', '#faf9f5']
+const CONFETTI_COLOURS = ['#c21f13', '#f9fafb', '#16222b']
 
 /**
- * T104, FR-041, FR-043. The Key Unlock card: a deep sage card with the new key on a keycap, the
- * finger that types it, what it opens and one button to the first drill. This is the requirements'
- * demo step, so it is a card on the result and never a full-screen moment.
+ * The Key Unlock block: the brand's red block with its rounded corner, the new key set huge in
+ * the display face, the finger that types it, what it opens and one button to the first drill.
+ * This is the requirements' demo step, so it is a block on the result and never a full-screen
+ * moment.
  *
  * Rendered from the `Unlock` the model derived from **store data**; this component knows no rule.
  *
@@ -90,43 +86,39 @@ export function UnlockCard({
     <section
       ref={cardRef}
       aria-labelledby="result-unlock"
-      className="result-unlock rounded-[var(--radius-card)] bg-sage p-5 text-paper shadow-[var(--shadow-raised)]"
+      className="result-unlock unlock gp-host gp-host--ember panel--corner"
     >
-      <h2 id="result-unlock" className="font-ui text-lg font-bold">
-        {m.result_unlock_heading()}
-      </h2>
-      <div className="mt-4 flex items-center gap-4">
-        <Keycap
-          glyph={displayChar(unlock.key)}
-          finger={unlock.finger ?? 'thumb'}
-          tier="learning"
-          className="result-unlock-glyph h-16 w-16 text-3xl"
-        />
-        <div>
-          <p className="font-ui text-xl font-bold">
-            {m.result_unlock_key({ key: displayChar(unlock.key) })}
-          </p>
-          <p className="font-ui">{m.result_unlock_finger({ finger: fingerName(unlock.finger) })}</p>
-        </div>
+      <GradLayer tone="ember" seed={5} count={4} />
+      <span className="unlock__glyph result-unlock-glyph" aria-hidden="true">
+        {displayChar(unlock.key)}
+      </span>
+      <div className="unlock__text">
+        <h2 id="result-unlock" className="flabel unlock__heading">
+          {m.result_unlock_heading()}
+        </h2>
+        <p className="unlock__key">{m.result_unlock_key({ key: displayChar(unlock.key) })}</p>
+        <p className="unlock__line">
+          {m.result_unlock_finger({ finger: fingerName(unlock.finger) })}
+        </p>
+        <p className="unlock__line">{opens}</p>
+        <p className="unlock__reason">{m.result_unlock_reason()}</p>
+        {drill === undefined ? null : (
+          <Button
+            variant="secondary"
+            size="lg"
+            className="unlock__cta"
+            onClick={() => {
+              void navigate({
+                to: '/exercise/$scaleId',
+                params: { scaleId: drill.id },
+                search: { mode: 'practice' },
+              })
+            }}
+          >
+            {m.result_unlock_start()}
+          </Button>
+        )}
       </div>
-      <p className="mt-4 font-ui">{opens}</p>
-      <p className="mt-1 font-ui text-sm opacity-90">{m.result_unlock_reason()}</p>
-      {drill === undefined ? null : (
-        <Button
-          variant="secondary"
-          size="lg"
-          className="mt-4"
-          onClick={() => {
-            void navigate({
-              to: '/exercise/$scaleId',
-              params: { scaleId: drill.id },
-              search: { mode: 'practice' },
-            })
-          }}
-        >
-          {m.result_unlock_start()}
-        </Button>
-      )}
     </section>
   )
 }

@@ -1,18 +1,36 @@
+import { Link } from '@tanstack/react-router'
+import { buttonClass, Index, Wordmark } from '@typing-race/ui'
+import type { ReactNode } from 'react'
 import { m } from '../../paraglide/messages.js'
+import { GradLayer } from '../grad.js'
+import { ScreenHead } from '../screen.js'
+import './public.css'
 
 /**
- * The three small public pages the footer links to. They are behind no sign-in, in F1 and in every
- * later feature, because the product rule lists them alongside the product page and Formulas.
+ * The three small public pages the footer links to. They are behind no sign-in, because the
+ * product rule lists them alongside the product page and Formulas.
  *
- * They live together because each is a page of prose with no state, and three directories holding
- * one component apiece would be three places to forget.
+ * Licences and Privacy are prose, set the way the brand site sets its "about" text: a head, then
+ * the words as a large manifesto offset into the right-hand two thirds. About is the product's own
+ * statement, on the brand's live red gradient with the wordmark across it, a full-bleed page like
+ * the product page it points to.
  */
 
-function Page({ title, children }: { readonly title: string; readonly children: React.ReactNode }) {
+function Page({
+  n,
+  title,
+  children,
+}: {
+  readonly n: number
+  readonly title: string
+  readonly children: ReactNode
+}) {
   return (
-    <article className="mx-auto max-w-2xl">
-      <h1 className="font-ui text-3xl font-bold">{title}</h1>
-      <div className="mt-6 flex flex-col gap-4 font-ui leading-relaxed text-ink">{children}</div>
+    <article className="screen">
+      <ScreenHead n={n} label={m.footer_nav()} title={title} dot />
+      <div className="public">
+        <div className="public__body">{children}</div>
+      </div>
     </article>
   )
 }
@@ -62,7 +80,7 @@ const SOURCES = [
 
 export function LicencesPage() {
   return (
-    <Page title={m.page_licences_title()}>
+    <Page n={6} title={m.page_licences_title()}>
       <p>{m.page_licences_body()}</p>
       <h2 className="font-ui text-xl font-bold">{m.page_licences_sources()}</h2>
       <ul className="flex flex-col gap-3">
@@ -81,7 +99,7 @@ export function LicencesPage() {
 
 export function PrivacyPage() {
   return (
-    <Page title={m.page_privacy_title()}>
+    <Page n={7} title={m.page_privacy_title()}>
       <p>{m.page_privacy_body()}</p>
     </Page>
   )
@@ -89,8 +107,31 @@ export function PrivacyPage() {
 
 export function AboutPage() {
   return (
-    <Page title={m.page_about_title()}>
-      <p>{m.page_about_body()}</p>
-    </Page>
+    <article className="about gp-host gp-host--ember" aria-labelledby="about-title">
+      <GradLayer tone="ember" seed={3} count={6} />
+      <div className="about__inner">
+        <Index n={1}>{m.footer_nav()}</Index>
+        <div className="about__grid">
+          <h1 id="about-title" className="about__title">
+            {m.page_about_title()}
+            <span className="red-dot about__dot" aria-hidden="true" />
+          </h1>
+          <div>
+            <p className="about__text">{m.page_about_body()}</p>
+            <div className="about__cta">
+              <Link to="/" className={`${buttonClass('secondary', 'lg')} about__white`}>
+                {m.product_cta_how()}
+              </Link>
+              <Link to="/formulas" className="ulink about__link">
+                {m.product_audit_link()}
+              </Link>
+            </div>
+          </div>
+        </div>
+        <div className="about__mark" aria-hidden="true">
+          <Wordmark className="about__wordmark" />
+        </div>
+      </div>
+    </article>
   )
 }

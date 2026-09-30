@@ -1,0 +1,265 @@
+/* The guided session: intro, running block, between blocks, the real-text block, the end. */
+
+.session__poster {
+  width: auto;
+  min-width: min(100%, 420px);
+  align-self: flex-start;
+}
+
+/* ---- Intro: the minutes as the one number, the four blocks as points in discs --------------- */
+
+.session-intro {
+  display: grid;
+  grid-template-columns: minmax(300px, 440px) minmax(0, 1fr);
+  gap: 48px clamp(48px, 7vw, 120px);
+  align-items: start;
+  margin-top: clamp(40px, 4.4vw, 64px);
+}
+
+.session-intro__length {
+  position: sticky;
+  top: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.session-intro__minutes {
+  margin: 0;
+  font-size: clamp(120px, 12vw, 180px);
+  line-height: 0.82;
+}
+
+.session-intro__stated {
+  margin: 12px 0 0;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+
+.session-intro__length .session__poster {
+  margin-top: 24px;
+  font-size: clamp(15px, 1.25vw, 18px);
+  min-width: 0;
+  width: 100%;
+}
+
+.blocks {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* b-red `.point`: an 84 px column for the disc, the text beside it, 42 px between points. */
+.blocks__item {
+  display: grid;
+  grid-template-columns: 84px minmax(0, 1fr);
+  gap: 0 16px;
+  align-items: start;
+}
+
+.blocks__item + .blocks__item {
+  margin-top: 42px;
+}
+
+.blocks__name {
+  margin: 12px 0 0;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+}
+
+.blocks__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  margin: 8px 0 0;
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.blocks__body {
+  margin: 8px 0 0;
+  max-width: 52ch;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--color-muted);
+}
+
+.blocks__item--later .blocks__name {
+  color: var(--color-muted);
+}
+
+.session-needs {
+  margin-top: 40px;
+  max-width: 24em;
+}
+
+/* ---- Running: the track of four discs, then the block itself -------------------------------- */
+
+.track {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin: clamp(32px, 3.4vw, 48px) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.track__step {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 0 14px;
+  box-shadow: inset 0 -2px 0 var(--color-hairline);
+  color: var(--color-muted);
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.track__step .disc {
+  background: transparent;
+  box-shadow: inset 0 0 0 var(--border-hairline) var(--color-hairline-strong);
+  color: var(--color-muted);
+}
+
+.track__step.is-done {
+  box-shadow: inset 0 -2px 0 var(--color-ink);
+  color: var(--color-ink);
+}
+
+.track__step.is-done .disc {
+  background: var(--color-sage-tint);
+  box-shadow: none;
+  color: var(--color-sage-ink);
+}
+
+.track__step.is-now {
+  box-shadow: inset 0 -2px 0 var(--color-accent);
+  color: var(--color-ink);
+  font-weight: 600;
+}
+
+.track__step.is-now .disc {
+  background: var(--color-accent-tint);
+  box-shadow: none;
+  color: var(--color-terracotta-ink);
+}
+
+.session-block {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 32px 48px;
+  align-items: end;
+  margin-top: clamp(40px, 4.4vw, 64px);
+}
+
+/* "Start attempt 2 of 9": in capitals the Cyrillic З reads as a 3 beside the numbers, so this
+   one poster keeps the sentence's own case. */
+.session-block .poster {
+  text-transform: none;
+  letter-spacing: -0.03em;
+}
+
+.session-block__body {
+  margin: 16px 0 0;
+  max-width: 22em;
+}
+
+.session-block__count {
+  margin: 16px 0 0;
+  font-size: 15px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.session-leave {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  margin-top: clamp(56px, 6vw, 88px);
+  padding-top: 20px;
+  box-shadow: inset 0 1px 0 var(--color-hairline);
+}
+
+/* ---- Between blocks: the brand's torn headline ------------------------------------------------ */
+
+.between {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  margin-top: clamp(32px, 3.4vw, 48px);
+  padding: clamp(40px, 4.4vw, 72px) clamp(28px, 4.4vw, 72px);
+}
+
+.torn2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(32px, 3.8vw, 56px);
+  line-height: 1.04;
+  letter-spacing: -0.045em;
+}
+
+.torn2 span {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+}
+
+.torn2__a {
+  color: var(--color-ink-faint);
+}
+
+.torn2__b {
+  margin-top: 0.12em;
+  margin-left: 18%;
+}
+
+.between__title {
+  margin: 0;
+  max-width: 18em;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(30px, 3.2vw, 46px);
+  line-height: 1.02;
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+}
+
+.between__aside {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+}
+
+/* ---- The end ----------------------------------------------------------------------------------- */
+
+.session-done {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: clamp(32px, 3.4vw, 48px);
+  padding: clamp(40px, 4.4vw, 72px);
+}
+
+.session-done__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(40px, 4.6vw, 68px);
+  line-height: 0.95;
+  letter-spacing: -0.045em;
+}
+
+.session-done .screen-lede {
+  margin: 0;
+}
+
+.session-done .session__poster {
+  margin-top: 16px;
+}

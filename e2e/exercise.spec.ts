@@ -169,7 +169,21 @@ async function outsideTypingLine(page: Page): Promise<string[]> {
 async function audit(page: Page): Promise<void> {
   await page.evaluate(() =>
     Promise.all(
-      document.getAnimations().map((animation) => animation.finished.then(() => undefined)),
+      document
+        .getAnimations()
+        // A deliberately endless animation (the live gradient, a caret) never finishes.
+        .filter(
+          (animation) =>
+            animation.effect?.getComputedTiming().iterations !== Number.POSITIVE_INFINITY &&
+            // Nor does one inside unrendered content (a closed <details>): it never runs.
+            ((animation.effect as KeyframeEffect | null)?.target?.checkVisibility() ?? true),
+        )
+        .map((animation) =>
+          animation.finished.then(
+            () => undefined,
+            () => undefined,
+          ),
+        ),
     ),
   )
   await expectNoAxeViolations(page)
@@ -318,16 +332,24 @@ test.describe('US1 typing an exercise', { tag: '@input' }, () => {
     const text = [...(await exerciseText(page))]
     const first = text[0] ?? ''
 
-    // The awaited key is the one highlighted, and it is ringed in its finger's own ink.
+    // The awaited key is the one highlighted: filled solid in the brand red and ringed in the same
+    // red, with its letter in white, so it is found without searching.
     const awaited = page.getByTestId('keyboard-guide').locator('[data-awaited="true"]')
     await expect(awaited).toHaveCount(1)
     await expect(awaited).toHaveText(first)
     const ring = await awaited.evaluate((node) => {
       const style = getComputedStyle(node)
-      return { style: style.outlineStyle, outline: style.outlineColor, ink: style.color }
+      return {
+        style: style.outlineStyle,
+        outline: style.outlineColor,
+        fill: style.backgroundColor,
+        ink: style.color,
+      }
     })
     expect(ring.style).toBe('solid')
-    expect(ring.outline).toBe(ring.ink)
+    expect(ring.fill).toBe('rgb(194, 31, 19)')
+    expect(ring.outline).toBe(ring.fill)
+    expect(ring.ink).toBe('rgb(255, 255, 255)')
 
     // The finger is named in words as well as colour (FR-061).
     await expect(page.getByTestId('next-key')).toContainText(/мізинець|палець/)

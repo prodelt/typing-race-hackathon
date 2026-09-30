@@ -3,6 +3,7 @@ import { isWordDrillId, scaleById } from '@typing-race/curriculum'
 import type { AttemptMode } from '@typing-race/domain'
 import { useDerived } from '../../app/state/index.js'
 import { m } from '../../paraglide/messages.js'
+import { ScreenHead } from '../screen.js'
 import { WordExercise } from '../words/WordExercise.js'
 import { BackToPath, ExerciseSession } from './ExerciseSession.js'
 
@@ -29,10 +30,15 @@ export function ExerciseScreen() {
 
   if (scale === undefined) {
     return (
-      <section className="mx-auto max-w-xl py-16 text-center">
-        <h1 className="font-ui text-2xl font-bold">{m.exercise_not_found_title()}</h1>
-        <p className="mt-3 font-ui leading-relaxed">{m.exercise_not_found_body()}</p>
-        <BackToPath />
+      <section className="screen">
+        <ScreenHead
+          n={2}
+          label={m.exercise_back_to_path()}
+          title={m.exercise_not_found_title()}
+          lede={m.exercise_not_found_body()}
+        >
+          <BackToPath />
+        </ScreenHead>
       </section>
     )
   }

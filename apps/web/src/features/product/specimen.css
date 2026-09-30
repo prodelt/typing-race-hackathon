@@ -10,8 +10,8 @@
   margin: 0;
   padding: 20px 24px 22px;
   border-radius: var(--radius-card);
-  background: #f9fafb;
-  color: #0f1418;
+  background: #ffffff;
+  color: #141414;
   box-shadow: 0 30px 60px -30px rgb(0 0 0 / 55%);
 }
 
@@ -21,7 +21,7 @@
   gap: 8px;
   font-size: 13px;
   font-weight: 500;
-  color: #56616b;
+  color: #666666;
 }
 
 .specimen__layout {
@@ -43,7 +43,7 @@
 .specimen__line {
   margin: 18px 0 0;
   padding-bottom: 14px;
-  border-bottom: 1px solid #d5dce1;
+  border-bottom: 1px solid #f2dcd9;
   font-family: var(--font-typing);
   font-size: clamp(1.5rem, 2.1vw, 1.9rem);
   font-weight: 400;
@@ -61,11 +61,11 @@
 }
 
 .specimen__char[data-state="typed"] {
-  color: #1f4257;
+  color: #666666;
 }
 
 .specimen__char[data-state="upcoming"] {
-  color: #7a858f;
+  color: #141414;
 }
 
 /* The error mark: colour, tint and an underline drawn as an inset shadow, so no box model changes
@@ -112,7 +112,7 @@
   display: block;
   font-size: 13px;
   font-weight: 500;
-  color: #56616b;
+  color: #666666;
 }
 
 .specimen__v {
@@ -124,7 +124,7 @@
   line-height: 1.1;
   letter-spacing: -0.04em;
   font-variant-numeric: tabular-nums;
-  color: #0f1418;
+  color: #141414;
 }
 
 .specimen__v small {
@@ -140,7 +140,7 @@
   margin: 10px 0 0;
   font-size: 13px;
   line-height: 1.4;
-  color: #56616b;
+  color: #666666;
 }
 
 @keyframes specimen-blink {

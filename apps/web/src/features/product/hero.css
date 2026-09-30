@@ -1,0 +1,224 @@
+/*
+ * The product page's hero, after the brand site's v4 hero (b-red v4 hero.css): a full-bleed red
+ * duotone with the wordmark set across nearly the whole frame, and the text grid along the
+ * bottom, clear of the fixed bar. The brand hero cuts video inside its logo; this one has the
+ * shader's red folds behind a white wordmark, and the live typing demo where the brand has its
+ * aside.
+ *
+ * Every duration and delay is a token, so the app's motion flag stills the whole hero at once.
+ */
+
+.hero {
+  padding: 0;
+}
+
+.hero__frame {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: max(640px, calc(100dvh - var(--head-h)));
+  padding: 28px var(--gutter) calc(var(--bar-h) + 40px);
+  color: var(--frame-ink);
+  /* The whole picture at motion off, and the first paint everywhere: the duotone the shader
+     draws, dark red folding into the brand red. */
+  background:
+    radial-gradient(70% 90% at 100% 100%, rgb(194 31 19 / 95%) 0%, rgb(194 31 19 / 0%) 72%),
+    radial-gradient(55% 70% at 70% 20%, rgb(180 28 17 / 70%) 0%, rgb(180 28 17 / 0%) 70%),
+    var(--frame-bg);
+}
+
+.hero__backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+}
+
+.hero__canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity calc(var(--dur-reveal) * 1.4) var(--ease-standard);
+}
+
+.hero__canvas[data-ready] {
+  opacity: 1;
+}
+
+.hero__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.hero__tag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 0 14px;
+  border: 1px solid rgb(255 255 255 / 40%);
+  border-radius: var(--radius-pill);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.hero__pause {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: rgb(255 255 255 / 16%);
+  color: #ffffff;
+  cursor: pointer;
+  transition: background-color var(--dur-base) var(--ease-standard);
+}
+
+.hero__pause:hover {
+  background: rgb(255 255 255 / 28%);
+}
+
+.hero__pause svg {
+  fill: currentColor;
+}
+
+/* The wordmark at about 88 % of the frame's width, as the brand hero sets its logo. */
+.hero__mark {
+  display: flex;
+  justify-content: center;
+  margin: auto 0;
+  padding: 24px 0;
+}
+
+.hero__mark-line {
+  display: block;
+  overflow: hidden;
+  padding: 0.02em 0 0.12em;
+}
+
+.hero__wordmark {
+  display: inline-flex;
+  font-size: clamp(60px, 11.4vw, 205px);
+  color: #ffffff;
+  animation: hero-line var(--dur-reveal) var(--ease-enter) both;
+  animation-delay: var(--stagger-tile);
+}
+
+/* On the red the caret is the one white block. */
+.hero__wordmark [data-wordmark-caret] {
+  background: #ffffff;
+}
+
+/* b-red v4 `.hero__content`: the text grid along the bottom, above the bar. */
+.hero__content {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(340px, 440px);
+  align-items: end;
+  gap: 32px clamp(32px, 5vw, 80px);
+}
+
+/* b-red v4 `.hero__title`: Unbounded 700, clamp(30px, 3.9vw, 58px), line-height 1, -0.03em. */
+.hero__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(30px, 3.9vw, 58px);
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.hero__line {
+  display: inline-block;
+  overflow: hidden;
+  padding: 0.04em 0 0.06em;
+  margin-top: -0.02em;
+}
+
+.hero__line > span {
+  display: inline-block;
+  animation: hero-line var(--dur-reveal) var(--ease-enter) both;
+  animation-delay: calc(var(--stagger-tile) + var(--i, 0) * var(--stagger-tile));
+}
+
+.hero__text {
+  animation: hero-rise var(--dur-reveal) var(--ease-enter) both;
+  animation-delay: calc(var(--stagger-tile) * 3);
+}
+
+/* b-red v4 `.hero__lede`: clamp(17px, 1.35vw, 20px), 500, line-height 1.4, 40ch. */
+.hero__lede {
+  margin: 20px 0 0;
+  max-width: 40ch;
+  font-size: clamp(17px, 1.35vw, 20px);
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+}
+
+.hero__cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+/* On the red, the brand's white pill with red text (`.btn--white`) and the veil (`.btn--veil`). */
+.hero__cta-white {
+  background: #ffffff;
+  border-color: #ffffff;
+  color: var(--color-accent);
+}
+
+.hero__cta-white:hover {
+  background: var(--color-accent-pale);
+  border-color: var(--color-accent-pale);
+}
+
+.hero__cta-veil {
+  background: rgb(255 255 255 / 14%);
+  border-color: transparent;
+  color: #ffffff;
+}
+
+.hero__cta-veil:hover {
+  background: #ffffff;
+  border-color: #ffffff;
+  color: var(--color-graphite);
+}
+
+.hero__aside {
+  animation: hero-rise var(--dur-reveal) var(--ease-enter) both;
+  animation-delay: calc(var(--stagger-tile) * 5);
+}
+
+.hero :focus-visible {
+  outline-color: #ffffff;
+}
+
+.landing .dot--white {
+  background: #ffffff;
+}
+
+@keyframes hero-line {
+  from {
+    transform: translateY(112%);
+  }
+}
+
+@keyframes hero-rise {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+}
+
+@media (max-width: 1180px) {
+  .hero__content {
+    grid-template-columns: minmax(0, 1fr) minmax(320px, 380px);
+  }
+}

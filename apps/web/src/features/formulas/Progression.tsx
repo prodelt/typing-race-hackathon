@@ -24,7 +24,8 @@ function speedCell(benchmark: Level['spmBenchmark']): string {
 /** Whole percent, the way the requirements' table prints it. */
 const percent = (fraction: number) => `${Math.round(fraction * 100)} %`
 
-const CELL = 'px-4 py-2'
+/** Cell spacing lives in formulas.css (`.ftable`); kept as a name so each cell reads the same. */
+const CELL = ''
 
 /**
  * The level table, rendered from the curriculum's one level config (`levels.json`) — names, goals,
@@ -36,10 +37,10 @@ export function Progression() {
   return (
     <Section id="progression" title={m.formulas_progress_title()}>
       <Block title={m.formulas_levels_title()}>
-        <div className="overflow-hidden rounded-[var(--radius-card)] border-[length:var(--border-hairline)] border-hairline-strong">
-          <table className="w-full border-collapse text-left font-ui text-base text-ink">
+        <div className="overflow-x-auto">
+          <table className="ftable">
             <caption className="sr-only">{m.formulas_levels_caption()}</caption>
-            <thead className="bg-sage-tint">
+            <thead>
               <tr>
                 <th scope="col" className={`${CELL} font-semibold`}>
                   {m.formulas_col_level()}
@@ -62,10 +63,7 @@ export function Progression() {
               {levels.map((level) => {
                 const inForce = level.id === introductionLevel.id
                 return (
-                  <tr
-                    key={level.id}
-                    className="border-t-[length:var(--border-hairline)] border-hairline"
-                  >
+                  <tr key={level.id}>
                     <th scope="row" className={`${CELL} font-semibold`}>
                       {level.name[language()]}
                     </th>

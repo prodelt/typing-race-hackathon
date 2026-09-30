@@ -18,13 +18,13 @@ export function ClearData() {
   }
 
   return (
-    <div className="flex flex-col gap-3">
-      <p className="font-ui text-sm text-ink/80">{m.settings_data_body()}</p>
+    <div className="setting gap-4">
+      <p className="setting__hint mb-0">{m.settings_data_body()}</p>
       {step === 'confirming' ? (
-        <div role="alert" className="flex flex-col gap-3">
-          <p className="font-ui font-semibold text-ink">{m.settings_data_confirm_title()}</p>
-          <p className="font-ui text-sm text-ink/80">{m.settings_data_confirm_body()}</p>
-          <div className="flex gap-3">
+        <div role="alert" className="clear__confirm">
+          <p className="clear__title">{m.settings_data_confirm_title()}</p>
+          <p className="setting__hint mb-0">{m.settings_data_confirm_body()}</p>
+          <div className="clear__actions">
             <Button variant="danger" onClick={() => void confirm()}>
               {m.settings_data_confirm_yes()}
             </Button>
@@ -41,7 +41,7 @@ export function ClearData() {
         </div>
       )}
       {step === 'done' && (
-        <p role="status" className="font-ui text-sm font-semibold text-ink">
+        <p role="status" className="setting__status">
           {m.settings_data_done()}
         </p>
       )}

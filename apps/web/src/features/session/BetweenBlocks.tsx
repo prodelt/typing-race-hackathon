@@ -1,9 +1,11 @@
-import { Button, Card } from '@typing-race/ui'
 import { m } from '../../paraglide/messages.js'
+import { GradLayer } from '../grad.js'
+import { Arrow } from '../screen.js'
 
 /**
- * T138. Screen E6: what was just done and what comes next, then one button. It names both blocks
- * in words, so the learner is never asked to infer the sequence from a progress bar.
+ * What was just done and what comes next, then one button. It names both blocks in words, so the
+ * learner is never asked to infer the sequence from a progress bar. Set as the brand's "torn"
+ * headline: the finished block in the faint grey, the next one in ink, offset under it.
  */
 export function BetweenBlocks(props: {
   readonly finished: string
@@ -11,17 +13,20 @@ export function BetweenBlocks(props: {
   readonly onContinue: () => void
 }) {
   return (
-    <Card raised className="flex flex-col gap-4 p-6" data-testid="between-blocks">
-      <h2 className="font-ui text-xl font-bold text-ink">{m.session_between_title()}</h2>
-      <p className="font-ui text-ink">{m.session_between_done({ block: props.finished })}</p>
-      <p className="font-ui font-semibold text-ink">
-        {m.session_between_next({ block: props.next })}
+    <div
+      className="between panel gp-host gp-host--bright panel--corner rise"
+      data-testid="between-blocks"
+    >
+      <GradLayer tone="bright" seed={4} count={4} />
+      <h2 className="flabel">{m.session_between_title()}</h2>
+      <p className="torn2">
+        <span className="torn2__a">{m.session_between_done({ block: props.finished })}</span>
+        <span className="torn2__b">{m.session_between_next({ block: props.next })}</span>
       </p>
-      <div>
-        <Button variant="primary" size="lg" onClick={props.onContinue}>
-          {m.session_between_continue()}
-        </Button>
-      </div>
-    </Card>
+      <button type="button" className="poster session__poster" onClick={props.onContinue}>
+        <span>{m.session_between_continue()}</span>
+        <Arrow size={40} />
+      </button>
+    </div>
   )
 }

@@ -9,7 +9,7 @@
 
 .landing {
   --frame-ink: #ffffff;
-  --frame-bg: #16222b;
+  --frame-bg: #5c0c07;
   color: var(--color-ink);
 }
 
@@ -41,214 +41,6 @@
 .ulink:hover {
   color: var(--color-terracotta-ink);
   text-underline-offset: 7px;
-}
-
-/* ---- Hero -------------------------------------------------------------------------------- */
-
-.hero {
-  padding: 8px var(--gutter) 0 0;
-}
-
-.hero__frame {
-  position: relative;
-  isolation: isolate;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 40px;
-  min-height: max(620px, calc(100dvh - var(--head-h) - 32px));
-  padding: 32px var(--gutter) clamp(32px, 4vw, 56px);
-  border-radius: 0 96px 0 0;
-  color: var(--frame-ink);
-  /* The whole picture at motion off, and the first paint everywhere: red gathering in the
-     bottom-right of dark steel, as the shader draws it. */
-  background:
-    radial-gradient(
-      60% 75% at 100% 100%,
-      rgb(194 31 19 / 92%) 0%,
-      rgb(194 31 19 / 40%) 42%,
-      rgb(194 31 19 / 0%) 72%
-    ),
-    radial-gradient(35% 45% at 78% 88%, rgb(120 16 9 / 55%) 0%, rgb(120 16 9 / 0%) 70%),
-    var(--frame-bg);
-  animation: hero-frame calc(var(--dur-reveal) * 1.4) var(--ease-in-out) both;
-}
-
-.hero__backdrop {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-}
-
-.hero__canvas {
-  display: block;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  transition: opacity calc(var(--dur-reveal) * 1.4) var(--ease-standard);
-}
-
-.hero__canvas[data-ready] {
-  opacity: 1;
-}
-
-.hero__top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-}
-
-.hero__tag {
-  display: inline-flex;
-  align-items: center;
-  min-height: 32px;
-  padding: 0 14px;
-  border: 1px solid rgb(255 255 255 / 32%);
-  border-radius: var(--radius-pill);
-  font-size: 13px;
-  font-weight: 500;
-  letter-spacing: 0.02em;
-}
-
-.hero__pause {
-  display: grid;
-  place-items: center;
-  width: 48px;
-  height: 48px;
-  border: 0;
-  border-radius: var(--radius-pill);
-  background: rgb(255 255 255 / 14%);
-  color: #ffffff;
-  cursor: pointer;
-  transition: background-color var(--dur-base) var(--ease-standard);
-}
-
-.hero__pause:hover {
-  background: rgb(255 255 255 / 28%);
-}
-
-.hero__pause svg {
-  fill: currentColor;
-}
-
-.hero__pause:focus-visible {
-  outline-color: #ffffff;
-}
-
-.hero__content {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(340px, 420px);
-  align-items: end;
-  gap: 40px clamp(32px, 4vw, 64px);
-}
-
-.hero__title {
-  margin: 0;
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: clamp(56px, 8.6vw, 138px);
-  line-height: 0.88;
-  letter-spacing: -0.045em;
-}
-
-/* Each line rises out from under its own mask. */
-.hero__line {
-  display: block;
-  overflow: hidden;
-  padding: 0.04em 0 0.08em;
-  margin-top: -0.02em;
-}
-
-.hero__line > span {
-  display: inline-block;
-  animation: hero-line var(--dur-reveal) var(--ease-enter) both;
-  animation-delay: calc(var(--stagger-tile) + var(--i, 0) * var(--stagger-tile));
-}
-
-/* The outlined word. Unbounded has no italic, so instead of a slant the word arrives filled and
-   the fill drains to the right, leaving the outline. */
-.hero__outline {
-  font-style: normal;
-  font-synthesis: none;
-  color: transparent;
-  -webkit-text-stroke: 2px var(--frame-ink);
-  background-image: linear-gradient(90deg, var(--frame-ink) 0 50%, rgb(255 255 255 / 0%) 50% 100%);
-  background-size: 200.5% 100%;
-  background-position: 100% 0;
-  -webkit-background-clip: text;
-  background-clip: text;
-  padding-right: 0.02em;
-  animation: hero-drain calc(var(--dur-reveal) * 1.3) var(--ease-in-out) both;
-  animation-delay: calc(var(--stagger-tile) * 13);
-}
-
-.hero__aside {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  animation: hero-rise var(--dur-reveal) var(--ease-enter) both;
-  animation-delay: calc(var(--stagger-tile) * 5);
-}
-
-.hero__lede {
-  margin: 4px 0 0;
-  font-size: clamp(16px, 1.3vw, 19px);
-  font-weight: 500;
-  line-height: 1.4;
-  letter-spacing: -0.01em;
-  max-width: 32ch;
-}
-
-.hero__cta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-/* A light pill on the dark frame, like the brand hero's second button. */
-.hero__cta-light {
-  background: #f4f6f7;
-  border-color: transparent;
-  color: #0f1418;
-}
-
-.hero__cta-light:hover {
-  background: #ffffff;
-  border-color: transparent;
-}
-
-.hero :focus-visible {
-  outline-color: #ffffff;
-}
-
-@keyframes hero-frame {
-  from {
-    clip-path: inset(0 0 0 100% round 0 96px 0 0);
-  }
-  to {
-    clip-path: inset(0 0 0 0 round 0 96px 0 0);
-  }
-}
-
-@keyframes hero-line {
-  from {
-    transform: translateY(112%);
-  }
-}
-
-@keyframes hero-drain {
-  from {
-    background-position: 0% 0;
-  }
-}
-
-@keyframes hero-rise {
-  from {
-    opacity: 0;
-    transform: translateY(24px);
-  }
 }
 
 /* ---- Sections ---------------------------------------------------------------------------- */
@@ -472,6 +264,22 @@
   letter-spacing: -0.02em;
 }
 
+/* A full-bleed ember panel, as the brand site's "about" section sits on the live red gradient:
+   white type on the red, the number cells as near-white blocks with the numbers in red. */
+.sec--accuracy {
+  margin-top: clamp(96px, 10vw, 150px);
+  padding-bottom: clamp(96px, 10vw, 150px);
+}
+
+.sec--accuracy .fact {
+  background: rgb(255 255 255 / 92%);
+  color: #141414;
+}
+
+.sec--accuracy .fact__num {
+  color: #c21f13;
+}
+
 /* ---- [03] Principles --------------------------------------------------------------------- */
 
 .sec--card {
@@ -676,12 +484,6 @@
 /* ---- Narrower desktops ------------------------------------------------------------------- */
 
 @media (max-width: 1180px) {
-  .hero__content {
-    grid-template-columns: minmax(0, 1fr) minmax(320px, 380px);
-  }
-  .hero__title {
-    font-size: clamp(52px, 7.6vw, 120px);
-  }
   .stage {
     min-height: 500px;
     padding: 24px;

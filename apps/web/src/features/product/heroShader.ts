@@ -83,14 +83,14 @@ void main(){
   float shade = 0.5 + 0.5 * wave;
   float sheen = pow(max(0.0, wave), 10.0);
 
-  // The red gathers in the bottom-right, leaving the headline's corner dark and quiet.
-  float cover = smoothstep(0.2, 1.05, uv.x * 0.95 + (1.0 - uv.y) * 0.5 + n * 0.22 - 0.12);
+  // A red duotone (b-red v4 hero): dark red folds under brand-red silk, gathering to the right.
+  float cover = smoothstep(0.05, 1.0, uv.x * 0.8 + (1.0 - uv.y) * 0.35 + n * 0.3);
 
-  vec3 steel = vec3(0.086, 0.133, 0.169);
+  vec3 ground = vec3(0.36, 0.047, 0.028);
   vec3 red = vec3(0.761, 0.122, 0.075);
   vec3 deep = vec3(0.30, 0.045, 0.03);
   vec3 silk = mix(deep, red, shade) + vec3(1.0, 0.55, 0.5) * sheen * 0.22;
-  vec3 col = mix(steel, silk, cover);
+  vec3 col = mix(ground, silk, cover);
   col *= mix(0.82, 1.0, smoothstep(0.0, 0.6, uv.x));
   gl_FragColor = vec4(col, 1.0);
 }
