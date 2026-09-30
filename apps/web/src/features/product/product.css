@@ -1,64 +1,696 @@
 /*
- * Product-page motion. Everything here animates `transform` and `opacity` only, and every duration
- * is a token, so the app-level flag turns the page still along with the rest of the product.
+ * The product page, laid out the way the brand site is: a dark hero frame with one rounded corner
+ * and a huge headline, then numbered sections on the grey canvas.
+ *
+ * Motion: every animation is `transform`, `opacity`, `clip-path` or a background position, and
+ * every duration *and delay* is a token, so the app's motion flag stills the whole page at once
+ * (a literal delay would survive the flag and leave the headline hidden for its length).
  */
 
-/* Hero entrance. Two elements, staggered, so the eye reads the claim and then sees it happen. */
-.product__enter {
-  animation: product-enter var(--dur-slow) var(--ease-enter) both;
+.landing {
+  --frame-ink: #ffffff;
+  --frame-bg: #16222b;
+  color: var(--color-ink);
 }
 
-.product__enter--late {
-  animation-delay: 140ms;
+/* ---- Shared ------------------------------------------------------------------------------ */
+
+.landing .dot {
+  display: inline-block;
+  width: 0.2em;
+  height: 0.2em;
+  margin-left: 0.06em;
+  border-radius: 50%;
+  background: var(--color-accent);
+  vertical-align: baseline;
 }
 
-/* Scroll reveal. **Never hides the content** — a translate only, and only once the script has
-   armed the section. The default paint is the final position, so a crawler, a print stylesheet or
-   a screenshot that resizes instead of scrolling sees a finished page. The first version of this
-   used `opacity: 0` and produced a blank page below the hero in exactly that situation. */
-.product__reveal[data-armed="true"] {
-  transform: translateY(20px);
-  transition: transform var(--dur-slow) var(--ease-enter);
+.ulink {
+  display: inline-block;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--color-ink);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+  transition:
+    color var(--dur-base) var(--ease-enter),
+    text-underline-offset var(--dur-base) var(--ease-enter);
 }
 
-.product__reveal[data-armed="true"][data-shown="true"] {
+.ulink:hover {
+  color: var(--color-terracotta-ink);
+  text-underline-offset: 7px;
+}
+
+/* ---- Hero -------------------------------------------------------------------------------- */
+
+.hero {
+  padding: 8px var(--gutter) 0 0;
+}
+
+.hero__frame {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 40px;
+  min-height: max(620px, calc(100dvh - var(--head-h) - 32px));
+  padding: 32px var(--gutter) clamp(32px, 4vw, 56px);
+  border-radius: 0 96px 0 0;
+  color: var(--frame-ink);
+  /* The whole picture at motion off, and the first paint everywhere: red gathering in the
+     bottom-right of dark steel, as the shader draws it. */
+  background:
+    radial-gradient(
+      60% 75% at 100% 100%,
+      rgb(194 31 19 / 92%) 0%,
+      rgb(194 31 19 / 40%) 42%,
+      rgb(194 31 19 / 0%) 72%
+    ),
+    radial-gradient(35% 45% at 78% 88%, rgb(120 16 9 / 55%) 0%, rgb(120 16 9 / 0%) 70%),
+    var(--frame-bg);
+  animation: hero-frame calc(var(--dur-reveal) * 1.4) var(--ease-in-out) both;
+}
+
+.hero__backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+}
+
+.hero__canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity calc(var(--dur-reveal) * 1.4) var(--ease-standard);
+}
+
+.hero__canvas[data-ready] {
+  opacity: 1;
+}
+
+.hero__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.hero__tag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 0 14px;
+  border: 1px solid rgb(255 255 255 / 32%);
+  border-radius: var(--radius-pill);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.hero__pause {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: rgb(255 255 255 / 14%);
+  color: #ffffff;
+  cursor: pointer;
+  transition: background-color var(--dur-base) var(--ease-standard);
+}
+
+.hero__pause:hover {
+  background: rgb(255 255 255 / 28%);
+}
+
+.hero__pause svg {
+  fill: currentColor;
+}
+
+.hero__pause:focus-visible {
+  outline-color: #ffffff;
+}
+
+.hero__content {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(340px, 420px);
+  align-items: end;
+  gap: 40px clamp(32px, 4vw, 64px);
+}
+
+.hero__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(56px, 8.6vw, 138px);
+  line-height: 0.88;
+  letter-spacing: -0.045em;
+}
+
+/* Each line rises out from under its own mask. */
+.hero__line {
+  display: block;
+  overflow: hidden;
+  padding: 0.04em 0 0.08em;
+  margin-top: -0.02em;
+}
+
+.hero__line > span {
+  display: inline-block;
+  animation: hero-line var(--dur-reveal) var(--ease-enter) both;
+  animation-delay: calc(var(--stagger-tile) + var(--i, 0) * var(--stagger-tile));
+}
+
+/* The outlined word. Unbounded has no italic, so instead of a slant the word arrives filled and
+   the fill drains to the right, leaving the outline. */
+.hero__outline {
+  font-style: normal;
+  font-synthesis: none;
+  color: transparent;
+  -webkit-text-stroke: 2px var(--frame-ink);
+  background-image: linear-gradient(90deg, var(--frame-ink) 0 50%, rgb(255 255 255 / 0%) 50% 100%);
+  background-size: 200.5% 100%;
+  background-position: 100% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  padding-right: 0.02em;
+  animation: hero-drain calc(var(--dur-reveal) * 1.3) var(--ease-in-out) both;
+  animation-delay: calc(var(--stagger-tile) * 13);
+}
+
+.hero__aside {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  animation: hero-rise var(--dur-reveal) var(--ease-enter) both;
+  animation-delay: calc(var(--stagger-tile) * 5);
+}
+
+.hero__lede {
+  margin: 4px 0 0;
+  font-size: clamp(16px, 1.3vw, 19px);
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+  max-width: 32ch;
+}
+
+.hero__cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* A light pill on the dark frame, like the brand hero's second button. */
+.hero__cta-light {
+  background: #f4f6f7;
+  border-color: transparent;
+  color: #0f1418;
+}
+
+.hero__cta-light:hover {
+  background: #ffffff;
+  border-color: transparent;
+}
+
+.hero :focus-visible {
+  outline-color: #ffffff;
+}
+
+@keyframes hero-frame {
+  from {
+    clip-path: inset(0 0 0 100% round 0 96px 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0 round 0 96px 0 0);
+  }
+}
+
+@keyframes hero-line {
+  from {
+    transform: translateY(112%);
+  }
+}
+
+@keyframes hero-drain {
+  from {
+    background-position: 0% 0;
+  }
+}
+
+@keyframes hero-rise {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+}
+
+/* ---- Sections ---------------------------------------------------------------------------- */
+
+.sec {
+  position: relative;
+  padding: clamp(96px, 10vw, 150px) var(--gutter) 0;
+}
+
+.sec__head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 360px);
+  align-items: end;
+  gap: 24px 48px;
+}
+
+.sec__title {
+  margin: 22px 0 0;
+  max-width: 12em;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(40px, 6.2vw, 96px);
+  line-height: 0.95;
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+}
+
+.sec__lede {
+  margin: 0;
+  padding-bottom: 0.4em;
+  max-width: 34ch;
+  font-size: clamp(17px, 1.4vw, 20px);
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--color-ink-soft);
+  text-wrap: pretty;
+}
+
+/* Scroll reveal: a translate only, never a hidden state (see Reveal.tsx for why). */
+.reveal[data-armed="true"] [data-reveal] {
+  transform: translateY(28px);
+  transition: transform var(--dur-reveal) var(--ease-enter);
+  transition-delay: calc(var(--i, 0) * var(--stagger-tile));
+}
+
+.reveal[data-armed="true"][data-shown="true"] [data-reveal] {
   transform: none;
 }
 
-/* The stage ladder. Stage 1 is the live one and says so by weight, not by a badge alone. */
-.product__stage[data-available="false"] {
+/* ---- [01] Stages ------------------------------------------------------------------------- */
+
+.stages {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr) minmax(0, 1fr);
+  gap: 8px;
+  margin: clamp(48px, 5vw, 72px) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stage {
+  display: flex;
+  flex-direction: column;
+  min-height: 540px;
+  padding: 28px 28px 30px;
+  container-type: inline-size;
+  background: var(--color-paper-raised);
+  transition: background-color var(--dur-base) var(--ease-enter);
+}
+
+.stage:not([data-live]):hover {
+  background: #ffffff;
+}
+
+:root[data-theme="dark"] .stage:not([data-live]):hover {
+  background: var(--color-paper-raised);
+}
+
+/* The live stage is the one red block on the page, with the hero's rounded corner. */
+.stage[data-live] {
+  background: var(--color-accent);
+  color: #ffffff;
+  border-radius: 0 72px 0 0;
+}
+
+.stage__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.stage__n {
+  font-size: 14px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
   color: var(--color-muted);
 }
 
-.product__stage[data-available="false"] .product__stage-n {
+.stage[data-live] .stage__n {
+  color: var(--color-accent-pale);
+}
+
+.stage__name {
+  margin: clamp(48px, 6vw, 88px) 0 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  /* Sized by the cell, not the window: the longest name (Академія) must fit its column. */
+  font-size: min(64px, 12.5cqi);
+  line-height: 0.95;
+  letter-spacing: -0.05em;
+}
+
+.stage__text {
+  margin-top: auto;
+  padding-top: 40px;
+}
+
+.stage__title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.stage__body {
+  margin: 10px 0 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--color-muted);
+  text-wrap: pretty;
+}
+
+.stage[data-live] .stage__body {
+  color: var(--color-accent-pale);
+}
+
+/* ---- [02] Accuracy ----------------------------------------------------------------------- */
+
+.accuracy {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 560px);
+  gap: 48px clamp(40px, 6vw, 96px);
+  align-items: start;
+}
+
+.accuracy__text {
+  position: sticky;
+  top: 48px;
+}
+
+.manifesto {
+  margin: 36px 0 0;
+  max-width: 19em;
+  font-size: clamp(22px, 2.3vw, 34px);
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  text-wrap: pretty;
+}
+
+.manifesto__red {
+  color: var(--color-terracotta);
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.facts__col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.facts__col + .facts__col {
+  margin-top: 96px;
+}
+
+.fact {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 24px;
+  min-height: 320px;
+  padding: 24px;
+  background: var(--color-paper-raised);
+  transition: background-color var(--dur-base) var(--ease-enter);
+}
+
+.fact:hover {
+  background: #ffffff;
+}
+
+:root[data-theme="dark"] .fact:hover {
+  background: var(--color-paper-raised);
+}
+
+.fact__num {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(64px, 6.6vw, 104px);
+  line-height: 0.9;
+  letter-spacing: -0.05em;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-terracotta);
+}
+
+.fact__label {
+  max-width: 13em;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+}
+
+/* ---- [03] Principles --------------------------------------------------------------------- */
+
+.sec--card {
+  padding-inline: calc(var(--gutter) / 2);
+}
+
+.card {
+  position: relative;
+  padding: clamp(96px, 9vw, 130px) clamp(24px, 5.5vw, 80px) clamp(64px, 6vw, 88px);
+  border-radius: 0 96px 0 0;
+  background: var(--color-paper-raised);
+}
+
+.card__index {
+  position: absolute;
+  top: clamp(32px, 3vw, 44px);
+  left: clamp(24px, 5.5vw, 80px);
+}
+
+.torn {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(38px, 5.2vw, 78px);
+  line-height: 1.02;
+  letter-spacing: -0.045em;
+}
+
+.torn span {
+  display: block;
+  width: max-content;
+  max-width: 100%;
+}
+
+.torn__a {
+  margin-left: 12%;
+  color: var(--color-ink-faint);
+}
+
+.torn__b {
+  margin-top: 0.12em;
+  margin-left: 34%;
+}
+
+.card__body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 560px);
+  gap: 48px clamp(40px, 6vw, 96px);
+  align-items: start;
+  margin-top: clamp(64px, 8vw, 120px);
+}
+
+.card__lede {
+  margin: 0 0 20px;
+  max-width: 30ch;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.45;
+  letter-spacing: -0.01em;
+}
+
+.points {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.point {
+  display: grid;
+  grid-template-columns: 84px minmax(0, 1fr);
+  gap: 0 16px;
+  align-items: start;
+}
+
+.point + .point {
+  margin-top: 40px;
+}
+
+.point__n {
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--color-accent-tint);
+  color: var(--color-terracotta-ink);
+  font-size: 19px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.point__title {
+  margin: 12px 0 0;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+}
+
+.point__body {
+  margin: 8px 0 0;
+  font-size: 15px;
+  line-height: 1.5;
   color: var(--color-muted);
 }
 
-.product__stage-n {
-  color: var(--color-sage-ink);
-  letter-spacing: 0.04em;
+/* ---- [04] Start -------------------------------------------------------------------------- */
+
+.sec--lead {
+  isolation: isolate;
+  overflow: clip;
+  margin-top: clamp(96px, 10vw, 150px);
+  padding-bottom: clamp(96px, 10vw, 140px);
 }
 
-/* Each principle gets a rule rather than a card: four boxes on one screen is a dashboard, and this
-   is a page of prose with icons. */
-.product__principle {
-  padding-top: 1.25rem;
-  border-top: var(--border-hairline) solid var(--color-hairline);
+.lead__bg {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(
+      60% 70% at 100% 100%,
+      rgb(194 31 19 / 58%) 0%,
+      rgb(194 31 19 / 18%) 45%,
+      rgb(194 31 19 / 0%) 72%
+    ),
+    radial-gradient(40% 40% at 88% 55%, rgb(194 31 19 / 16%) 0%, rgb(194 31 19 / 0%) 70%),
+    var(--color-paper-deep);
 }
 
-@keyframes product-enter {
-  from {
-    opacity: 0;
-    transform: translateY(18px);
+.lead__top {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 320px);
+  align-items: end;
+  gap: 32px 48px;
+}
+
+.lead__title {
+  margin: 22px 0 0;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(40px, 6.3vw, 104px);
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+}
+
+.lead__title > span {
+  display: block;
+}
+
+.lead__lede {
+  margin: 0;
+  padding-bottom: 8px;
+  max-width: 18em;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+.submit {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  width: 100%;
+  min-height: clamp(96px, 9vw, 132px);
+  margin-top: clamp(64px, 7vw, 104px);
+  padding: 0 clamp(28px, 3vw, 48px);
+  border-radius: var(--radius-pill);
+  background: var(--color-accent);
+  color: #ffffff;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(20px, 2vw, 28px);
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition:
+    background-color var(--dur-base) var(--ease-enter),
+    transform var(--dur-base) var(--ease-enter);
+}
+
+.submit svg {
+  flex: none;
+  transition: transform calc(var(--dur-base) * 1.3) var(--ease-enter);
+}
+
+.submit:hover {
+  background: var(--color-ink);
+  color: var(--color-paper);
+}
+
+.submit:hover svg {
+  transform: translateX(8px);
+}
+
+.submit:active {
+  transform: scale(0.985);
+}
+
+/* ---- Narrower desktops ------------------------------------------------------------------- */
+
+@media (max-width: 1180px) {
+  .hero__content {
+    grid-template-columns: minmax(0, 1fr) minmax(320px, 380px);
   }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .product__enter {
-    animation: none;
+  .hero__title {
+    font-size: clamp(52px, 7.6vw, 120px);
   }
-  .product__reveal[data-armed="true"] {
-    transform: none;
-    transition: none;
+  .stage {
+    min-height: 500px;
+    padding: 24px;
+  }
+  .accuracy,
+  .card__body {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 460px);
+  }
+  .fact {
+    min-height: 260px;
   }
 }

@@ -145,9 +145,8 @@ hunspell-en; матеріалу `dict_uk` у виході немає взага�
 
 | Родина | Застосування | Ліцензія |
 |---|---|---|
-| Source Serif 4 | текст, який друкує учень (28 px, міжрядковий інтервал 1,5) | SIL Open Font License 1.1 |
-| Source Sans 3 | інтерфейс | SIL Open Font License 1.1 |
-| JetBrains Mono | метрики й скорочення клавіш | SIL Open Font License 1.1 |
+| Unbounded | великі заголовки й числа | SIL Open Font License 1.1 |
+| Onest | інтерфейс і текст, який друкує учень (28 px, міжрядковий інтервал 1,5); цифри метрик — табличні | SIL Open Font License 1.1 |
 
 Файли лежать у [`packages/ui/src/fonts/`](../packages/ui/src/fonts/) у підмножинах кирилиці й
 латиниці (з розширеними діапазонами), оголошені в [`fonts.css`](../packages/ui/src/fonts.css).

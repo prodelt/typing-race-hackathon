@@ -354,8 +354,10 @@ test.describe('US5 settings', () => {
     const before = await exerciseText()
 
     await page.goto('/settings')
-    // The choice reloads the document; do not make the click wait for that navigation.
-    await radio(page, 'Мова інтерфейсу', 'English').check({ noWaitAfter: true })
+    // The choice reloads the document. A click, not `check()`: check re-reads the radio after
+    // clicking, and once the reload has switched the page to English its Ukrainian legend no
+    // longer matches, so the re-read waits for ever whenever the reload wins the race.
+    await radio(page, 'Мова інтерфейсу', 'English').click({ noWaitAfter: true })
     await expect(page.getByRole('heading', { level: 1, name: 'Settings' })).toBeVisible()
 
     // The shell, the page and the footer have all switched.
@@ -396,8 +398,10 @@ test.describe('US5 settings', () => {
     await radio(page, 'Мова набору', 'English').check()
     await radio(page, 'Розкладка', 'QWERTY').check()
     // Last, because it reloads the document.
-    // The choice reloads the document; do not make the click wait for that navigation.
-    await radio(page, 'Мова інтерфейсу', 'English').check({ noWaitAfter: true })
+    // The choice reloads the document. A click, not `check()`: check re-reads the radio after
+    // clicking, and once the reload has switched the page to English its Ukrainian legend no
+    // longer matches, so the re-read waits for ever whenever the reload wins the race.
+    await radio(page, 'Мова інтерфейсу', 'English').click({ noWaitAfter: true })
     await expect(page.getByRole('heading', { level: 1, name: 'Settings' })).toBeVisible()
 
     const expectAllInForce = async (target: Page): Promise<void> => {

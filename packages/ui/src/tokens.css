@@ -1,120 +1,154 @@
 /*
- * T025. Serene Script — every design value as a CSS custom property.
+ * The design system as CSS custom properties.
  *
- * Why custom properties rather than Tailwind variants: there are three themes, and ticket 20
- * settled that the low-vision preset is a *third theme* rather than a scale factor — it redefines
- * borders, shadows, fills, tracking and sizes rather than multiplying them. With variants that is
- * three class names on every styled element; here it is one declaration block per theme, and the
- * component markup never mentions a theme at all (research R2).
+ * The look is a cool grey canvas, near-white surfaces, near-black ink and one accent, a brand red
+ * used sparingly and boldly: the primary call to action, the key the learner is being asked for,
+ * one large geometric shape. Display type is Unbounded (heavy, huge, tight); everything else,
+ * the typing line included, is Onest.
  *
- * It is also where the motion flag lives: one attribute drives every duration to 0.01ms, which is
- * what makes visual comparisons deterministic (FR-064).
+ * Why custom properties rather than Tailwind variants: there are three themes, and the low-vision
+ * one is a third theme rather than a scale factor. It redefines borders, shadows, fills, tracking
+ * and sizes. With variants that is three class names on every styled element; here it is one
+ * declaration block per theme, and the component markup never mentions a theme at all.
+ *
+ * **Token names are older than the palette.** `sage` and `terracotta` were the two brand colours
+ * of the previous look, and every screen refers to them by name. They are kept as *roles* so the
+ * screens inherit the new look without being rewritten:
+ *
+ * - `sage` is the calm, cool secondary: progress, typed text, links, the selected option.
+ *   It is now a deep steel blue, which keeps it clearly apart from the red.
+ * - `terracotta` is the error role, now the brand red. An error is never colour alone (it always
+ *   carries an underline and a count), so sharing the hue with the accent costs nothing.
+ * - `accent` is the brand red as an *accent*: the one filled button, the current key.
  *
  * `@theme static` forces every variable into the build rather than only the ones Tailwind sees
- * used — the dark and low-vision blocks redefine variables the light theme may never reference.
+ * used: the dark and low-vision blocks redefine variables the light theme may never reference.
  */
 
 @import "tailwindcss";
 @import "./fonts.css";
 
+/* The primitives' class names live in this package, outside the app Tailwind detects by itself. */
+@source "./components";
+
 @theme static {
-  /* ---- The five core colours (light theme, the default) ------------------------------- */
-  --color-paper: #faf9f5;
-  --color-paper-raised: #ffffff;
-  --color-ink: #2d312e;
-  --color-sage: #4a7c59;
-  --color-terracotta: #d95d39;
-  /*
-   * Ticket 20 named the secondary slate #94A3B8. Measured against the paper ground that is
-   * 2.3:1 — it fails WCAG AA for text, which Lighthouse caught on the muted `Chip`, and zero axe
-   * violations is a gate rather than an aspiration (ticket 15). Darkened to the lightest slate
-   * that clears 4.5:1 on #FAF9F5, so the token still reads as "secondary" and now also reads.
-   *
-   * The typing line is unaffected: its upcoming characters derive their colour from `--color-ink`
-   * directly, so the "text that recedes" effect the design wanted is still there and still large.
-   */
-  /* Darkened from #67707c on 2026-09-30: the old value read 4.32:1 against `--color-sage-tint`,
-     which fails AA for 12–14px text, and muted labels do sit on a tint on the Path screen. This
-     value clears 4.85:1 there and 5.33:1 on paper. */
-  --color-muted: #5f6874;
+  /* ---- Canvas, surfaces, ink (light theme, the default) -------------------------------- */
+  --color-paper: #e7ebee;
+  --color-paper-deep: #dce2e6;
+  --color-paper-raised: #f9fafb;
+  --color-ink: #0f1418;
+  --color-ink-soft: #26303a;
+  /* 5.3:1 on the canvas, 6.1:1 on a surface, 4.65:1 on the steel tint. */
+  --color-muted: #56616b;
+  /* Display-size text only (3.5:1 on a surface): the grey half of a two-tone headline. */
+  --color-ink-faint: #7b8690;
 
-  /* Derived surfaces. Ticket 20: a 1px border plus a two-layer shadow is the whole paper effect. */
-  --color-hairline: #e6e4da;
-  --color-hairline-strong: #d5d2c4;
-  --color-sage-tint: #e9f0ea;
-  --color-terracotta-tint: #fbe9e3;
+  --color-hairline: #d5dce1;
+  --color-hairline-strong: #b6c0c8;
 
-  /*
-   * Text *on* a tint needs its own value. The brand sage reads 4.19:1 against its own tint at
-   * 12px, which fails WCAG AA — so small text on a tint uses the darker half of the pair
-   * `DECISIONS.md` already names (#316342 and #BA1A1A). The brand colours themselves are unchanged:
-   * this is about legibility at chip size, not about the palette.
-   */
-  --color-sage-ink: #316342;
-  --color-terracotta-ink: #ba1a1a;
-  --color-nav-dimmed: #a3aaa4;
+  /* ---- The accent: brand red and its steps ---------------------------------------------
+   * White on the red is 6.0:1, the red on the canvas 5.0:1, so it may carry text either way.
+   * `accent-pale` is for small text *on* red (4.9:1). */
+  --color-accent: #c21f13;
+  --color-accent-deep: #9c170d;
+  --color-accent-tint: #f2dcd9;
+  --color-accent-soft: #f7d0cb;
+  --color-accent-pale: #fbe3e0;
+  --color-on-accent: #ffffff;
 
-  /* ---- Finger colours: ink / tint / line, one triple per finger (ticket 20) ------------
-   * A keycap glyph takes its finger's *ink*, so the colour never carries meaning alone — the
-   * letter is still the letter, which is what keeps the guide usable without colour vision. */
-  --color-finger-pinky-ink: #6b5b96;
-  --color-finger-pinky-tint: #efebf6;
-  --color-finger-pinky-line: #cfc4e4;
+  /* ---- Roles kept from the previous palette (see the header) --------------------------- */
+  --color-sage: #1f4257;
+  --color-sage-tint: #d5e0e8;
+  --color-sage-ink: #173447;
+  --color-steel: #1d2a34;
 
-  --color-finger-ring-ink: #316342;
-  --color-finger-ring-tint: #e9f0ea;
-  --color-finger-ring-line: #bfd4c4;
+  --color-terracotta: #c21f13;
+  --color-terracotta-tint: #fbe3e0;
+  --color-terracotta-ink: #9c170d;
 
-  --color-finger-middle-ink: #8a6416;
-  --color-finger-middle-tint: #f7efdf;
-  --color-finger-middle-line: #e3cfa4;
+  --color-nav-dimmed: #8b959e;
 
-  --color-finger-index-ink: #265c79;
-  --color-finger-index-tint: #e6eff4;
-  --color-finger-index-line: #b8d2df;
+  /* ---- Finger colours: ink / tint / line, one triple per finger -------------------------
+   * A keycap glyph takes its finger's *ink*, so the colour never carries meaning alone: the
+   * letter is still the letter, which is what keeps the guide usable without colour vision.
+   * Kept cool and muted so the keyboard never out-shouts the red of the awaited key. */
+  --color-finger-pinky-ink: #5b4f8f;
+  --color-finger-pinky-tint: #ebe8f5;
+  --color-finger-pinky-line: #cbc4e2;
 
-  --color-finger-thumb-ink: #5f6b63;
-  --color-finger-thumb-tint: #f2f4ee;
-  --color-finger-thumb-line: #d9dcd6;
+  --color-finger-ring-ink: #2e5e45;
+  --color-finger-ring-tint: #e3eee7;
+  --color-finger-ring-line: #bcd3c4;
+
+  --color-finger-middle-ink: #7d5a12;
+  --color-finger-middle-tint: #f4ecdc;
+  --color-finger-middle-line: #decaa0;
+
+  --color-finger-index-ink: #1f5471;
+  --color-finger-index-tint: #e1ecf3;
+  --color-finger-index-line: #b3cfe0;
+
+  --color-finger-thumb-ink: #4f5b64;
+  --color-finger-thumb-tint: #eef1f3;
+  --color-finger-thumb-line: #d3d9de;
 
   /* ---- Typography ---------------------------------------------------------------------- */
-  --font-typing: "Source Serif 4", Georgia, "Times New Roman", serif;
-  --font-ui: "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --font-display: "Unbounded", "Onest", system-ui, sans-serif;
+  --font-ui: "Onest", system-ui, -apple-system, "Segoe UI", sans-serif;
+  /* The typing line: a calm, open grotesque with distinct і/ї/l/I, never the display face. */
+  --font-typing: "Onest", system-ui, -apple-system, "Segoe UI", sans-serif;
+  /* There is no monospace any more. `font-mono` is kept as a name for "a number or a machine
+     note", and it is Onest with tabular figures (set below), which is all the old mono was for. */
+  --font-mono: "Onest", system-ui, -apple-system, "Segoe UI", sans-serif;
 
   /* The typing line's own size is a *setting* (24–40 px), so it is a variable the app writes. */
   --text-typing: 28px;
   --leading-typing: 1.5;
-  --tracking-typing: 0;
+  --tracking-typing: 0.005em;
 
-  /* ---- Shape ---------------------------------------------------------------------------- */
-  --radius-card: 18px;
+  /* ---- Shape ----------------------------------------------------------------------------
+   * Buttons and chips are fully round pills. Large panels take a big radius, the way the hero
+   * frame does; keycaps stay small, because a keycap is an object, not a panel. */
+  --radius-panel: 40px;
+  --radius-card: 24px;
   --radius-keycap: 8px;
   --radius-chip: 999px;
-  --radius-field: 10px;
+  --radius-pill: 999px;
+  /* Fields, option cards, formula boxes: blocks that may wrap to several lines, so never a pill. */
+  --radius-field: 14px;
 
   --border-hairline: 1px;
   /* The 2px inset bottom bevel on a keycap is the entire "tactile" budget. No gradients. */
   --keycap-bevel: 2px;
 
-  --shadow-paper: 0 1px 2px rgb(45 49 46 / 4%), 0 8px 20px -20px rgb(45 49 46 / 18%);
-  --shadow-raised: 0 1px 2px rgb(45 49 46 / 6%), 0 12px 28px -18px rgb(45 49 46 / 22%);
+  /* Flat by default: a surface is separated from the canvas by its lightness, not by a shadow. */
+  --shadow-paper: 0 1px 0 rgb(15 20 24 / 3%);
+  --shadow-raised: 0 1px 2px rgb(15 20 24 / 5%), 0 24px 48px -28px rgb(15 20 24 / 28%);
 
-  /* ---- Motion (docs/design/motion.md) ---------------------------------------------------
+  /* ---- Layout ---------------------------------------------------------------------------- */
+  --gutter: clamp(24px, 5.2vw, 75px);
+  --head-h: 72px;
+
+  /* ---- Motion ---------------------------------------------------------------------------
    * Durations are tokens, never literals, so the motion flag turns everything off in one place
-   * rather than each animation checking a condition. */
+   * rather than each animation checking a condition.
+   *
+   * The curves: `--ease-enter` is a long expo-out (fast start, a long soft landing) used for every
+   * reveal and every link; `--ease-standard` is a gentle quad-out for colour and layer changes. */
   --dur-instant: 90ms;
   --dur-quick: 140ms;
-  --dur-base: 220ms;
-  --dur-slow: 420ms;
+  --dur-base: 350ms;
+  --dur-slow: 600ms;
+  --dur-reveal: 900ms;
   --dur-celebrate: 900ms;
 
-  --ease-standard: cubic-bezier(0.2, 0, 0.2, 1);
-  --ease-enter: cubic-bezier(0.05, 0.7, 0.1, 1);
+  --ease-standard: cubic-bezier(0.5, 1, 0.89, 1);
+  --ease-enter: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-exit: cubic-bezier(0.3, 0, 0.8, 0.15);
+  --ease-in-out: cubic-bezier(0.87, 0, 0.13, 1);
   --ease-linear: linear;
 
-  --stagger-tile: 60ms;
+  --stagger-tile: 80ms;
   --stagger-bar: 12ms;
 }
 
@@ -123,11 +157,24 @@
   background-color: var(--color-paper);
   color: var(--color-ink);
   font-family: var(--font-ui);
+  accent-color: var(--color-accent);
+  font-feature-settings: "tnum" 0;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  background-color: var(--color-paper);
+}
+
+/* Numbers that sit in columns or change while you watch never jitter sideways. */
+.font-mono {
+  font-variant-numeric: tabular-nums;
 }
 
 /*
- * The motion kill switch (FR-064). One attribute, every duration. The value is 0.01ms rather than
- * 0 because a zero-duration CSS transition fires no `transitionend`, and code that waits for one
+ * The motion kill switch. One attribute, every duration. The value is 0.01ms rather than 0
+ * because a zero-duration CSS transition fires no `transitionend`, and code that waits for one
  * would hang instead of running instantly.
  */
 :root[data-motion="off"] {
@@ -135,6 +182,7 @@
   --dur-quick: 0.01ms;
   --dur-base: 0.01ms;
   --dur-slow: 0.01ms;
+  --dur-reveal: 0.01ms;
   --dur-celebrate: 0.01ms;
   --stagger-tile: 0ms;
   --stagger-bar: 0ms;
@@ -143,6 +191,7 @@
 /* Reduced keeps the frame's short movements and drops the celebratory ones. */
 :root[data-motion="reduced"] {
   --dur-slow: var(--dur-base);
+  --dur-reveal: 0.01ms;
   --dur-celebrate: 0.01ms;
   --stagger-tile: 0ms;
   --stagger-bar: 0ms;
@@ -158,19 +207,17 @@
 }
 
 /*
- * Route transitions — docs/design/motion.md, the frame layer.
+ * Route transitions, the frame layer.
  *
  * The whole document crossfades while the main column rises 8 px, which gives navigation a
  * direction without animating anything the learner is reading. It is deliberately **not** applied
- * during an attempt: `main` is excluded from the transition while `[data-attempt="running"]` is
- * set, because FR-069 forbids anything outside the typing line from changing between keystrokes,
- * and a route change mid-attempt would be the largest change of all.
+ * during an attempt: nothing outside the typing line may change between keystrokes.
  */
 @media (prefers-reduced-motion: no-preference) {
   ::view-transition-old(root),
   ::view-transition-new(root) {
     animation-duration: var(--dur-base);
-    animation-timing-function: var(--ease-standard);
+    animation-timing-function: var(--ease-enter);
   }
 
   ::view-transition-new(root) {

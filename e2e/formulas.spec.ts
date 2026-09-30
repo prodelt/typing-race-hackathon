@@ -61,7 +61,7 @@ test.describe('US4 the public Formulas page', () => {
     // The product page, formulas, licences, privacy and about are the only screens a visitor
     // without a learner may reach (docs/adr/0003).
     for (const [path, heading] of [
-      ['/', 'Навчися друкувати, не дивлячись на клавіатуру'],
+      ['/', 'Друкуй наосліп'],
       ['/licences', 'Ліцензії'],
       ['/privacy', 'Приватність'],
       ['/about', 'Про проєкт'],

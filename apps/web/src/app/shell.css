@@ -1,0 +1,278 @@
+/*
+ * The shell: header, main column, footer.
+ *
+ * The header follows the brand site's: 72 px tall on the canvas colour, wordmark left, a quiet
+ * text nav pushed right, then the language switch and one red pill. No boxes around links: the
+ * current destination is marked by weight and a small red square, the way the brand site marks
+ * the current section.
+ */
+
+.shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  overflow-x: clip;
+}
+
+/* One column width for every app screen, header included, so the wordmark lines up with the
+   content below it. The landing page is wider, as the brand site is. */
+.shell-container {
+  width: 100%;
+  max-width: calc(72rem + 2 * var(--gutter));
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.shell[data-landing] .shell-container {
+  max-width: none;
+}
+
+/* ---- Header ------------------------------------------------------------------------------ */
+
+.shell-head {
+  position: relative;
+  z-index: 30;
+  background: var(--color-paper);
+}
+
+.shell-head__inner {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  height: var(--head-h);
+}
+
+.shell-head__logo {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--color-ink);
+  text-decoration: none;
+  border-radius: 6px;
+}
+
+.shell-head__logo [data-wordmark-caret] {
+  transition: transform var(--dur-base) var(--ease-enter);
+}
+
+.shell-head__logo:hover [data-wordmark-caret] {
+  transform: translate(0.12em, 0.04em);
+}
+
+.shell-nav {
+  display: flex;
+  align-items: center;
+  gap: clamp(16px, 1.9vw, 28px);
+  margin-left: auto;
+}
+
+.shell-nav__link,
+.shell-head__settings {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--color-ink);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color var(--dur-base) var(--ease-enter);
+}
+
+a.shell-nav__link:hover,
+a.shell-head__settings:hover {
+  color: var(--color-terracotta-ink);
+}
+
+/* The current destination: heavier, and a small red square underneath. */
+.shell-nav__link[data-active],
+.shell-head__settings[data-active] {
+  font-weight: 600;
+}
+
+.shell-nav__link[data-active]::after,
+.shell-head__settings[data-active]::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 2px;
+  width: 5px;
+  height: 5px;
+  margin-left: -2.5px;
+  background: var(--color-accent);
+}
+
+.shell-head__settings {
+  gap: 8px;
+}
+
+.shell-head__settings svg {
+  flex: none;
+}
+
+.shell-nav__link--later {
+  color: var(--color-nav-dimmed);
+  cursor: default;
+}
+
+.shell-head__right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-left: 12px;
+}
+
+.shell-lang {
+  display: flex;
+  gap: 2px;
+}
+
+.shell-lang__option {
+  min-width: 32px;
+  min-height: 32px;
+  padding: 0 4px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-muted);
+  cursor: pointer;
+  transition: color var(--dur-base) var(--ease-enter);
+}
+
+.shell-lang__option:hover {
+  color: var(--color-ink);
+}
+
+.shell-lang__option[aria-pressed="true"] {
+  color: var(--color-ink);
+  font-weight: 600;
+  cursor: default;
+}
+
+/* During an attempt the header stays where it is and steps back. The wordmark is left alone:
+   dimming the one link that still works would make it look broken. */
+.shell-head[data-dimmed] .shell-nav,
+.shell-head[data-dimmed] .shell-head__right {
+  opacity: 0.45;
+  transition: opacity var(--dur-base) var(--ease-standard);
+}
+
+.shell-head[data-dimmed] .shell-nav__link,
+.shell-head[data-dimmed] .shell-head__settings {
+  color: var(--color-nav-dimmed);
+}
+
+.shell-head__note {
+  margin: 0;
+  padding: 6px var(--gutter);
+  border-top: var(--border-hairline) solid var(--color-hairline);
+  text-align: center;
+  font-size: 13px;
+  color: var(--color-muted);
+}
+
+/* Narrow windows get the notice, not the app; the header keeps only the wordmark. */
+@media (max-width: 1023px) {
+  .shell-nav,
+  .shell-head__right {
+    display: none;
+  }
+}
+
+/* Between 1024 and 1240 px the six destinations, the switch and the pill share one row. */
+@media (max-width: 1240px) {
+  .shell-head__inner {
+    gap: 20px;
+  }
+  .shell-nav__link,
+  .shell-head__settings {
+    font-size: 14px;
+  }
+  .shell-nav {
+    gap: 12px;
+  }
+  .shell-head__right {
+    gap: 10px;
+    margin-left: 0;
+  }
+  .shell-head__logo > span {
+    font-size: 17px;
+  }
+  /* The settings link keeps its name for assistive tech and shows only its icon. */
+  .shell-head__settings {
+    justify-content: center;
+    min-width: 36px;
+  }
+  .shell-head__settings-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+/* ---- Main -------------------------------------------------------------------------------- */
+
+.shell-main {
+  flex: 1;
+  padding-top: 32px;
+  padding-bottom: 72px;
+}
+
+.shell[data-landing] .shell-main {
+  padding: 0;
+}
+
+/* ---- Footer ------------------------------------------------------------------------------ */
+
+.shell-foot {
+  border-top: var(--border-hairline) solid var(--color-hairline);
+}
+
+.shell-foot__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 28px;
+  padding-block: 22px 26px;
+  font-size: 14px;
+}
+
+.shell-foot__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 24px;
+}
+
+.shell-foot__links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  font-weight: 500;
+  color: var(--color-ink);
+  text-decoration: none;
+  text-underline-offset: 4px;
+  transition:
+    color var(--dur-base) var(--ease-enter),
+    text-underline-offset var(--dur-base) var(--ease-enter);
+}
+
+.shell-foot__links a:hover {
+  color: var(--color-terracotta-ink);
+  text-decoration: underline;
+  text-underline-offset: 6px;
+}
+
+.shell-foot__note {
+  margin-left: auto;
+  color: var(--color-muted);
+}

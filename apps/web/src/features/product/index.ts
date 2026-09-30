@@ -1,1 +1,1 @@
-export { ProductPage, type ProductPageProps } from './ProductPage.js'
+export { ProductPage } from './ProductPage.js'

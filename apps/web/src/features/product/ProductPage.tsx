@@ -1,205 +1,346 @@
-import { Chip, IconKeyboard, IconNextAction, IconUnlock, IconZeroPeek } from '@typing-race/ui'
-import type { ReactNode } from 'react'
+import { Link } from '@tanstack/react-router'
+import {
+  buttonClass,
+  Chip,
+  currentMotion,
+  Index,
+  type ResolvedMotion,
+  watchMotion,
+} from '@typing-race/ui'
+import { type CSSProperties, useEffect, useRef, useState } from 'react'
 import { m } from '../../paraglide/messages.js'
+import type { HeroShader } from './heroShader.js'
 import { Reveal } from './Reveal.js'
 import { TypingSpecimen } from './TypingSpecimen.js'
 import './product.css'
 
-export interface ProductPageProps {
-  /** Where "Start practising" leads. The router owns the real route; this is only a default. */
-  readonly practiceHref?: string
-  /** Where the Formulas page lives. */
-  readonly formulasHref?: string
+/** Where "Start practising" leads: Today asks a new learner where to begin. */
+const PRACTICE = '/today'
+const FORMULAS = '/formulas'
+
+/** `--i` orders a staggered reveal; typed here once instead of casting at every use. */
+function order(i: number): CSSProperties {
+  return { '--i': i } as CSSProperties
 }
 
-const CTA_BASE =
-  'inline-flex items-center justify-center rounded-[var(--radius-field)] border-[length:var(--border-hairline)] font-ui font-semibold h-12 px-6 text-base ease-[var(--ease-standard)] duration-[var(--dur-base)] transition-[background-color,filter,transform] active:translate-y-px'
-
-interface Stage {
-  readonly n: number
-  readonly title: string
-  readonly body: string
-  readonly available: boolean
-}
-
-interface Principle {
-  readonly icon: ReactNode
-  readonly title: string
-  readonly body: string
+function useMotion(): ResolvedMotion {
+  const [motion, setMotion] = useState<ResolvedMotion>(() => currentMotion())
+  useEffect(() => watchMotion(setMotion), [])
+  return motion
 }
 
 /**
- * P0, the product page. The one screen before sign-in, so it reads nothing about the learner.
- *
- * **Its visual asset is the product itself.** A typing trainer's landing page does not need stock
- * photography of hands on a keyboard; it needs to demonstrate the one thing that makes this
- * trainer different, and the fastest way to say "a corrected error still counts" is to show a line
- * being typed, a wrong key being marked in place, a Backspace, and a counter that does not fall.
- * That is FR-016, FR-017 and FR-024 argued in eight seconds without a word of copy.
- *
- * Four sections, four different layout families, because a page where every section is three equal
- * cards reads as a template no matter how good the typography is: an asymmetric split hero, a
- * stepped stage ladder that is deliberately unequal, a two-column editorial list ruled with
- * hairlines rather than boxed in cards, and a full-width band.
+ * The hero's backdrop. The CSS gradient under the canvas *is* the picture at motion `off`, and
+ * the first paint everywhere; the shader, when it loads, fades in over it. It is imported only
+ * once the page is idle, as its own chunk, so it never delays the first paint or counts against
+ * the initial-JS budget.
  */
-export function ProductPage({
-  practiceHref = '/path',
-  formulasHref = '/formulas',
-}: ProductPageProps) {
-  const stages: readonly Stage[] = [
-    { n: 1, title: m.product_stage1_title(), body: m.product_stage1_body(), available: true },
-    { n: 2, title: m.product_stage2_title(), body: m.product_stage2_body(), available: false },
-    { n: 3, title: m.product_stage3_title(), body: m.product_stage3_body(), available: false },
-  ]
-  const principles: readonly Principle[] = [
-    {
-      icon: <IconZeroPeek size={22} />,
-      title: m.product_p_blind_title(),
-      body: m.product_p_blind_body(),
-    },
-    {
-      icon: <IconUnlock size={22} />,
-      title: m.product_p_speed_title(),
-      body: m.product_p_speed_body(),
-    },
-    {
-      icon: <IconKeyboard size={22} />,
-      title: m.product_p_errors_title(),
-      body: m.product_p_errors_body(),
-    },
-    {
-      icon: <IconNextAction size={22} />,
-      title: m.product_p_next_title(),
-      body: m.product_p_next_body(),
-    },
-  ]
+function HeroBackdrop({
+  motion,
+  playing,
+}: {
+  readonly motion: ResolvedMotion
+  readonly playing: boolean
+}) {
+  const canvas = useRef<HTMLCanvasElement>(null)
+  const shader = useRef<HeroShader | null>(null)
+  const [ready, setReady] = useState(false)
+  const wanted = useRef(playing && motion === 'full')
+  wanted.current = playing && motion === 'full'
+
+  useEffect(() => {
+    if (motion === 'off') return
+    let cancelled = false
+    const start = () => {
+      void import('./heroShader.js').then(({ startHeroShader }) => {
+        const node = canvas.current
+        if (cancelled || node === null) return
+        shader.current = startHeroShader(node, wanted.current)
+        if (shader.current !== null) setReady(true)
+      })
+    }
+    const idle =
+      window.requestIdleCallback ?? ((callback: () => void) => window.setTimeout(callback, 200))
+    const handle = idle(start)
+    return () => {
+      cancelled = true
+      if (typeof handle === 'number') window.cancelIdleCallback?.(handle)
+      shader.current?.destroy()
+      shader.current = null
+      setReady(false)
+    }
+  }, [motion])
+
+  useEffect(() => {
+    shader.current?.setPlaying(playing && motion === 'full')
+  }, [playing, motion])
 
   return (
-    <article className="product mx-auto w-full max-w-6xl font-ui text-ink">
-      {/* ---- Hero: asymmetric split, text left, the live product right ------------------ */}
-      <section
-        aria-labelledby="product-title"
-        className="grid items-center gap-10 pt-6 pb-16 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-14"
-      >
-        <div className="product__enter">
-          <p className="mb-4 font-mono text-xs tracking-[0.18em] text-sage uppercase">
-            {m.product_eyebrow()}
-          </p>
-          <h1
-            id="product-title"
-            className="max-w-[19ch] font-ui text-[clamp(2rem,3.6vw,3.1rem)] leading-[1.08] font-bold tracking-tight text-balance"
-          >
-            {m.product_h1()}
-          </h1>
-          <p className="mt-5 max-w-[44ch] font-ui text-[1.0625rem] leading-relaxed text-ink/75">
-            {m.product_lead()}
-          </p>
-          <div className="mt-7 flex flex-wrap items-center gap-3">
-            <a
-              className={`${CTA_BASE} border-sage bg-sage text-paper hover:brightness-110`}
-              href={practiceHref}
-            >
-              {m.product_cta_start()}
-            </a>
-            <a
-              className={`${CTA_BASE} border-hairline-strong bg-paper-raised hover:bg-sage-tint`}
-              href={formulasHref}
-            >
-              {m.product_cta_formulas()}
-            </a>
-          </div>
-        </div>
+    <div className="hero__backdrop" aria-hidden="true">
+      <canvas ref={canvas} className="hero__canvas" data-ready={ready || undefined} />
+    </div>
+  )
+}
 
-        <div className="product__enter product__enter--late">
-          <TypingSpecimen />
+/**
+ * The product page: the one screen before the learner, so it reads nothing about them.
+ *
+ * Built the way the brand site is built: a dark hero panel with a huge headline and one outlined
+ * word, then numbered sections, each a different layout family (a row of stage cells, a manifesto
+ * beside offset number cells, a card with a torn headline and circled points, and a poster-sized
+ * call to action), so the page never reads as a template of equal boxes.
+ *
+ * Its visual asset is the product itself: the live typing demo in the hero shows a wrong key
+ * marked in place, a Backspace, and an error count that does not fall.
+ */
+export function ProductPage() {
+  const motion = useMotion()
+  const [playing, setPlaying] = useState(true)
+  const animated = motion === 'full'
+
+  const stages = [
+    {
+      n: 1,
+      name: m.product_stage1_name(),
+      title: m.product_stage1_title(),
+      body: m.product_stage1_body(),
+      live: true,
+    },
+    {
+      n: 2,
+      name: m.product_stage2_name(),
+      title: m.product_stage2_title(),
+      body: m.product_stage2_body(),
+      live: false,
+    },
+    {
+      n: 3,
+      name: m.product_stage3_name(),
+      title: m.product_stage3_title(),
+      body: m.product_stage3_body(),
+      live: false,
+    },
+  ] as const
+
+  const facts = [
+    { value: '3', label: m.product_fact_attempts() },
+    { value: '8', label: m.product_fact_scales() },
+    { value: '0', label: m.product_fact_peek() },
+    { value: '1', label: m.product_fact_next() },
+  ] as const
+
+  const principles = [
+    { title: m.product_p_blind_title(), body: m.product_p_blind_body() },
+    { title: m.product_p_speed_title(), body: m.product_p_speed_body() },
+    { title: m.product_p_errors_title(), body: m.product_p_errors_body() },
+    { title: m.product_p_next_title(), body: m.product_p_next_body() },
+  ] as const
+
+  return (
+    <article className="landing">
+      {/* ---- Hero ------------------------------------------------------------------------ */}
+      <section className="hero" aria-labelledby="product-title">
+        <div className="hero__frame">
+          <HeroBackdrop motion={motion} playing={playing} />
+
+          <div className="hero__top">
+            <span className="hero__tag">{m.product_layouts()}</span>
+            {animated && (
+              <button
+                type="button"
+                className="hero__pause"
+                aria-pressed={!playing}
+                aria-label={playing ? m.product_motion_pause() : m.product_motion_play()}
+                onClick={() => setPlaying((value) => !value)}
+              >
+                {playing ? (
+                  <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
+                    <rect x="2" y="1" width="3.5" height="12" rx="1" />
+                    <rect x="8.5" y="1" width="3.5" height="12" rx="1" />
+                  </svg>
+                ) : (
+                  <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
+                    <path d="M3 1.5v11a.5.5 0 0 0 .77.42l8.5-5.5a.5.5 0 0 0 0-.84l-8.5-5.5A.5.5 0 0 0 3 1.5Z" />
+                  </svg>
+                )}
+              </button>
+            )}
+          </div>
+
+          <div className="hero__content">
+            <h1 id="product-title" className="hero__title">
+              <span className="hero__line">
+                <span style={order(0)}>{m.product_hero_line1()}</span>
+              </span>{' '}
+              <span className="hero__line">
+                <span style={order(1)}>
+                  <em className="hero__outline">{m.product_hero_line2()}</em>
+                  {/* The full stop is a drawn red dot, not a glyph: a red character on the
+                      dark frame would be text below contrast, a shape is not text. */}
+                  <span className="dot" aria-hidden="true" />
+                </span>
+              </span>
+            </h1>
+
+            <div className="hero__aside">
+              <TypingSpecimen playing={playing && animated} still={motion === 'off'} />
+              <p className="hero__lede">{m.product_lead()}</p>
+              <div className="hero__cta">
+                <Link to={PRACTICE} className={buttonClass('primary', 'lg')}>
+                  {m.product_cta_start()}
+                </Link>
+                <a href="#method" className={`${buttonClass('secondary', 'lg')} hero__cta-light`}>
+                  {m.product_cta_how()}
+                </a>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* ---- Stages: a ladder, deliberately unequal --------------------------------------
-          Three equal cards would say the three stages are equally real. They are not: only
-          Stage 1 ships today, and a layout that admits it is both more honest and better
-          looking than one that pretends otherwise. */}
-      <Reveal
-        as="section"
-        aria-labelledby="product-stages"
-        className="border-t border-hairline py-16"
-      >
-        <h2 id="product-stages" className="font-ui text-3xl font-bold tracking-tight">
-          {m.product_stages_title()}
-        </h2>
-        <ol className="mt-8 grid list-none gap-px overflow-hidden rounded-[var(--radius-card)] border border-hairline bg-hairline p-0 md:grid-cols-[1.3fr_1fr_1fr]">
-          {stages.map((stage) => (
+      {/* ---- [01] Method: three stage cells, the live one in red ---------------------------- */}
+      <Reveal as="section" id="method" aria-labelledby="method-title" className="sec">
+        <div className="sec__head">
+          <div data-reveal="" style={order(0)}>
+            <Index n={1}>{m.product_section_method()}</Index>
+            <h2 id="method-title" className="sec__title">
+              {m.product_stages_title()}
+            </h2>
+          </div>
+          <p className="sec__lede" data-reveal="" style={order(1)}>
+            {m.product_stages_lede()}
+          </p>
+        </div>
+
+        <ol className="stages">
+          {stages.map((stage, i) => (
             <li
               key={stage.n}
-              data-available={stage.available}
-              className="product__stage bg-paper-raised p-6"
+              className="stage"
+              data-live={stage.live || undefined}
+              data-reveal=""
+              style={order(i + 1)}
             >
-              <div className="flex items-center gap-2">
-                <span className="product__stage-n font-mono text-sm">
+              <div className="stage__top">
+                <span className="stage__n">
+                  [{String(stage.n).padStart(2, '0')}]{' '}
                   {m.product_stage_label({ n: String(stage.n) })}
                 </span>
-                <Chip tone={stage.available ? 'sage' : 'muted'}>
-                  {stage.available ? m.product_stage_now() : m.product_stage_later()}
+                <Chip tone={stage.live ? 'neutral' : 'muted'}>
+                  {stage.live ? m.product_stage_now() : m.product_stage_later()}
                 </Chip>
               </div>
-              <h3 className="mt-4 font-ui text-xl leading-snug font-semibold text-balance">
-                {stage.title}
-              </h3>
-              <p className="mt-3 font-ui text-sm leading-relaxed text-ink/70">{stage.body}</p>
+              <h3 className="stage__name">{stage.name}</h3>
+              <div className="stage__text">
+                <p className="stage__title">{stage.title}</p>
+                <p className="stage__body">{stage.body}</p>
+              </div>
             </li>
           ))}
         </ol>
       </Reveal>
 
-      {/* ---- Principles: an editorial list ruled with hairlines, not four boxes ---------- */}
-      <Reveal
-        as="section"
-        aria-labelledby="product-principles"
-        className="border-t border-hairline py-16"
-      >
-        <h2 id="product-principles" className="font-ui text-3xl font-bold tracking-tight">
-          {m.product_principles_title()}
-        </h2>
-        <dl className="mt-8 grid gap-x-14 gap-y-9 md:grid-cols-2">
-          {principles.map((principle) => (
-            <div key={principle.title} className="product__principle">
-              <dt className="flex items-center gap-2.5 font-ui text-lg font-semibold">
-                <span className="text-sage">{principle.icon}</span>
-                {principle.title}
-              </dt>
-              <dd className="mt-2 ml-0 font-ui text-[0.95rem] leading-relaxed text-ink/70">
-                {principle.body}
-              </dd>
-            </div>
-          ))}
-        </dl>
-      </Reveal>
-
-      {/* ---- Formulas: a full-width band, the fourth layout family ----------------------- */}
-      <Reveal
-        as="section"
-        aria-labelledby="product-audit"
-        className="my-16 rounded-[var(--radius-card)] bg-sage-tint px-8 py-12 md:px-12"
-      >
-        <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-          <div>
-            <h2
-              id="product-audit"
-              className="max-w-[18ch] font-ui text-3xl leading-tight font-bold tracking-tight text-balance"
-            >
-              {m.product_audit_title()}
+      {/* ---- [02] Accuracy: a manifesto beside offset number cells ------------------------ */}
+      <Reveal as="section" aria-labelledby="accuracy-title" className="sec sec--accuracy">
+        <div className="accuracy">
+          <div className="accuracy__text" data-reveal="" style={order(0)}>
+            <Index n={2}>{m.product_section_accuracy()}</Index>
+            <h2 id="accuracy-title" className="sec__title">
+              {m.product_accuracy_title()}
             </h2>
-            <p className="mt-4 max-w-[52ch] font-ui leading-relaxed text-ink/75">
-              {m.product_audit_body()}
+            <p className="manifesto">
+              {m.product_accuracy_a()}{' '}
+              <span className="manifesto__red">{m.product_accuracy_b()}</span>
             </p>
           </div>
-          <a
-            className={`${CTA_BASE} shrink-0 border-sage-ink bg-transparent text-sage-ink hover:bg-paper-raised`}
-            href={formulasHref}
-          >
-            {m.product_audit_link()}
-          </a>
+          {/* Two columns, the second set lower, so the four numbers read as a staggered
+              pair of stacks rather than a table. */}
+          <div className="facts">
+            {[0, 1].map((column) => (
+              <ul key={column} className="facts__col">
+                {facts
+                  .filter((_, i) => i % 2 === column)
+                  .map((fact, i) => (
+                    <li
+                      key={fact.value}
+                      className="fact"
+                      data-reveal=""
+                      style={order(i * 2 + column + 1)}
+                    >
+                      <span className="fact__num">{fact.value}</span>
+                      <span className="fact__label">{fact.label}</span>
+                    </li>
+                  ))}
+              </ul>
+            ))}
+          </div>
         </div>
+      </Reveal>
+
+      {/* ---- [03] Principles: a torn headline and circled points ------------------------- */}
+      <Reveal as="section" aria-labelledby="principles-title" className="sec sec--card">
+        <div className="card">
+          <Index n={3} className="card__index">
+            {m.product_section_principles()}
+          </Index>
+          <h2 id="principles-title" className="torn" data-reveal="" style={order(0)}>
+            <span className="torn__a">{m.product_principles_a()}</span>{' '}
+            <span className="torn__b">{m.product_principles_b()}</span>
+          </h2>
+
+          <div className="card__body">
+            <div className="card__aside" data-reveal="" style={order(1)}>
+              <p className="card__lede">{m.product_audit_body()}</p>
+              <Link to={FORMULAS} className="ulink">
+                {m.product_audit_link()}
+              </Link>
+            </div>
+            <ol className="points">
+              {principles.map((point, i) => (
+                <li key={point.title} className="point" data-reveal="" style={order(i + 2)}>
+                  <span className="point__n" aria-hidden="true">
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <div>
+                    <h3 className="point__title">{point.title}</h3>
+                    <p className="point__body">{point.body}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </div>
+      </Reveal>
+
+      {/* ---- [04] Start: a poster headline and one enormous red pill -------------------- */}
+      <Reveal as="section" aria-labelledby="start-title" className="sec sec--lead">
+        <div className="lead__bg" aria-hidden="true" />
+        <div className="lead__top">
+          <div data-reveal="" style={order(0)}>
+            <Index n={4}>{m.product_section_start()}</Index>
+            <h2 id="start-title" className="lead__title">
+              <span>{m.product_final_a()}</span>{' '}
+              <span>
+                {m.product_final_b()}
+                <span className="dot" aria-hidden="true" />
+              </span>
+            </h2>
+          </div>
+          <p className="lead__lede" data-reveal="" style={order(1)}>
+            {m.product_final_lede()}
+          </p>
+        </div>
+        <Link to={PRACTICE} className="submit" data-reveal="" style={order(2)}>
+          <span>{m.product_cta_start()}</span>
+          <svg width="44" height="24" viewBox="0 0 44 24" aria-hidden="true">
+            <path
+              d="M0 12h40M30 2l10 10-10 10"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+            />
+          </svg>
+        </Link>
       </Reveal>
     </article>
   )

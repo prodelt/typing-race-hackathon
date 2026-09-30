@@ -8,11 +8,11 @@ export interface CardProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 /**
- * T029. The paper surface: a 1px hairline plus a two-layer shadow, 18px radius (ticket 20).
+ * A near-white surface on the grey canvas, with a large radius.
  *
- * That is the entire paper effect. No gradient, no texture image — the "tactile" budget is spent
- * on the keycap bevel, and a card that also competes for attention would make a screen of six
- * cards look like a dashboard rather than a page.
+ * The separation is mostly lightness: a hairline that is barely there in the light theme and
+ * becomes a real 2px border in the low-vision one. Only a `raised` card gets a shadow, so a
+ * screen of several cards reads as a page rather than as a stack of floating tiles.
  */
 export function Card({ raised = false, className, ...rest }: CardProps) {
   return (

@@ -1,27 +1,32 @@
 import { useEffect, useRef, useState } from 'react'
+import { m } from '../../paraglide/messages.js'
+import { getLocale } from '../../paraglide/runtime.js'
 import './specimen.css'
 
 /**
- * The hero's visual asset: the product typing, for real.
+ * The hero's live demo: the product typing, for real.
  *
- * A landing page for a typing trainer does not need a stock photograph of hands on a keyboard.
- * It needs to show the one thing that makes this trainer different from every other one, and the
- * quickest way to say it is to do it: type a line, hit a wrong key, watch the awaited character
- * get marked **in place** with nothing moving, correct it with Backspace, and watch the error
- * counter stay at one.
+ * A landing page for a typing trainer does not need a photograph of hands on a keyboard. It needs
+ * to show the one thing that makes this trainer different, and the quickest way to say it is to
+ * do it: type a line, hit a wrong key, watch the awaited character get marked **in place** with
+ * nothing moving, correct it with Backspace, and watch the error count stay at one while the
+ * accuracy stays honest.
  *
- * That is FR-016, FR-017 and FR-024 demonstrated in eight seconds without a word of copy. It is
- * also honest — the same tokens, the same font, the same mark treatment as the real typing line,
- * so nobody arrives at the product and finds it looks different from the advert.
- *
- * Motion lives here rather than in the typing line itself: ticket 20's rule is expressive frame,
- * calm text, and this *is* the frame.
+ * The same font and the same error mark as the real typing line, so nobody arrives at the product
+ * and finds it looks different from the advert.
  */
 
-const TEXT = 'фіва олдж фіва'
-/** Where the deliberate mistake happens, and what gets typed instead. */
-const WRONG_AT = 5
-const WRONG_CHAR = 'ж'
+interface Script {
+  readonly text: string
+  /** Where the deliberate mistake happens, and what gets typed instead. */
+  readonly wrongAt: number
+  readonly wrongChar: string
+}
+
+const SCRIPTS: Record<string, Script> = {
+  uk: { text: 'фіва олдж фіва', wrongAt: 5, wrongChar: 'ж' },
+  en: { text: 'asdf jkl; asdf', wrongAt: 5, wrongChar: ';' },
+}
 
 type Step =
   | { kind: 'type'; index: number }
@@ -29,28 +34,23 @@ type Step =
   | { kind: 'backspace' }
   | { kind: 'hold' }
 
-/** Built once. The sequence is fixed, so there is nothing to compute per frame. */
-function buildScript(): Step[] {
+function buildSteps(script: Script): Step[] {
   const steps: Step[] = []
-  const characters = [...TEXT]
+  const characters = [...script.text]
   for (let i = 0; i < characters.length; i += 1) {
-    if (i === WRONG_AT) {
-      steps.push({ kind: 'wrong' }, { kind: 'backspace' })
-    }
+    if (i === script.wrongAt) steps.push({ kind: 'wrong' }, { kind: 'backspace' })
     steps.push({ kind: 'type', index: i })
   }
   steps.push({ kind: 'hold' })
   return steps
 }
 
-const SCRIPT = buildScript()
-
 /** Unequal delays, because an even cadence reads as a machine rather than as someone typing. */
 function delayFor(step: Step): number {
   if (step.kind === 'hold') return 2600
-  if (step.kind === 'wrong') return 260
-  if (step.kind === 'backspace') return 420
-  return 110 + (step.index % 3) * 45
+  if (step.kind === 'wrong') return 320
+  if (step.kind === 'backspace') return 480
+  return 115 + (step.index % 3) * 50
 }
 
 interface SpecimenState {
@@ -59,43 +59,47 @@ interface SpecimenState {
   readonly errors: number
 }
 
-const FINAL: SpecimenState = { cursor: [...TEXT].length, marked: false, errors: 1 }
 const START: SpecimenState = { cursor: 0, marked: false, errors: 0 }
 
-export function TypingSpecimen() {
-  // Read once rather than subscribed to: the specimen is decorative, and a learner who changes
-  // the system setting mid-visit is not owed a re-render of an advertisement.
-  const [reduced] = useState(
-    () =>
-      typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches,
-  )
-  const [state, setState] = useState<SpecimenState>(reduced ? FINAL : START)
+export interface TypingSpecimenProps {
+  /** False freezes the demo where it is (the hero's pause button, or motion turned down). */
+  readonly playing: boolean
+  /** True shows the finished line with its one error, for motion-off and reduced motion. */
+  readonly still: boolean
+}
+
+export function TypingSpecimen({ playing, still }: TypingSpecimenProps) {
+  const script = SCRIPTS[getLocale()] ?? (SCRIPTS['uk'] as Script)
+  const characters = [...script.text]
+  const final: SpecimenState = { cursor: characters.length, marked: false, errors: 1 }
+
+  const [state, setState] = useState<SpecimenState>(still ? final : START)
+  const step = useRef(0)
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined)
 
   useEffect(() => {
-    // Reduced motion still gets the *point* — the finished line with its mark and its error count
-    // — rather than a blank box. Turning motion off should cost the animation, not the message.
-    if (reduced) return
+    if (still) {
+      setState({ cursor: [...script.text].length, marked: false, errors: 1 })
+      return
+    }
+    if (!playing) return
 
-    let step = 0
+    const steps = buildSteps(script)
     const advance = () => {
-      const current = SCRIPT[step % SCRIPT.length]
-      if (!current) return
+      const current = steps[step.current % steps.length]
+      if (current === undefined) return
 
       setState((previous) => {
         if (current.kind === 'hold') return previous
-        if (current.kind === 'wrong') {
+        if (current.kind === 'wrong')
           return { ...previous, marked: true, errors: previous.errors + 1 }
-        }
-        if (current.kind === 'backspace') {
-          // The whole demonstration: the mark clears, the count does not (FR-024).
-          return { ...previous, marked: false }
-        }
+        // The whole demonstration: the mark clears, the count does not.
+        if (current.kind === 'backspace') return { ...previous, marked: false }
         return { ...previous, cursor: current.index + 1, marked: false }
       })
 
-      step += 1
-      if (step % SCRIPT.length === 0) {
+      step.current += 1
+      if (step.current % steps.length === 0) {
         timer.current = setTimeout(() => {
           setState(START)
           advance()
@@ -105,38 +109,61 @@ export function TypingSpecimen() {
       timer.current = setTimeout(advance, delayFor(current))
     }
 
-    timer.current = setTimeout(advance, 900)
+    timer.current = setTimeout(advance, step.current === 0 ? 1400 : 300)
     return () => clearTimeout(timer.current)
-  }, [reduced])
+  }, [playing, still, script])
 
-  const characters = [...TEXT]
+  // Accuracy exactly as the product computes it: correct keystrokes over all character
+  // keystrokes, the wrong one included for ever.
+  const keystrokes = state.cursor + state.errors
+  const accuracy = keystrokes === 0 ? 100 : Math.round((state.cursor / keystrokes) * 100)
 
   return (
     <figure className="specimen" aria-hidden="true">
-      <div className="specimen__frame">
-        <p className="specimen__line">
-          {characters.map((char, index) => {
-            const key = `${index}-${char}`
-            const awaited = index === state.cursor
-            const state_ =
-              index < state.cursor ? 'typed' : awaited && state.marked ? 'marked' : 'upcoming'
-            return (
-              <span key={key} className="specimen__char" data-state={state_}>
-                {char === ' ' ? ' ' : char}
-                {awaited && !state.marked && <i className="specimen__caret" />}
-                {awaited && state.marked && <i className="specimen__typed-wrong">{WRONG_CHAR}</i>}
-              </span>
-            )
-          })}
-        </p>
+      <figcaption className="specimen__bar">
+        <span className="specimen__live" data-playing={(playing && !still) || undefined} />
+        {m.product_specimen_label()}
+        <span className="specimen__layout">{getLocale() === 'en' ? 'QWERTY' : 'ЙЦУКЕН'}</span>
+      </figcaption>
 
-        <div className="specimen__readout">
-          <span>
-            <b>{state.errors}</b> помилка
+      <p className="specimen__line">
+        {characters.map((char, index) => {
+          const key = `${index}-${char}`
+          const awaited = index === state.cursor
+          const charState =
+            index < state.cursor ? 'typed' : awaited && state.marked ? 'marked' : 'upcoming'
+          return (
+            <span key={key} className="specimen__char" data-state={charState}>
+              {char}
+              {awaited && !state.marked && <i className="specimen__caret" />}
+              {awaited && state.marked && (
+                <i className="specimen__typed-wrong">{script.wrongChar}</i>
+              )}
+            </span>
+          )
+        })}
+        {state.cursor === characters.length && (
+          <span className="specimen__char">
+            {' '}
+            <i className="specimen__caret" />
           </span>
-          <span className="specimen__note">не зменшується після виправлення</span>
+        )}
+      </p>
+
+      <div className="specimen__readout">
+        <div>
+          <span className="specimen__k">{m.product_specimen_errors()}</span>
+          <b className="specimen__v specimen__v--error">{state.errors}</b>
+        </div>
+        <div>
+          <span className="specimen__k">{m.product_specimen_accuracy()}</span>
+          <b className="specimen__v">
+            {accuracy}
+            <small>%</small>
+          </b>
         </div>
       </div>
+      <p className="specimen__note">{m.product_specimen_note()}</p>
     </figure>
   )
 }

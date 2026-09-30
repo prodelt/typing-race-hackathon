@@ -6,10 +6,11 @@ OUT = pathlib.Path('packages/ui/src/fonts')
 OUT.mkdir(parents=True, exist_ok=True)
 WANT = {'cyrillic', 'cyrillic-ext', 'latin', 'latin-ext'}
 
+# Both are variable fonts, so one file per subset carries every weight in the range.
+# Unbounded: display type (headlines, big numbers). Onest: everything else, typing line included.
 FAMILIES = [
-    ('source-serif-4', 'Source+Serif+4:opsz,wght@8..60,400;8..60,600'),
-    ('source-sans-3', 'Source+Sans+3:wght@400;600;700'),
-    ('jetbrains-mono', 'JetBrains+Mono:wght@400;700'),
+    ('unbounded', 'Unbounded:wght@400..800'),
+    ('onest', 'Onest:wght@400..700'),
 ]
 
 def get(url):
@@ -30,7 +31,7 @@ for slug, spec in FAMILIES:
             continue
         url = m.group(1)
         weight = re.search(r'font-weight:\s*([^;]+);', block)
-        w = (weight.group(1).strip().replace(' ', '') if weight else '400')
+        w = (weight.group(1).strip().replace(' ', '-') if weight else '400')
         name = f'{slug}-{w}-{subset}.woff2'
         target = OUT / name
         if not target.exists():
@@ -38,12 +39,12 @@ for slug, spec in FAMILIES:
         blocks_out.append(f'/* {subset} */\n' + block.replace(url, f'./fonts/{name}').strip())
 
 header = """/*
- * T027. Self-hosted, subset webfonts.
+ * Self-hosted, subset webfonts: Unbounded (display) and Onest (interface and typing line). Both are
+ * SIL OFL 1.1 and variable, so one file per subset covers every weight in the range.
  *
- * FR-053 forbids third-party network calls and FR-074 promises practice offline after the first
- * load. Google Fonts would break both at once, so the files are vendored here and served from our
- * own origin. Only the Cyrillic and Latin subsets are kept — the Greek and Vietnamese ranges are
- * dead weight for a Ukrainian and English product.
+ * Served from our own origin: no third-party request, and practice works offline after the first
+ * load. Only the Cyrillic and Latin subsets are kept; the others are dead weight for a Ukrainian
+ * and English product, and `unicode-range` means a page only downloads the subsets it renders.
  *
  * Generated; regenerate with tools/fetch-fonts.py rather than editing by hand.
  */

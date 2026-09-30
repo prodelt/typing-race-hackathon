@@ -1,10 +1,10 @@
 /*
- * T026. The two themes beyond the light default.
+ * The two themes beyond the light default.
  *
- * Both are **full theme blocks**, not modifiers. Ticket 20 settled that the low-vision preset is a
- * third theme rather than a scale factor on the light one (FR-062): it redefines borders, shadows,
- * fills, tracking and sizes, because a preset built by multiplying the light theme produces
- * hairlines that are still hairlines and tints that are still nearly invisible.
+ * Both are **full theme blocks**, not modifiers. The low-vision preset is a third theme rather
+ * than a scale factor on the light one: it redefines borders, shadows, fills, tracking and sizes,
+ * because a preset built by multiplying the light theme produces hairlines that are still
+ * hairlines and tints that are still nearly invisible.
  *
  * Selection is `data-theme` on `<html>`, applied at boot before first paint so no frame of the
  * wrong theme is ever shown. `theme: 'system'` resolves to light or dark in `theme.ts`; it never
@@ -12,80 +12,107 @@
  */
 
 /* ---------------------------------------------------------------------------------------------
- * Dark — a theme of its own, because the pairs in DECISIONS.md are token variants, not a theme.
- * Sage and terracotta are lightened so both clear 4.5:1 against the dark ground.
+ * Dark: the light theme's ink becomes the ground. The red stays the same red where it is a fill
+ * (white on it is still 6:1); where the red is *text* it lifts to a coral that reads on the dark.
  * ------------------------------------------------------------------------------------------- */
 :root[data-theme="dark"] {
   color-scheme: dark;
 
-  --color-paper: #191c19;
-  --color-paper-raised: #232723;
-  --color-ink: #e8e8e0;
-  --color-sage: #7fae8b;
-  --color-terracotta: #f08a63;
-  --color-muted: #8e968d;
+  --color-paper: #11171c;
+  --color-paper-deep: #0b1014;
+  --color-paper-raised: #19212a;
+  --color-ink: #e7ebee;
+  --color-ink-soft: #c9d1d7;
+  --color-muted: #9aa5ae;
+  --color-ink-faint: #7d8993;
 
-  --color-hairline: #333833;
-  --color-hairline-strong: #3c423b;
-  --color-sage-tint: #223026;
-  --color-terracotta-tint: #3a2318;
-  /* On a dark tint the readable ink is the *light* half of the pair. */
-  --color-sage-ink: #7fae8b;
-  --color-terracotta-ink: #f08a63;
-  --color-nav-dimmed: #6c746b;
+  --color-hairline: #26313b;
+  --color-hairline-strong: #3a4753;
+
+  --color-accent: #c21f13;
+  --color-accent-deep: #9c170d;
+  --color-accent-tint: #3a1714;
+  --color-accent-soft: #4a1a15;
+  --color-accent-pale: #fbe3e0;
+  --color-on-accent: #ffffff;
+
+  --color-sage: #8fb4cc;
+  --color-sage-tint: #1e2c37;
+  --color-sage-ink: #a9c7da;
+  --color-steel: #c9d6df;
+
+  --color-terracotta: #ff7a6e;
+  --color-terracotta-tint: #3a1714;
+  --color-terracotta-ink: #ff8c80;
+
+  --color-nav-dimmed: #5d6872;
 
   /* Finger inks lift and tints darken; the line stays the mid value so a keycap still reads as
    * a keycap rather than as a filled block. */
   --color-finger-pinky-ink: #b7a6e0;
-  --color-finger-pinky-tint: #272335;
+  --color-finger-pinky-tint: #242236;
   --color-finger-pinky-line: #4b4266;
 
   --color-finger-ring-ink: #8fc79e;
-  --color-finger-ring-tint: #1f2c23;
+  --color-finger-ring-tint: #1b2a24;
   --color-finger-ring-line: #3d5a46;
 
   --color-finger-middle-ink: #dcb567;
-  --color-finger-middle-tint: #2e2718;
+  --color-finger-middle-tint: #2b2619;
   --color-finger-middle-line: #5c4c26;
 
   --color-finger-index-ink: #86bcd8;
-  --color-finger-index-tint: #1c2830;
+  --color-finger-index-tint: #182832;
   --color-finger-index-line: #34505f;
 
-  --color-finger-thumb-ink: #a3aea6;
-  --color-finger-thumb-tint: #232723;
-  --color-finger-thumb-line: #414a43;
+  --color-finger-thumb-ink: #a7b2ba;
+  --color-finger-thumb-tint: #1d252c;
+  --color-finger-thumb-line: #3b4650;
 
   /* Shadow does almost nothing on a dark ground; the hairline carries the separation instead. */
-  --shadow-paper: 0 1px 2px rgb(0 0 0 / 40%);
-  --shadow-raised: 0 2px 6px rgb(0 0 0 / 50%);
+  --shadow-paper: 0 1px 0 rgb(0 0 0 / 30%);
+  --shadow-raised: 0 2px 6px rgb(0 0 0 / 45%), 0 24px 48px -28px rgb(0 0 0 / 70%);
 }
 
 /* ---------------------------------------------------------------------------------------------
- * Low vision — a third theme (FR-062).
+ * Low vision: a third theme.
  *
- * What changes and why: near-black on near-white for maximum contrast; every hairline becomes a
- * 2px visible border, because a 1px #E6E4DA line is not a boundary to a low-vision reader; tints
- * deepen so a filled region is unmistakably filled; letter spacing opens; the typing line and the
- * interface both grow. Shadows are removed entirely — a soft shadow reads as blur, not as depth.
+ * What changes and why: near-black on white for maximum contrast; every hairline becomes a 2px
+ * visible border, because a 1px pale line is not a boundary to a low-vision reader; tints deepen
+ * so a filled region is unmistakably filled; letter spacing opens; the typing line grows.
+ * Shadows are removed entirely: a soft shadow reads as blur, not as depth.
  * ------------------------------------------------------------------------------------------- */
 :root[data-theme="low-vision"] {
   color-scheme: light;
 
   --color-paper: #ffffff;
+  --color-paper-deep: #eef1f3;
   --color-paper-raised: #ffffff;
-  --color-ink: #101310;
-  --color-sage: #1f5130;
-  --color-terracotta: #a3260b;
-  --color-muted: #4a544c;
+  --color-ink: #0b0f12;
+  --color-ink-soft: #1d2a34;
+  --color-muted: #3f4a53;
+  --color-ink-faint: #3f4a53;
 
-  --color-hairline: #101310;
-  --color-hairline-strong: #101310;
-  --color-sage-tint: #d3e6d8;
-  --color-terracotta-tint: #f6d9d1;
-  --color-sage-ink: #14361f;
-  --color-terracotta-ink: #6d1400;
-  --color-nav-dimmed: #4a544c;
+  --color-hairline: #0b0f12;
+  --color-hairline-strong: #0b0f12;
+
+  --color-accent: #a3170d;
+  --color-accent-deep: #7a1008;
+  --color-accent-tint: #f6d9d5;
+  --color-accent-soft: #f6d9d5;
+  --color-accent-pale: #ffffff;
+  --color-on-accent: #ffffff;
+
+  --color-sage: #0f3347;
+  --color-sage-tint: #cfdde8;
+  --color-sage-ink: #0b2536;
+  --color-steel: #0b0f12;
+
+  --color-terracotta: #a3170d;
+  --color-terracotta-tint: #f6d9d5;
+  --color-terracotta-ink: #6d0f07;
+
+  --color-nav-dimmed: #3f4a53;
 
   --color-finger-pinky-ink: #3d2f66;
   --color-finger-pinky-tint: #ded6f0;
@@ -109,10 +136,11 @@
 
   --text-typing: 40px;
   --leading-typing: 1.7;
-  --tracking-typing: 0.02em;
+  --tracking-typing: 0.03em;
 
   --border-hairline: 2px;
-  --radius-card: 10px;
+  --radius-panel: 16px;
+  --radius-card: 12px;
   --radius-keycap: 6px;
   --keycap-bevel: 3px;
 
@@ -120,10 +148,15 @@
   --shadow-raised: none;
 }
 
-/* Focus is always visible, in every theme. Never removed, never reduced to a colour change —
- * a learner navigating by keyboard must be able to see where they are at all times. */
+/* Focus is always visible, in every theme. Never removed, never reduced to a colour change: a
+ * learner navigating by keyboard must be able to see where they are at all times. A 3px ring
+ * offset from the element, so it reads even around a filled red button. */
 :where(:focus-visible) {
-  outline: 3px solid var(--color-sage);
-  outline-offset: 2px;
-  border-radius: 3px;
+  outline: 3px solid var(--color-accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+:root[data-theme="dark"] :where(:focus-visible) {
+  outline-color: var(--color-terracotta);
 }

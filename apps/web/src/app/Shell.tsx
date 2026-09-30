@@ -1,101 +1,77 @@
 import { Link, Outlet, useRouterState } from '@tanstack/react-router'
-import {
-  cx,
-  IconLeaderboard,
-  IconPath,
-  IconRace,
-  IconReview,
-  IconStats,
-  IconToday,
-  Mark,
-} from '@typing-race/ui'
-import type { ComponentType } from 'react'
+import type { Language } from '@typing-race/domain'
+import { buttonClass, cx, IconSettings, Wordmark } from '@typing-race/ui'
 import { m } from '../paraglide/messages.js'
+import { setLocale } from '../paraglide/runtime.js'
 import { BootGate } from './BootGate.js'
 import { CommandPalette } from './CommandPalette.js'
 import { useAppStore } from './state/index.js'
+import './shell.css'
 
 /**
- * T060. The app shell.
+ * The app shell: a header in the shape of the brand site's (wordmark left, a quiet text nav, the
+ * language switch and one red pill), the main column, and a small footer.
  *
- * Two rules from the specification shape everything here:
+ * Two rules shape everything here:
  *
- * - **FR-055**: all six destinations are present, and the ones F1 does not build are *disabled*,
- *   not removed. A navigation that grows over five features teaches the learner a new layout each
- *   time; one that is complete from the first release teaches it once. It also keeps the
- *   requirements' §9 demo route intact, since the jury can see where the rest will live.
- * - **FR-057**: during an attempt the navigation stays put and **dims**, with a note saying it is
- *   muted until the attempt ends. Removing it would reflow the page mid-keystroke, and FR-069 says
- *   nothing outside the typing line may change between two keystrokes.
+ * - All six destinations are present, and the ones not built yet are *disabled*, not removed. A
+ *   navigation that grows feature by feature teaches the learner a new layout each time; one that
+ *   is complete from the first release teaches it once.
+ * - During an attempt the header stays put and **dims**, with a note saying it is muted until the
+ *   attempt ends. Removing it would reflow the page mid-keystroke, and nothing outside the typing
+ *   line may change between two keystrokes.
  */
 
 interface Destination {
   readonly to: string
-  readonly label: string
-  readonly icon: ComponentType<{ size?: number }>
-  /** Arrives with a later feature. Present and disabled — FR-055. */
-  readonly arrivesIn?: string
+  readonly label: () => string
+  /** Arrives with a later release. Present and disabled. */
+  readonly later?: boolean
 }
 
 const DESTINATIONS: Destination[] = [
-  { to: '/today', label: 'nav_today', icon: IconToday },
-  { to: '/path', label: 'nav_path', icon: IconPath },
-  { to: '/review', label: 'nav_review', icon: IconReview, arrivesIn: 'F4' },
-  { to: '/races', label: 'nav_races', icon: IconRace, arrivesIn: 'F5' },
-  { to: '/leaderboards', label: 'nav_leaderboards', icon: IconLeaderboard, arrivesIn: 'F5' },
-  { to: '/statistics', label: 'nav_statistics', icon: IconStats, arrivesIn: 'F4' },
+  { to: '/today', label: m.nav_today },
+  { to: '/path', label: m.nav_path },
+  { to: '/review', label: m.nav_review, later: true },
+  { to: '/races', label: m.nav_races, later: true },
+  { to: '/leaderboards', label: m.nav_leaderboards, later: true },
+  { to: '/statistics', label: m.nav_statistics, later: true },
 ]
 
-const NAV_LABELS: Record<string, () => string> = {
-  nav_today: m.nav_today,
-  nav_path: m.nav_path,
-  nav_review: m.nav_review,
-  nav_races: m.nav_races,
-  nav_leaderboards: m.nav_leaderboards,
-  nav_statistics: m.nav_statistics,
-}
-
-function PrimaryNavigation({ dimmed }: { readonly dimmed: boolean }) {
-  const pathname = useRouterState({ select: (state) => state.location.pathname })
-
+function PrimaryNavigation({
+  pathname,
+  dimmed,
+}: {
+  readonly pathname: string
+  readonly dimmed: boolean
+}) {
   return (
-    <nav
-      aria-label={m.nav_primary()}
-      className={cx(
-        'flex items-center gap-1',
-        'transition-opacity duration-[var(--dur-base)] ease-[var(--ease-standard)]',
-        dimmed && 'opacity-45',
-      )}
-    >
-      {DESTINATIONS.map(({ to, label, icon: Icon, arrivesIn }) => {
-        const disabled = arrivesIn !== undefined || dimmed
+    <nav aria-label={m.nav_primary()} className="shell-nav">
+      {DESTINATIONS.map(({ to, label, later }) => {
+        const disabled = later === true || dimmed
         const active = pathname.startsWith(to)
-        const text = NAV_LABELS[label]?.() ?? label
+        const text = label()
 
-        const className = cx(
-          'inline-flex items-center gap-2 h-9 px-3 font-ui text-sm rounded-[var(--radius-chip)]',
-          'transition-colors duration-[var(--dur-base)] ease-[var(--ease-standard)]',
-          // `text-sage-ink`, not `text-sage`: the brand sage reads 4.19:1 on its own tint, which
-          // fails AA at this size. That pair is exactly what the ink half of the token exists for.
-          active ? 'bg-sage-tint text-sage-ink font-semibold' : 'text-ink hover:bg-sage-tint',
-          disabled && 'pointer-events-none text-nav-dimmed',
-        )
-
-        // A disabled destination is still announced, with its reason — "present but not yet
+        // A disabled destination is still announced, with its reason: "present but not yet
         // available" is information, and hiding it would make the nav silently incomplete.
         return disabled ? (
           <span
             key={to}
             aria-disabled="true"
-            title={arrivesIn === undefined ? undefined : m.nav_arrives_later()}
-            className={className}
+            title={later === true ? m.nav_arrives_later() : undefined}
+            className={cx('shell-nav__link', later === true && 'shell-nav__link--later')}
+            data-active={active || undefined}
           >
-            <Icon size={18} />
             {text}
           </span>
         ) : (
-          <Link key={to} to={to} className={className}>
-            <Icon size={18} />
+          <Link
+            key={to}
+            to={to}
+            className="shell-nav__link"
+            data-active={active || undefined}
+            aria-current={active ? 'page' : undefined}
+          >
             {text}
           </Link>
         )
@@ -104,52 +80,125 @@ function PrimaryNavigation({ dimmed }: { readonly dimmed: boolean }) {
   )
 }
 
-export function Shell() {
-  const attemptInProgress = useAppStore((state) => state.attemptInProgress)
+const LANGUAGES: readonly { readonly value: Language; readonly short: string }[] = [
+  { value: 'uk', short: 'UA' },
+  { value: 'en', short: 'EN' },
+]
+
+/**
+ * UA / EN, as on the brand site. Persisted first, then Paraglide's locale switched, which reloads
+ * the document: the one way every already-rendered string is guaranteed to switch. The same order
+ * the settings screen uses, for the same reason: the reload must not race the write.
+ */
+function LanguageSwitch({ disabled }: { readonly disabled: boolean }) {
+  const current = useAppStore((state) => state.settings.interfaceLanguage)
+  const changeSettings = useAppStore((state) => state.changeSettings)
+
+  async function choose(language: Language): Promise<void> {
+    if (language === current) return
+    await changeSettings({ interfaceLanguage: language })
+    await setLocale(language)
+  }
 
   return (
-    <div className="min-h-dvh flex flex-col bg-paper text-ink">
+    // biome-ignore lint/a11y/useSemanticElements: a pair of toggle buttons, not a fieldset of inputs
+    <div role="group" aria-label={m.nav_language()} className="shell-lang">
+      {LANGUAGES.map(({ value, short }) => (
+        <button
+          key={value}
+          type="button"
+          lang={value}
+          aria-pressed={value === current}
+          disabled={disabled}
+          onClick={() => void choose(value)}
+          className="shell-lang__option"
+        >
+          {short}
+        </button>
+      ))}
+    </div>
+  )
+}
+
+export function Shell() {
+  const attemptInProgress = useAppStore((state) => state.attemptInProgress)
+  const pathname = useRouterState({ select: (state) => state.location.pathname })
+  // The product page is a full-bleed landing page; every other screen is an app column.
+  const landing = pathname === '/'
+
+  return (
+    <div className="shell" data-landing={landing || undefined}>
       <a
         href="#main"
-        className="sr-only focus:not-sr-only focus:absolute focus:m-3 focus:rounded-[var(--radius-field)] focus:bg-paper-raised focus:px-3 focus:py-2"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-4 focus:z-50 focus:rounded-[var(--radius-pill)] focus:bg-ink focus:px-4 focus:py-2.5 focus:text-paper"
       >
         {m.skip_to_content()}
       </a>
 
-      <header className="border-b-[length:var(--border-hairline)] border-hairline">
-        <div className="mx-auto flex h-14 w-full max-w-6xl items-center gap-6 px-6">
-          <Link to="/" className="flex items-center gap-2 font-ui font-bold">
-            <Mark size={26} />
-            <span>{m.app_name()}</span>
+      <header className="shell-head" data-dimmed={attemptInProgress || undefined}>
+        <div className="shell-head__inner shell-container">
+          <Link to="/" className="shell-head__logo" aria-label={m.nav_home()}>
+            <Wordmark />
           </Link>
-          <PrimaryNavigation dimmed={attemptInProgress} />
+
+          <PrimaryNavigation pathname={pathname} dimmed={attemptInProgress} />
+
+          <div className="shell-head__right">
+            {attemptInProgress ? (
+              <span aria-disabled="true" className="shell-head__settings">
+                <IconSettings size={18} />
+                <span className="shell-head__settings-label">{m.nav_settings()}</span>
+              </span>
+            ) : (
+              <Link
+                to="/settings"
+                className="shell-head__settings"
+                data-active={pathname.startsWith('/settings') || undefined}
+              >
+                <IconSettings size={18} />
+                <span className="shell-head__settings-label">{m.nav_settings()}</span>
+              </Link>
+            )}
+            <LanguageSwitch disabled={attemptInProgress} />
+            {attemptInProgress ? (
+              <span aria-disabled="true" className={buttonClass('primary', 'sm')}>
+                {m.nav_cta()}
+              </span>
+            ) : (
+              <Link to="/today" className={buttonClass('primary', 'sm')}>
+                {m.nav_cta()}
+              </Link>
+            )}
+          </div>
         </div>
         {attemptInProgress && (
-          // FR-057: not merely dimmed — it says why, in the mono voice the design uses for
-          // machine-state notes.
-          <p
-            role="status"
-            className="border-t-[length:var(--border-hairline)] border-hairline bg-sage-tint/40 px-6 py-1 text-center font-mono text-xs text-muted"
-          >
+          // Not merely dimmed: it says why.
+          <p role="status" className="shell-head__note">
             {m.nav_muted_during_attempt()}
           </p>
         )}
       </header>
 
       {/*
-        FR-067. Below 1024 px the learner is *told the target platform*, not shown a broken typing
-        line. A media query rather than a JavaScript check, because it must be right on the first
-        paint and must follow a window resize with no re-render — and because the typing screen
-        below it is genuinely unusable, not merely cramped: ticket 20's rail plus a full keyboard
-        guide does not fit, and a squeezed guide teaches the wrong finger positions.
+        Below 1024 px the learner is *told the target platform*, not shown a broken typing line.
+        A media query rather than a JavaScript check, because it must be right on the first paint
+        and must follow a window resize with no re-render, and because the typing screen below it
+        is genuinely unusable, not merely cramped: the rail plus a full keyboard guide does not
+        fit, and a squeezed guide teaches the wrong finger positions.
       */}
-      <div className="hidden max-[1023px]:block px-6 py-10">
-        <p className="mx-auto max-w-md text-center font-ui leading-relaxed text-ink">
-          {m.narrow_window_notice()}
-        </p>
+      <div className="hidden max-[1023px]:block px-6 py-16">
+        <div className="mx-auto max-w-md">
+          <Wordmark size={22} />
+          <p className="mt-6 font-ui text-lg leading-relaxed text-ink">
+            {m.narrow_window_notice()}
+          </p>
+        </div>
       </div>
 
-      <main id="main" className="mx-auto w-full max-w-6xl flex-1 px-6 py-8 max-[1023px]:hidden">
+      <main
+        id="main"
+        className={cx('shell-main max-[1023px]:hidden', !landing && 'shell-container')}
+      >
         <BootGate>
           <Outlet />
         </BootGate>
@@ -157,21 +206,15 @@ export function Shell() {
 
       <CommandPalette />
 
-      <footer className="border-t-[length:var(--border-hairline)] border-hairline">
-        <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center gap-x-5 gap-y-1 px-6 py-4 font-ui text-xs text-muted">
-          <Link to="/formulas" className="hover:text-sage">
-            {m.footer_formulas()}
-          </Link>
-          <Link to="/licences" className="hover:text-sage">
-            {m.footer_licences()}
-          </Link>
-          <Link to="/privacy" className="hover:text-sage">
-            {m.footer_privacy()}
-          </Link>
-          <Link to="/about" className="hover:text-sage">
-            {m.footer_about()}
-          </Link>
-          <span className="ml-auto font-mono">{m.footer_note()}</span>
+      <footer className="shell-foot">
+        <div className="shell-foot__inner shell-container">
+          <nav aria-label={m.footer_nav()} className="shell-foot__links">
+            <Link to="/formulas">{m.footer_formulas()}</Link>
+            <Link to="/licences">{m.footer_licences()}</Link>
+            <Link to="/privacy">{m.footer_privacy()}</Link>
+            <Link to="/about">{m.footer_about()}</Link>
+          </nav>
+          <span className="shell-foot__note">{m.footer_note()}</span>
         </div>
       </footer>
     </div>

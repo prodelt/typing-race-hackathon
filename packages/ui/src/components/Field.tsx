@@ -30,9 +30,13 @@ export function Field({ label, hint, invalid = false, className, ...rest }: Fiel
         aria-describedby={hint === undefined ? undefined : hintId}
         aria-invalid={invalid || undefined}
         className={cx(
-          'h-10 px-3 font-ui text-ink bg-paper-raised',
+          'h-11 px-4 font-ui text-ink bg-paper-raised',
           'rounded-[var(--radius-field)] border-[length:var(--border-hairline)]',
-          invalid ? 'border-terracotta' : 'border-hairline-strong',
+          'transition-[border-color,box-shadow] duration-[var(--dur-base)] ease-[var(--ease-enter)]',
+          'hover:border-ink focus:border-ink',
+          invalid
+            ? 'border-terracotta shadow-[inset_0_-3px_0_var(--color-terracotta)]'
+            : 'border-hairline-strong',
           className,
         )}
         {...rest}

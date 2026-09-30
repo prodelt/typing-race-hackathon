@@ -6,7 +6,7 @@
   "sideEffects": [
     "*.css"
   ],
-  "description": "Serene Script: tokens as CSS custom properties, the three themes, primitives, icons and the motion flag.",
+  "description": "The design system: tokens as CSS custom properties, the three themes, primitives, icons and the motion flag.",
   "exports": {
     ".": "./src/index.ts",
     "./tokens.css": "./src/tokens.css",

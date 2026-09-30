@@ -60,24 +60,32 @@ export function Keycap({
       aria-hidden={!awaited}
       className={cx(
         'inline-flex items-center justify-center select-none',
-        'h-11 font-mono text-[0.95rem] leading-none',
+        'h-11 font-ui font-medium text-[0.95rem] leading-none',
         'rounded-[var(--radius-keycap)] border-[length:var(--border-hairline)]',
-        // The 2px inset bottom bevel — ticket 20's entire tactile budget. An inset shadow rather
-        // than a gradient, so it survives the low-vision theme, where gradients read as smudges.
+        // The 2px inset bottom bevel: the entire tactile budget. An inset shadow rather than a
+        // gradient, so it survives the low-vision theme, where gradients read as smudges.
         'shadow-[inset_0_calc(-1*var(--keycap-bevel))_0_0_rgb(0_0_0/8%)]',
-        'transition-[background-color,border-color,opacity,transform]',
-        'duration-[var(--dur-quick)] ease-[var(--ease-standard)]',
-        locked ? 'opacity-30' : TIERS[tier],
-        awaited && 'ring-2 ring-offset-1 scale-105',
+        'transition-[background-color,border-color,color,opacity,transform]',
+        'duration-[var(--dur-quick)] ease-[var(--ease-enter)]',
+        // The awaited key is the one place the keyboard uses the brand red, at full strength
+        // whatever its guide tier, so the eye finds it without searching.
+        awaited ? 'opacity-100 scale-105' : locked ? 'opacity-30' : TIERS[tier],
         WIDTHS[width],
         className,
       )}
-      style={{
-        color: locked ? 'var(--color-muted)' : ink,
-        backgroundColor: locked ? 'var(--color-paper)' : tint,
-        borderColor: locked ? 'var(--color-hairline)' : line,
-        ...(awaited ? { ['--tw-ring-color' as string]: ink } : {}),
-      }}
+      style={
+        awaited
+          ? {
+              color: 'var(--color-on-accent)',
+              backgroundColor: 'var(--color-accent)',
+              borderColor: 'var(--color-accent-deep)',
+            }
+          : {
+              color: locked ? 'var(--color-muted)' : ink,
+              backgroundColor: locked ? 'var(--color-paper)' : tint,
+              borderColor: locked ? 'var(--color-hairline)' : line,
+            }
+      }
       {...rest}
     >
       {width === 'space' ? '' : glyph}

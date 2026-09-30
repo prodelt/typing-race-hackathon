@@ -50,3 +50,27 @@ export function prefersReducedMotion(): boolean {
   if (typeof matchMedia !== 'function') return false
   return matchMedia('(prefers-reduced-motion: reduce)').matches
 }
+
+/**
+ * The motion level the document is showing right now, read from the `data-motion` attribute the
+ * app writes on `<html>`. For code that runs outside React's state (a canvas loop, a scroll
+ * reveal) and must obey the same switch as the CSS. Without a document, or before the attribute is
+ * written, it answers from the media query alone.
+ */
+export function currentMotion(): ResolvedMotion {
+  if (typeof document === 'undefined') return 'full'
+  const value = document.documentElement.dataset['motion']
+  if (value === 'full' || value === 'reduced' || value === 'off') return value
+  return prefersReducedMotion() ? 'reduced' : 'full'
+}
+
+/**
+ * Calls `onChange` whenever the document's motion level changes, whether the learner flipped the
+ * setting or the operating system did. Returns an unsubscribe.
+ */
+export function watchMotion(onChange: (motion: ResolvedMotion) => void): () => void {
+  if (typeof MutationObserver !== 'function' || typeof document === 'undefined') return () => {}
+  const observer = new MutationObserver(() => onChange(currentMotion()))
+  observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-motion'] })
+  return () => observer.disconnect()
+}
