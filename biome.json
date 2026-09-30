@@ -7,15 +7,7 @@
   },
   "files": {
     "ignoreUnknown": true,
-    "includes": [
-      "**",
-      "!.specify",
-      "!.claude",
-      "!skills-lock.json",
-      "!supabase/functions",
-      "!**/paraglide",
-      "!**/*.gen.ts"
-    ]
+    "includes": ["**", "!.claude", "!supabase/functions", "!**/paraglide", "!**/*.gen.ts"]
   },
   "formatter": {
     "enabled": true,

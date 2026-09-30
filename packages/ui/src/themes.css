@@ -12,7 +12,7 @@
  */
 
 /* ---------------------------------------------------------------------------------------------
- * Dark — derived in ticket 20, because the pairs in AGENTS.md are token variants, not a theme.
+ * Dark — a theme of its own, because the pairs in DECISIONS.md are token variants, not a theme.
  * Sage and terracotta are lightened so both clear 4.5:1 against the dark ground.
  * ------------------------------------------------------------------------------------------- */
 :root[data-theme="dark"] {

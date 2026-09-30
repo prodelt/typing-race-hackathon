@@ -42,7 +42,7 @@ export function fingerLabel({ hand, finger }: FingerAssignment): string {
   return `${hand === 'left' ? m.exercise_hand_left() : m.exercise_hand_right()} ${name}`
 }
 
-/** Stored as U+0027, shown as U+2019 (AGENTS.md product rules). */
+/** Stored as U+0027, shown as U+2019 (DECISIONS.md product rules). */
 export function displayChar(char: string): string {
   return char === "'" ? '’' : char
 }

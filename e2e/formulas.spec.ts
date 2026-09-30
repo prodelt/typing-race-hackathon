@@ -59,7 +59,7 @@ test.describe('US4 the public Formulas page', () => {
 
   test('the other public pages open with no stored progress too', async ({ page }) => {
     // The product page, formulas, licences, privacy and about are the only screens a visitor
-    // without a learner may reach (AGENTS.md, product rules).
+    // without a learner may reach (DECISIONS.md, product rules).
     for (const [path, heading] of [
       ['/', 'Навчися друкувати, не дивлячись на клавіатуру'],
       ['/licences', 'Ліцензії'],

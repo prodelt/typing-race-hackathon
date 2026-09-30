@@ -44,7 +44,7 @@
   /*
    * Text *on* a tint needs its own value. The brand sage reads 4.19:1 against its own tint at
    * 12px, which fails WCAG AA — so small text on a tint uses the darker half of the pair
-   * `AGENTS.md` already names (#316342 and #BA1A1A). The brand colours themselves are unchanged:
+   * `DECISIONS.md` already names (#316342 and #BA1A1A). The brand colours themselves are unchanged:
    * this is about legibility at chip size, not about the palette.
    */
   --color-sage-ink: #316342;

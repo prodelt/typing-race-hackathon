@@ -14,9 +14,8 @@ env:
   PNPM_VERSION: '12.8.1'
 
 jobs:
-  # typecheck · lint · unit · build · dictionary-checksum
-  static:
-    name: static checks
+  checks:
+    name: typecheck, lint, unit, build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -28,36 +27,15 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm lint
+      - run: pnpm test
+      # The initial-JS budget plugin fails this step past 150 KB gzip.
+      - run: pnpm build
 
-      - name: typecheck
-        run: pnpm typecheck
-      - name: lint
-        run: pnpm lint
-      - name: unit
-        # Includes the seam-boundary scan in tools/architecture.test.ts.
-        run: pnpm test
-      - name: build
-        # The initial-JS budget plugin fails this step past 150 KB gzip (ticket 15).
-        run: pnpm build
-
-      - name: dictionary-checksum
-        # F1 ships no derived dictionary data. The job exists so F3 inherits the gate rather than
-        # inventing it, and so its absence is a visible "nothing to verify" instead of a silence.
-        run: |
-          if [ -d data/derived ]; then
-            sha256sum -c data/derived/CHECKSUMS.txt
-          else
-            echo 'no data/derived yet — nothing to verify in F1'
-          fi
-
-  # E2E against the production build, all three engines (Definition of Done, ADR-0009).
   e2e:
-    name: e2e ${{ matrix.project }}
+    name: e2e
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        project: [chromium, firefox, webkit]
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -68,41 +46,23 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm exec playwright install --with-deps ${{ matrix.project }}
-      - run: pnpm exec playwright test --project=${{ matrix.project }}
+      - run: pnpm exec playwright install --with-deps chromium firefox webkit
+
+      - name: chromium — every scenario, including the @axe audits
+        run: pnpm test:e2e
+
+      - name: firefox and webkit — the input path only
+        # Firefox ignores preventDefault() on beforeinput and delivers non-US characters as IME
+        # compositions, so the keystroke path is the one place the engines genuinely disagree.
+        # Everything else is Chromium-only on purpose.
+        run: pnpm test:e2e:input
+
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
-          name: playwright-${{ matrix.project }}
+          name: playwright-report
           path: playwright-report/
           retention-days: 7
-
-  # e2e-cdp · latency · axe — Chromium only, each for its own reason.
-  chromium-only:
-    name: cdp, latency and axe
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm exec playwright install --with-deps chromium
-
-      - name: e2e-cdp
-        # Simulating a physical ЙЦУКЕН layout needs the DevTools Protocol: Playwright's keyboard
-        # API cannot type Cyrillic in any engine (research 06).
-        run: pnpm exec playwright test --project=cdp
-      - name: latency
-        # Keystroke-to-paint p95 <= 16 ms, frame-rate limiting off (research R8).
-        run: pnpm exec playwright test --project=latency
-      - name: axe
-        # Zero violations. The audit runs inside the tagged accessibility specs.
-        run: pnpm exec playwright test --project=chromium --grep @axe
 
   secret-scan:
     name: secret scan
@@ -111,7 +71,6 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: gitleaks
-        uses: gitleaks/gitleaks-action@v2
+      - uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,16 +1,10 @@
-# Local agent scratch — only the wayfinder map and its tickets are published
-.tasks/
-.scratch/*
-!.scratch/typing-race-hackathon/
+# Local agent scratch
+.scratch/
 
-# Third-party skill copies and cloned reference repos.
-# Restore with skills-lock.json (Matt Pocock skills) and `specify init` (Spec Kit).
-.agents/skills/
+# Third-party skill copies (installed per checkout) and Claude Code worktrees
 .claude/skills/
 .claude/worktrees/
 .claude/settings.local.json
-/skills/
-/spec-kit/
 
 # Organizer snapshot: REVIEW_REQUIRED content, cloned separately, never committed
 /tasks/

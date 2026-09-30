@@ -118,7 +118,7 @@ export function streakFor(progress: Progress, scaleId: string): number {
 
 export { MASTERY_STREAK }
 
-/** U+0027 is stored, U+2019 is displayed (AGENTS.md). */
+/** U+0027 is stored, U+2019 is displayed (DECISIONS.md). */
 export function displayChar(char: string): string {
   return char === "'" ? '’' : char
 }

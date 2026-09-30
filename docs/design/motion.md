@@ -1,6 +1,6 @@
 # Motion specification — "Serene Script"
 
-Decided in [ticket 20](../../.scratch/typing-race-hackathon/issues/20-key-screen-mockups-and-motion-spec.md); the library choices come from [research 04](../research/04-animation-libraries.md). Hi-fi mockups: the Claude Design canvas "Typing-Race — Key Screens & Motion", source on branch `prototype/20-key-screens`.
+The library choices come from [research 04](../research/04-animation-libraries.md). Hi-fi mockups: the Claude Design canvas "Typing-Race — Key Screens & Motion", source on branch `prototype/20-key-screens`.
 
 ## The rule
 
@@ -8,7 +8,7 @@ Decided in [ticket 20](../../.scratch/typing-race-hackathon/issues/20-key-screen
 
 Three hard consequences:
 
-1. **No JavaScript animation runs per keystroke.** The typing line is CSS only. The keystroke path is outside React ([ADR-0003](../adr/0003-react-spa-with-input-engine-outside-the-framework.md)) and must stay inside the p95 keystroke-to-paint budget of 16 ms enforced in CI.
+1. **No JavaScript animation runs per keystroke.** The typing line is CSS only. The keystroke path is outside React (`DECISIONS.md`) and must stay inside the p95 keystroke-to-paint budget of 16 ms, checked by `pnpm test:latency`.
 2. **Error feedback never moves the text.** A wrong keystroke changes colour, background and underline in place. Shake, jitter and horizontal nudge are forbidden: they reflow the line the learner is reading.
 3. **Motion is never the only carrier of meaning.** Every animated state change also has a static form (colour, count, label), because the motion flag can be off and screenshot tests always run with it off.
 

@@ -6,10 +6,9 @@ const BASE_URL = `http://127.0.0.1:${PORT}`
 /**
  * Tags that decide which engines a spec runs on.
  *
- * `@input` is the exception ADR-0009 carves out of "a lane may iterate on Chromium": research 06
- * found Firefox ignores `preventDefault()` on `beforeinput`, so a Chromium-only green run on the
- * keystroke path would be misleading rather than merely weaker. Input-path specs therefore run on
- * all three engines from their first commit — `pnpm test:e2e:input`.
+ * `@input` is the exception to "a lane iterates on Chromium": Firefox ignores `preventDefault()`
+ * on `beforeinput`, so a Chromium-only green run on the keystroke path would be misleading rather
+ * than merely weaker. Input-path specs run on all three engines — `pnpm test:e2e:input`.
  *
  * `@cdp` is Chromium-only forever: simulating a physical ЙЦУКЕН layout needs the Chrome DevTools
  * Protocol, because Playwright's keyboard API cannot type Cyrillic in any engine.
@@ -18,9 +17,11 @@ const CDP_ONLY = /@cdp/
 
 export default defineConfig({
   testDir: './e2e',
-  // Every scenario runs against the production build, per the Definition of Done.
+  // Every scenario runs against the production build.
   webServer: {
-    command: `pnpm build && pnpm preview --port ${PORT} --strictPort`,
+    // --host 127.0.0.1 is load-bearing: without it `vite preview` binds localhost, which resolves
+    // to ::1 first on Windows, and the poll against 127.0.0.1 below never connects.
+    command: `pnpm build && pnpm preview --port ${PORT} --strictPort --host 127.0.0.1`,
     url: BASE_URL,
     reuseExistingServer: !process.env['CI'],
     timeout: 180_000,
@@ -31,7 +32,7 @@ export default defineConfig({
   retries: process.env['CI'] ? 1 : 0,
   reporter: process.env['CI'] ? [['github'], ['html', { open: 'never' }]] : [['list']],
   expect: {
-    // Visual comparisons run with motion off, which is what makes them deterministic (FR-064).
+    // Visual comparisons run with motion off, which is what makes them deterministic.
     toHaveScreenshot: { maxDiffPixelRatio: 0.01 },
   },
   use: {

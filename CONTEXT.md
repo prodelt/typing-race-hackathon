@@ -4,7 +4,7 @@ Comprehensive domain model and conceptual glossary for the Typing-Race touch-typ
 
 ## People
 
-- **Learner (Учень)**: A signed-in person progressing through the curriculum; every learner has an account (see ADR-0002).
+- **Learner (Учень)**: A signed-in person progressing through the curriculum; every learner has an account (see `DECISIONS.md`).
   _Avoid_: Guest, anonymous user, visitor
 
 ## Pedagogical Core Concepts
@@ -68,7 +68,7 @@ Comprehensive domain model and conceptual glossary for the Typing-Race touch-typ
 ## Curriculum Data Model
 
 The five nouns the code uses for the shipped curriculum data. Field-level detail lives in
-[`specs/001-typing-core/data-model.md`](specs/001-typing-core/data-model.md); this is the naming.
+the archived data model (`git show archive/process-harness-2026-09-30:specs/001-typing-core/data-model.md`); this is the naming.
 
 - **Layout (Розкладка)**: One keyboard layout as data — its keys, its eight home anchors and its
   Unlock Order. Two exist: `yq` (ЙЦУКЕН, Ukrainian) and `qwerty` (English). A Layout is generated
