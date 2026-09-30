@@ -25,3 +25,15 @@ registerHooks({
     throw lastError
   },
 })
+
+// `curriculum` imports its config JSON the bundler's way, without `with { type: 'json' }`; Node
+// requires the attribute, so it is supplied here for every JSON module.
+registerHooks({
+  load(url, context, nextLoad) {
+    if (!url.endsWith('.json')) return nextLoad(url, context)
+    return nextLoad(url, {
+      ...context,
+      importAttributes: { ...context.importAttributes, type: 'json' },
+    })
+  },
+})

@@ -32,6 +32,7 @@ interface Destination {
 const DESTINATIONS: Destination[] = [
   { to: '/today', label: m.nav_today },
   { to: '/path', label: m.nav_path },
+  { to: '/academy', label: m.academy_nav },
   { to: '/review', label: m.nav_review, later: true },
   { to: '/races', label: m.nav_races, later: true },
   { to: '/leaderboards', label: m.nav_leaderboards, later: true },

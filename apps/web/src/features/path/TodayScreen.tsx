@@ -106,6 +106,9 @@ export function TodayScreen() {
         <Link to="/path" className={LINK_SECONDARY}>
           {m.path_open_path()}
         </Link>
+        <Link to="/academy" className={LINK_SECONDARY} data-testid="today-academy">
+          {m.academy_stage_open()}
+        </Link>
       </nav>
     </div>
   )

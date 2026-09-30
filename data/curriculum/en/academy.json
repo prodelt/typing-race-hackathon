@@ -1,0 +1,1287 @@
+{
+  "format": "typing-race/academy@1",
+  "language": "en",
+  "layout": "qwerty",
+  "algorithmVersion": "1.0.0",
+  "modules": [
+    {
+      "id": "warm-up",
+      "step": "keys",
+      "kind": "warmup",
+      "title": {
+        "uk": "Розминка: ряди",
+        "en": "Warm-up: the rows"
+      },
+      "summary": {
+        "uk": "Базовий ряд, верхній і нижній: руки стають на місце.",
+        "en": "Home, top and bottom rows: the hands find their place."
+      },
+      "exercises": [
+        {
+          "id": "academy.en.warm-up.1",
+          "title": "Home Row: Basic Positions",
+          "text": "a s d f j k l a s d f j k l f d s a l k j a f d s j l k",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.warm-up.2",
+          "title": "Home Row: Rhythms",
+          "text": "asdf jkl; asdf jkl; asdf jkl; jkl; asdf",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.warm-up.3",
+          "title": "Finger Pairs",
+          "text": "fj dk sl a; fj dk sl a; a; sl dk fj",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.warm-up.4",
+          "title": "Common Short Words",
+          "text": "sad fad lad ask fall flask dash jail lake fall ask dad sad",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.warm-up.5",
+          "title": "Top Row Reach",
+          "text": "q w e r t y u i o p e r t y u i o",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.warm-up.6",
+          "title": "Bottom Row Reach",
+          "text": "z x c v b n m v b n m z x c v b n",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.warm-up.7",
+          "title": "Top Row: Finger Reach",
+          "text": "q w e r t y u i o p q a w s e d r f u j i k o l p",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.warm-up.8",
+          "title": "Bottom Row Practice",
+          "text": "z x c v b n m a z s x d c f v j n k m l",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.warm-up.9",
+          "title": "Top Row: Common Words",
+          "text": "tree rope wire type your power quiet write port",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        }
+      ]
+    },
+    {
+      "id": "finger-control",
+      "step": "keys",
+      "kind": "warmup",
+      "title": {
+        "uk": "Контроль пальців",
+        "en": "Finger control"
+      },
+      "summary": {
+        "uk": "Ізоляція кожного пальця й дзеркальні рухи обох рук.",
+        "en": "Each finger in isolation, then mirrored moves of both hands."
+      },
+      "exercises": [
+        {
+          "id": "academy.en.finger-control.1",
+          "title": "Pinky Control",
+          "text": "a; a; a; a; a; a; ;a ;a ;a ;a ;a ;a a; ;a a; ;a a; ;a",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.finger-control.2",
+          "title": "Ring Finger Control",
+          "text": "sl sl sl sl sl ls ls ls ls ls sl ls sl ls sl ls sl ls",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.finger-control.3",
+          "title": "Middle Finger Control",
+          "text": "dk dk dk dk dk kd kd kd kd kd dk kd dk kd dk kd dk kd",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.finger-control.4",
+          "title": "Index Finger Control",
+          "text": "fj fj fj fj fj jf jf jf jf jf fj jf fj jf fj jf fj jf",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.finger-control.5",
+          "title": "Outside → Inside",
+          "text": "a; sl dk fj a; sl dk fj a; sl dk fj a; sl dk fj a; sl dk fj",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.finger-control.6",
+          "title": "Inside → Outside",
+          "text": "fj dk sl a; fj dk sl a; fj dk sl a; fj dk sl a; fj dk sl a;",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.finger-control.7",
+          "title": "Symmetric Pairs",
+          "text": "a; fj sl dk a; fj sl dk a; fj sl dk a; fj sl dk a; fj sl dk",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.finger-control.8",
+          "title": "Mirror Roll",
+          "text": "asdf ;lkj asdf ;lkj asdf ;lkj asdf ;lkj asdf ;lkj asdf ;lkj",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        }
+      ]
+    },
+    {
+      "id": "letters",
+      "step": "keys",
+      "kind": "letters",
+      "title": {
+        "uk": "Слабкі літери й вертикалі",
+        "en": "Weak letters and vertical reaches"
+      },
+      "summary": {
+        "uk": "Q, X, Z, J, K і стовпчики клавіш, які палець проходить згори донизу.",
+        "en": "Q, X, Z, J, K and the key columns a finger travels top to bottom."
+      },
+      "exercises": [
+        {
+          "id": "academy.en.letters.1",
+          "title": "q/x/z Words",
+          "text": "quiz quick queen quiet quote quake quality quantum extra exact exile exotic oxygen tuxedo pixel zero zone fizz buzz breeze freeze zigzag puzzle",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.letters.2",
+          "title": "j/k Focus",
+          "text": "jacket jungle judge juice major inject object project reject kayak blanket basket bracket pocket rocket socket ticket knack joke baker maker shaker spoken broken taken awoken",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.letters.3",
+          "title": "Vowel-Start Words",
+          "text": "abandon about above absorb abuse accept account achieve across elephant electric element eleven email embrace emerge emotion island isolate issue itself ivory idea identity imagine ignore",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.letters.4",
+          "title": "q/a/z - left pinky column",
+          "text": "qa aq az za qaz zaq quiz equal zebra quartz plaza",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.letters.5",
+          "title": "w/s/x - left ring column",
+          "text": "ws sw sx xs wsx xsw was saw wax waxes swan sweat switch",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.letters.6",
+          "title": "e/d/c - left middle column",
+          "text": "ed de ec ce dc cd decide decade cedar exceed edited needed",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.letters.7",
+          "title": "i/k/, + o/l/. - right verticals",
+          "text": "ik ki i, ,i k, ,k ol lo o. .o look local kilo skill milk",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        }
+      ]
+    },
+    {
+      "id": "bigrams",
+      "step": "pairs",
+      "kind": "bigrams",
+      "title": {
+        "uk": "Найчастотніші біграми",
+        "en": "The most frequent bigrams"
+      },
+      "summary": {
+        "uk": "Пари літер усередині слів, зважені частотою слів, у яких вони трапляються.",
+        "en": "Letter pairs inside words, weighted by the frequency of the words that hold them."
+      },
+      "exercises": [
+        {
+          "id": "academy.en.bigrams.1",
+          "title": "th · he",
+          "text": "th th th the that this th th with there they he he he here she her he he when them where",
+          "focus": "th he",
+          "targetSpm": null,
+          "source": "derived"
+        },
+        {
+          "id": "academy.en.bigrams.2",
+          "title": "ou · in",
+          "text": "ou ou ou you your out ou ou about would our in in in think going something in in doing thing into",
+          "focus": "ou in",
+          "targetSpm": null,
+          "source": "derived"
+        },
+        {
+          "id": "academy.en.bigrams.3",
+          "title": "er · an",
+          "text": "er er er there here her er er where were very an an an and can want an an man mean thank",
+          "focus": "er an",
+          "targetSpm": null,
+          "source": "derived"
+        },
+        {
+          "id": "academy.en.bigrams.4",
+          "title": "yo · re",
+          "text": "yo yo yo you your yourself yo yo everyone anyone young re re re are there here re re where were really",
+          "focus": "yo re",
+          "targetSpm": null,
+          "source": "derived"
+        },
+        {
+          "id": "academy.en.bigrams.5",
+          "title": "ha · at",
+          "text": "ha ha ha that what have ha ha had has thank at at at great father matter at at later watch eat",
+          "focus": "ha at",
+          "targetSpm": null,
+          "source": "derived"
+        },
+        {
+          "id": "academy.en.bigrams.6",
+          "title": "it · ng",
+          "text": "it it it with little wait it it without bit sit ng ng ng going something doing ng ng thing anything nothing",
+          "focus": "it ng",
+          "targetSpm": null,
+          "source": "derived"
+        },
+        {
+          "id": "academy.en.bigrams.7",
+          "title": "th/he/ther - English rhythm",
+          "text": "the there then these those other rather mother weather whether",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.bigrams.8",
+          "title": "re/er - reverse bigram",
+          "text": "re er red read real rare error never render return reverse",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        }
+      ]
+    },
+    {
+      "id": "same-finger",
+      "step": "pairs",
+      "kind": "sameFinger",
+      "title": {
+        "uk": "Один палець, дві клавіші",
+        "en": "One finger, two keys"
+      },
+      "summary": {
+        "uk": "Найчастіші переходи, які друкує той самий палець: найповільніше місце будь-якого тексту.",
+        "en": "The most frequent moves typed by the same finger: the slowest spot in any text."
+      },
+      "exercises": [
+        {
+          "id": "academy.en.same-finger.1",
+          "title": "ed · lo",
+          "text": "ed ed ed need wanted happened ed ed called used killed lo lo lo look love long lo lo lot hello looking",
+          "focus": "ed lo",
+          "targetSpm": null,
+          "source": "derived"
+        },
+        {
+          "id": "academy.en.same-finger.2",
+          "title": "de · ce",
+          "text": "de de de made understand dead de de idea under death ce ce ce place nice once ce ce since face police",
+          "focus": "de ce",
+          "targetSpm": null,
+          "source": "derived"
+        },
+        {
+          "id": "academy.en.same-finger.3",
+          "title": "un · my",
+          "text": "un un un around understand found un un run until young my my my myself army enemy my my jimmy mommy mystery",
+          "focus": "un my",
+          "targetSpm": null,
+          "source": "derived"
+        },
+        {
+          "id": "academy.en.same-finger.4",
+          "title": "ec · tr",
+          "text": "ec ec ec because second check ec ec become perfect special tr tr tr try trying true tr tr truth trouble trust",
+          "focus": "ec tr",
+          "targetSpm": null,
+          "source": "derived"
+        },
+        {
+          "id": "academy.en.same-finger.5",
+          "title": "un/nu - right index overload",
+          "text": "un nu under unless unit union unusual unused nuance annual",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.same-finger.6",
+          "title": "fr/rf/fv/vf - left index",
+          "text": "fr rf fv vf fry from frame fresh craft draft drift verify",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.same-finger.7",
+          "title": "ol/lo - right ring reverse",
+          "text": "ol lo old only also color follow hollow local slowly colony",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.same-finger.8",
+          "title": "my/ym - right index cross-row",
+          "text": "my ym my ym symbol rhythm system myself mystery dynamic",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        }
+      ]
+    },
+    {
+      "id": "rolls",
+      "step": "pairs",
+      "kind": "rolls",
+      "title": {
+        "uk": "Перекати й чергування рук",
+        "en": "Rolls and hand alternation"
+      },
+      "summary": {
+        "uk": "Сусідні пальці однієї руки підряд, а потім слова, де руки міняються на кожній літері.",
+        "en": "Neighbouring fingers of one hand in a row, then words that switch hands on every letter."
+      },
+      "exercises": [
+        {
+          "id": "academy.en.rolls.1",
+          "title": "as/sa/ask - left pinky+ring",
+          "text": "as sa as sa ask task mask flask bask cask ask task mask flask",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.rolls.2",
+          "title": "df/fd - left mid+index",
+          "text": "df fd dfd fdf fade deaf faded deface drafted drifted fidget",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.rolls.3",
+          "title": "jk/kj/; - right home center",
+          "text": "jk kj jk kj jkl lkj j;k k;j jk; ;kj jkl; ;lkj",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.rolls.4",
+          "title": "kl/lk - right mid+ring",
+          "text": "kl lk klk lkl milk silk bulk sulk chalk stalk walk talk",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.rolls.5",
+          "title": "er · re",
+          "text": "er er er there here her er er where were very re re re are really more re re sure before great",
+          "focus": "er re",
+          "targetSpm": null,
+          "source": "derived"
+        },
+        {
+          "id": "academy.en.rolls.6",
+          "title": "te · as",
+          "text": "te te te tell after better te te wanted listen matter as as as was has please as as last ask case",
+          "focus": "te as",
+          "targetSpm": null,
+          "source": "derived"
+        },
+        {
+          "id": "academy.en.rolls.7",
+          "title": "we · et",
+          "text": "we we we well were went we we week between welcome et et et get let something et et better getting together",
+          "focus": "we et",
+          "targetSpm": null,
+          "source": "derived"
+        },
+        {
+          "id": "academy.en.rolls.8",
+          "title": "Simple Alternation",
+          "text": "aj sk dl f; aj sk dl f; aj sk dl f; aj sk dl f; aj sk dl f;",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.rolls.9",
+          "title": "the · and · for",
+          "text": "the and for with but they she right got did when them",
+          "focus": null,
+          "targetSpm": null,
+          "source": "derived"
+        },
+        {
+          "id": "academy.en.rolls.10",
+          "title": "then · man · hey",
+          "text": "then man hey down make sir god work their than name big",
+          "focus": null,
+          "targetSpm": null,
+          "source": "derived"
+        }
+      ]
+    },
+    {
+      "id": "doubles",
+      "step": "pairs",
+      "kind": "doubles",
+      "title": {
+        "uk": "Подвоєння",
+        "en": "Double letters"
+      },
+      "summary": {
+        "uk": "Два однакові удари поспіль: рівно, без затримки між ними.",
+        "en": "Two identical strokes in a row: even, with no pause between them."
+      },
+      "exercises": [
+        {
+          "id": "academy.en.doubles.1",
+          "title": "ll · ee",
+          "text": "ll ll ll all well will ll ll tell really still ee ee ee see been need ee ee keep feel three",
+          "focus": "ll ee",
+          "targetSpm": null,
+          "source": "derived"
+        },
+        {
+          "id": "academy.en.doubles.2",
+          "title": "oo · ss",
+          "text": "oo oo oo good look too oo oo looking room door ss ss ss miss guess business ss ss boss possible less",
+          "focus": "oo ss",
+          "targetSpm": null,
+          "source": "derived"
+        },
+        {
+          "id": "academy.en.doubles.3",
+          "title": "tt · rr",
+          "text": "tt tt tt little better getting tt tt pretty matter gotta rr rr rr sorry tomorrow worry rr rr married hurry worried",
+          "focus": "tt rr",
+          "targetSpm": null,
+          "source": "derived"
+        },
+        {
+          "id": "academy.en.doubles.4",
+          "title": "Double Letters",
+          "text": "balloon bassoon bittersweet broccoli cappuccino coffee committee corridor daffodil dossier fission giraffe goddess gutter happiness harness jazz kennel assess announce appease affair",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        }
+      ]
+    },
+    {
+      "id": "trigrams",
+      "step": "morphemes",
+      "kind": "trigrams",
+      "title": {
+        "uk": "Найчастотніші триграми",
+        "en": "The most frequent trigrams"
+      },
+      "summary": {
+        "uk": "Трійки літер, які найчастіше трапляються в словах: готові склади для пальців.",
+        "en": "The letter triples most common in words: ready-made syllables for the fingers."
+      },
+      "exercises": [
+        {
+          "id": "academy.en.trigrams.1",
+          "title": "the · you",
+          "text": "the the the the there they the the them then these you you you you your yourself you you young yours younger",
+          "focus": "the you",
+          "targetSpm": null,
+          "source": "derived"
+        },
+        {
+          "id": "academy.en.trigrams.2",
+          "title": "ing · hat",
+          "text": "ing ing ing going something doing ing ing thing anything nothing hat hat hat that what whatever hat hat hate hat chatter",
+          "focus": "ing hat",
+          "targetSpm": null,
+          "source": "derived"
+        },
+        {
+          "id": "academy.en.trigrams.3",
+          "title": "her · and",
+          "text": "her her her there here her her her where other father and and and and understand hand and and hands husband stand",
+          "focus": "her and",
+          "targetSpm": null,
+          "source": "derived"
+        },
+        {
+          "id": "academy.en.trigrams.4",
+          "title": "thi · tha",
+          "text": "thi thi thi this think something thi thi thing anything nothing tha tha tha that thank than tha tha thanks thankful lethal",
+          "focus": "thi tha",
+          "targetSpm": null,
+          "source": "derived"
+        },
+        {
+          "id": "academy.en.trigrams.5",
+          "title": "his · our",
+          "text": "his his his this his history his his whispering whistle whispers our our our your our course our our yourself four hours",
+          "focus": "his our",
+          "targetSpm": null,
+          "source": "derived"
+        },
+        {
+          "id": "academy.en.trigrams.6",
+          "title": "for · wha",
+          "text": "for for for for before forget for for forgive forever forgot wha wha wha what whatever whale wha wha somewhat whatsoever whack",
+          "focus": "for wha",
+          "targetSpm": null,
+          "source": "derived"
+        },
+        {
+          "id": "academy.en.trigrams.7",
+          "title": "in/ng/ing - endings",
+          "text": "in ing sing ring bring thing string typing reading writing",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.trigrams.8",
+          "title": "ou/ow/you - right upper",
+          "text": "out our you your young house sound around power flower",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        }
+      ]
+    },
+    {
+      "id": "morphemes",
+      "step": "morphemes",
+      "kind": "morphemes",
+      "title": {
+        "uk": "Суфікси, закінчення, префікси",
+        "en": "Suffixes, endings, prefixes"
+      },
+      "summary": {
+        "uk": "Частини слова, що повторюються в тисячах слів: -ing, -tion, -ly, un-, re-.",
+        "en": "Word parts repeated across thousands of words: -ing, -tion, -ly, un-, re-."
+      },
+      "exercises": [
+        {
+          "id": "academy.en.morphemes.1",
+          "title": "-ed/-ing switching",
+          "text": "tested testing coded coding moved moving planned planning started starting",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.morphemes.2",
+          "title": "tch/tion/sion",
+          "text": "kitchen scratch watching stretching catching match patch thatch station nation motion question section mention version tension decision collision explosion permission",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.morphemes.3",
+          "title": "-ing · -ed",
+          "text": "ing ing going something doing thing anything nothing everything ed ed need wanted happened called used killed asked",
+          "focus": "ing ed",
+          "targetSpm": null,
+          "source": "derived"
+        },
+        {
+          "id": "academy.en.morphemes.4",
+          "title": "-tion · -ment",
+          "text": "tion tion question information station situation attention position action ment ment moment government apartment department statement appointment treatment",
+          "focus": "tion ment",
+          "targetSpm": null,
+          "source": "derived"
+        },
+        {
+          "id": "academy.en.morphemes.5",
+          "title": "-ly · -ness",
+          "text": "ly ly really only family actually probably exactly finally ness ness business witness happiness goodness darkness highness madness",
+          "focus": "ly ness",
+          "targetSpm": null,
+          "source": "derived"
+        },
+        {
+          "id": "academy.en.morphemes.6",
+          "title": "un- · re-",
+          "text": "un un understand until under uncle unless understood united re re really remember real ready rest read reason",
+          "focus": "un re",
+          "targetSpm": null,
+          "source": "derived"
+        }
+      ]
+    },
+    {
+      "id": "clusters",
+      "step": "morphemes",
+      "kind": "clusters",
+      "title": {
+        "uk": "Скупчення приголосних",
+        "en": "Consonant clusters"
+      },
+      "summary": {
+        "uk": "Str-, -ght, thr-, scr-: кілька приголосних без голосної між ними.",
+        "en": "Str-, -ght, thr-, scr-: several consonants with no vowel between them."
+      },
+      "exercises": [
+        {
+          "id": "academy.en.clusters.1",
+          "title": "str/ght Clusters",
+          "text": "straight strength stretch strange street struggle structure strategy strictly stream strike string strong brought thought fought caught daughter naughty slaughter",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.clusters.2",
+          "title": "thr/wh/wr",
+          "text": "through throw throat throne thrash thrive three threat whale where white while whisper whether whole whom write wrong wrap wrist wrath wreck wrestle wrinkle",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.clusters.3",
+          "title": "sch/scr/spr/squ",
+          "text": "school schedule scheme scholar scratch screen script scroll scream scrub spring spread sprint spray sprinkle sprout splash split splendid squash squeeze squid squint",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.clusters.4",
+          "title": "Silent Letters",
+          "text": "knight knowledge kneel knob knock psalm psychology pterodactyl pneumonia debt subtle doubt lamb comb climb receipt island listen castle whistle mortgage muscle Wednesday February",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        }
+      ]
+    },
+    {
+      "id": "words",
+      "step": "words",
+      "kind": "words",
+      "title": {
+        "uk": "Найчастотніші слова",
+        "en": "The most frequent words"
+      },
+      "summary": {
+        "uk": "Сотня слів, з яких складається половина будь-якого тексту.",
+        "en": "The hundred words that make up half of any text."
+      },
+      "exercises": [
+        {
+          "id": "academy.en.words.1",
+          "title": "Mixed Vocabulary",
+          "text": "name zone box music calm next move bank value",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.words.2",
+          "title": "1-20",
+          "text": "you the to it and that of is in what we me this he for my on have your do",
+          "focus": null,
+          "targetSpm": null,
+          "source": "derived"
+        },
+        {
+          "id": "academy.en.words.3",
+          "title": "21-40",
+          "text": "was no not be are know can with but all so just there here they like get she go if",
+          "focus": null,
+          "targetSpm": null,
+          "source": "derived"
+        },
+        {
+          "id": "academy.en.words.4",
+          "title": "41-60",
+          "text": "right out about up at him now oh one come well her how yeah will got want think as see",
+          "focus": null,
+          "targetSpm": null,
+          "source": "derived"
+        },
+        {
+          "id": "academy.en.words.5",
+          "title": "61-80",
+          "text": "did good who why from let his yes when going time an okay back look us would them where were",
+          "focus": null,
+          "targetSpm": null,
+          "source": "derived"
+        },
+        {
+          "id": "academy.en.words.6",
+          "title": "81-100",
+          "text": "take then had or been our gonna tell really man some say hey could by need something has too more",
+          "focus": null,
+          "targetSpm": null,
+          "source": "derived"
+        }
+      ]
+    },
+    {
+      "id": "marks",
+      "step": "phrases",
+      "kind": "marks",
+      "title": {
+        "uk": "Великі літери, апостроф, дефіс",
+        "en": "Capitals, apostrophe, hyphen"
+      },
+      "summary": {
+        "uk": "Shift протилежною рукою, апостроф і дефіс правим мізинцем.",
+        "en": "Shift with the opposite hand, the apostrophe and hyphen with the right pinky."
+      },
+      "exercises": [
+        {
+          "id": "academy.en.marks.1",
+          "title": "Shift Drill: CamelCase",
+          "text": "JavaScript TypeScript McDonald iPhone GitHub YouTube LinkedIn WiFi PowerPoint PlayStation FedEx PayPal TikTok UNESCO NASA FBI CIA HTML CSS JSON API SDK MVP CEO CFO",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.marks.2",
+          "title": "n't/'re/'ll - contractions",
+          "text": "don't can't won't I'm you're we're they'll she'll it's that's",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.marks.3",
+          "title": "Hyphens",
+          "text": "well-known self-made old-fashioned up-to-date one-on-one mother-in-law brother-in-law day-to-day. Back-to-back face-to-face. Full-time part-time. Hand-to-hand. Twenty-one thirty-three forty-five sixty-seven eighty-nine",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.marks.4",
+          "title": "don't · it's · you're",
+          "text": "don't it's you're that's can't he's what's let's didn't we're there's won't",
+          "focus": "'",
+          "targetSpm": null,
+          "source": "derived"
+        }
+      ]
+    },
+    {
+      "id": "punctuation",
+      "step": "phrases",
+      "kind": "punctuation",
+      "title": {
+        "uk": "Кома, крапка, лапки, числа",
+        "en": "Comma, full stop, quotes, numbers"
+      },
+      "summary": {
+        "uk": "Розділові знаки й цифри між словами, без зупинки ритму.",
+        "en": "Punctuation and digits between words, without breaking the rhythm."
+      },
+      "exercises": [
+        {
+          "id": "academy.en.punctuation.1",
+          "title": "Doubles + Commas",
+          "text": "rabbit, parrot, kitten, puppy, mammal, buffalo, hippo, raccoon, squirrel, grasshopper, jellyfish, butterfly, cattle, llama, gorilla, cheetah, mammoth, bull, bass, trout, herring, cuttlefish, starfish",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.punctuation.2",
+          "title": "Comma/period rhythm",
+          "text": "yes, no. now, later. first, second. clear, fast. slow, accurate.",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.punctuation.3",
+          "title": "Shift + quotes",
+          "text": "\"Yes,\" Anna said. \"No,\" Omar replied. \"Almost.\"",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.punctuation.4",
+          "title": "need, something.",
+          "text": "Need, something, more, down. Make, very, never, only. People, over, because, little.",
+          "focus": ", .",
+          "targetSpm": null,
+          "source": "derived"
+        },
+        {
+          "id": "academy.en.punctuation.5",
+          "title": "please, love.",
+          "text": "Please, love, should, mean. Said, sorry, give, thank. Even, much, doing, sure.",
+          "focus": ", .",
+          "targetSpm": null,
+          "source": "derived"
+        },
+        {
+          "id": "academy.en.punctuation.6",
+          "title": "Brackets & Symbols",
+          "text": "\"hello\" 'world' \"yes\" 'no' 2,",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.punctuation.7",
+          "title": "Numbers + Words",
+          "text": "5 cats 6 dogs 65 raccoons 56 hippos 565 hyenas 465 sirens 645 sheep 656 horses 456 perch 965 swine 12 apples 34 oranges 78 bananas 90 lemons 123 grapes",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.punctuation.8",
+          "title": "Numbers & Email Format",
+          "text": "123 456 789 0 10 20 30 40 email test at mail dot com",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        }
+      ]
+    },
+    {
+      "id": "sentences",
+      "step": "sentences",
+      "kind": "sentences",
+      "title": {
+        "uk": "Речення",
+        "en": "Sentences"
+      },
+      "summary": {
+        "uk": "Два речення поспіль: велика літера, розділові знаки, крапка в кінці.",
+        "en": "Two sentences at a time: a capital, punctuation, a full stop at the end."
+      },
+      "exercises": [
+        {
+          "id": "academy.en.sentences.1",
+          "title": "Basic Sentence Structure",
+          "text": "you are typing write more often keep your fingers home",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.sentences.2",
+          "title": "Accuracy vs Speed",
+          "text": "touch typing is a useful skill accuracy is more important than speed slow practice builds fast typing",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.sentences.3",
+          "title": "Present Simple",
+          "text": "We use the present simple to talk about habits, routines, and things that are generally true. For example, I work in an office, she drinks coffee every morning, and the sun rises in the east.",
+          "focus": null,
+          "targetSpm": null,
+          "source": "knowledge"
+        },
+        {
+          "id": "academy.en.sentences.4",
+          "title": "Present Continuous",
+          "text": "We use the present continuous for actions that are happening now or around the present time. We form it with the verb to be and a verb ending in ing, for example I am reading a book and they are working today.",
+          "focus": null,
+          "targetSpm": null,
+          "source": "knowledge"
+        },
+        {
+          "id": "academy.en.sentences.5",
+          "title": "Past Simple",
+          "text": "We use the past simple for finished actions and events at a definite time in the past. Regular verbs end in ed, for example I watched a film and they visited Kyiv last year.",
+          "focus": null,
+          "targetSpm": null,
+          "source": "knowledge"
+        },
+        {
+          "id": "academy.en.sentences.6",
+          "title": "Present Perfect",
+          "text": "We use the present perfect to connect the past with the present. We form it with have or has and the past participle, for example I have finished my work and she has visited London.",
+          "focus": null,
+          "targetSpm": null,
+          "source": "knowledge"
+        },
+        {
+          "id": "academy.en.sentences.7",
+          "title": "Talking About the Future",
+          "text": "English has several ways to talk about the future. We use will for decisions made at the moment of speaking and for predictions, as in I will help you and It will rain tomorrow.",
+          "focus": null,
+          "targetSpm": null,
+          "source": "knowledge"
+        },
+        {
+          "id": "academy.en.sentences.8",
+          "title": "Modal Verbs",
+          "text": "Modal verbs add meaning to the main verb and are followed by the base form. We use can for ability and permission, as in I can swim and Can I sit here.",
+          "focus": null,
+          "targetSpm": null,
+          "source": "knowledge"
+        }
+      ]
+    },
+    {
+      "id": "paragraphs",
+      "step": "text",
+      "kind": "paragraphs",
+      "title": {
+        "uk": "Абзаци",
+        "en": "Paragraphs"
+      },
+      "summary": {
+        "uk": "Джером, Лікок, Твен, Сакі: суцільний текст із гумором.",
+        "en": "Jerome, Leacock, Twain, Saki: continuous text with a sense of humour."
+      },
+      "exercises": [
+        {
+          "id": "academy.en.paragraphs.1",
+          "title": "I like work",
+          "text": "It always does seem to me that I am doing more work than I should do. It is not that I object to the work, mind you; I like work: it fascinates me. I can sit and look at it for hours. I love to keep it by me: the idea of getting rid of it nearly breaks my heart. You cannot give me too much work; to accumulate work has almost become a passion with me: my study is so full of it now, that there is hardly an inch of room for any more. I shall have to throw out a wing soon.",
+          "focus": null,
+          "targetSpm": null,
+          "source": "knowledge"
+        },
+        {
+          "id": "academy.en.paragraphs.2",
+          "title": "On being idle",
+          "text": "I certainly did not enjoy that month's idling. I like idling when I ought not to be idling; not when it is the only thing I have to do. That is my pig-headed nature. The time when I like best to stand with my back to the fire, calculating how much I owe, is when my desk is heaped highest with letters that must be answered by the next post. When I like to dawdle longest over my dinner is when I have a heavy evening's work before me. And if, for some urgent reason, I ought to be up particularly early in the morning, it is then, more than at any other time, that I love to lie an extra half-hour in bed.",
+          "focus": null,
+          "targetSpm": null,
+          "source": "knowledge"
+        },
+        {
+          "id": "academy.en.paragraphs.3",
+          "title": "Thirty years of German",
+          "text": "My philological studies have satisfied me that a gifted person ought to learn English barring spelling and pronouncing in thirty hours, French in thirty days, and German in thirty years. It seems manifest, then, that the latter tongue ought to be trimmed down and repaired. If it is to remain as it is, it ought to be gently and reverently set aside among the dead languages, for only the dead have time to learn it.",
+          "focus": null,
+          "targetSpm": null,
+          "source": "knowledge"
+        },
+        {
+          "id": "academy.en.paragraphs.4",
+          "title": "A bank makes me rattled",
+          "text": "When I go into a bank I get rattled. The clerks rattle me; the wickets rattle me; the sight of the money rattles me; everything rattles me. The moment I cross the threshold of a bank and attempt to transact business there, I become an irresponsible idiot. I knew this beforehand, but my salary had been raised to fifty dollars a month and I felt that the bank was the only place for it. So I shambled in and looked timidly round at the clerks. I had an idea that a person about to open an account must needs consult the manager. I went up to a wicket marked \"Accountant.\" The accountant was a tall, cool devil. The very sight of him rattled me. My voice was sepulchral. \"Can I see the manager.\" I said, and added solemnly, \"alone.\" I don't know why I said \"alone.\"",
+          "focus": null,
+          "targetSpm": null,
+          "source": "knowledge"
+        },
+        {
+          "id": "academy.en.paragraphs.5",
+          "title": "In sixes, I said",
+          "text": "An idiot hope struck me that they might think something had insulted me while I was writing the cheque and that I had changed my mind. I made a wretched attempt to look like a man with a fearfully quick temper. The clerk prepared to pay the money. \"How will you have it.\" he said. \"What.\" \"How will you have it.\" \"Oh\"-I caught his meaning and answered without even trying to think-\"in fifties.\" He gave me a fifty-dollar bill. \"And the six.\" he asked dryly. \"In sixes,\" I said. He gave it me and I rushed out. As the big door swung behind me I caught the echo of a roar of laughter that went up to the ceiling of the bank. Since then I bank no more. I keep my money in cash in my trousers pocket and my savings in silver dollars in a sock.",
+          "focus": null,
+          "targetSpm": null,
+          "source": "knowledge"
+        },
+        {
+          "id": "academy.en.paragraphs.6",
+          "title": "The tin of pineapple",
+          "text": "Then we looked for the knife to open the tin with. We turned out everything in the hamper. We turned out the bags. We pulled up the boards at the bottom of the boat. We took everything out on to the bank and shook it. There was no tin-opener to be found. Then Harris tried to open the tin with a pocket-knife, and broke the knife and cut himself badly; and George tried a pair of scissors, and the scissors flew up, and nearly put his eye out. While they were dressing their wounds, I tried to make a hole in the thing with the spiky end of the hitcher, and the hitcher slipped and jerked me out between the boat and the bank into two feet of muddy water, and the tin rolled over, uninjured, and broke a teacup.",
+          "focus": null,
+          "targetSpm": null,
+          "source": "knowledge"
+        },
+        {
+          "id": "academy.en.paragraphs.7",
+          "title": "Uncle Podger hangs a picture",
+          "text": "At last, Uncle Podger would get the spot fixed again, and put the point of the nail on it with his left hand, and take the hammer in his right hand. And, with the first blow, he would smash his thumb, and drop the hammer, with a yell, on somebody's toes. Aunt Maria would mildly observe that, next time Uncle Podger was going to hammer a nail into the wall, she hoped he'd let her know in time, so that she could make arrangements to go and spend a week with her mother while it was being done. \"Oh. you women, you make such a fuss over everything,\" Uncle Podger would reply, picking himself up. \"Why, I like doing a little job of this sort.\"",
+          "focus": null,
+          "targetSpm": null,
+          "source": "knowledge"
+        },
+        {
+          "id": "academy.en.paragraphs.8",
+          "title": "Harris in the maze",
+          "text": "They picked up various other people who wanted to get it over, as they went along, until they had absorbed all the persons in the maze. People who had given up all hopes of ever getting either in or out, or of ever seeing their home and friends again, plucked up courage at the sight of Harris and his party, and joined the procession, blessing him. Harris said he should judge there must have been twenty people, following him, in all; and one woman with a baby, who had been there all the morning, insisted on taking his arm, for fear of losing him. Harris kept on turning to the right, but it seemed a long way, and his cousin said he supposed it was a very big maze. \"Oh, one of the largest in Europe,\" said Harris. \"Yes, it must be,\" replied the cousin, \"because we've walked a good two miles already.\"",
+          "focus": null,
+          "targetSpm": null,
+          "source": "knowledge"
+        }
+      ]
+    },
+    {
+      "id": "civic-classics",
+      "step": "text",
+      "kind": "paragraphs",
+      "title": {
+        "uk": "Класичні промови й документи",
+        "en": "Civic classics"
+      },
+      "summary": {
+        "uk": "Декларація незалежності, Геттисберзька промова, Мілль, Дуглас, Панкгерст.",
+        "en": "The Declaration of Independence, the Gettysburg Address, Mill, Douglass, Pankhurst."
+      },
+      "exercises": [
+        {
+          "id": "academy.en.civic-classics.1",
+          "title": "Self-Evident Truths",
+          "text": "We hold these truths to be self-evident, that all men are created equal, that they are endowed by their Creator with certain unalienable Rights, that among these are Life, Liberty and the pursuit of Happiness.",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.civic-classics.2",
+          "title": "Consent of the Governed",
+          "text": "That to secure these rights, Governments are instituted among Men, deriving their just powers from the consent of the governed - That whenever any Form of Government becomes destructive of these ends, it is the Right of the People to alter or to abolish it, and to institute new Government.",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.civic-classics.3",
+          "title": "We the People",
+          "text": "We the People of the United States, in Order to form a more perfect Union, establish Justice, insure domestic Tranquility, provide for the common defence, promote the general Welfare, and secure the Blessings of Liberty to ourselves and our Posterity, do ordain and establish this Constitution for the United States of America.",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.civic-classics.4",
+          "title": "The First Amendment",
+          "text": "Congress shall make no law respecting an establishment of religion, or prohibiting the free exercise thereof; or abridging the freedom of speech, or of the press; or the right of the people peaceably to assemble, and to petition the Government for a redress of grievances.",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.civic-classics.5",
+          "title": "Declaration of Sentiments",
+          "text": "We hold these truths to be self-evident; that all men and women are created equal; that they are endowed by their Creator with certain inalienable rights; that among these are life, liberty, and the pursuit of happiness; that to secure these rights governments are instituted, deriving their just powers from the consent of the governed.",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.civic-classics.6",
+          "title": "Fourth of July",
+          "text": "What, to the American slave, is your 4th of July. I answer: a day that reveals to him, more than all other days in the year, the gross injustice and cruelty to which he is the constant victim. To him, your celebration is a sham; your boasted liberty, an unholy license; your national greatness, swelling vanity.",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.civic-classics.7",
+          "title": "On Liberty",
+          "text": "The only freedom which deserves the name, is that of pursuing our own good in our own way, so long as we do not attempt to deprive others of theirs, or impede their efforts to obtain it. Each is the proper guardian of his own health, whether bodily, or mental and spiritual. Mankind are greater gainers by suffering each other to live as seems good to themselves, than by compelling each to live as seems good to the rest.",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.civic-classics.8",
+          "title": "Gettysburg Address, Pt. 1",
+          "text": "Four score and seven years ago our fathers brought forth, on this continent, a new nation, conceived in Liberty, and dedicated to the proposition that all men are created equal. Now we are engaged in a great civil war, testing whether that nation, or any nation so conceived and so dedicated, can long endure. We are met on a great battle-field of that war.",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.civic-classics.9",
+          "title": "Gettysburg Address, Pt. 2",
+          "text": "We have come to dedicate a portion of that field, as a final resting place for those who here gave their lives that that nation might live. It is altogether fitting and proper that we should do this. But, in a larger sense, we can not dedicate - we can not consecrate - we can not hallow - this ground.",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.civic-classics.10",
+          "title": "Gettysburg Address, Pt. 3",
+          "text": "The brave men, living and dead, who struggled here, have consecrated it, far above our poor power to add or detract. The world will little note, nor long remember what we say here, but it can never forget what they did here. It is for us the living, rather, to be dedicated here to the unfinished work which they who fought here have thus far so nobly advanced.",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.civic-classics.11",
+          "title": "Gettysburg Address, Pt. 4",
+          "text": "It is rather for us to be here dedicated to the great task remaining before us - that from these honored dead we take increased devotion to that cause for which they gave the last full measure of devotion - that we here highly resolve that these dead shall not have died in vain - that this nation, under God, shall have a new birth of freedom - and that government of the people, by the people, for the people, shall not perish from the earth.",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.civic-classics.12",
+          "title": "With Malice Toward None",
+          "text": "With malice toward none; with charity for all; with firmness in the right, as God gives us to see the right, let us strive on to finish the work we are in; to bind up the nation's wounds; to care for him who shall have borne the battle, and for his widow, and his orphan - to do all which may achieve and cherish a just and lasting peace among ourselves, and with all nations.",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.civic-classics.13",
+          "title": "Freedom or Death",
+          "text": "I am here as a soldier who has temporarily left the field of battle in order to explain - it seems strange it should have to be explained - what civil war is like when civil war is waged by women.",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        }
+      ]
+    },
+    {
+      "id": "tempo",
+      "step": "tempo",
+      "kind": "tempo",
+      "title": {
+        "uk": "Темпові серії",
+        "en": "Tempo series"
+      },
+      "summary": {
+        "uk": "Короткі серії під метроном, від 150 до 300 знаків на хвилину. Точність важливіша.",
+        "en": "Short series to a metronome, from 150 to 300 characters a minute. Accuracy first."
+      },
+      "exercises": [
+        {
+          "id": "academy.en.tempo.1",
+          "title": "Alternating Short Words",
+          "text": "the and the and they are they are the and they are the and they are for but for but not for but not yet for but not yet the and they are for but not yet now the and now they are now",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.tempo.2",
+          "title": "Hand Balance",
+          "text": "palm palm fist fist palm palm fist fist hand wrist hand wrist left right left right type type left right left right type fast slow fast slow fast fast slow slow fast type slow type fast type",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.tempo.3",
+          "title": "4-key Pulse",
+          "text": "asdf asdf asdf fdsa fdsa fdsa jkl; jkl; jkl; ;lkj ;lkj ;lkj",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.tempo.4",
+          "title": "Controlled Chaos",
+          "text": "asdf a;sl dkfj jkl; fjdk sla; fdsa ;lkj ajsk dlf; f;dl skaj",
+          "focus": null,
+          "targetSpm": null,
+          "source": "organiser"
+        },
+        {
+          "id": "academy.en.tempo.5",
+          "title": "150",
+          "text": "you the to it and that of is in",
+          "focus": null,
+          "targetSpm": 150,
+          "source": "derived"
+        },
+        {
+          "id": "academy.en.tempo.6",
+          "title": "190",
+          "text": "what we me this he for my on have",
+          "focus": null,
+          "targetSpm": 190,
+          "source": "derived"
+        },
+        {
+          "id": "academy.en.tempo.7",
+          "title": "225",
+          "text": "your do was no not be are know can",
+          "focus": null,
+          "targetSpm": 225,
+          "source": "derived"
+        },
+        {
+          "id": "academy.en.tempo.8",
+          "title": "260",
+          "text": "with but all so just there here they like",
+          "focus": null,
+          "targetSpm": 260,
+          "source": "derived"
+        },
+        {
+          "id": "academy.en.tempo.9",
+          "title": "300",
+          "text": "get she go if right out about up at",
+          "focus": null,
+          "targetSpm": 300,
+          "source": "derived"
+        }
+      ]
+    }
+  ]
+}

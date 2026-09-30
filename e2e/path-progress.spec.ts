@@ -266,10 +266,10 @@ test.describe('US3 the path and mastery', () => {
     await expect(
       region(page, 'Слова з відкритих клавіш').getByTestId('words-closed'),
     ).toContainText('Бракує клавіш: п р є')
-    // The Academy is shown as arriving later, not offered.
+    // Stage 3, the Academy, is a real stage with a way in.
     const later = region(page, 'Далі')
-    await expect(later).toContainText('Стадія 3: Академія')
-    await expect(later).toContainText('З’явиться в наступному випуску.')
+    await expect(later.getByTestId('academy-stage')).toContainText('Етап 3. Академія')
+    await expect(later.getByRole('link', { name: 'Перейти до Академії' })).toBeVisible()
     await expect(later.getByRole('button')).toHaveCount(0)
   })
 

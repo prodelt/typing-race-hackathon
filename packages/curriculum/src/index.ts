@@ -10,6 +10,7 @@
  * to validate that an attempt's text was legitimate (ADR-0007).
  */
 
+export * from './academy/index.js'
 export * from './coach/index.js'
 export * from './layout/index.js'
 export * from './levels/index.js'

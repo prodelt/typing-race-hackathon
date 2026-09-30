@@ -55,6 +55,27 @@ const exerciseRoute = createRoute({
   component: lazyRouteComponent(() => import('../features/exercise/index.js'), 'ExerciseScreen'),
 })
 
+/** Stage 3. `course` picks the Ukrainian or English course; absent, the typing language decides. */
+const academyRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/academy',
+  validateSearch: (search: Record<string, unknown>): { course?: 'uk' | 'en' } =>
+    search['course'] === 'uk' || search['course'] === 'en' ? { course: search['course'] } : {},
+  component: lazyRouteComponent(() => import('../features/academy/index.js'), 'AcademyScreen'),
+})
+
+const academyExerciseRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/academy/$exerciseId',
+  validateSearch: (search: Record<string, unknown>): { mode: 'practice' | 'test' } => ({
+    mode: search['mode'] === 'test' ? 'test' : 'practice',
+  }),
+  component: lazyRouteComponent(
+    () => import('../features/academy/index.js'),
+    'AcademyExerciseScreen',
+  ),
+})
+
 const resultRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/result/$attemptId',
@@ -120,6 +141,8 @@ export function buildRouteTree(pages: { readonly product: FunctionComponent }) {
     todayRoute,
     pathRoute,
     exerciseRoute,
+    academyRoute,
+    academyExerciseRoute,
     resultRoute,
     sessionRoute,
     settingsRoute,

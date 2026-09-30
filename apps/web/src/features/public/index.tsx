@@ -47,6 +47,12 @@ const SOURCES = [
     use: () => m.page_licences_dwyl(),
   },
   {
+    name: 'Typing-Race 2026 (academy, knowledge, texts)',
+    licence: 'used with the organisers’ permission',
+    url: 'https://github.com/StsZu/Typing-race-2026',
+    use: () => m.academy_licence_use(),
+  },
+  {
     name: 'Unbounded, Onest',
     licence: 'SIL Open Font License 1.1',
     url: 'https://openfontlicense.org',

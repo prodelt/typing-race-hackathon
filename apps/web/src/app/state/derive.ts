@@ -2,6 +2,7 @@ import {
   catalogue,
   deriveProgress,
   focusDrillFor,
+  isAcademyExerciseId,
   layouts,
   levelFor,
   nextAction,
@@ -58,7 +59,9 @@ export function derive(state: AppState): DerivedState {
     confidence: confidencePort,
   })
 
-  const lastAttempt = state.attempts.at(-1) ?? null
+  // The coach answers for Stage 1. An Academy attempt has its own next step on its result screen,
+  // and a Stage 1 recommendation must never point at an Academy exercise id.
+  const lastAttempt = state.attempts.findLast((a) => !isAcademyExerciseId(a.scaleId)) ?? null
 
   return {
     layout,

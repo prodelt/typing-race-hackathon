@@ -1,0 +1,224 @@
+{
+  "format": "typing-race/academy-report@1",
+  "language": "en",
+  "algorithmVersion": "1.0.0",
+  "inputs": [
+    {
+      "path": "english/academy/typing-race-2026/course.json",
+      "sha256": "d86ebf494c53c70237b3d72c0d2161fc5502a388df1cf5a53c1772ee741fdaab",
+      "bytes": 30894
+    },
+    {
+      "path": "english/knowledge/typing-race-2026/english/01-present-simple.md",
+      "sha256": "4bca54a6b39e0affb2e5050cfe3881dafac909eed6be19b325d226edd9816d11",
+      "bytes": 760
+    },
+    {
+      "path": "english/knowledge/typing-race-2026/english/02-present-continuous.md",
+      "sha256": "476478937ed6c7c8ba3c807f8d17179017f212b5423db72f6850baf63765ebf7",
+      "bytes": 823
+    },
+    {
+      "path": "english/knowledge/typing-race-2026/english/03-past-simple.md",
+      "sha256": "fff98442dbef174b4412eab200d9160fa31c1f9c29c33eb4b1fe1cb82fb4d6b5",
+      "bytes": 784
+    },
+    {
+      "path": "english/knowledge/typing-race-2026/english/04-present-perfect.md",
+      "sha256": "c7ae93c230550653181436f4ddcec6ac9db7e4cf74a72eff441807ad2b03e16f",
+      "bytes": 803
+    },
+    {
+      "path": "english/knowledge/typing-race-2026/english/05-future.md",
+      "sha256": "88d852aa684cd70f9cffbe49e6ef8db0566a050e4a642efce86e0ecff1ef3f60",
+      "bytes": 861
+    },
+    {
+      "path": "english/knowledge/typing-race-2026/english/06-modal-verbs.md",
+      "sha256": "960c3d1404c46e6030ed5e3ebdd3446df561b8ec94da895f16064d7c7476978d",
+      "bytes": 779
+    },
+    {
+      "path": "english/knowledge/typing-race-2026/english/07-articles.md",
+      "sha256": "440ab842fc2057b7d0bcd717947e0c7176e2a9d66026d743252a333b7ec93e1e",
+      "bytes": 900
+    },
+    {
+      "path": "english/knowledge/typing-race-2026/english/08-passive-voice.md",
+      "sha256": "669847f46dc32de8536a1bdbba9c052d1d3ec0e2791eae15a5b9f5b94891085b",
+      "bytes": 969
+    },
+    {
+      "path": "english/knowledge/typing-race-2026/english/09-count-and-noncount.md",
+      "sha256": "911eb2a0eacd3d03db4ce6371b3a2157e7288af5fd81d622b03daf75ab5416b3",
+      "bytes": 947
+    },
+    {
+      "path": "english/knowledge/typing-race-2026/english/10-prepositions.md",
+      "sha256": "54beca30d04b1c2ef730d8052c0702a4e282bef6e8ebd9e70b9ddc8e84f152bb",
+      "bytes": 991
+    },
+    {
+      "path": "english/knowledge/typing-race-2026/english-humour/01-i-like-work.md",
+      "sha256": "c4b8c8fae6e01e4230b56df934c4498e3bcfa0fcd1f97e369d3aafd0edcafb30",
+      "bytes": 909
+    },
+    {
+      "path": "english/knowledge/typing-race-2026/english-humour/02-on-being-idle.md",
+      "sha256": "5ee16c61f3a493f55c0c0d8eb50b31b3ae46446f9f811cca151fd4fbab1b86ed",
+      "bytes": 1023
+    },
+    {
+      "path": "english/knowledge/typing-race-2026/english-humour/03-thirty-years-of-german.md",
+      "sha256": "609971557dec9eeb1502d512e864f2bc8e6b0b8640eba1ce22013c89f92f28f7",
+      "bytes": 861
+    },
+    {
+      "path": "english/knowledge/typing-race-2026/english-humour/04-a-bank-makes-me-rattled.md",
+      "sha256": "d2a8a1d7457aebb80b2c2adac495626e69e3ac224e3dd0f07c70d148c9ec2d6e",
+      "bytes": 1271
+    },
+    {
+      "path": "english/knowledge/typing-race-2026/english-humour/05-in-sixes-i-said.md",
+      "sha256": "4bbb3527c177e46acb7902daeaf364266cf02e128d38b9b532af2e9a09c91e21",
+      "bytes": 1157
+    },
+    {
+      "path": "english/knowledge/typing-race-2026/english-humour/06-the-tin-of-pineapple.md",
+      "sha256": "551efa657de206eea2c123c2ba53ec66885543947e9d64922d5869c4378b1f22",
+      "bytes": 1144
+    },
+    {
+      "path": "english/knowledge/typing-race-2026/english-humour/07-uncle-podger-hangs-a-picture.md",
+      "sha256": "c7693e88c513485802cf7bf6ce3478f3e3fad2c263f70c8dddb6c080e9d9a03a",
+      "bytes": 1159
+    },
+    {
+      "path": "english/knowledge/typing-race-2026/english-humour/08-harris-in-the-maze.md",
+      "sha256": "6c3c01e300eccdd43387fbd1c1fffac7c4a867adae1c28e77526a70381811d8f",
+      "bytes": 1291
+    },
+    {
+      "path": "english/knowledge/typing-race-2026/english-humour/09-gowings-walking-stick.md",
+      "sha256": "52f2b92aa6a2bd7831aa4b92d5732e922040ac85e0fb4f2b0f868f79efa5558f",
+      "bytes": 1217
+    },
+    {
+      "path": "english/knowledge/typing-race-2026/english-humour/10-boarding-house-geometry.md",
+      "sha256": "933c20f323184f5a08ef9afeb7c381d513059b89c30b9a0f54eb5f8aa129dc5b",
+      "bytes": 1019
+    },
+    {
+      "path": "english/knowledge/typing-race-2026/english-humour/11-reginald-on-christmas-presents.md",
+      "sha256": "590ae9e4a9bcb5a021b816cda37af2b85483f072dfff6ff6c782db2ccdec507d",
+      "bytes": 912
+    },
+    {
+      "path": "english/knowledge/typing-race-2026/english-humour/12-jeeves-is-my-man.md",
+      "sha256": "ab3e77021b52004ed100b7d4a328562f53afc9cc50c7ffd8e35301f372e39557",
+      "bytes": 986
+    },
+    {
+      "path": "data/derived/en/words.json",
+      "sha256": "7d555b4f67e0b88c11f88d979cbea77eedf558409ff1ac0d5b4e9fe6bceb204e"
+    },
+    {
+      "path": "data/derived/en/ngrams.json",
+      "sha256": "d99a4d92ff2e82662ad98897bc0982d7b6edd08c3101f57610a623f7cf667d5b"
+    }
+  ],
+  "rules": {
+    "text": "NFC; apostrophe variants fold to U+0027; stress marks removed; dashes to hyphen, typographic quotes to straight double quote, ellipsis to three full stops; whitespace collapsed. і ї є ґ are never substituted.",
+    "prose": "Sentences and paragraphs also map ! and ? to a full stop and drop brackets, because neither layout types them here; a text that still has an untypable character is dropped whole.",
+    "drills": "Drill texts keep only the tokens the layout can type.",
+    "generated": "N-gram drills: the heaviest in-word bigrams/trigrams (weight = sum of the frequencies of the words that contain them), each followed by the most frequent words containing it. Same-finger, roll (neighbouring fingers, same hand and row) and double-letter pairs are filtered from the same table; alternation words switch hands on every letter."
+  },
+  "counts": {
+    "modules": 17,
+    "exercises": 128,
+    "bySource": {
+      "organiser": 73,
+      "derived": 41,
+      "knowledge": 14
+    }
+  },
+  "organiserUsed": 73,
+  "organiserUnused": [
+    "e9",
+    "e48",
+    "e49",
+    "e50",
+    "e51",
+    "e57",
+    "e58",
+    "e59",
+    "e65",
+    "e66"
+  ],
+  "dropped": [],
+  "tokensDropped": [
+    {
+      "source": "e1",
+      "tokens": [
+        ";",
+        ";",
+        ";",
+        ";"
+      ]
+    },
+    {
+      "source": "e4",
+      "tokens": [
+        ";"
+      ]
+    },
+    {
+      "source": "e6",
+      "tokens": [
+        ";"
+      ]
+    },
+    {
+      "source": "e47",
+      "tokens": [
+        "\"Ready?\""
+      ]
+    },
+    {
+      "source": "e25",
+      "tokens": [
+        "(),",
+        "(",
+        "),",
+        "(),",
+        "()",
+        "-",
+        ",",
+        "()",
+        "-",
+        "(),",
+        ")(",
+        "-",
+        ")(,",
+        "(())",
+        "(())",
+        "(\"maybe\")",
+        "['array']",
+        "{key:",
+        "value},",
+        "{name:",
+        "\"test\"},",
+        "[1,",
+        "3],",
+        "(a",
+        "+",
+        "b)"
+      ]
+    }
+  ],
+  "outputs": {
+    "academy.json": {
+      "sha256": "c9c7541f7e98ec80cc6c7305ac3687cbbb71ead202cfb7264e87181a62676d8c"
+    }
+  }
+}

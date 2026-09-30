@@ -1,9 +1,11 @@
 import { useNavigate, useParams } from '@tanstack/react-router'
+import { isAcademyExerciseId } from '@typing-race/curriculum'
 import type { AttemptSummary } from '@typing-race/domain'
 import { Button, Card, Chip } from '@typing-race/ui'
 import { useMemo } from 'react'
 import { useAppStore } from '../../app/state/index.js'
 import { m } from '../../paraglide/messages.js'
+import { AcademyNextCard } from '../academy/NextCard.js'
 import { UnlockWords } from '../words/UnlockWords.js'
 import { Comparison } from './Comparison.js'
 import { ErrorList } from './ErrorList.js'
@@ -80,10 +82,12 @@ export function ResultScreen() {
   const attempts = useAppStore((state) => state.attempts)
   const startingLevelChoice = useAppStore((state) => state.startingLevelChoice)
 
-  const model = useMemo(
-    () => buildResultModel({ attempts, attemptId, startingLevelChoice }),
-    [attempts, attemptId, startingLevelChoice],
-  )
+  const model = useMemo(() => {
+    // An Academy attempt needs no Stage 1 starting level: the Academy can be opened directly.
+    const academy = isAcademyExerciseId(attempts.find((a) => a.id === attemptId)?.scaleId ?? '')
+    const choice = startingLevelChoice ?? (academy ? 'neverTouchTyped' : null)
+    return buildResultModel({ attempts, attemptId, startingLevelChoice: choice })
+  }, [attempts, attemptId, startingLevelChoice])
 
   if (model === null) {
     return (
@@ -130,14 +134,20 @@ export function ResultScreen() {
           {model.unlock === null ? null : (
             <UnlockCard unlock={model.unlock} attemptId={attempt.id} />
           )}
-          {model.unlock === null ? null : (
-            <UnlockWords
-              layoutId={attempt.layoutId}
-              unlockKey={model.unlock.key}
-              unlocked={model.unlock.unlockedAfter}
-            />
+          {isAcademyExerciseId(attempt.scaleId) ? (
+            <AcademyNextCard attempt={attempt} />
+          ) : (
+            <>
+              {model.unlock === null ? null : (
+                <UnlockWords
+                  layoutId={attempt.layoutId}
+                  unlockKey={model.unlock.key}
+                  unlocked={model.unlock.unlockedAfter}
+                />
+              )}
+              <NextActionCard model={model} />
+            </>
           )}
-          <NextActionCard model={model} />
         </aside>
       </div>
     </section>

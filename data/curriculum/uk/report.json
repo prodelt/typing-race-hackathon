@@ -1,0 +1,189 @@
+{
+  "format": "typing-race/academy-report@1",
+  "language": "uk",
+  "algorithmVersion": "1.0.0",
+  "inputs": [
+    {
+      "path": "ukrainian/academy/typing-race-2026/course.json",
+      "sha256": "a939037bf482c8fd5057cd7950ebd8b2537e55b44a9677ad721130c8ecad98e8",
+      "bytes": 52021
+    },
+    {
+      "path": "ukrainian/knowledge/typing-race-2026/cyber-hygiene/01-parol-do-poshty.md",
+      "sha256": "c842410ce25ce3b5ea911182fe59d050405ad7fa6e93554a21c42ea2ed12fc07",
+      "bytes": 1526
+    },
+    {
+      "path": "ukrainian/knowledge/typing-race-2026/cyber-hygiene/02-try-vypadkovi-slova.md",
+      "sha256": "7e10896688cd7ea828bdac00ffd753078838396c00cb4d450180c04a4236f7b1",
+      "bytes": 1471
+    },
+    {
+      "path": "ukrainian/knowledge/typing-race-2026/cyber-hygiene/03-dvoetapna-perevirka.md",
+      "sha256": "399cb7c1dc01f9ea9840ea517238021b8bc3a7f2dbe31ad99b250a28c8977abd",
+      "bytes": 1541
+    },
+    {
+      "path": "ukrainian/knowledge/typing-race-2026/cyber-hygiene/04-onovlennya.md",
+      "sha256": "318db728d68ee17b64d3e8dc92f9df63c3d3911f36592b1cbf8bfca4f92dfeda",
+      "bytes": 1503
+    },
+    {
+      "path": "ukrainian/knowledge/typing-race-2026/cyber-hygiene/05-rezervni-kopii.md",
+      "sha256": "573abf8aed4e248547848233748cbd97d2d6734eeed0307287cbaed4d0840cc6",
+      "bytes": 1500
+    },
+    {
+      "path": "ukrainian/knowledge/typing-race-2026/cyber-hygiene/06-fishing.md",
+      "sha256": "c960c31ebf5d87241c6a6573a0572971433a4af7da28cd48e35ea0f8c1a46691",
+      "bytes": 1443
+    },
+    {
+      "path": "ukrainian/knowledge/typing-race-2026/cyber-hygiene/07-menedzher-paroliv.md",
+      "sha256": "45b5dfaf552469e855dc82f0ab005dfdfaa791e3cefc8bfaf90abeb621eb38a7",
+      "bytes": 1531
+    },
+    {
+      "path": "ukrainian/knowledge/typing-race-2026/cyber-hygiene/08-bezpechni-pokupky.md",
+      "sha256": "affd9ba0165e716505cd6d60e1e6632c78d92eef86d284c3d1437ee56101525e",
+      "bytes": 1582
+    },
+    {
+      "path": "ukrainian/knowledge/typing-race-2026/road-rules/01-bezpeka.md",
+      "sha256": "317e9ecc766e5fa8f5dce93b7898875d98b6fbfcc9991acefd12b4be2f0f896d",
+      "bytes": 1232
+    },
+    {
+      "path": "ukrainian/knowledge/typing-race-2026/road-rules/02-pidgotovka.md",
+      "sha256": "c77080374131d6e9a7ef0e023715748d5d92b6bb9e051aa6dd645b88d91e37fc",
+      "bytes": 1204
+    },
+    {
+      "path": "ukrainian/knowledge/typing-race-2026/road-rules/03-signaly.md",
+      "sha256": "621b2d3dc23423726b3aa089100e2428f18842d05d1d6aa89e912fe5bc43b6b5",
+      "bytes": 1210
+    },
+    {
+      "path": "ukrainian/knowledge/typing-race-2026/road-rules/04-shvydkist.md",
+      "sha256": "2af8eb75455b3b919e14dc52d6f44524b0e14aca729942228dd63f3146c1e888",
+      "bytes": 1221
+    },
+    {
+      "path": "ukrainian/knowledge/typing-race-2026/road-rules/05-perehrestya.md",
+      "sha256": "3ea741111e266606567c9be323a09bb7bfbd025d9483fd9b2d3ac68f3accf5ce",
+      "bytes": 1268
+    },
+    {
+      "path": "ukrainian/knowledge/typing-race-2026/road-rules/06-perehody.md",
+      "sha256": "176d5dcb0b9da0b533ddf0f7835d347316e8bd87dc476adfbe16a0de18157201",
+      "bytes": 1202
+    },
+    {
+      "path": "ukrainian/knowledge/typing-race-2026/road-rules/07-dokumenty-vodiya.md",
+      "sha256": "02cdba515da76a216fd78ee63d77df0b91cfea54676fa06b38adbfe53e260cdf",
+      "bytes": 1479
+    },
+    {
+      "path": "ukrainian/knowledge/typing-race-2026/road-rules/08-pered-vyizdom.md",
+      "sha256": "70edc88138214150b8279bb844a6852e7f53c120d8a6c678f87f81c855be13ef",
+      "bytes": 1423
+    },
+    {
+      "path": "ukrainian/knowledge/typing-race-2026/road-rules/09-dii-pry-dtp.md",
+      "sha256": "ce8909d86094affcff299073b201f1171aaf0582579c6c03b4985b8aee262b7b",
+      "bytes": 1481
+    },
+    {
+      "path": "ukrainian/knowledge/typing-race-2026/road-rules/10-grupy-znakiv.md",
+      "sha256": "ef555b12aa5f6a6bad773a9905066d187df25eb7926e16b2fc82168249cb42b1",
+      "bytes": 1458
+    },
+    {
+      "path": "ukrainian/knowledge/typing-race-2026/road-rules/11-dorozhnya-rozmitka.md",
+      "sha256": "3db927a0bbc0808c64a633a5c1c783729f210a8cc5d9a0ad7f665ee313c051f3",
+      "bytes": 1432
+    },
+    {
+      "path": "ukrainian/knowledge/typing-race-2026/road-rules/12-zupynka-i-stoyanka.md",
+      "sha256": "fe61f6c1d75a4900541f3f4749633c2e7e07467c30df9acbb8329ce9e35db538",
+      "bytes": 1454
+    },
+    {
+      "path": "data/derived/uk/words.json",
+      "sha256": "9a6c63c1a51ec2349e29718f1fb243287cf3dad68c1e4322f32ab3cb6733c94d"
+    },
+    {
+      "path": "data/derived/uk/ngrams.json",
+      "sha256": "56e0a6063e154c04a72b1e778fa4045439225039e05706ec9781248d024989a3"
+    }
+  ],
+  "rules": {
+    "text": "NFC; apostrophe variants fold to U+0027; stress marks removed; dashes to hyphen, typographic quotes to straight double quote, ellipsis to three full stops; whitespace collapsed. і ї є ґ are never substituted.",
+    "prose": "Sentences and paragraphs also map ! and ? to a full stop and drop brackets, because neither layout types them here; a text that still has an untypable character is dropped whole.",
+    "drills": "Drill texts keep only the tokens the layout can type.",
+    "generated": "N-gram drills: the heaviest in-word bigrams/trigrams (weight = sum of the frequencies of the words that contain them), each followed by the most frequent words containing it. Same-finger, roll (neighbouring fingers, same hand and row) and double-letter pairs are filtered from the same table; alternation words switch hands on every letter."
+  },
+  "counts": {
+    "modules": 17,
+    "exercises": 118,
+    "bySource": {
+      "organiser": 61,
+      "derived": 43,
+      "knowledge": 14
+    }
+  },
+  "organiserUsed": 63,
+  "organiserUnused": [],
+  "dropped": [
+    {
+      "source": "u35",
+      "reason": "too short once untypable tokens are removed"
+    },
+    {
+      "source": "u58",
+      "reason": "too short once untypable tokens are removed"
+    },
+    {
+      "source": "cyber-hygiene/02-try-vypadkovi-slova",
+      "reason": "untypable: N C S"
+    },
+    {
+      "source": "cyber-hygiene/07-menedzher-paroliv",
+      "reason": "untypable: N C S"
+    }
+  ],
+  "tokensDropped": [
+    {
+      "source": "u58",
+      "tokens": [
+        "(),",
+        "(",
+        "),",
+        "(),",
+        "()",
+        "-",
+        ",",
+        "()",
+        "-",
+        "(),",
+        ")(",
+        "-",
+        ")(,",
+        "(())",
+        "(())",
+        "(\"можливо\")",
+        "[масив],",
+        "{ключ:",
+        "значення},",
+        "(а",
+        "+",
+        "б)"
+      ]
+    }
+  ],
+  "outputs": {
+    "academy.json": {
+      "sha256": "6b612600453a5284e91d07e6ec0cd208cf8a844697aa3228557daf36a3db8fb2"
+    }
+  }
+}

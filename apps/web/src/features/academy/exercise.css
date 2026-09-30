@@ -1,0 +1,193 @@
+/* The Academy exercise: the pre-start sheet and the running layout. Tokens only. */
+
+.academy-ex__crumb {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-ink-soft);
+}
+
+.academy-ex__crumb-n {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--color-terracotta-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- Pre-start --------------------------------------------------------------------------- */
+
+.academy-pre {
+  display: grid;
+  gap: 20px;
+  max-width: 880px;
+  padding-top: 8px;
+  animation: academy-rise var(--dur-reveal) var(--ease-enter) both;
+}
+
+.academy-pre__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(40px, 5vw, 72px);
+  font-weight: 700;
+  line-height: 0.95;
+  letter-spacing: -0.045em;
+}
+
+.academy-pre__text {
+  display: -webkit-box;
+  max-width: 64ch;
+  margin: 0;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  padding-left: 18px;
+  border-left: 3px solid var(--color-accent);
+  font-family: var(--font-typing);
+  font-size: 20px;
+  line-height: 1.55;
+  color: var(--color-ink-soft);
+}
+
+.academy-pre__facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  max-width: 760px;
+  margin: 8px 0 0;
+}
+
+.academy-pre__facts > div {
+  padding: 12px 16px 0 0;
+  border-top: 1px solid var(--color-hairline-strong);
+}
+
+.academy-pre__facts dt {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--color-muted);
+}
+
+.academy-pre__facts dd {
+  margin: 4px 0 0;
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.academy-pre__facts dd[data-mode="test"] {
+  color: var(--color-terracotta-ink);
+}
+
+.academy-pre__hint,
+.academy-pre__probe {
+  max-width: 64ch;
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--color-ink-soft);
+}
+
+.academy-pre__probe {
+  font-size: 14px;
+  color: var(--color-muted);
+}
+
+.academy-pre__alert {
+  display: grid;
+  justify-items: start;
+  gap: 10px;
+  max-width: 64ch;
+  padding: 14px 16px;
+  border: 1px solid var(--color-terracotta);
+  border-radius: var(--radius-field);
+  background: var(--color-terracotta-tint);
+  font-family: var(--font-ui);
+}
+
+.academy-pre__alert p {
+  margin: 0;
+}
+
+.academy-pre__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.academy-pre__back {
+  margin-left: 8px;
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--color-ink);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.academy-pre__back:hover {
+  color: var(--color-terracotta-ink);
+}
+
+/* ---- Running ----------------------------------------------------------------------------- */
+
+.academy-ex__run {
+  display: grid;
+  grid-template-columns: 276px minmax(0, 1fr);
+  align-items: start;
+  gap: 32px;
+}
+
+.academy-ex__rail {
+  display: grid;
+  gap: 10px;
+  padding-top: 14px;
+  border-top: 2px solid var(--color-accent);
+}
+
+.academy-ex__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+
+.academy-ex__mode {
+  justify-self: start;
+  margin: 4px 0 0;
+  padding: 3px 12px;
+  border: 1px solid var(--color-hairline-strong);
+  border-radius: var(--radius-pill);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.academy-ex__mode[data-mode="test"] {
+  border-color: var(--color-accent);
+  color: var(--color-terracotta-ink);
+}
+
+.academy-ex__hint {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-muted);
+}
+
+.academy-ex__stage {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 40px;
+}
