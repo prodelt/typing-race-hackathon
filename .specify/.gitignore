@@ -7,34 +7,3 @@ feature.json
 
 # Per-machine extension config overrides.
 extensions/*/local-config.yml
-
-# Зависимости и пакеты
-node_modules/
-vendor/
-target/
-__pycache__/
-*.py[cod]
-env/
-venv/
-.env
-
-# Сборки и логи
-dist/
-build/
-*.log
-
-# Системный мусор и IDE
-.DS_Store
-Thumbs.db
-.idea/
-.vscode/
-*.swp
-
-.agents/
-.claude/
-.gemini/
-.scratch/
-.Specify/
-skills/
-spec-Kit/
-tasks/
