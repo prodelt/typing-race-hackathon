@@ -7,7 +7,7 @@
   },
   "files": {
     "ignoreUnknown": true,
-    "includes": ["**", "!.claude", "!supabase/functions", "!**/paraglide", "!**/*.gen.ts"]
+    "includes": ["**", "!.claude", "!tasks", "!.scratch", "!supabase/functions", "!**/paraglide", "!**/*.gen.ts"]
   },
   "formatter": {
     "enabled": true,
