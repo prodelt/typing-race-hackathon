@@ -76,6 +76,13 @@ const academyExerciseRoute = createRoute({
   ),
 })
 
+/** Weak-spot review: the learner's weakest keys and moves, one drill for them, and the maps. */
+const reviewRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/review',
+  component: lazyRouteComponent(() => import('../features/review/index.js'), 'ReviewScreen'),
+})
+
 const resultRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/result/$attemptId',
@@ -200,6 +207,7 @@ export function buildRouteTree(pages: { readonly product: FunctionComponent }) {
     exerciseRoute,
     academyRoute,
     academyExerciseRoute,
+    reviewRoute,
     resultRoute,
     sessionRoute,
     settingsRoute,

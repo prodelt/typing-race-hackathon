@@ -58,6 +58,7 @@ const action: NextAction = {
 describe('composeSession', () => {
   it('falls back to the target skill when there is no weak Transition, never skipping the warm-up', () => {
     const plan = composeSession({
+      layout,
       catalogue: scales,
       progress: progressWith({}),
       nextAction: action,
@@ -73,6 +74,7 @@ describe('composeSession', () => {
     const second = anchors[1]
     if (first === undefined || second === undefined) throw new Error('anchors missing')
     const plan = composeSession({
+      layout,
       catalogue: scales,
       progress: progressWith({ [transitionKey(first, second)]: 0.3 }),
       nextAction: action,
@@ -85,6 +87,7 @@ describe('composeSession', () => {
 
   it('keeps consolidation as test attempts, so it counts toward mastery without a guide', () => {
     const plan = composeSession({
+      layout,
       catalogue: scales,
       progress: progressWith({}),
       nextAction: action,

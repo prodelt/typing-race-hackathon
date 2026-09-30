@@ -33,9 +33,24 @@ export function currentSpm(attempts: readonly AttemptSummary[]): number | null {
   return recent.reduce((sum, spm) => sum + spm, 0) / recent.length
 }
 
+/** Minutes the real-text block is sized to: long enough to read as text, short enough to finish. */
+export const REAL_TEXT_MINUTES = 3
+/** The real-text block never drops below one short sentence, nor grows past a paragraph. */
+export const REAL_TEXT_MIN_CHARS = 60
+export const REAL_TEXT_MAX_CHARS = 360
+
+/** Characters in the real-text block at this speed: about {@link REAL_TEXT_MINUTES} of typing. */
+export function realTextChars(spm: number | null): number {
+  const chars = Math.round((spm ?? FALLBACK_SPM) * REAL_TEXT_MINUTES)
+  return Math.min(REAL_TEXT_MAX_CHARS, Math.max(REAL_TEXT_MIN_CHARS, chars))
+}
+
 export interface SessionSize {
   /** Attempts in warm-up, target and consolidation, each at least one. */
   readonly reps: readonly [number, number, number]
+  /** Characters of the fourth block, real text. */
+  readonly realTextChars: number
+  /** All four blocks, real text included. */
   readonly expectedMinutes: number
 }
 
@@ -46,12 +61,18 @@ export function secondsPerAttempt(spm: number | null, scaleSize: number): number
 
 export function sizeSession(args: { spm: number | null; scaleSize: number }): SessionSize {
   const per = secondsPerAttempt(args.spm, args.scaleSize)
+  // The real-text block is one attempt of its own length; the exercise blocks fill the rest.
+  const textChars = realTextChars(args.spm)
+  const text = secondsPerAttempt(args.spm, textChars)
   // The window is 600 s wide and one attempt is at most 300 s for any speed above ~14 SPM, so an
   // integer always fits inside it; below that the floor of one attempt per block wins and the run
   // is honestly longer than the window rather than pretending otherwise.
-  const low = Math.ceil((MIN_MINUTES * 60) / per)
-  const high = Math.floor((MAX_MINUTES * 60) / per)
-  const total = Math.max(3, Math.min(Math.max(Math.round((TARGET_MINUTES * 60) / per), low), high))
+  const low = Math.ceil((MIN_MINUTES * 60 - text) / per)
+  const high = Math.floor((MAX_MINUTES * 60 - text) / per)
+  const total = Math.max(
+    3,
+    Math.min(Math.max(Math.round((TARGET_MINUTES * 60 - text) / per), low), high),
+  )
 
   const warmUp = Math.max(1, Math.round(total * 0.25))
   const consolidation = Math.max(1, Math.round(total * 0.3))
@@ -59,6 +80,7 @@ export function sizeSession(args: { spm: number | null; scaleSize: number }): Se
 
   return {
     reps: [warmUp, target, consolidation],
-    expectedMinutes: Math.round(((warmUp + target + consolidation) * per) / 60),
+    realTextChars: textChars,
+    expectedMinutes: Math.round(((warmUp + target + consolidation) * per + text) / 60),
   }
 }

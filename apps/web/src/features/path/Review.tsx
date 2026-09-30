@@ -1,5 +1,11 @@
 import { Link } from '@tanstack/react-router'
-import { fingerOf, MIN_TRANSITION_SAMPLES, WEAK_CONFIDENCE_CEILING } from '@typing-race/curriculum'
+import {
+  fingerOf,
+  MIN_TRANSITION_SAMPLES,
+  scaleById,
+  transitionScale,
+  WEAK_CONFIDENCE_CEILING,
+} from '@typing-race/curriculum'
 import type { Layout, Progress, Scale } from '@typing-race/domain'
 import { parseTransitionKey } from '@typing-race/domain'
 import { CONFIDENCE_MIN_SAMPLES } from '@typing-race/metrics'
@@ -34,7 +40,16 @@ interface WeakElement {
 /** How many to show. Enough to be useful, few enough that the list is not a verdict. */
 const SHOWN = 6
 
-function weakest(progress: Progress, catalogue: readonly Scale[]): WeakElement[] {
+/**
+ * The id of a drill the learner can start now, resolved through `scaleById` so a Transition drill
+ * built on demand counts exactly like an authored Scale; `undefined` when it is not startable.
+ */
+function startable(layout: Layout, progress: Progress, id: string | undefined): string | undefined {
+  const scale = id === undefined ? undefined : scaleById(layout, id)
+  return scale?.requires.every((char) => progress.unlockedSet.includes(char)) ? scale.id : undefined
+}
+
+function weakest(progress: Progress, layout: Layout, catalogue: readonly Scale[]): WeakElement[] {
   const found: WeakElement[] = []
 
   for (const [char, confidence] of Object.entries(progress.keyConfidence)) {
@@ -46,7 +61,11 @@ function weakest(progress: Progress, catalogue: readonly Scale[]): WeakElement[]
       label: displayChar(char),
       confidence,
       kind: 'key',
-      scaleId: catalogue.find((s) => s.focus.kind === 'key' && s.focus.value === char)?.id,
+      scaleId: startable(
+        layout,
+        progress,
+        catalogue.find((s) => s.focus.kind === 'key' && s.focus.value === char)?.id,
+      ),
     })
   }
 
@@ -59,7 +78,12 @@ function weakest(progress: Progress, catalogue: readonly Scale[]): WeakElement[]
       label: `${displayChar(pair.from)} → ${displayChar(pair.to)}`,
       confidence,
       kind: 'transition',
-      scaleId: catalogue.find((s) => s.focus.kind === 'transition' && s.focus.value === key)?.id,
+      scaleId: startable(
+        layout,
+        progress,
+        catalogue.find((s) => s.focus.kind === 'transition' && s.focus.value === key)?.id ??
+          transitionScale(layout, key)?.id,
+      ),
     })
   }
 
@@ -73,7 +97,7 @@ export interface ReviewProps {
 }
 
 export function Review({ progress, layout, catalogue }: ReviewProps) {
-  const weak = weakest(progress, catalogue)
+  const weak = weakest(progress, layout, catalogue)
 
   return (
     <Card aria-labelledby="path-review" role="region" className="p-5">

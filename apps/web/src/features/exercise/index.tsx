@@ -1,8 +1,10 @@
 import { useParams, useSearch } from '@tanstack/react-router'
-import { isWordDrillId, scaleById } from '@typing-race/curriculum'
+import { isRealTextId, isReviewDrillId, isWordDrillId, scaleById } from '@typing-race/curriculum'
 import type { AttemptMode } from '@typing-race/domain'
 import { useDerived } from '../../app/state/index.js'
 import { m } from '../../paraglide/messages.js'
+import { ReviewDrillExercise } from '../review/ReviewDrill.js'
+import { RealTextExercise } from '../session/RealTextExercise.js'
 import { WordExercise } from '../words/WordExercise.js'
 import { BackToPath, ExerciseSession } from './ExerciseSession.js'
 
@@ -23,6 +25,13 @@ export function ExerciseScreen() {
   // Stage 2 word drills share this route, so a Next Action or a mode switch reaches them unchanged.
   if (params.scaleId !== undefined && isWordDrillId(params.scaleId)) {
     return <WordExercise drillId={params.scaleId} mode={mode} />
+  }
+  // The weak-spot drill and a session's real text are built per learner, like a word drill.
+  if (params.scaleId !== undefined && isReviewDrillId(params.scaleId)) {
+    return <ReviewDrillExercise key={params.scaleId} drillId={params.scaleId} mode={mode} />
+  }
+  if (params.scaleId !== undefined && isRealTextId(params.scaleId)) {
+    return <RealTextExercise mode={mode} />
   }
   // An authored scale, or a Transition drill the coach built for this learner.
   const scale = scaleById(layout, params.scaleId ?? '')

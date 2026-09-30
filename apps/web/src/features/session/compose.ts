@@ -1,8 +1,9 @@
-import { WEAK_CONFIDENCE_CEILING } from '@typing-race/curriculum'
+import { realTextId, scaleById, WEAK_CONFIDENCE_CEILING } from '@typing-race/curriculum'
 import type {
   AttemptMode,
   AttemptSummary,
   FocusElement,
+  Layout,
   NextAction,
   Progress,
   Scale,
@@ -11,10 +12,11 @@ import { parseTransitionKey } from '@typing-race/domain'
 import { currentSpm, type SessionSize, sizeSession } from './sizing.js'
 
 /**
- * T136. Block composition.
+ * Block composition: warm-up, one target skill, consolidation, then real text (requirements §4.1).
  *
- * Three exercise blocks are composed here; the fourth, real text, is deliberately not: F1 has no
- * dictionary, and FR-076 forbids filling its place with pseudo-words.
+ * The three exercise blocks are Scales. The fourth is not planned here beyond its id: its text is
+ * the Academy's sentences or real words from open keys, which need the course and the word bank,
+ * so `RealTextBlock` builds it when the learner reaches it (`realTextBlock` in curriculum).
  */
 
 export type BlockKind = 'warmUp' | 'target' | 'consolidation'
@@ -32,10 +34,13 @@ export interface Block {
 
 export interface SessionPlan {
   readonly blocks: readonly [Block, Block, Block]
+  /** The id the real-text attempt is recorded under; one attempt closes the block. */
+  readonly realTextId: string
   readonly expectedMinutes: number
 }
 
 export interface ComposeArgs {
+  readonly layout: Layout
   readonly catalogue: readonly Scale[]
   readonly progress: Progress
   readonly nextAction: NextAction
@@ -45,9 +50,10 @@ export interface ComposeArgs {
 /**
  * The scale for the warm-up: one startable scale focused on a key of the weakest Transition.
  *
- * F1's catalogue has no Scale focused on a Transition, so the closest honest reading of "built
- * around the weakest Transitions" is a scale on one of that Transition's two keys. Weakest first;
- * a Transition measured below five observations is `undefined` upstream (research R4) and skipped.
+ * The key scale rather than the Transition drill, because the Transition drill is usually the
+ * target skill already (the Next Action names the weakest Transition first), and warming up on
+ * the exact exercise that follows would make the two blocks one. A Transition measured below five
+ * observations is `undefined` upstream and skipped.
  */
 function warmUpScale(progress: Progress, startable: readonly Scale[]): Scale | undefined {
   const weak = Object.entries(progress.transitionConfidence)
@@ -71,11 +77,14 @@ function warmUpScale(progress: Progress, startable: readonly Scale[]): Scale | u
 }
 
 export function composeSession(args: ComposeArgs): (SessionPlan & { size: SessionSize }) | null {
-  const { catalogue, progress, nextAction, attempts } = args
+  const { layout, catalogue, progress, nextAction, attempts } = args
   const unlocked = new Set(progress.unlockedSet)
   const startable = catalogue.filter((scale) => scale.requires.every((char) => unlocked.has(char)))
 
-  const target = catalogue.find((scale) => scale.id === nextAction.startsScaleId) ?? startable[0]
+  // `scaleById` resolves a Transition drill the coach built as well as an authored Scale; a Stage 2
+  // word drill is not a Scale, and the session then trains the first startable one instead.
+  const named = scaleById(layout, nextAction.startsScaleId)
+  const target = named?.requires.every((char) => unlocked.has(char)) === true ? named : startable[0]
   if (target === undefined) return null
 
   const weak = warmUpScale(progress, startable)
@@ -86,6 +95,7 @@ export function composeSession(args: ComposeArgs): (SessionPlan & { size: Sessio
   return {
     size,
     expectedMinutes: size.expectedMinutes,
+    realTextId: realTextId(layout),
     blocks: [
       {
         kind: 'warmUp',

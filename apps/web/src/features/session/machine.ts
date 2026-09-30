@@ -61,13 +61,18 @@ export type SessionPosition =
     }
   | { readonly kind: 'between'; readonly finishedIndex: number; readonly nextIndex: number }
   | { readonly kind: 'realText' }
+  /** The real-text attempt is recorded: the session is ready to finish. */
+  | { readonly kind: 'realTextDone' }
 
 /** Attempts recorded since the session began, on a scale the session planned. */
 export function sessionAttempts(
   state: Extract<SessionState, { status: 'running' }>,
   attempts: readonly AttemptSummary[],
 ): readonly AttemptSummary[] {
-  const planned = new Set(state.plan.blocks.map((block) => block.scaleId))
+  const planned = new Set([
+    ...state.plan.blocks.map((block) => block.scaleId),
+    state.plan.realTextId,
+  ])
   const before = new Set(state.baseline)
   return attempts.filter((attempt) => !before.has(attempt.id) && planned.has(attempt.scaleId))
 }
@@ -76,7 +81,10 @@ type Running = Extract<SessionState, { status: 'running' }>
 
 /** How many attempts the session has, how many blocks they complete, and how many they consume. */
 function tally(state: Running, attempts: readonly AttemptSummary[]) {
-  const done = sessionAttempts(state, attempts).length
+  // The real-text attempt closes the fourth block; it never counts toward the first three.
+  const done = sessionAttempts(state, attempts).filter(
+    (attempt) => attempt.scaleId !== state.plan.realTextId,
+  ).length
   let consumed = 0
   let completed = 0
   for (const block of state.plan.blocks) {
@@ -99,7 +107,12 @@ export function completedBlocks(state: Running, attempts: readonly AttemptSummar
 export function positionOf(state: Running, attempts: readonly AttemptSummary[]): SessionPosition {
   const { done, consumed, completed } = tally(state, attempts)
 
-  if (completed >= state.plan.blocks.length) return { kind: 'realText' }
+  if (completed >= state.plan.blocks.length) {
+    const read = sessionAttempts(state, attempts).some(
+      (attempt) => attempt.scaleId === state.plan.realTextId,
+    )
+    return read ? { kind: 'realTextDone' } : { kind: 'realText' }
+  }
   if (completed >= 1 && state.acknowledged < completed) {
     return { kind: 'between', finishedIndex: completed - 1, nextIndex: completed }
   }

@@ -33,7 +33,7 @@ const DESTINATIONS: Destination[] = [
   { to: '/today', label: m.nav_today },
   { to: '/path', label: m.nav_path },
   { to: '/academy', label: m.academy_nav },
-  { to: '/review', label: m.nav_review, later: true },
+  { to: '/review', label: m.nav_review },
   { to: '/races', label: m.nav_races },
   { to: '/leaderboards', label: m.nav_leaderboards },
   { to: '/statistics', label: m.nav_statistics, later: true },

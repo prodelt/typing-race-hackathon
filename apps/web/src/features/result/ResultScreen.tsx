@@ -1,11 +1,12 @@
 import { useNavigate, useParams } from '@tanstack/react-router'
-import { isAcademyExerciseId } from '@typing-race/curriculum'
+import { isAcademyExerciseId, isReviewDrillId } from '@typing-race/curriculum'
 import type { AttemptSummary } from '@typing-race/domain'
 import { Button, Card, Chip } from '@typing-race/ui'
 import { useMemo } from 'react'
 import { useAppStore } from '../../app/state/index.js'
 import { m } from '../../paraglide/messages.js'
 import { AcademyNextCard } from '../academy/NextCard.js'
+import { ReviewOutcome } from '../review/Outcome.js'
 import { UnlockWords } from '../words/UnlockWords.js'
 import { Comparison } from './Comparison.js'
 import { ErrorList } from './ErrorList.js'
@@ -119,6 +120,9 @@ export function ResultScreen() {
 
       <div className="mt-5 grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
         <div className="space-y-6">
+          {isReviewDrillId(attempt.scaleId) ? (
+            <ReviewOutcome attempt={attempt} attempts={attempts} />
+          ) : null}
           <Tiles attempt={attempt} />
           <Comparison attempt={attempt} previous={model.previousBest} />
           <RhythmChart attempt={attempt} />

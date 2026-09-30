@@ -11,12 +11,12 @@ const TRANSITION_SIZE = 60
 export const TRANSITION_SCALE_LIMIT = 3
 
 /** A character as its key's code, `+shift` for the shifted character: stable and URL-safe. */
-function slugOf(key: Key, char: string): string {
+export function slugOf(key: Key, char: string): string {
   return key.shifted === char && key.plain !== char ? `${key.code}+shift` : key.code
 }
 
 /** The inverse of {@link slugOf}. */
-function charOfSlug(layout: Layout, slug: string): string | undefined {
+export function charOfSlug(layout: Layout, slug: string): string | undefined {
   const shifted = slug.endsWith('+shift')
   const code = shifted ? slug.slice(0, -'+shift'.length) : slug
   const key = layout.keys.find((candidate) => candidate.code === code)

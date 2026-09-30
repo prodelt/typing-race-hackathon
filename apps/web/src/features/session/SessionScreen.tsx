@@ -6,8 +6,9 @@ import { m } from '../../paraglide/messages.js'
 import { BetweenBlocks } from './BetweenBlocks.js'
 import { type Block, composeSession, type SessionPlan } from './compose.js'
 import { completedBlocks, positionOf, sessionAttempts } from './machine.js'
-import { RealTextPending } from './RealTextPending.js'
+import { RealTextBlock } from './RealTextBlock.js'
 import { useSessionStore } from './store.js'
+import { useRealText } from './useRealText.js'
 
 const BLOCK_NAMES: readonly (() => string)[] = [
   () => m.session_block_warmUp(),
@@ -39,7 +40,7 @@ export function SessionScreen() {
   const navigate = useNavigate()
   const attempts = useAppStore((state) => state.attempts)
   const abandonAttempt = useAppStore((state) => state.abandonAttempt)
-  const { progress, nextAction, catalogue } = useDerived()
+  const { layout, progress, nextAction, catalogue } = useDerived()
   const session = useSessionStore((store) => store.session)
   const dispatch = useSessionStore((store) => store.dispatch)
 
@@ -47,8 +48,8 @@ export function SessionScreen() {
     () =>
       progress === null || nextAction === null
         ? null
-        : composeSession({ catalogue, progress, nextAction, attempts }),
-    [catalogue, progress, nextAction, attempts],
+        : composeSession({ layout, catalogue, progress, nextAction, attempts }),
+    [layout, catalogue, progress, nextAction, attempts],
   )
 
   function launch(scaleId: string, mode: Block['mode']): void {
@@ -70,6 +71,9 @@ export function SessionScreen() {
     abandonAttempt()
     dispatch({ type: 'abandon' })
   }
+
+  // Loaded ahead of the fourth block, so the text is ready when the learner gets there.
+  const realText = useRealText(layout, progress, attempts)
 
   const header = <h1 className="font-ui text-2xl font-bold text-ink">{m.session_title()}</h1>
 
@@ -114,12 +118,11 @@ export function SessionScreen() {
             }}
           />
         )}
-        {position.kind === 'realText' && (
-          <RealTextPending
-            onMechanics={() => {
-              const target = session.plan.blocks[1]
-              if (target !== undefined) launch(target.scaleId, 'practice')
-            }}
+        {(position.kind === 'realText' || position.kind === 'realTextDone') && (
+          <RealTextBlock
+            state={realText}
+            done={position.kind === 'realTextDone'}
+            onStart={() => launch(session.plan.realTextId, 'practice')}
             onFinish={() => dispatch({ type: 'finish', recorded })}
           />
         )}

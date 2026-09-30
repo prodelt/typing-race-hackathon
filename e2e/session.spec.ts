@@ -11,13 +11,15 @@ import { typeText } from './harness/type.js'
 /**
  * T133, T134. User Story 6, "Running a guided session".
  *
- * Independent Test: start a session from Today, run it to the end through all three blocks, and
- * confirm the between-blocks screen appears twice, the expected length was stated up front, and
- * abandoning mid-block keeps the attempts already recorded.
+ * Independent Test: start a session from Today, run it to the end through all four blocks, and
+ * confirm the between-blocks screen appears twice, the expected length was stated up front, the
+ * fourth block is real words or text (never pseudo-words), and abandoning mid-block keeps the
+ * attempts already recorded.
  *
  * A session is long by design (15 to 25 minutes of typing), so the seeded learner is a slow one:
- * at 20 characters a minute the planner sizes a full session at six attempts (2 warm-up, 2 target,
- * 2 consolidation), which is what makes running it end to end affordable. The plan is sized from
+ * at 25 characters a minute the planner sizes the three exercise blocks at six attempts (2 warm-up,
+ * 2 target, 2 consolidation) and the real-text block at a short one, which is what makes running it
+ * end to end affordable. The plan is sized from
  * the learner's own recent speed (FR-077), so this is not a shortcut around the rule — it is the
  * rule, applied to a learner for whom it yields a short list.
  *
@@ -95,7 +97,7 @@ async function seedLearner(page: Page, learner?: Learner): Promise<void> {
   await seedStore(page, envelope)
 }
 
-const SLOW: Learner = { spm: 20 }
+const SLOW: Learner = { spm: 25 }
 
 /** Twelve observations of ф→в, eight missed: a weak Transition by any reading. */
 const WEAK_TRANSITION: Learner = {
@@ -233,9 +235,12 @@ test.describe('US6 a guided session', () => {
     await expect(page.getByRole('heading', { name: 'Гама: клавіша п' })).toBeVisible()
   })
 
-  test('it runs through all three blocks, with the between-blocks screen twice and real text named, not faked (scenarios 4 and 6, Independent Test)', async ({
+  test('it runs through all four blocks, with the between-blocks screen twice and real words from open keys to finish (scenarios 4 and 6, Independent Test)', async ({
     page,
   }) => {
+    // Seven attempts typed one event per character, with five accessibility audits: about a minute
+    // on its own, and more under a parallel run.
+    test.setTimeout(180_000)
     await seedLearner(page, SLOW)
     await openSessionFromToday(page)
     await audit(page)
@@ -291,24 +296,31 @@ test.describe('US6 a guided session', () => {
     expect(betweenScreens).toBe(2)
     await expect(between).toHaveCount(0)
 
-    // Scenario 6: the real-text block is named as arriving with the word curriculum.
-    const pending = page.getByTestId('real-text-pending')
-    await expect(pending).toBeVisible()
-    await expect(pending).toContainText('Справжній текст — у словниковому курсі')
-    await expect(pending).toContainText('словниковим курсом')
-    // No pseudo-word substitute: nothing to type on this screen, and the one exercise it offers
-    // says in its own label that it is not text.
-    await expect(page.getByTestId('typing-line')).toHaveCount(0)
-    await expect(page.getByTestId('typing-input')).toHaveCount(0)
-    await expect(
-      pending.getByRole('button', { name: 'Вправа на механіку (це не текст)' }),
-    ).toBeVisible()
-    await expect(pending).toContainText('Необов’язково. Вона не входить до сесії')
+    // Scenario 6, the fourth block. This learner has only the home row open: too few keys for
+    // whole sentences, so the block is real words from open keys, and it says so.
+    const block = page.getByTestId('real-text-block')
+    await expect(block).toBeVisible()
+    await expect(block.getByTestId('real-text-kind')).toHaveAttribute('data-kind', 'words')
+    await expect(block).toContainText('Слова з відкритих клавіш')
+    const preview = ((await block.getByTestId('real-text-preview').textContent()) ?? '').trim()
+    // Every character is a home-row key or a space: nothing locked, nothing made up.
+    expect(preview).toMatch(/^[фівапролдж ]+$/)
     await audit(page)
 
-    await pending.getByRole('button', { name: 'Завершити сесію' }).click()
+    await block.getByRole('button', { name: 'Набрати текст' }).click()
+    await expect(page).toHaveURL(/\/exercise\/yq\.realtext/)
+    await page.getByRole('button', { name: 'Почати', exact: true }).click()
+    const typed = (await page.getByTestId('typing-line').locator('p.sr-only').textContent()) ?? ''
+    // The exercise types exactly the text the session previewed.
+    expect(typed.trim()).toBe(preview)
+    await typeText(page, typed)
+    await expect(page).toHaveURL(/\/result\//)
+    await toSession(page)
+
+    await expect(block).toContainText('Текст набрано')
+    await block.getByRole('button', { name: 'Завершити сесію' }).click()
     await expect(page.getByRole('heading', { name: 'Сесію завершено' })).toBeVisible()
-    await expect(page.getByText('За цю сесію записано спроб: 6.')).toBeVisible()
+    await expect(page.getByText('За цю сесію записано спроб: 7.')).toBeVisible()
     await audit(page)
   })
 
