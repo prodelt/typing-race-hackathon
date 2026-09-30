@@ -47,3 +47,8 @@ apps/web/src/paraglide/
 # Supabase local state — only migrations, functions, seed and config are tracked
 supabase/.branches/
 supabase/.temp/
+
+# Vercel CLI link
+.vercel
+
+.vercel
