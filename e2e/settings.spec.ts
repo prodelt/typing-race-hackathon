@@ -354,7 +354,8 @@ test.describe('US5 settings', () => {
     const before = await exerciseText()
 
     await page.goto('/settings')
-    await radio(page, 'Мова інтерфейсу', 'English').check()
+    // The choice reloads the document; do not make the click wait for that navigation.
+    await radio(page, 'Мова інтерфейсу', 'English').check({ noWaitAfter: true })
     await expect(page.getByRole('heading', { level: 1, name: 'Settings' })).toBeVisible()
 
     // The shell, the page and the footer have all switched.
@@ -395,7 +396,8 @@ test.describe('US5 settings', () => {
     await radio(page, 'Мова набору', 'English').check()
     await radio(page, 'Розкладка', 'QWERTY').check()
     // Last, because it reloads the document.
-    await radio(page, 'Мова інтерфейсу', 'English').check()
+    // The choice reloads the document; do not make the click wait for that navigation.
+    await radio(page, 'Мова інтерфейсу', 'English').check({ noWaitAfter: true })
     await expect(page.getByRole('heading', { level: 1, name: 'Settings' })).toBeVisible()
 
     const expectAllInForce = async (target: Page): Promise<void> => {
