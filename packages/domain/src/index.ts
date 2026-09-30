@@ -355,6 +355,12 @@ export interface Clock {
 export interface Random {
   /** A float in [0, 1). Seeded, so a generated exercise is reproducible. */
   next(): number
+  /**
+   * An integer in [0, maxExclusive). The form `contracts/seams.md` specifies, and the one the
+   * scale generators want — deriving it from `next()` at each call site is how a modulo bias
+   * gets copy-pasted into eight generators.
+   */
+  nextInt(maxExclusive: number): number
 }
 
 export type InputEvent =
@@ -378,3 +384,36 @@ export interface InputSource {
   probeLayout(): Promise<LayoutProbe>
   focus(): void
 }
+
+// ---------------------------------------------------------------------------------------------
+// The stored envelope — everything `ProgressStore` persists, in one version-marked object
+// ---------------------------------------------------------------------------------------------
+
+/**
+ * `specs/001-typing-core/data-model.md` § The stored envelope (FR-082, FR-083).
+ *
+ * Attempts and their keystroke logs are stored **apart**, keyed by attempt id, because the logs are
+ * prunable and the summaries are not: only the last 20 logs are kept (FR-081), and discarding an
+ * older one must change no metric, no confidence value and no unlocked key (SC-019). Keeping the
+ * log inside the attempt record would make that rule a delete-and-hope; keeping it beside makes it
+ * structurally impossible for a derived value to depend on a log that may be gone. It is also the
+ * shape ticket 21 fixed for the server, so F2 changes nothing.
+ */
+export interface StoredEnvelope {
+  /** Explicit and documented, so F2 can decide whether to import it. F1 has no migration code. */
+  readonly storeVersion: number
+  /** Used to resolve concurrent tabs — a stale write must never silently win. */
+  readonly writtenAt: number
+  readonly progressByLanguage: Readonly<Partial<Record<Language, Progress>>>
+  readonly settings: Settings
+  /** Kept forever. */
+  readonly attempts: readonly AttemptSummary[]
+  /** Keyed by attempt id. Only the 20 most recent survive — FR-081. */
+  readonly logs: Readonly<Record<string, KeystrokeEventLog>>
+}
+
+/** What the current build writes. A different value on disk is FR-083's deliberate fresh start. */
+export const STORE_VERSION = 1
+
+/** The number of attempts whose keystroke logs are retained — FR-081. */
+export const LOG_RETENTION_COUNT = 20

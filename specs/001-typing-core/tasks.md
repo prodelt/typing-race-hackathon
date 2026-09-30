@@ -82,18 +82,18 @@ another lane's unmerged code, so none of this can live in a lane.
 
 ### Seams — before anything that uses them
 
-- [ ] T013 Define the seam interfaces in `apps/web/src/seams/index.ts` exactly as [contracts/seams.md](./contracts/seams.md) states them
-- [ ] T014 [P] Implement `Clock`: `systemClock` and `manualClock` in `apps/web/src/seams/clock.ts`, with unit tests for the manual clock's advance
-- [ ] T015 [P] Implement `Random`: `seededRandom` in `apps/web/src/seams/random.ts`, with a test that the same seed always yields the same sequence
-- [ ] T016 Implement `InputSource`: `domInputSource` reading `beforeinput` and `compositionend` for characters and `keydown` only for timing and modifiers, in `apps/web/src/seams/input.ts`; emit `ignored` events rather than swallowing them
-- [ ] T017 Implement `scriptedInput` in `apps/web/src/seams/input.ts` so the engine is testable with no DOM
-- [ ] T018 Implement `probeLayout` on `InputSource` for the pre-start layout check (FR-021)
-- [ ] T019 Implement `ProgressStore`: `indexedDbStore` in `apps/web/src/seams/store.ts` with the version-marked envelope of [data-model.md](./data-model.md#the-stored-envelope) (FR-082, and no migration code in F1), idempotent `appendAttempts`, and the four `load` outcomes
-- [ ] T020 [P] Implement `memoryStore(seed)` in `apps/web/src/seams/store.ts` — the adapter US2, US3 and US6 seed to stay independent of each other
-- [ ] T021 Implement the 20-log retention rule inside the store, with a test that pruning changes no metric, no confidence value and no unlocked key (FR-081, SC-019)
-- [ ] T022 Implement the concurrent-tab resolution using the envelope's `writtenAt`, with a test that stale state cannot silently overwrite newer state
-- [ ] T023 [P] Implement `AssetCache`: `serviceWorkerCache` and `noAssetCache` in `apps/web/src/seams/cache.ts`
-- [ ] T024 Contract suite in `apps/web/src/seams/store.contract.test.ts` running the same assertions against both `ProgressStore` adapters — this is the suite F2 reuses when it adds the Supabase adapter
+- [X] T013 Define the seam interfaces in `apps/web/src/seams/index.ts` exactly as [contracts/seams.md](./contracts/seams.md) states them
+- [X] T014 [P] Implement `Clock`: `systemClock` and `manualClock` in `apps/web/src/seams/clock.ts`, with unit tests for the manual clock's advance
+- [X] T015 [P] Implement `Random`: `seededRandom` in `apps/web/src/seams/random.ts`, with a test that the same seed always yields the same sequence
+- [X] T016 Implement `InputSource`: `domInputSource` reading `beforeinput` and `compositionend` for characters and `keydown` only for timing and modifiers, in `apps/web/src/seams/input.ts`; emit `ignored` events rather than swallowing them
+- [X] T017 Implement `scriptedInput` in `apps/web/src/seams/input.ts` so the engine is testable with no DOM
+- [X] T018 Implement `probeLayout` on `InputSource` for the pre-start layout check (FR-021)
+- [X] T019 Implement `ProgressStore`: `indexedDbStore` in `apps/web/src/seams/store.ts` with the version-marked envelope of [data-model.md](./data-model.md#the-stored-envelope) (FR-082, and no migration code in F1), idempotent `appendAttempts`, and the four `load` outcomes
+- [X] T020 [P] Implement `memoryStore(seed)` in `apps/web/src/seams/store.ts` — the adapter US2, US3 and US6 seed to stay independent of each other
+- [X] T021 Implement the 20-log retention rule inside the store, with a test that pruning changes no metric, no confidence value and no unlocked key (FR-081, SC-019)
+- [X] T022 Implement the concurrent-tab resolution using the envelope's `writtenAt`, with a test that stale state cannot silently overwrite newer state
+- [X] T023 [P] Implement `AssetCache`: `serviceWorkerCache` and `noAssetCache` in `apps/web/src/seams/cache.ts`
+- [X] T024 Contract suite in `apps/web/src/seams/store.contract.test.ts` running the same assertions against both `ProgressStore` adapters — this is the suite F2 reuses when it adds the Supabase adapter
 
 ### `packages/ui` — tokens, themes, primitives
 
@@ -136,13 +136,13 @@ another lane's unmerged code, so none of this can live in a lane.
 
 ### `packages/metrics`
 
-- [ ] T052 `computeMetrics` in `packages/metrics/src/compute.ts`: SPM/CPM, `WPM = SPM / 5`, error count, errors by character, elapsed time (FR-023, FR-025)
-- [ ] T053 Accuracy in `packages/metrics/src/accuracy.ts` — correct character keystrokes over all character keystrokes, a corrected error still counted, Backspace not in the denominator (FR-024)
-- [ ] T054 Fixed worked examples with hand-computed values in `packages/metrics/src/accuracy.test.ts` and `compute.test.ts` — the requirements' §8.1 and §8.2 checks, including examples with corrected errors
-- [ ] T055 `computeAggregates` in `packages/metrics/src/aggregates.ts` — per-key and per-transition count, misses, sum and sum of squares of intervals — the only input to progress and confidence (FR-026, FR-028)
-- [ ] T056 Rhythm consistency in `packages/metrics/src/rhythm.ts` per [research.md R5](./research.md#r5-rhythm-consistency): `100 × max(0, 1 − cv)`, eligible intervals only, `breaksExcluded` reported (FR-026)
-- [ ] T057 `foldConfidence` and `confidenceOf` in `packages/metrics/src/confidence.ts` per [research.md R4](./research.md#r4-confidence-per-key-and-per-transition): exponential half-life of 10, timing from correct keystrokes only, `undefined` below five observations (FR-029)
-- [ ] T058 Property tests in `packages/metrics/src/*.test.ts` for every obligation in [contracts/metrics.md](./contracts/metrics.md): `accuracy ∈ [0,1]`; `wpm × 5 === spm`; `rhythmConsistency ∈ [0,100]`; confidence `undefined` or in `[0,1]`; a hit never lowers it, a miss never raises it, a shorter interval never lowers it; recomputation is identical
+- [X] T052 `computeMetrics` in `packages/metrics/src/compute.ts`: SPM/CPM, `WPM = SPM / 5`, error count, errors by character, elapsed time (FR-023, FR-025)
+- [X] T053 Accuracy in `packages/metrics/src/accuracy.ts` — correct character keystrokes over all character keystrokes, a corrected error still counted, Backspace not in the denominator (FR-024)
+- [X] T054 Fixed worked examples with hand-computed values in `packages/metrics/src/accuracy.test.ts` and `compute.test.ts` — the requirements' §8.1 and §8.2 checks, including examples with corrected errors
+- [X] T055 `computeAggregates` in `packages/metrics/src/aggregates.ts` — per-key and per-transition count, misses, sum and sum of squares of intervals — the only input to progress and confidence (FR-026, FR-028)
+- [X] T056 Rhythm consistency in `packages/metrics/src/rhythm.ts` per [research.md R5](./research.md#r5-rhythm-consistency): `100 × max(0, 1 − cv)`, eligible intervals only, `breaksExcluded` reported (FR-026)
+- [X] T057 `foldConfidence` and `confidenceOf` in `packages/metrics/src/confidence.ts` per [research.md R4](./research.md#r4-confidence-per-key-and-per-transition): exponential half-life of 10, timing from correct keystrokes only, `undefined` below five observations (FR-029)
+- [X] T058 Property tests in `packages/metrics/src/*.test.ts` for every obligation in [contracts/metrics.md](./contracts/metrics.md): `accuracy ∈ [0,1]`; `wpm × 5 === spm`; `rhythmConsistency ∈ [0,100]`; confidence `undefined` or in `[0,1]`; a hit never lowers it, a miss never raises it, a shorter interval never lowers it; recomputation is identical
 
 ### `apps/web` shell, service worker, instrumentation
 
@@ -188,12 +188,12 @@ the first and absent in the second, and both attempts reach completion.
 
 ### Implementation for User Story 1
 
-- [ ] T078 [US1] The `Engine` surface, judging typed against awaited and distinguishing typed, awaited and upcoming text (FR-014, FR-015), in `packages/engine/src/index.ts` exactly as [contracts/engine.md](./contracts/engine.md) states it — it computes no metric, because metrics must also run server-side in F2
-- [ ] T079 [US1] The cursor and mark state machine in `packages/engine/src/machine.ts`: `idle → running → (paused ⇄ running) → completed`, plus `abandoned` producing no Attempt at all
-- [ ] T080 [US1] Stop-on-letter and free-Backspace error modes in `packages/engine/src/machine.ts`; Backspace never lowers `errorCount` and never walks behind index zero (FR-017, FR-018)
-- [ ] T081 [US1] `ignored`-event handling in `packages/engine/src/machine.ts` for modifiers, input-method events and dead keys — recorded in the log, consuming nothing, counting nothing (FR-020)
-- [ ] T082 [US1] Focus-loss and pause time accounting in `packages/engine/src/clock-accounting.ts`, so `elapsedMs` excludes time away
-- [ ] T083 [US1] Keystroke Event Log encoding into parallel arrays in `packages/engine/src/log.ts`, with `formatVersion` — append-only, and the sole source every metric is derived from (FR-019)
+- [X] T078 [US1] The `Engine` surface, judging typed against awaited and distinguishing typed, awaited and upcoming text (FR-014, FR-015), in `packages/engine/src/index.ts` exactly as [contracts/engine.md](./contracts/engine.md) states it — it computes no metric, because metrics must also run server-side in F2
+- [X] T079 [US1] The cursor and mark state machine in `packages/engine/src/machine.ts`: `idle → running → (paused ⇄ running) → completed`, plus `abandoned` producing no Attempt at all
+- [X] T080 [US1] Stop-on-letter and free-Backspace error modes in `packages/engine/src/machine.ts`; Backspace never lowers `errorCount` and never walks behind index zero (FR-017, FR-018)
+- [X] T081 [US1] `ignored`-event handling in `packages/engine/src/machine.ts` for modifiers, input-method events and dead keys — recorded in the log, consuming nothing, counting nothing (FR-020)
+- [X] T082 [US1] Focus-loss and pause time accounting in `packages/engine/src/clock-accounting.ts`, so `elapsedMs` excludes time away
+- [X] T083 [US1] Keystroke Event Log encoding into parallel arrays in `packages/engine/src/log.ts`, with `formatVersion` — append-only, and the sole source every metric is derived from (FR-019)
 - [ ] T084 [US1] The pre-start screen E1 in `apps/web/src/features/exercise/PreStart.tsx` — the layout and character check with the required layout named (FR-021), and **the one goal this scale serves shown to the learner** (FR-010); repeating any unlocked exercise starts here (FR-045)
 - [ ] T085 [US1] The typing screen in `apps/web/src/features/exercise/TypingScreen.tsx`: the 276 px left rail plus a single scrolling line at the configured size, the line vertically centred with edge fades and the same vertical position in every exercise type (FR-058)
 - [ ] T086 [US1] The typing line in `apps/web/src/features/exercise/TypingLine.tsx`: in-place error mark — colour, tint, 3 px underline on the awaited character, caret held, nothing moving; CSS-only animation of caret and judged character; shake and nudge forbidden (FR-015, FR-016, FR-065)

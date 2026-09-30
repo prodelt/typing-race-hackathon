@@ -13,6 +13,7 @@
     "@typing-race/metrics": "workspace:*",
     "@typing-race/ui": "workspace:*",
     "canvas-confetti": "^1.9.4",
+    "idb": "^8.0.3",
     "motion": "^13.4.5",
     "react": "19.3.0",
     "react-dom": "19.3.0",
