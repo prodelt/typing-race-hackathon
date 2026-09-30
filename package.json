@@ -21,6 +21,7 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test --project=chromium",
     "test:e2e:all": "playwright test --project=chromium --project=firefox --project=webkit",
+    "test:e2e:input": "playwright test --grep @input --project=chromium --project=firefox --project=webkit",
     "test:e2e:cdp": "playwright test --project=cdp",
     "test:latency": "playwright test --project=latency",
     "check": "pnpm typecheck && pnpm lint && pnpm test"
