@@ -12,6 +12,7 @@
       "!.specify",
       "!.claude",
       "!skills-lock.json",
+      "!supabase/functions",
       "!**/paraglide",
       "!**/*.gen.ts"
     ]

@@ -1,0 +1,13 @@
+{
+  "//": "Edge Functions run on Deno, which the rest of this repository does not.",
+  "imports": {
+    "@typing-race/domain": "../../packages/domain/src/index.ts",
+    "@typing-race/metrics": "../../packages/metrics/src/index.ts",
+    "@typing-race/curriculum": "../../packages/curriculum/src/index.ts"
+  },
+  "unstable": ["sloppy-imports"],
+  "compilerOptions": {
+    "lib": ["deno.window", "esnext"],
+    "strict": true
+  }
+}
