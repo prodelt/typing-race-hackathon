@@ -49,7 +49,9 @@ function attempt(id: string, completedAt: number): Attempt {
     metrics: metrics(),
     aggregates: {
       keys: { ф: { count: 2, misses: 0, sumIki: 900, sumIkiSq: 410_000 } },
-      transitions: { 'ф>і': { count: 1, misses: 0, sumIki: 450, sumIkiSq: 202_500 } },
+      transitions: {
+        'ф>і': { count: 1, misses: 0, sumIki: 450, sumIkiSq: 202_500 },
+      },
     },
     log: {
       formatVersion: 1,
@@ -108,7 +110,10 @@ const adapters: Adapter[] = [
   {
     name: 'indexedDbStore',
     create: (generation) =>
-      indexedDbStore({ now: tickingClock(), databaseName: `typing-race-test-${generation}` }),
+      indexedDbStore({
+        now: tickingClock(),
+        databaseName: `typing-race-test-${generation}`,
+      }),
     next: generations(),
   },
 ]
@@ -210,7 +215,11 @@ for (const adapter of adapters) {
     })
 
     it('saves and restores settings', async () => {
-      const settings: Settings = { ...DEFAULT_SETTINGS, theme: 'dark', textSizePx: 34 }
+      const settings: Settings = {
+        ...DEFAULT_SETTINGS,
+        theme: 'dark',
+        textSizePx: 34,
+      }
       await store.saveSettings(settings)
 
       const loaded = await store.load()
@@ -270,7 +279,10 @@ describe('memoryStore seeding', () => {
   })
 
   it('reports an unreadable version rather than silently resetting (FR-083)', async () => {
-    const store = memoryStore({ ...emptyEnvelope(1), storeVersion: STORE_VERSION + 1 })
+    const store = memoryStore({
+      ...emptyEnvelope(1),
+      storeVersion: STORE_VERSION + 1,
+    })
     await expect(store.load()).resolves.toBe('unreadable-version')
   })
 })

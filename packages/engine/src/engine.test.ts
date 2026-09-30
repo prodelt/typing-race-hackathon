@@ -143,19 +143,35 @@ describe('judging', () => {
   it('stopOnLetter: a wrong key holds the cursor, marks it and counts (FR-016, FR-017)', () => {
     const { engine, input } = setup('ab')
     input.emit(char('x', 1))
-    expect(engine.view).toMatchObject({ cursor: 0, markedAt: 0, errorCount: 1 })
+    expect(engine.view).toMatchObject({
+      cursor: 0,
+      markedAt: 0,
+      errorCount: 1,
+    })
     expect(engine.view.lastError).toEqual({ expected: 'a', got: 'x', at: 0 })
     input.emit(char('y', 2))
-    expect(engine.view).toMatchObject({ cursor: 0, markedAt: 0, errorCount: 2 })
+    expect(engine.view).toMatchObject({
+      cursor: 0,
+      markedAt: 0,
+      errorCount: 2,
+    })
     input.emit(char('a', 3))
-    expect(engine.view).toMatchObject({ cursor: 1, markedAt: null, errorCount: 2 })
+    expect(engine.view).toMatchObject({
+      cursor: 1,
+      markedAt: null,
+      errorCount: 2,
+    })
   })
 
   it('stopOnLetter: Backspace clears the mark, keeps the error, and never passes index 0', () => {
     const { engine, input } = setup('ab')
     input.emit(char('x', 1))
     input.emit(backspace(2))
-    expect(engine.view).toMatchObject({ cursor: 0, markedAt: null, errorCount: 1 })
+    expect(engine.view).toMatchObject({
+      cursor: 0,
+      markedAt: null,
+      errorCount: 1,
+    })
     input.emit(backspace(3))
     expect(engine.view).toMatchObject({ cursor: 0, errorCount: 1 })
     expect(engine.view.lastError).not.toBeNull()
@@ -176,7 +192,11 @@ describe('judging', () => {
     input.emit(backspace(30))
     input.emit(char('a', 40))
     input.emit(char('t', 50))
-    expect(engine.view).toMatchObject({ state: 'completed', errorCount: 1, cursor: 3 })
+    expect(engine.view).toMatchObject({
+      state: 'completed',
+      errorCount: 1,
+      cursor: 3,
+    })
     const log = engine.finish()
     expect(log).toEqual({
       formatVersion: 1,
@@ -191,12 +211,24 @@ describe('judging', () => {
     const { engine, input } = setup('abc', 'freeBackspace')
     input.emit(char('a', 1))
     input.emit(char('x', 2))
-    expect(engine.view).toMatchObject({ cursor: 2, markedAt: 1, errorCount: 1 })
+    expect(engine.view).toMatchObject({
+      cursor: 2,
+      markedAt: 1,
+      errorCount: 1,
+    })
     input.emit(char('c', 3))
-    expect(engine.view).toMatchObject({ cursor: 3, markedAt: 1, state: 'running' })
+    expect(engine.view).toMatchObject({
+      cursor: 3,
+      markedAt: 1,
+      state: 'running',
+    })
     input.emit(backspace(4))
     input.emit(backspace(5))
-    expect(engine.view).toMatchObject({ cursor: 1, markedAt: null, errorCount: 1 })
+    expect(engine.view).toMatchObject({
+      cursor: 1,
+      markedAt: null,
+      errorCount: 1,
+    })
     input.emit(char('b', 6))
     input.emit(char('c', 7))
     expect(engine.view).toMatchObject({ state: 'completed', errorCount: 1 })
@@ -214,7 +246,11 @@ describe('judging', () => {
   it('freeBackspace: a wrong character at the end blocks completion until erased', () => {
     const { engine, input, views } = setup('a', 'freeBackspace')
     input.emit(char('x', 1))
-    expect(engine.view).toMatchObject({ cursor: 1, markedAt: 0, state: 'running' })
+    expect(engine.view).toMatchObject({
+      cursor: 1,
+      markedAt: 0,
+      state: 'running',
+    })
     input.emit(char('z', 2))
     expect(views).toHaveLength(1)
     input.emit(backspace(3))
@@ -400,6 +436,10 @@ describe('view and segmentation', () => {
       awaited: 'l',
       upcoming: 'lo',
     })
-    expect(segmentText('hi', { cursor: 2 })).toEqual({ typed: 'hi', awaited: '', upcoming: '' })
+    expect(segmentText('hi', { cursor: 2 })).toEqual({
+      typed: 'hi',
+      awaited: '',
+      upcoming: '',
+    })
   })
 })

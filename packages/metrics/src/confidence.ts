@@ -9,7 +9,12 @@ import { CONFIDENCE_HALF_LIFE, CONFIDENCE_MIN_SAMPLES, REFERENCE_IKI_MS } from '
 /** `2^(−1/10)`: the factor that halves a counter after exactly `CONFIDENCE_HALF_LIFE` attempts. */
 const DECAY = 2 ** (-1 / CONFIDENCE_HALF_LIFE)
 
-const ZERO: WeightedCounters = { wHits: 0, wMisses: 0, wSumIki: 0, wSumIkiSq: 0 }
+const ZERO: WeightedCounters = {
+  wHits: 0,
+  wMisses: 0,
+  wSumIki: 0,
+  wSumIkiSq: 0,
+}
 
 function foldElements(
   prior: Readonly<Record<string, WeightedCounters>>,

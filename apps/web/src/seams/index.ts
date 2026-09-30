@@ -16,7 +16,13 @@
 
 import type { Attempt, Settings, StoredEnvelope } from '@typing-race/domain'
 
-export type { Clock, InputEvent, InputSource, LayoutProbe, Random } from '@typing-race/domain'
+export type {
+  Clock,
+  InputEvent,
+  InputSource,
+  LayoutProbe,
+  Random,
+} from '@typing-race/domain'
 
 /**
  * The seam F2 replaces with Supabase, so its shape is designed for that now: asynchronous,

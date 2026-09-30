@@ -97,42 +97,42 @@ another lane's unmerged code, so none of this can live in a lane.
 
 ### `packages/ui` — tokens, themes, primitives
 
-- [ ] T025 Serene Script tokens as CSS custom properties in `packages/ui/src/tokens.css`: the five core colours, the finger-colour group (ink / tint / line per finger) from ticket 20
-- [ ] T026 [P] The dark theme and the low-vision preset as full theme blocks under `[data-theme="dark"]` and `[data-theme="low-vision"]` in `packages/ui/src/themes.css`; low-vision is a third theme, never a scale factor (FR-062)
-- [ ] T027 [P] Self-host and subset Source Serif 4, Source Sans 3 and JetBrains Mono under `packages/ui/src/fonts/` — FR-085; a hosted font would break FR-053 and FR-074 at once
-- [ ] T028 Motion tokens plus `resolveMotion` in `packages/ui/src/motion.ts`, per [docs/design/motion.md](../../docs/design/motion.md); the off state drives every duration to `0.01ms`, skips the confetti import and disables sound
-- [ ] T029 [P] Primitives in `packages/ui/src/components/`: button, keycap with its 2 px inset bevel, chip, field, card — all three themes, focus always visible
-- [ ] T030 [P] The icon set and the mark at three sizes in `packages/ui/src/icons/`, from ticket 20's `Identity` board
+- [X] T025 Serene Script tokens as CSS custom properties in `packages/ui/src/tokens.css`: the five core colours, the finger-colour group (ink / tint / line per finger) from ticket 20
+- [X] T026 [P] The dark theme and the low-vision preset as full theme blocks under `[data-theme="dark"]` and `[data-theme="low-vision"]` in `packages/ui/src/themes.css`; low-vision is a third theme, never a scale factor (FR-062)
+- [X] T027 [P] Self-host and subset Source Serif 4, Source Sans 3 and JetBrains Mono under `packages/ui/src/fonts/` — FR-085; a hosted font would break FR-053 and FR-074 at once
+- [X] T028 Motion tokens plus `resolveMotion` in `packages/ui/src/motion.ts`, per [docs/design/motion.md](../../docs/design/motion.md); the off state drives every duration to `0.01ms`, skips the confetti import and disables sound
+- [X] T029 [P] Primitives in `packages/ui/src/components/`: button, keycap with its 2 px inset bevel, chip, field, card — all three themes, focus always visible
+- [X] T030 [P] The icon set and the mark at three sizes in `packages/ui/src/icons/`, from ticket 20's `Identity` board
 
 ### `packages/curriculum/src/layout` — the keyboard model
 
-- [ ] T031 Layout, Key and Transition types in `packages/curriculum/src/layout/types.ts` (FR-001, FR-005)
-- [ ] T032 The ЙЦУКЕН finger map as data in `packages/curriculum/src/layout/yq.ts`, including the ticket-10 extensions: apostrophe on the left pinky, `ґ` on the backslash key, hyphen and digits (FR-001, FR-003, FR-006)
-- [ ] T033 [P] The QWERTY finger map as data in `packages/curriculum/src/layout/qwerty.ts` (FR-001, FR-003)
-- [ ] T034 Table test in `packages/curriculum/src/layout/layout.test.ts` asserting every supported key in both layouts resolves to **exactly one** finger — none unassigned, none twice; the space bar on the thumbs and Shift on the opposite-hand pinky (FR-002, FR-003, FR-004, SC-004, requirements §8.4)
-- [ ] T035 `fingerOf` and `transitionOf` in `packages/curriculum/src/layout/query.ts`, with `sameFinger` detection and property tests (FR-005)
-- [ ] T036 Derive the Unlock Order per [research.md R7](./research.md#r7-unlock-order) in `packages/curriculum/src/layout/unlock-order.ts`, with the initial anchor set (FR-084) and tests that it covers every unlockable key exactly once and excludes space
-- [ ] T037 Verify the macOS positions of `ґ` and the apostrophe against a real machine and correct `yq.ts` — the data, never the code; `data-model.md` records this as an unvalidated assumption
+- [X] T031 Layout, Key and Transition types in `packages/curriculum/src/layout/types.ts` (FR-001, FR-005)
+- [X] T032 The ЙЦУКЕН finger map as data in `packages/curriculum/src/layout/yq.ts`, including the ticket-10 extensions: apostrophe on the left pinky, `ґ` on the backslash key, hyphen and digits (FR-001, FR-003, FR-006)
+- [X] T033 [P] The QWERTY finger map as data in `packages/curriculum/src/layout/qwerty.ts` (FR-001, FR-003)
+- [X] T034 Table test in `packages/curriculum/src/layout/layout.test.ts` asserting every supported key in both layouts resolves to **exactly one** finger — none unassigned, none twice; the space bar on the thumbs and Shift on the opposite-hand pinky (FR-002, FR-003, FR-004, SC-004, requirements §8.4)
+- [X] T035 `fingerOf` and `transitionOf` in `packages/curriculum/src/layout/query.ts`, with `sameFinger` detection and property tests (FR-005)
+- [X] T036 Derive the Unlock Order per [research.md R7](./research.md#r7-unlock-order) in `packages/curriculum/src/layout/unlock-order.ts`, with the initial anchor set (FR-084) and tests that it covers every unlockable key exactly once and excludes space
+- [ ] T037 Verify the macOS positions of `ґ` and the apostrophe against a real machine and correct `yq.ts` — the data, never the code; `data-model.md` records this as an unvalidated assumption **BLOCKED 2026-09-30 — this is a Windows machine and the task asks for the macOS positions of `ґ` and the apostrophe to be verified against a real Mac. The `yq.ts` data records the Windows/Linux positions and its header comment says the macOS correction belongs in that data, never in code. Needs a person with a Mac**
 
 ### `packages/curriculum/src/scales` — the eight generators
 
-- [ ] T038 Scale and Scale Catalogue types in `packages/curriculum/src/scales/types.ts`
-- [ ] T039 Generators `run`, `mirror` and `alternate` in `packages/curriculum/src/scales/generators/`, per [research.md R6](./research.md#r6-generating-the-eight-stage-1-scale-types-from-a-finger-map) (FR-008, FR-009)
-- [ ] T040 Generators `fingerIsolation` and `fingerSpan` — kept distinct, because they are two separate bullets of the requirements' Stage 1 list and `fingerSpan` is the only place the index fingers' six-key spans are drilled (FR-008, FR-009)
-- [ ] T041 Generators `vertical`, `modifiers` (space · Shift with the opposite-hand pinky · digits · punctuation) and `tempo` (one motif against a stepping metronome target) — FR-008, FR-009
-- [ ] T042 `generateText` in `packages/curriculum/src/scales/generate.ts` returning `'requirements-unmet'` rather than degrading when the unlocked set cannot serve the generator
-- [ ] T043 Property tests in `packages/curriculum/src/scales/generate.test.ts`: generated text never contains a locked character (FR-012); the Focus Element appears in every item (FR-046); identical `(scale, unlocked, seed)` gives identical text
-- [ ] T044 The Scale Catalogue for both layouts in `packages/curriculum/src/scales/catalogue.ts` with the authored metadata of FR-011 and a `goal` message key per scale (FR-010, FR-013), plus a coverage test that all eight generator types are present for each and that every scale has a goal string in both interface languages (FR-008, SC-003)
+- [X] T038 Scale and Scale Catalogue types in `packages/curriculum/src/scales/types.ts`
+- [X] T039 Generators `run`, `mirror` and `alternate` in `packages/curriculum/src/scales/generators/`, per [research.md R6](./research.md#r6-generating-the-eight-stage-1-scale-types-from-a-finger-map) (FR-008, FR-009)
+- [X] T040 Generators `fingerIsolation` and `fingerSpan` — kept distinct, because they are two separate bullets of the requirements' Stage 1 list and `fingerSpan` is the only place the index fingers' six-key spans are drilled (FR-008, FR-009)
+- [X] T041 Generators `vertical`, `modifiers` (space · Shift with the opposite-hand pinky · digits · punctuation) and `tempo` (one motif against a stepping metronome target) — FR-008, FR-009
+- [X] T042 `generateText` in `packages/curriculum/src/scales/generate.ts` returning `'requirements-unmet'` rather than degrading when the unlocked set cannot serve the generator
+- [X] T043 Property tests in `packages/curriculum/src/scales/generate.test.ts`: generated text never contains a locked character (FR-012); the Focus Element appears in every item (FR-046); identical `(scale, unlocked, seed)` gives identical text
+- [X] T044 The Scale Catalogue for both layouts in `packages/curriculum/src/scales/catalogue.ts` with the authored metadata of FR-011 and a `goal` message key per scale (FR-010, FR-013), plus a coverage test that all eight generator types are present for each and that every scale has a goal string in both interface languages (FR-008, SC-003)
 
 ### `packages/curriculum` — levels, progress, coach
 
-- [ ] T045 [P] The level table as data in `packages/curriculum/src/levels/table.ts`, plus `levelFor` taking the **stage** not the speed (FR-030, FR-080) and `passes`
-- [ ] T046 `deriveProgress` in `packages/curriculum/src/progress/derive.ts` — the fold over Attempt Aggregates in completion order (FR-050)
-- [ ] T047 The Mastery Rule inside the fold: three consecutive **Test** Attempts at or above the floor, a failing attempt resets, a Practice Attempt never counts (FR-039)
-- [ ] T048 The unlock rule inside the fold (FR-041), with a property test that the unlocked set is always a prefix of the Unlock Order (FR-042) and that no sequence of attempts, however fast, unlocks a key without three consecutive passes (SC-009, FR-040)
-- [ ] T049 The starting-level choice's forward-only effect on the unlocked boundary (FR-073), and Stage 1 completion at every scale done plus 96% over the last five attempts (FR-044)
-- [ ] T050 `nextAction` in `packages/curriculum/src/coach/next-action.ts` — strict priority, first match wins, returning **exactly one** value by type rather than by check (FR-031, FR-032, SC-010)
-- [ ] T051 Recommendation templates plus substitution in `packages/curriculum/src/coach/templates.ts`, so the exact sentence for given inputs is unit-testable (FR-034); Same-Finger Transitions weighted up for Ukrainian (FR-033); a Transition with fewer than five observations never named (FR-035)
+- [X] T045 [P] The level table as data in `packages/curriculum/src/levels/table.ts`, plus `levelFor` taking the **stage** not the speed (FR-030, FR-080) and `passes`
+- [X] T046 `deriveProgress` in `packages/curriculum/src/progress/derive.ts` — the fold over Attempt Aggregates in completion order (FR-050)
+- [X] T047 The Mastery Rule inside the fold: three consecutive **Test** Attempts at or above the floor, a failing attempt resets, a Practice Attempt never counts (FR-039)
+- [X] T048 The unlock rule inside the fold (FR-041), with a property test that the unlocked set is always a prefix of the Unlock Order (FR-042) and that no sequence of attempts, however fast, unlocks a key without three consecutive passes (SC-009, FR-040)
+- [X] T049 The starting-level choice's forward-only effect on the unlocked boundary (FR-073), and Stage 1 completion at every scale done plus 96% over the last five attempts (FR-044)
+- [X] T050 `nextAction` in `packages/curriculum/src/coach/next-action.ts` — strict priority, first match wins, returning **exactly one** value by type rather than by check (FR-031, FR-032, SC-010)
+- [X] T051 Recommendation templates plus substitution in `packages/curriculum/src/coach/templates.ts`, so the exact sentence for given inputs is unit-testable (FR-034); Same-Finger Transitions weighted up for Ukrainian (FR-033); a Transition with fewer than five observations never named (FR-035)
 
 ### `packages/metrics`
 

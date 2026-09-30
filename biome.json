@@ -58,6 +58,9 @@
       }
     }
   },
+  "css": {
+    "parser": { "tailwindDirectives": true }
+  },
   "javascript": {
     "formatter": {
       "quoteStyle": "single",
@@ -88,6 +91,10 @@
     {
       "includes": ["apps/web/src/seams/**", "apps/web/src/sw/**"],
       "linter": { "rules": { "style": { "noRestrictedGlobals": "off" } } }
+    },
+    {
+      "includes": ["packages/ui/src/tokens.css"],
+      "linter": { "rules": { "complexity": { "noImportantStyles": "off" } } }
     }
   ]
 }

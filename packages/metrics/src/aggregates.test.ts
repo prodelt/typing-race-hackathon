@@ -27,7 +27,9 @@ describe('computeAggregates: fixed worked examples', () => {
     // Key b: one miss, then one hit with interval 300: count 2, misses 1, sum 300, sq 90000.
     // The 700 ms before the wrong key is hesitation and is not recorded.
     const a = aggregatesOf([ok('a', 500), bad('x', 700), back(100), ok('b', 300)], 'ab')
-    expect(a.keys).toEqual({ b: { count: 2, misses: 1, sumIki: 300, sumIkiSq: 90000 } })
+    expect(a.keys).toEqual({
+      b: { count: 2, misses: 1, sumIki: 300, sumIkiSq: 90000 },
+    })
     expect(a.transitions).toEqual({
       'a>b': { count: 2, misses: 1, sumIki: 300, sumIkiSq: 90000 },
     })
@@ -36,13 +38,18 @@ describe('computeAggregates: fixed worked examples', () => {
   it('records a miss on the very first key, which has no previous character', () => {
     // A wrong first key is a miss on a, but there is no transition into the first character.
     const a = aggregatesOf([bad('x', 800), ok('a', 300)], 'a')
-    expect(a.keys).toEqual({ a: { count: 2, misses: 1, sumIki: 300, sumIkiSq: 90000 } })
+    expect(a.keys).toEqual({
+      a: { count: 2, misses: 1, sumIki: 300, sumIkiSq: 90000 },
+    })
     expect(a.transitions).toEqual({})
   })
 
   it('drops a hit whose interval is a break, but keeps every miss', () => {
     // "ab": a, then b after 3001 ms (a break: not a usable interval, so not recorded at all).
-    expect(aggregatesOf([ok('a', 100), ok('b', 3001)], 'ab')).toEqual({ keys: {}, transitions: {} })
+    expect(aggregatesOf([ok('a', 100), ok('b', 3001)], 'ab')).toEqual({
+      keys: {},
+      transitions: {},
+    })
     // An interval of exactly 3000 ms is still usable.
     expect(aggregatesOf([ok('a', 100), ok('b', 3000)], 'ab').keys).toEqual({
       b: { count: 1, misses: 0, sumIki: 3000, sumIkiSq: 9000000 },

@@ -1,0 +1,124 @@
+/*
+ * T026. The two themes beyond the light default.
+ *
+ * Both are **full theme blocks**, not modifiers. Ticket 20 settled that the low-vision preset is a
+ * third theme rather than a scale factor on the light one (FR-062): it redefines borders, shadows,
+ * fills, tracking and sizes, because a preset built by multiplying the light theme produces
+ * hairlines that are still hairlines and tints that are still nearly invisible.
+ *
+ * Selection is `data-theme` on `<html>`, applied at boot before first paint so no frame of the
+ * wrong theme is ever shown. `theme: 'system'` resolves to light or dark in `theme.ts`; it never
+ * reaches this file as a value.
+ */
+
+/* ---------------------------------------------------------------------------------------------
+ * Dark — derived in ticket 20, because the pairs in AGENTS.md are token variants, not a theme.
+ * Sage and terracotta are lightened so both clear 4.5:1 against the dark ground.
+ * ------------------------------------------------------------------------------------------- */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --color-paper: #191c19;
+  --color-paper-raised: #232723;
+  --color-ink: #e8e8e0;
+  --color-sage: #7fae8b;
+  --color-terracotta: #f08a63;
+  --color-muted: #8e968d;
+
+  --color-hairline: #333833;
+  --color-hairline-strong: #3c423b;
+  --color-sage-tint: #223026;
+  --color-terracotta-tint: #3a2318;
+  --color-nav-dimmed: #6c746b;
+
+  /* Finger inks lift and tints darken; the line stays the mid value so a keycap still reads as
+   * a keycap rather than as a filled block. */
+  --color-finger-pinky-ink: #b7a6e0;
+  --color-finger-pinky-tint: #272335;
+  --color-finger-pinky-line: #4b4266;
+
+  --color-finger-ring-ink: #8fc79e;
+  --color-finger-ring-tint: #1f2c23;
+  --color-finger-ring-line: #3d5a46;
+
+  --color-finger-middle-ink: #dcb567;
+  --color-finger-middle-tint: #2e2718;
+  --color-finger-middle-line: #5c4c26;
+
+  --color-finger-index-ink: #86bcd8;
+  --color-finger-index-tint: #1c2830;
+  --color-finger-index-line: #34505f;
+
+  --color-finger-thumb-ink: #a3aea6;
+  --color-finger-thumb-tint: #232723;
+  --color-finger-thumb-line: #414a43;
+
+  /* Shadow does almost nothing on a dark ground; the hairline carries the separation instead. */
+  --shadow-paper: 0 1px 2px rgb(0 0 0 / 40%);
+  --shadow-raised: 0 2px 6px rgb(0 0 0 / 50%);
+}
+
+/* ---------------------------------------------------------------------------------------------
+ * Low vision — a third theme (FR-062).
+ *
+ * What changes and why: near-black on near-white for maximum contrast; every hairline becomes a
+ * 2px visible border, because a 1px #E6E4DA line is not a boundary to a low-vision reader; tints
+ * deepen so a filled region is unmistakably filled; letter spacing opens; the typing line and the
+ * interface both grow. Shadows are removed entirely — a soft shadow reads as blur, not as depth.
+ * ------------------------------------------------------------------------------------------- */
+:root[data-theme="low-vision"] {
+  color-scheme: light;
+
+  --color-paper: #ffffff;
+  --color-paper-raised: #ffffff;
+  --color-ink: #101310;
+  --color-sage: #1f5130;
+  --color-terracotta: #a3260b;
+  --color-muted: #4a544c;
+
+  --color-hairline: #101310;
+  --color-hairline-strong: #101310;
+  --color-sage-tint: #d3e6d8;
+  --color-terracotta-tint: #f6d9d1;
+  --color-nav-dimmed: #4a544c;
+
+  --color-finger-pinky-ink: #3d2f66;
+  --color-finger-pinky-tint: #ded6f0;
+  --color-finger-pinky-line: #3d2f66;
+
+  --color-finger-ring-ink: #1f5130;
+  --color-finger-ring-tint: #d3e6d8;
+  --color-finger-ring-line: #1f5130;
+
+  --color-finger-middle-ink: #5a3f00;
+  --color-finger-middle-tint: #f0e2c0;
+  --color-finger-middle-line: #5a3f00;
+
+  --color-finger-index-ink: #103c52;
+  --color-finger-index-tint: #cfe3ee;
+  --color-finger-index-line: #103c52;
+
+  --color-finger-thumb-ink: #2c3630;
+  --color-finger-thumb-tint: #e4e8e2;
+  --color-finger-thumb-line: #2c3630;
+
+  --text-typing: 40px;
+  --leading-typing: 1.7;
+  --tracking-typing: 0.02em;
+
+  --border-hairline: 2px;
+  --radius-card: 10px;
+  --radius-keycap: 6px;
+  --keycap-bevel: 3px;
+
+  --shadow-paper: none;
+  --shadow-raised: none;
+}
+
+/* Focus is always visible, in every theme. Never removed, never reduced to a colour change —
+ * a learner navigating by keyboard must be able to see where they are at all times. */
+:where(:focus-visible) {
+  outline: 3px solid var(--color-sage);
+  outline-offset: 2px;
+  border-radius: 3px;
+}

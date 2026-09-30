@@ -154,11 +154,19 @@ describe('engine properties', () => {
   })
 
   it('Ukrainian і ї є ґ are judged as themselves and lookalikes are wrong', () => {
-    const lookalike: Record<string, string> = { і: 'i', ї: 'ï', є: 'e', ґ: 'г' }
+    const lookalike: Record<string, string> = {
+      і: 'i',
+      ї: 'ï',
+      є: 'e',
+      ґ: 'г',
+    }
     fc.assert(
       fc.property(fc.constantFrom('і', 'ї', 'є', 'ґ'), modeArb, (c, mode) => {
         const right = drive(c, mode, [char(c, 1)])
-        expect(right.engine.view).toMatchObject({ state: 'completed', errorCount: 0 })
+        expect(right.engine.view).toMatchObject({
+          state: 'completed',
+          errorCount: 0,
+        })
         const wrong = drive(c, mode, [char(lookalike[c] ?? '', 1)])
         expect(wrong.engine.view.errorCount).toBe(1)
         expect(wrong.engine.view.state).toBe('running')
@@ -176,7 +184,10 @@ describe('engine properties', () => {
           const text = textParts.join('')
           const typed = typedParts.slice(0, textParts.length).join('')
           const { engine } = drive(text, mode, typeText(typed))
-          expect(engine.view).toMatchObject({ state: 'completed', errorCount: 0 })
+          expect(engine.view).toMatchObject({
+            state: 'completed',
+            errorCount: 0,
+          })
           expect(engine.finish().char.every((c) => c === "'")).toBe(true)
         },
       ),

@@ -98,7 +98,9 @@ describe('scriptedInput (T017)', () => {
   })
 
   it('probes as producible and needs no DOM', async () => {
-    await expect(scriptedInput([]).probeLayout()).resolves.toEqual({ producible: true })
+    await expect(scriptedInput([]).probeLayout()).resolves.toEqual({
+      producible: true,
+    })
   })
 })
 
@@ -115,7 +117,12 @@ describe('domInputSource (T016, T018)', () => {
 
   function beforeInput(element: HTMLTextAreaElement, inputType: string, data: string | null) {
     element.dispatchEvent(
-      new window.InputEvent('beforeinput', { inputType, data, bubbles: true, cancelable: true }),
+      new window.InputEvent('beforeinput', {
+        inputType,
+        data,
+        bubbles: true,
+        cancelable: true,
+      }),
     )
   }
 

@@ -8,10 +8,13 @@
   ],
   "description": "Serene Script: tokens as CSS custom properties, the three themes, primitives, icons and the motion flag.",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./tokens.css": "./src/tokens.css",
+    "./themes.css": "./src/themes.css"
   },
   "types": "./src/index.ts",
   "dependencies": {
+    "@typing-race/domain": "workspace:*",
     "react": "19.3.0",
     "react-dom": "19.3.0"
   }

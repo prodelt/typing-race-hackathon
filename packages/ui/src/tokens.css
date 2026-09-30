@@ -1,0 +1,137 @@
+/*
+ * T025. Serene Script — every design value as a CSS custom property.
+ *
+ * Why custom properties rather than Tailwind variants: there are three themes, and ticket 20
+ * settled that the low-vision preset is a *third theme* rather than a scale factor — it redefines
+ * borders, shadows, fills, tracking and sizes rather than multiplying them. With variants that is
+ * three class names on every styled element; here it is one declaration block per theme, and the
+ * component markup never mentions a theme at all (research R2).
+ *
+ * It is also where the motion flag lives: one attribute drives every duration to 0.01ms, which is
+ * what makes visual comparisons deterministic (FR-064).
+ *
+ * `@theme static` forces every variable into the build rather than only the ones Tailwind sees
+ * used — the dark and low-vision blocks redefine variables the light theme may never reference.
+ */
+
+@import "tailwindcss";
+@import "./fonts.css";
+
+@theme static {
+  /* ---- The five core colours (light theme, the default) ------------------------------- */
+  --color-paper: #faf9f5;
+  --color-paper-raised: #ffffff;
+  --color-ink: #2d312e;
+  --color-sage: #4a7c59;
+  --color-terracotta: #d95d39;
+  --color-muted: #94a3b8;
+
+  /* Derived surfaces. Ticket 20: a 1px border plus a two-layer shadow is the whole paper effect. */
+  --color-hairline: #e6e4da;
+  --color-hairline-strong: #d5d2c4;
+  --color-sage-tint: #e9f0ea;
+  --color-terracotta-tint: #fbe9e3;
+  --color-nav-dimmed: #a3aaa4;
+
+  /* ---- Finger colours: ink / tint / line, one triple per finger (ticket 20) ------------
+   * A keycap glyph takes its finger's *ink*, so the colour never carries meaning alone — the
+   * letter is still the letter, which is what keeps the guide usable without colour vision. */
+  --color-finger-pinky-ink: #6b5b96;
+  --color-finger-pinky-tint: #efebf6;
+  --color-finger-pinky-line: #cfc4e4;
+
+  --color-finger-ring-ink: #316342;
+  --color-finger-ring-tint: #e9f0ea;
+  --color-finger-ring-line: #bfd4c4;
+
+  --color-finger-middle-ink: #8a6416;
+  --color-finger-middle-tint: #f7efdf;
+  --color-finger-middle-line: #e3cfa4;
+
+  --color-finger-index-ink: #265c79;
+  --color-finger-index-tint: #e6eff4;
+  --color-finger-index-line: #b8d2df;
+
+  --color-finger-thumb-ink: #5f6b63;
+  --color-finger-thumb-tint: #f2f4ee;
+  --color-finger-thumb-line: #d9dcd6;
+
+  /* ---- Typography ---------------------------------------------------------------------- */
+  --font-typing: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-ui: "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+
+  /* The typing line's own size is a *setting* (24–40 px), so it is a variable the app writes. */
+  --text-typing: 28px;
+  --leading-typing: 1.5;
+  --tracking-typing: 0;
+
+  /* ---- Shape ---------------------------------------------------------------------------- */
+  --radius-card: 18px;
+  --radius-keycap: 8px;
+  --radius-chip: 999px;
+  --radius-field: 10px;
+
+  --border-hairline: 1px;
+  /* The 2px inset bottom bevel on a keycap is the entire "tactile" budget. No gradients. */
+  --keycap-bevel: 2px;
+
+  --shadow-paper: 0 1px 2px rgb(45 49 46 / 4%), 0 8px 20px -20px rgb(45 49 46 / 18%);
+  --shadow-raised: 0 1px 2px rgb(45 49 46 / 6%), 0 12px 28px -18px rgb(45 49 46 / 22%);
+
+  /* ---- Motion (docs/design/motion.md) ---------------------------------------------------
+   * Durations are tokens, never literals, so the motion flag turns everything off in one place
+   * rather than each animation checking a condition. */
+  --dur-instant: 90ms;
+  --dur-quick: 140ms;
+  --dur-base: 220ms;
+  --dur-slow: 420ms;
+  --dur-celebrate: 900ms;
+
+  --ease-standard: cubic-bezier(0.2, 0, 0.2, 1);
+  --ease-enter: cubic-bezier(0.05, 0.7, 0.1, 1);
+  --ease-exit: cubic-bezier(0.3, 0, 0.8, 0.15);
+  --ease-linear: linear;
+
+  --stagger-tile: 60ms;
+  --stagger-bar: 12ms;
+}
+
+:root {
+  color-scheme: light;
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-ui);
+}
+
+/*
+ * The motion kill switch (FR-064). One attribute, every duration. The value is 0.01ms rather than
+ * 0 because a zero-duration CSS transition fires no `transitionend`, and code that waits for one
+ * would hang instead of running instantly.
+ */
+:root[data-motion="off"] {
+  --dur-instant: 0.01ms;
+  --dur-quick: 0.01ms;
+  --dur-base: 0.01ms;
+  --dur-slow: 0.01ms;
+  --dur-celebrate: 0.01ms;
+  --stagger-tile: 0ms;
+  --stagger-bar: 0ms;
+}
+
+/* Reduced keeps the frame's short movements and drops the celebratory ones. */
+:root[data-motion="reduced"] {
+  --dur-slow: var(--dur-base);
+  --dur-celebrate: 0.01ms;
+  --stagger-tile: 0ms;
+  --stagger-bar: 0ms;
+}
+
+:root[data-motion="off"] *,
+:root[data-motion="off"] *::before,
+:root[data-motion="off"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}

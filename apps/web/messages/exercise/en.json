@@ -1,3 +1,11 @@
 {
-  "$schema": "https://inlang.com/schema/inlang-message-format"
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "scale_goal_run": "Walk the row without stopping: one finger per key, back to the home row after every press.",
+  "scale_goal_mirror": "Mirror pairs: the left and right hands repeat one movement. Keep both hands moving alike.",
+  "scale_goal_alternate": "Alternate hands. While one hand types, the other is already moving — that is what makes the tempo even.",
+  "scale_goal_finger_isolation": "One finger works, the rest stay on the home row. The goal is neighbours that do not lift.",
+  "scale_goal_vertical": "Row changes on the same finger. Only the finger moves, never the whole hand.",
+  "scale_goal_finger_span": "The index finger's full six-key span. The palm stays where it is.",
+  "scale_goal_modifiers": "Shift with the opposite pinky, space with a thumb, digits and punctuation without looking down.",
+  "scale_goal_tempo": "Hold the metronome's tempo. Accuracy before speed: if you stumble, slow down."
 }

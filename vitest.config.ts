@@ -88,7 +88,12 @@ export default defineConfig({
         'packages/curriculum/src/**',
         'packages/engine/src/**',
       ],
-      thresholds: { lines: 100, functions: 100, branches: 100, statements: 100 },
+      thresholds: {
+        lines: 100,
+        functions: 100,
+        branches: 100,
+        statements: 100,
+      },
     },
   },
 })

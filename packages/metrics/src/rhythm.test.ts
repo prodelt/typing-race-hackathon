@@ -60,7 +60,10 @@ describe('rhythmConsistencyOf: fixed worked examples (research R5)', () => {
   })
 
   it('reports 0 with fewer than two eligible intervals', () => {
-    expect(rhythmConsistencyOf(buildLog([]))).toEqual({ value: 0, breaksExcluded: 0 })
+    expect(rhythmConsistencyOf(buildLog([]))).toEqual({
+      value: 0,
+      breaksExcluded: 0,
+    })
     expect(rhythmConsistencyOf(buildLog([ok('a', 10), ok('b', 100)]))).toEqual({
       value: 0,
       breaksExcluded: 0,
@@ -90,7 +93,10 @@ describe('rhythmConsistencyOf: properties', () => {
   it('is scale-free: multiplying every interval by k leaves the value unchanged', () => {
     fc.assert(
       fc.property(
-        fc.array(fc.integer({ min: 1, max: 1000 }), { minLength: 3, maxLength: 30 }),
+        fc.array(fc.integer({ min: 1, max: 1000 }), {
+          minLength: 3,
+          maxLength: 30,
+        }),
         fc.integer({ min: 2, max: 3 }),
         (dts, k) => {
           const scaled = rhythmConsistencyOf(buildLog(dts.map((dt) => ok('a', dt * k))))

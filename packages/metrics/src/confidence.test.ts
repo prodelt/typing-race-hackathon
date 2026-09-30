@@ -98,13 +98,19 @@ describe('confidenceOf: fixed worked examples (research R4)', () => {
 
   it('leaves an element untouched by an attempt that never observed it', () => {
     const before = foldAll([statsOf([200, 200, 200, 200, 200], 0)])
-    const after = foldConfidence(before, { keys: { b: statsOf([200], 0) }, transitions: {} })
+    const after = foldConfidence(before, {
+      keys: { b: statsOf([200], 0) },
+      transitions: {},
+    })
     expect(after.keys['a']).toEqual(before.keys['a'])
   })
 
   it('reads a Transition by its a>b key, separately from keys', () => {
     const hits = statsOf([300, 300, 300, 300, 300], 0)
-    const state = foldConfidence(EMPTY, { keys: {}, transitions: { 'a>b': hits } })
+    const state = foldConfidence(EMPTY, {
+      keys: {},
+      transitions: { 'a>b': hits },
+    })
     expect(confidenceOf(state, 'a>b')).toBe(1)
     expect(confidenceOf(state, 'a')).toBeUndefined()
   })
@@ -157,7 +163,11 @@ describe('confidence: properties', () => {
     fc.assert(
       fc.property(historyArbitrary, statsArbitrary, (history, latest) => {
         const before = confidenceOf(foldAll([...history, latest]), 'a')
-        const withMiss = { ...latest, count: latest.count + 1, misses: latest.misses + 1 }
+        const withMiss = {
+          ...latest,
+          count: latest.count + 1,
+          misses: latest.misses + 1,
+        }
         const after = confidenceOf(foldAll([...history, withMiss]), 'a')
         if (before !== undefined) {
           expect(after).toBeDefined()

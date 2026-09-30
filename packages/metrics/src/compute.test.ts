@@ -4,7 +4,12 @@ import { computeMetrics } from './compute'
 import { back, bad, buildLog, EMPTY_LAYOUT, ignored, ok, type RawEvent } from './logs'
 
 const metricsOf = (events: readonly RawEvent[], text: string, elapsedMs: number) =>
-  computeMetrics({ log: buildLog(events), text, layout: EMPTY_LAYOUT, elapsedMs })
+  computeMetrics({
+    log: buildLog(events),
+    text,
+    layout: EMPTY_LAYOUT,
+    elapsedMs,
+  })
 
 // Requirements 8.1 (SPM and accuracy on fixed examples) and 8.2 (corrected errors).
 describe('computeMetrics: fixed worked examples', () => {
@@ -100,10 +105,21 @@ describe('computeMetrics: fixed worked examples', () => {
     }
     // Event 0 is a correct a. Event 1 has no character and event 2 has no char entry at all, so
     // both are skipped.
-    const m = computeMetrics({ log, text: 'ab', layout: EMPTY_LAYOUT, elapsedMs: 1000 })
+    const m = computeMetrics({
+      log,
+      text: 'ab',
+      layout: EMPTY_LAYOUT,
+      elapsedMs: 1000,
+    })
     expect(m.accuracy).toBe(1)
     // A missing correct flag is read as wrong, a missing dt as 0.
-    const short = { formatVersion: 1, dt: [], kind: ['char'] as const, char: ['a'], correct: [] }
+    const short = {
+      formatVersion: 1,
+      dt: [],
+      kind: ['char'] as const,
+      char: ['a'],
+      correct: [],
+    }
     const shortMetrics = computeMetrics({
       log: short,
       text: 'a',

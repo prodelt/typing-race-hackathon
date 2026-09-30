@@ -21,7 +21,12 @@ import {
 } from './machine'
 import type { EngineView } from './types'
 
-export { type ManualClock, manualClock, type ScriptedInput, scriptedInput } from './testing'
+export {
+  type ManualClock,
+  manualClock,
+  type ScriptedInput,
+  scriptedInput,
+} from './testing'
 export type { AttemptState, EngineView } from './types'
 
 export interface Engine {

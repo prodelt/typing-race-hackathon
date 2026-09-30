@@ -61,7 +61,11 @@ export function abandon(state: MachineState): MachineState {
 }
 
 export type CharOutcome =
-  | { readonly kind: 'judged'; readonly state: MachineState; readonly correct: boolean }
+  | {
+      readonly kind: 'judged'
+      readonly state: MachineState
+      readonly correct: boolean
+    }
   /** Nothing is awaited: `freeBackspace` at the end of the text with a wrong character left in it. */
   | { readonly kind: 'overflow' }
 
@@ -88,7 +92,12 @@ export function applyChar(
     return {
       kind: 'judged',
       correct: true,
-      state: { ...state, cursor, markedAt, phase: done ? 'completed' : state.phase },
+      state: {
+        ...state,
+        cursor,
+        markedAt,
+        phase: done ? 'completed' : state.phase,
+      },
     }
   }
 

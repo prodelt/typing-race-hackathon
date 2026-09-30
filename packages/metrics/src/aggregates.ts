@@ -58,5 +58,8 @@ export function computeAggregates(args: {
     if (previous !== undefined) record(transitions, transitionKey(previous, awaited), iki)
   }
 
-  return { keys: Object.fromEntries(keys), transitions: Object.fromEntries(transitions) }
+  return {
+    keys: Object.fromEntries(keys),
+    transitions: Object.fromEntries(transitions),
+  }
 }

@@ -1,0 +1,5 @@
+export { catalogue, SCALE_GOAL_KEYS } from './catalogue'
+export { generateText } from './generate'
+export { tempoSteps } from './generators'
+export type { FocusElement, Scale, ScaleType } from './types'
+export { REQUIREMENTS_UNMET, SCALE_TYPES } from './types'

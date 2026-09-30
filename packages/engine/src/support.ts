@@ -10,9 +10,20 @@ export const layout: Layout = {
   unlockOrder: [],
 }
 
-export const char = (c: string, at: number): InputEvent => ({ kind: 'char', char: c, at })
-export const backspace = (at: number): InputEvent => ({ kind: 'backspace', at })
-export const ignored = (at: number): InputEvent => ({ kind: 'ignored', reason: 'modifier', at })
+export const char = (c: string, at: number): InputEvent => ({
+  kind: 'char',
+  char: c,
+  at,
+})
+export const backspace = (at: number): InputEvent => ({
+  kind: 'backspace',
+  at,
+})
+export const ignored = (at: number): InputEvent => ({
+  kind: 'ignored',
+  reason: 'modifier',
+  at,
+})
 
 export function setup(text: string, errorMode: ErrorMode = 'stopOnLetter') {
   const clock = manualClock()
