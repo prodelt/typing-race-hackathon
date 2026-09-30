@@ -330,12 +330,12 @@ abandoning mid-block keeps the attempts already recorded.
 
 - [ ] T141 Re-run `/speckit-analyze` and close anything it reports at the source
 - [ ] T142 [P] Confirm the 150 KB initial-JS budget holds on the production build, and that the latency gate still passes with every feature merged
-- [ ] T143 [P] Confirm the requirements' §8 checks each have a named passing test, and record the mapping in `quickstart.md`
+- [X] T143 [P] Confirm the requirements' §8 checks each have a named passing test, and record the mapping in `quickstart.md` **Done 2026-09-30 — the mapping is in [quickstart.md](./quickstart.md#validating-the-requirements-own-mandatory-checks), one named test per check across both layouts where the check demands it**
 - [ ] T144 [P] Walk the §9 demo route end to end on the production build and fix anything that breaks the sequence
 - [X] T145 [P] Confirm the 1024 px minimum width and the message shown below it (FR-067)
 - [ ] T146 [P] Confirm every F1 PR body carried `Waived: VII — authentication arrives in F2`
 - [ ] T147 Tick the reviewer-owned items in `checklists/core.md` that the merged work has satisfied, and open a ticket for anything still unresolved
-- [ ] T148 Audit every learner-facing and juror-facing string in the product — product page, Path, the typing screen, Formulas — for any claim that the program verifies the learner did not look at the keyboard, and confirm nothing requests camera, microphone or biometric access (FR-038). The requirements forbid claiming technically guaranteed gaze control, and §11 makes a misrepresented capability grounds for rejection
+- [X] T148 Audit every learner-facing and juror-facing string in the product — product page, Path, the typing screen, Formulas — for any claim that the program verifies the learner did not look at the keyboard, and confirm nothing requests camera, microphone or biometric access (FR-038). The requirements forbid claiming technically guaranteed gaze control, and §11 makes a misrepresented capability grounds for rejection **Done 2026-09-30 — audited every message catalogue and the four jury documents for claims about gaze, cameras, guarantees and absolutes. No over-claim found in learner-facing strings; `docs/pedagogy.md` states the limitation outright, that the trainer does not claim to verify whether the learner looked at the keyboard and needs no camera or microphone (FR-038)**
 - [ ] T149 Run `/speckit-converge` once for F1 and append anything it finds
 
 ---

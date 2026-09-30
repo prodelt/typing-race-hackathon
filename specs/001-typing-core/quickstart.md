@@ -58,14 +58,24 @@ Playwright spec carries.
 
 ## Validating the requirements' own mandatory checks
 
-| Check | Where it is proved |
-|---|---|
-| §8.1 SPM and accuracy on fixed examples | `packages/metrics` unit tests with hand-computed values |
-| §8.2 a corrected error still counts | `packages/metrics` and `packages/engine`, plus US1 and US2 E2E |
-| §8.4 every key has exactly one finger | `packages/curriculum` table test over both layouts |
-| §8.5 `і`, `ї`, `є`, `ґ` never substituted | `packages/engine` property test, plus a US1 scenario |
-| §8.9 lessons and results survive a reload | US3 E2E |
-| §8.10 basic training works offline after first load | US3 E2E with the network disabled |
+Each check maps to a **named** test, so a reviewer can run one command and read one result rather
+than take the claim on trust. Filled in as the work landed (T143).
+
+| Check | Named test | Where |
+|---|---|---|
+| §8.1 SPM and accuracy on fixed examples | `accuracyOf — fixed worked examples` and the `computeMetrics` worked examples, with the expected numbers computed by hand in comments | `packages/metrics/src/accuracy.test.ts`, `compute.test.ts` |
+| §8.2 a corrected error still counts | `keeps a corrected error in the denominator`, `counts every wrong keystroke, not only the last one before a correction`, and `Backspace never lowers errorCount and never passes index 0` | `packages/metrics/src/accuracy.test.ts`, `packages/engine/src/engine.property.test.ts` |
+| §8.2 end to end, in a browser | the wrong-key-then-Backspace scenario driven through the real `beforeinput` path | `e2e/exercise.spec.ts`, and verified by hand on the production build on 2026-09-30 |
+| §8.4 every key has exactly one finger | `gives every supported character exactly one key and one finger (FR-002, SC-004)`, over **both** layouts, plus `matches the finger map in CONTEXT.md` | `packages/curriculum/src/layout/layout.test.ts` |
+| §8.5 `і`, `ї`, `є`, `ґ` never substituted | `Ukrainian і ї є ґ are judged as themselves and lookalikes are wrong` (property) and `judges і ї є ґ as themselves and rejects lookalikes` (example), plus `folds nothing else — і, ї, є and ґ stay themselves (FR-006)` | `packages/engine/src/engine.property.test.ts`, `engine.test.ts`, `units.test.ts` |
+| §8.9 lessons and results survive a reload | the US3 reload scenario | `e2e/path-progress.spec.ts` |
+| §8.10 basic training works offline after first load | the US3 offline scenario, with `context.setOffline(true)` | `e2e/path-progress.spec.ts` |
+
+Two of these are worth naming for what they *rule out* rather than what they assert. The
+`accuracyOf` example `reports 0 for an attempt with no character keystrokes, not a flattering 1`
+exists because the obvious implementation returns 1 for an empty attempt. And
+`replaying a finished attempt reproduces its errorCount and final cursor` is not in the
+requirements at all: it is what F2's server-side validation will do, so it had better hold now.
 
 ## Validating the demo route
 
