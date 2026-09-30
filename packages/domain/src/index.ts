@@ -338,3 +338,43 @@ export function parseTransitionKey(key: TransitionKey): { from: string; to: stri
   if (separator <= 0 || separator === key.length - 1) return undefined
   return { from: key.slice(0, separator), to: key.slice(separator + 1) }
 }
+
+// ---------------------------------------------------------------------------------------------
+// Seam ports
+//
+// Declared here rather than in `apps/web/src/seams/` so that `packages/engine` can consume them
+// without depending on the application. The seams directory holds the *adapters*; these are the
+// interfaces they satisfy. Signatures follow `specs/001-typing-core/contracts/seams.md`.
+// ---------------------------------------------------------------------------------------------
+
+export interface Clock {
+  /** Monotonic milliseconds. Never wall-clock — an attempt must survive a clock change. */
+  now(): number
+}
+
+export interface Random {
+  /** A float in [0, 1). Seeded, so a generated exercise is reproducible. */
+  next(): number
+}
+
+export type InputEvent =
+  | { readonly kind: 'char'; readonly char: string; readonly at: number }
+  | { readonly kind: 'backspace'; readonly at: number }
+  | {
+      readonly kind: 'ignored'
+      readonly reason: 'modifier' | 'composition' | 'deadKey'
+      readonly at: number
+    }
+
+export interface LayoutProbe {
+  readonly producible: boolean
+  readonly suggestedLayoutId?: LayoutId
+}
+
+/** The only seam that knows a keyboard exists. The engine consumes events; it never reads the DOM. */
+export interface InputSource {
+  subscribe(listener: (event: InputEvent) => void): () => void
+  /** Probe what the active physical layout produces, for the pre-start check (FR-021). */
+  probeLayout(): Promise<LayoutProbe>
+  focus(): void
+}
