@@ -49,3 +49,7 @@ Desktop.ini
 
 # Paraglide compiler output — generated at build time from apps/web/messages/
 apps/web/src/paraglide/
+
+# Supabase local state — only migrations, functions, seed and config are tracked
+supabase/.branches/
+supabase/.temp/
