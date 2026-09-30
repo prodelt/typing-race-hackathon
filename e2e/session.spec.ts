@@ -147,6 +147,21 @@ function minutesStated(text: string): number {
   return Number(match[1])
 }
 
+/**
+ * The audit, after the page has stopped moving. "Motion off" leaves transitions of a hundredth of a
+ * millisecond behind rather than none, so the frame after a theme change can still hold the old
+ * colours, and axe samples colours. Waiting for them to land makes the audit about the screen and
+ * not about a frame.
+ */
+async function audit(page: Page): Promise<void> {
+  await page.evaluate(() =>
+    Promise.all(
+      document.getAnimations().map((animation) => animation.finished.then(() => undefined)),
+    ),
+  )
+  await expectNoAxeViolations(page)
+}
+
 test.describe('US6 a guided session', () => {
   test('the expected length is stated before the first block, between 15 and 25 minutes (scenario 1)', async ({
     page,
@@ -223,7 +238,7 @@ test.describe('US6 a guided session', () => {
   }) => {
     await seedLearner(page, SLOW)
     await openSessionFromToday(page)
-    await expectNoAxeViolations(page)
+    await audit(page)
 
     // Warm-up: two practice attempts.
     await page.getByRole('button', { name: 'Почати першу вправу' }).click()
@@ -231,7 +246,7 @@ test.describe('US6 a guided session', () => {
     await typeExerciseThroughToResult(page)
     await toSession(page)
     await expectBlock(page, 1, 'Розминка', 1, 2)
-    await expectNoAxeViolations(page)
+    await audit(page)
     await page.getByRole('button', { name: 'Почати спробу 2 з 2' }).click()
     await typeExerciseThroughToResult(page)
     await toSession(page)
@@ -243,7 +258,7 @@ test.describe('US6 a guided session', () => {
     betweenScreens += 1
     await expect(between).toContainText('Щойно завершено: Розминка')
     await expect(between).toContainText('Далі: Головна навичка')
-    await expectNoAxeViolations(page)
+    await audit(page)
     await between.getByRole('button', { name: 'Перейти до наступного блоку' }).click()
 
     // Target skill: two practice attempts.
@@ -289,12 +304,12 @@ test.describe('US6 a guided session', () => {
       pending.getByRole('button', { name: 'Вправа на механіку (це не текст)' }),
     ).toBeVisible()
     await expect(pending).toContainText('Необов’язково. Вона не входить до сесії')
-    await expectNoAxeViolations(page)
+    await audit(page)
 
     await pending.getByRole('button', { name: 'Завершити сесію' }).click()
     await expect(page.getByRole('heading', { name: 'Сесію завершено' })).toBeVisible()
     await expect(page.getByText('За цю сесію записано спроб: 6.')).toBeVisible()
-    await expectNoAxeViolations(page)
+    await audit(page)
   })
 
   test('leaving after one completed attempt keeps it, and the session can be resumed or abandoned (scenario 5)', async ({

@@ -98,6 +98,21 @@ async function longestMotion(page: Page): Promise<number> {
   })
 }
 
+/**
+ * The audit, after the page has stopped moving. "Motion off" leaves transitions of a hundredth of a
+ * millisecond behind rather than none, so the frame after a theme change can still hold the old
+ * colours, and axe samples colours. Waiting for them to land makes the audit about the screen and
+ * not about a frame.
+ */
+async function audit(page: Page): Promise<void> {
+  await page.evaluate(() =>
+    Promise.all(
+      document.getAnimations().map((animation) => animation.finished.then(() => undefined)),
+    ),
+  )
+  await expectNoAxeViolations(page)
+}
+
 test.describe('US5 settings', () => {
   test('system, light, dark and the low-vision preset are offered, light is the default, and each applies at once (scenario 1)', async ({
     page,
@@ -253,10 +268,14 @@ test.describe('US5 settings', () => {
     }
 
     // The range has ends: asking for more or less lands on them, never outside.
-    await slider.fill('99')
-    await expect(slider).toHaveValue('40')
-    await slider.fill('3')
+    await slider.press('Home')
     await expect(slider).toHaveValue('24')
+    await slider.press('ArrowLeft')
+    await expect(slider).toHaveValue('24')
+    await slider.press('End')
+    await expect(slider).toHaveValue('40')
+    await slider.press('ArrowRight')
+    await expect(slider).toHaveValue('40')
 
     // And the typing line changes size: the setting is for the exercise text, not just a preview.
     await slider.fill('36')
@@ -676,7 +695,7 @@ test.describe('US5 accessibility audit of every screen (SC-011)', () => {
       await seedLearner(page)
       await page.goto(path)
       await expect(page.getByRole('heading', { level: 1 }).first()).toBeVisible()
-      await expectNoAxeViolations(page)
+      await audit(page)
     })
   }
 
@@ -684,7 +703,7 @@ test.describe('US5 accessibility audit of every screen (SC-011)', () => {
     await page.emulateMedia({ reducedMotion: 'reduce' })
     await page.goto('/today')
     await expect(page.getByRole('heading', { name: 'З чого почнемо?' })).toBeVisible()
-    await expectNoAxeViolations(page)
+    await audit(page)
   })
 
   test('the typing screen and its pause dialog have no accessibility violations', async ({
@@ -694,14 +713,14 @@ test.describe('US5 accessibility audit of every screen (SC-011)', () => {
     await page.goto(`/exercise/${ANCHORS}?mode=practice`)
     await page.getByRole('button', { name: 'Почати', exact: true }).click()
     await expect(page.getByTestId('typing-line')).toBeVisible()
-    await expectNoAxeViolations(page)
+    await audit(page)
 
     // Escape pauses a running attempt, and an attempt runs from its first character.
     const first = (await page.getByTestId('typing-line').locator('p.sr-only').textContent()) ?? ''
     await typeChar(page, [...first][0] ?? '')
     await page.keyboard.press('Escape')
     await expect(page.getByRole('dialog', { name: 'Пауза' })).toBeVisible()
-    await expectNoAxeViolations(page)
+    await audit(page)
   })
 
   // The dark theme and the low-vision preset are themes of their own, so a pass in light proves
@@ -723,7 +742,7 @@ test.describe('US5 accessibility audit of every screen (SC-011)', () => {
           'data-theme',
           theme === 'lowVision' ? 'low-vision' : theme,
         )
-        await expectNoAxeViolations(page)
+        await audit(page)
       })
     }
   }

@@ -113,6 +113,21 @@ async function expectSingleNextAction(page: Page): Promise<void> {
   await expect(next.getByRole('button', { name: 'Почати' })).toBeVisible()
 }
 
+/**
+ * The audit, after the page has stopped moving. "Motion off" leaves transitions of a hundredth of a
+ * millisecond behind rather than none, so the frame after a theme change can still hold the old
+ * colours, and axe samples colours. Waiting for them to land makes the audit about the screen and
+ * not about a frame.
+ */
+async function audit(page: Page): Promise<void> {
+  await page.evaluate(() =>
+    Promise.all(
+      document.getAnimations().map((animation) => animation.finished.then(() => undefined)),
+    ),
+  )
+  await expectNoAxeViolations(page)
+}
+
 test.describe('US2 the result of an attempt', () => {
   test('every metric of the requirements is on the screen (scenario 1)', async ({ page }) => {
     await seedLearner(page, [
@@ -434,10 +449,10 @@ test.describe('US2 the result of an attempt', () => {
 
     await page.goto('/result/slow')
     await expect(region(page, 'Ритм')).toBeVisible()
-    await expectNoAxeViolations(page)
+    await audit(page)
 
     await page.goto('/result/fast')
     await expect(region(page, 'Ритм')).toBeVisible()
-    await expectNoAxeViolations(page)
+    await audit(page)
   })
 })

@@ -214,6 +214,21 @@ function scaleRow(page: Page, name: string) {
   return page.locator('li[data-state]').filter({ hasText: name }).first()
 }
 
+/**
+ * The audit, after the page has stopped moving. "Motion off" leaves transitions of a hundredth of a
+ * millisecond behind rather than none, so the frame after a theme change can still hold the old
+ * colours, and axe samples colours. Waiting for them to land makes the audit about the screen and
+ * not about a frame.
+ */
+async function audit(page: Page): Promise<void> {
+  await page.evaluate(() =>
+    Promise.all(
+      document.getAnimations().map((animation) => animation.finished.then(() => undefined)),
+    ),
+  )
+  await expectNoAxeViolations(page)
+}
+
 test.describe('US3 the path and mastery', () => {
   test('a learner with no history has the first scales open and later ones locked with their condition (scenario 1)', async ({
     page,
@@ -452,7 +467,7 @@ test.describe('US3 the path and mastery', () => {
     for (const route of ['/today', '/path']) {
       await page.goto(route)
       await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
-      await expectNoAxeViolations(page)
+      await audit(page)
     }
   })
 })

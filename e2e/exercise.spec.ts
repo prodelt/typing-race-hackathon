@@ -160,6 +160,21 @@ async function outsideTypingLine(page: Page): Promise<string[]> {
   return page.evaluate(() => (window as unknown as { __outside: () => string[] }).__outside())
 }
 
+/**
+ * The audit, after the page has stopped moving. "Motion off" leaves transitions of a hundredth of a
+ * millisecond behind rather than none, so the frame after a theme change can still hold the old
+ * colours, and axe samples colours. Waiting for them to land makes the audit about the screen and
+ * not about a frame.
+ */
+async function audit(page: Page): Promise<void> {
+  await page.evaluate(() =>
+    Promise.all(
+      document.getAnimations().map((animation) => animation.finished.then(() => undefined)),
+    ),
+  )
+  await expectNoAxeViolations(page)
+}
+
 test.describe('US1 typing an exercise', { tag: '@input' }, () => {
   test('the attempt begins on the first printable character and shows it as correct (scenario 1)', async ({
     calmPage: page,
@@ -517,9 +532,9 @@ test.describe('US1 typing an exercise', { tag: '@input' }, () => {
   }) => {
     for (const mode of ['practice', 'test'] as const) {
       await openExercise(page, UK_SCALE, mode)
-      await expectNoAxeViolations(page)
+      await audit(page)
       await begin(page)
-      await expectNoAxeViolations(page)
+      await audit(page)
     }
   })
 })
