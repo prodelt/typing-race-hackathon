@@ -15,6 +15,7 @@ import { Button, buttonClass, cx } from '@typing-race/ui'
 import { type CSSProperties, useMemo, useState } from 'react'
 import { useAppStore, useDerived } from '../../app/state/index.js'
 import { m } from '../../paraglide/messages.js'
+import { GradLayer } from '../grad.js'
 import { useAcademyCourse } from './data.js'
 import { groupBySteps, LAYOUT_NAME, local, percent, STEP_NAMES } from './model.js'
 import './academy.css'
@@ -70,7 +71,8 @@ function Contents({ course, language }: { course: AcademyCourse; language: Langu
 
   return (
     <article className="academy" data-course={language}>
-      <section className="academy-panel" aria-labelledby="academy-title">
+      <section className="academy-panel gp-host gp-host--ember" aria-labelledby="academy-title">
+        <GradLayer tone="ember" seed={11} count={4} />
         <div className="academy-panel__top">
           <CourseSwitch current={language} />
           <span className="academy-panel__layout">{LAYOUT_NAME[language]}</span>

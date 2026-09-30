@@ -64,7 +64,7 @@
 .shell-nav {
   display: flex;
   align-items: center;
-  gap: clamp(16px, 1.9vw, 28px);
+  gap: clamp(14px, 1.6vw, 24px);
   margin-left: auto;
 }
 
@@ -106,8 +106,19 @@ a.shell-head__settings:hover {
   background: var(--color-accent);
 }
 
+/* The settings link is the cog alone: the name is kept for assistive technology and as a tooltip. */
 .shell-head__settings {
-  gap: 8px;
+  justify-content: center;
+  min-width: 36px;
+}
+
+.shell-head__settings-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 .shell-head__settings svg {
@@ -205,18 +216,15 @@ a.shell-head__settings:hover {
   .shell-head__logo > span {
     font-size: 17px;
   }
-  /* The settings link keeps its name for assistive tech and shows only its icon. */
-  .shell-head__settings {
-    justify-content: center;
-    min-width: 36px;
+  .shell-nav__link {
+    font-size: 13.5px;
   }
-  .shell-head__settings-label {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
+  .shell-nav {
+    gap: 10px;
+  }
+  /* The bottom bar carries the same red pill, so the header lets it go when space runs out. */
+  .shell-head__cta {
+    display: none;
   }
 }
 

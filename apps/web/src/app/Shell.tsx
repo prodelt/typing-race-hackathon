@@ -154,6 +154,7 @@ export function Shell() {
             ) : (
               <Link
                 to="/settings"
+                title={m.nav_settings()}
                 className="shell-head__settings"
                 data-active={pathname.startsWith('/settings') || undefined}
               >
@@ -163,11 +164,14 @@ export function Shell() {
             )}
             <LanguageSwitch disabled={attemptInProgress} />
             {attemptInProgress ? (
-              <span aria-disabled="true" className={buttonClass('primary', 'sm')}>
+              <span
+                aria-disabled="true"
+                className={`${buttonClass('primary', 'sm')} shell-head__cta`}
+              >
                 {m.nav_cta()}
               </span>
             ) : (
-              <Link to="/today" className={buttonClass('primary', 'sm')}>
+              <Link to="/today" className={`${buttonClass('primary', 'sm')} shell-head__cta`}>
                 {m.nav_cta()}
               </Link>
             )}

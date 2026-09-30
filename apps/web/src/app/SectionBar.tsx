@@ -25,11 +25,13 @@ interface Place {
 function placeOf(pathname: string): Place | null {
   if (pathname.startsWith('/today')) return { n: 1, label: m.nav_today }
   if (/^\/(path|exercise|result)/.test(pathname)) return { n: 2, label: m.nav_path }
-  if (pathname.startsWith('/session')) return { n: 3, label: m.session_title }
-  if (pathname.startsWith('/settings')) return { n: 4, label: m.nav_settings }
-  if (pathname.startsWith('/formulas')) return { n: 5, label: m.footer_formulas }
-  if (pathname.startsWith('/licences')) return { n: 6, label: m.footer_licences }
-  if (pathname.startsWith('/privacy')) return { n: 7, label: m.footer_privacy }
+  if (pathname.startsWith('/session')) return { n: 1, label: m.session_title }
+  if (pathname.startsWith('/academy')) return { n: 3, label: m.academy_nav }
+  if (pathname.startsWith('/races')) return { n: 4, label: m.nav_races }
+  if (pathname.startsWith('/settings')) return { n: 5, label: m.nav_settings }
+  if (pathname.startsWith('/formulas')) return { n: 6, label: m.footer_formulas }
+  if (pathname.startsWith('/licences')) return { n: 7, label: m.footer_licences }
+  if (pathname.startsWith('/privacy')) return { n: 8, label: m.footer_privacy }
   return null
 }
 

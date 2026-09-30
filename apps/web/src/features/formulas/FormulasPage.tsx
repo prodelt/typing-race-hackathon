@@ -24,7 +24,7 @@ export function FormulasPage() {
   return (
     <article className="screen formulas">
       <ScreenHead
-        n={5}
+        n={6}
         label={m.footer_formulas()}
         title={m.formulas_page_title()}
         lede={m.formulas_lead()}

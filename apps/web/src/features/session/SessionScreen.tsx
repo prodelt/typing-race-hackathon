@@ -97,7 +97,7 @@ export function SessionScreen() {
   if (session.status === 'finished') {
     return (
       <section className="screen">
-        <ScreenHead n={3} label={m.session_title()} title={m.session_title()} small />
+        <ScreenHead n={1} label={m.session_title()} title={m.session_title()} small />
         <div className="session-done panel gp-host gp-host--bright panel--corner rise">
           <GradLayer tone="bright" seed={8} count={4} />
           <h2 className="session-done__title">
@@ -134,7 +134,7 @@ export function SessionScreen() {
 
     return (
       <section className="screen">
-        <ScreenHead n={3} label={m.session_title()} title={m.session_title()} small />
+        <ScreenHead n={1} label={m.session_title()} title={m.session_title()} small />
         <Track current={trackAt} />
 
         {position.kind === 'between' && (
@@ -197,7 +197,7 @@ export function SessionScreen() {
   return (
     <section className="screen">
       <ScreenHead
-        n={3}
+        n={1}
         label={m.session_blocks_heading()}
         title={m.session_title()}
         lede={m.session_lead()}

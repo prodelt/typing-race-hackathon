@@ -80,7 +80,7 @@ const SOURCES = [
 
 export function LicencesPage() {
   return (
-    <Page n={6} title={m.page_licences_title()}>
+    <Page n={7} title={m.page_licences_title()}>
       <p>{m.page_licences_body()}</p>
       <h2 className="font-ui text-xl font-bold">{m.page_licences_sources()}</h2>
       <ul className="flex flex-col gap-3">
@@ -99,7 +99,7 @@ export function LicencesPage() {
 
 export function PrivacyPage() {
   return (
-    <Page n={7} title={m.page_privacy_title()}>
+    <Page n={8} title={m.page_privacy_title()}>
       <p>{m.page_privacy_body()}</p>
     </Page>
   )

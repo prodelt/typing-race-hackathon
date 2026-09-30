@@ -46,7 +46,7 @@ export function SettingsScreen() {
   return (
     <div className="screen">
       <ScreenHead
-        n={4}
+        n={5}
         label={m.nav_settings()}
         title={m.settings_title()}
         lede={m.settings_intro()}

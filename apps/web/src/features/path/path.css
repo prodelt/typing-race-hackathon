@@ -460,6 +460,15 @@
   color: var(--color-muted);
 }
 
+.later--one {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.later--one li {
+  min-height: 0;
+  padding: 28px 32px;
+}
+
 .later__name {
   font-family: var(--font-display);
   font-weight: 600;

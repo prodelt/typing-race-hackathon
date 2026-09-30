@@ -34,9 +34,14 @@ export function WordsSection({ layout, progress }: { layout: Layout; progress: P
   )
 
   return (
-    <section className="words" aria-labelledby="path-words-title">
+    <section
+      id="words"
+      data-section={m.path_words_index()}
+      className="words"
+      aria-labelledby="path-words-title"
+    >
       <header className="words__head">
-        <Index n={2}>{m.path_words_index()}</Index>
+        <Index n={3}>{m.path_words_index()}</Index>
         <h2 id="path-words-title" className="words__title">
           {m.path_words_title()}
         </h2>
