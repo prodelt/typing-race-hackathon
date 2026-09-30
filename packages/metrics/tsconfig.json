@@ -1,0 +1,9 @@
+{
+  // PURE PACKAGE. Inherits the base unchanged: no `lib`, no `types`, no DOM, no Node.
+  // See the purity assertion in tsconfig.base.json — adding either key here breaks ADR-0007.
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "src"
+  },
+  "include": ["src"]
+}

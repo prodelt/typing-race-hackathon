@@ -1,0 +1,15 @@
+{
+  "name": "@typing-race/engine",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "sideEffects": false,
+  "description": "The keystroke state machine. The only package that knows input exists; it reads no DOM and computes no metric.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "types": "./src/index.ts",
+  "dependencies": {
+    "@typing-race/curriculum": "workspace:*"
+  }
+}

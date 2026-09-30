@@ -1,0 +1,11 @@
+{
+  // Browser package: tokens, themes, React primitives, icons, the motion flag.
+  // Opts into the DOM deliberately — see tsconfig.base.json.
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2024", "DOM", "DOM.Iterable"],
+    "jsx": "react-jsx",
+    "rootDir": "src"
+  },
+  "include": ["src"]
+}

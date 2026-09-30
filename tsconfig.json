@@ -1,0 +1,14 @@
+{
+  // Root program: the workspace's own config files and the Playwright suite. Not a solution file —
+  // `pnpm typecheck` runs one `tsc` per package so that each keeps its own `lib` and `types`, which
+  // is what makes the purity assertion in tsconfig.base.json enforceable at all.
+  //
+  // Playwright specs need both Node (the runner) and the DOM (`page.evaluate` bodies execute in the
+  // browser), so this is the one program that sees everything.
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2024", "DOM", "DOM.Iterable"],
+    "types": ["node"]
+  },
+  "include": ["*.config.ts", "e2e/**/*.ts"]
+}

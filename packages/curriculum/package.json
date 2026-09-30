@@ -1,0 +1,12 @@
+{
+  "name": "@typing-race/curriculum",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "sideEffects": false,
+  "description": "Finger maps, unlock order, the eight Stage 1 scale generators, the level table, the progress fold and the next-action rules. No browser and no Node APIs (ADR-0007).",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "types": "./src/index.ts"
+}

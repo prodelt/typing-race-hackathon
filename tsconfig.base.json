@@ -1,0 +1,43 @@
+{
+  // Shared compiler settings for every package in the workspace.
+  //
+  // THE PURITY ASSERTION (T004, ADR-0007). The base is deliberately *pure*: no DOM library and no
+  // ambient type packages. `packages/metrics` and `packages/curriculum` inherit it unchanged and
+  // therefore cannot see `document`, `window`, `process` or `Buffer` — a reference to any of them
+  // is a type error, not a review comment. That is what lets F2's Supabase Edge Functions import
+  // both packages unmodified.
+  //
+  // Browser access is an explicit opt-in, so the tsconfigs allowed to have it are exactly the ones
+  // that name `lib` or `types` themselves: `packages/ui`, `apps/web`, and the root config below.
+  // Adding either key to a pure package's tsconfig breaks ADR-0007 and must be rejected in review.
+  "compilerOptions": {
+    "target": "ES2024",
+    "lib": ["ES2024"],
+    "types": [],
+
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "moduleDetection": "force",
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    "resolveJsonModule": true,
+    "allowImportingTsExtensions": false,
+
+    "noEmit": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "useUnknownInCatchVariables": true,
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false
+  }
+}

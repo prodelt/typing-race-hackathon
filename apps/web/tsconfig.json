@@ -1,0 +1,11 @@
+{
+  // The application. Opts into the DOM and Vite's client types — see tsconfig.base.json.
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2024", "DOM", "DOM.Iterable"],
+    "types": ["vite/client"],
+    "jsx": "react-jsx",
+    "rootDir": "src"
+  },
+  "include": ["src"]
+}
