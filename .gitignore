@@ -41,3 +41,6 @@ test-results/
 Thumbs.db
 Desktop.ini
 .DS_Store
+
+# Paraglide compiler output — generated at build time from apps/web/messages/
+apps/web/src/paraglide/

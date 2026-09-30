@@ -1,0 +1,21 @@
+{
+  "$schema": "https://inlang.com/schema/project-settings",
+  "baseLocale": "uk",
+  "locales": ["uk", "en"],
+  "modules": [
+    "../../node_modules/@inlang/plugin-message-format/dist/index.js",
+    "../../node_modules/@inlang/plugin-m-function-matcher/dist/index.js"
+  ],
+  "plugin.inlang.messageFormat": {
+    "pathPattern": [
+      "./messages/app/{locale}.json",
+      "./messages/exercise/{locale}.json",
+      "./messages/result/{locale}.json",
+      "./messages/path/{locale}.json",
+      "./messages/formulas/{locale}.json",
+      "./messages/settings/{locale}.json",
+      "./messages/session/{locale}.json",
+      "./messages/races/{locale}.json"
+    ]
+  }
+}
