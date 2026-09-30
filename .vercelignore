@@ -1,0 +1,11 @@
+.claude
+.scratch
+tasks
+test-results
+playwright-report
+node_modules
+**/node_modules
+apps/web/dist
+coverage
+*.local
+.env.local
