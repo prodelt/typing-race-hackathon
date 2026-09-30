@@ -6,11 +6,16 @@ Feature IDs are immutable once referenced. When scope shifts, this file is edite
 
 | ID | Feature directory | Intent | Scope boundary | Depends on | Status |
 |---|---|---|---|---|---|
-| F1 | `001-typing-core` | App shell and routing, "Serene Script" tokens, keyboard model (ЙЦУКЕН/QWERTY) with the finger map, keystroke engine on `beforeinput`, SPM/CPM/WPM, accuracy and error counting, key and transition confidence, Stage 1 scales, zero-peek test attempts, local progress, the Formulas page | Seed drill content only — no word lists; no accounts; no races | — | not started |
+| F1 | `001-typing-core` | App shell and routing, "Serene Script" tokens, keyboard model (ЙЦУКЕН/QWERTY) with the finger map, keystroke engine on `beforeinput`, SPM/CPM/WPM, accuracy and error counting, key and transition confidence, Stage 1 scales, the Unlock Order and Mastery Rule over those scales, zero-peek test attempts, local progress, the Formulas page | Seed drill content only — no word lists; no accounts; no races | — | in spec |
 | F2 | `002-accounts-and-progress` | Supabase auth (email + password, Google/GitHub OAuth, PKCE), RLS, append-only attempts, the `submit-attempt` Edge Function, server-derived progress, IndexedDB cache and outbox, history, export/import, account deletion | No leaderboards (F5); no new drill types | F1 | not started |
-| F3 | `003-words-and-curriculum` | Dictionary pipeline as the Foundational phase (vendored licensed sources, filters, checksummed `data/derived/`), Stage 2 words built only from unlocked keys, the key unlock ladder, the authored apostrophe list | No Academy n-grams or morphemes (F4) | F1 | not started |
+| F3 | `003-words-and-curriculum` | Dictionary pipeline as the Foundational phase (vendored licensed sources, filters, checksummed `data/derived/`), Stage 2 words built only from unlocked keys, the word bank attached to F1's existing unlock ladder, the authored apostrophe list | No Academy n-grams or morphemes (F4) | F1 | not started |
 | F4 | `004-academy-and-analytics` | Stage 3 Academy (frequency n-grams, morphemes, tempo), the adaptive slow-bigram generator, heatmaps, rhythm and error visualisation, the one-next-action rule engine, the diagnostic | Consumes F3's generator and F2's stored history | F2, F3 | not started |
 | F5 | `005-races-and-leaderboards` | Quick match and private-code rooms, Realtime broadcast, race state machine, the `finish-race` replay function, accuracy-weighted ranking, group, weekly and global leaderboards | Requires accounts from F2 | F2 | not started |
+
+## Scope notes
+
+- **F1 owns the key unlock ladder.** The Unlock Order and the Mastery Rule are built in F1 over Stage 1 scales, so TZ §9.3 (a key opening after mastery) is demonstrable from the first feature. F3 does not build a second ladder; it attaches the Word Bank to F1's.
+- **F1 has no authentication and is not publicly deployed.** Constitution principle VII (mandatory sign-in) is waived for F1 alone, recorded as `Waived: VII — authentication arrives in F2` in `specs/001-typing-core/plan.md` and in every F1 PR body. F1 progress lives only in the browser; F2 replaces that store with server-derived progress and puts every learning screen behind sign-in.
 
 ## Order
 
