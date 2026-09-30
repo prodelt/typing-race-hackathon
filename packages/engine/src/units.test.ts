@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { createStopwatch } from './clock-accounting'
 import { createLogBuilder, LOG_FORMAT_VERSION } from './log'
+import { foldApostrophe } from './machine'
 import { manualClock, scriptedInput } from './testing'
 
 describe('createStopwatch', () => {
@@ -65,5 +66,22 @@ describe('test doubles', () => {
     await expect(input.probeLayout()).resolves.toEqual({ producible: true })
     input.focus()
     expect(input.focusCalls).toBe(1)
+  })
+})
+
+describe('apostrophe folding across every keyboard variant (FR-007)', () => {
+  // U+02BC is what macOS produces on a Ukrainian layout. A learner typing the apostrophe
+  // correctly on a Mac must not be told they are wrong, and the variants are visually
+  // indistinguishable in the typing line — judging them apart judges something nobody can see.
+  const VARIANTS = ["'", '\u2019', '\u02bc', '\u2018', '\u00b4']
+
+  it.each(VARIANTS)('judges %j as the stored apostrophe', (variant) => {
+    expect(foldApostrophe(variant)).toBe("'")
+  })
+
+  it('folds nothing else — і, ї, є and ґ stay themselves (FR-006)', () => {
+    for (const char of ['і', 'ї', 'є', 'ґ', 'i', 'e', 'г', '`', '"']) {
+      expect(foldApostrophe(char)).toBe(char)
+    }
   })
 })

@@ -1,7 +1,14 @@
 import type { Finger, Hand, Key, Layout, Transition } from '@typing-race/domain'
 
-/** The apostrophe is stored as U+0027 and displayed as U+2019; the two fold together on input. */
-const TYPOGRAPHIC_APOSTROPHE = '’'
+/**
+ * Every apostrophe a keyboard can produce, folded onto the stored U+0027.
+ *
+ * U+2019 is the display form; **U+02BC is what macOS produces** on a Ukrainian layout; U+2018 and
+ * U+00B4 arrive from pasted text and from dead keys. They are visually indistinguishable in the
+ * typing line, so resolving them to different keys would give the same glyph two fingers.
+ * Kept identical to `foldApostrophe` in `packages/engine/src/machine.ts`.
+ */
+const TYPOGRAPHIC_APOSTROPHES = new Set(['’', 'ʼ', '‘', '´'])
 
 const indexes = new WeakMap<Layout, ReadonlyMap<string, Key>>()
 
@@ -19,7 +26,7 @@ function indexOf(layout: Layout): ReadonlyMap<string, Key> {
 }
 
 function fold(char: string): string {
-  return char === TYPOGRAPHIC_APOSTROPHE ? "'" : char
+  return TYPOGRAPHIC_APOSTROPHES.has(char) ? "'" : char
 }
 
 /** The physical key that produces `char`, or `undefined` when the layout does not support it. */

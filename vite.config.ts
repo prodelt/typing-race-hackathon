@@ -104,7 +104,13 @@ export default defineConfig({
     paraglideVitePlugin({
       project: `${appRoot}/project.inlang`,
       outdir: `${appRoot}/src/paraglide`,
-      strategy: ['localStorage', 'preferredLanguage', 'baseLocale'],
+      // The learner's stored choice, then Ukrainian. **Not** `preferredLanguage`: FR-068 makes
+      // the interface language a setting whose default is `uk`, and browser detection would
+      // silently contradict that default for anyone whose operating system is in English —
+      // which is most of the people who will open this. The settings screen writes the choice
+      // into localStorage through Paraglide's own `setLocale`, so the first strategy is the
+      // learner's actual answer rather than a guess about them.
+      strategy: ['localStorage', 'baseLocale'],
     }),
     initialJsBudget(INITIAL_JS_BUDGET_BYTES),
     serviceWorker(),

@@ -18,6 +18,9 @@ import { SLOW_INTERVAL_MS, transitionLabel } from './model.js'
  * the count.
  */
 
+/** How many of the slowest transitions get an axis label; the rest are in the table below. */
+const LABELLED_BARS = 5
+
 const WIDTH = 640
 const PLOT_HEIGHT = 140
 const LABEL_HEIGHT = 26
@@ -105,16 +108,25 @@ export function RhythmChart({ attempt }: { readonly attempt: AttemptSummary }) {
                       fill="var(--color-terracotta)"
                     />
                   ) : null}
-                  <text
-                    x={x + width / 2}
-                    y={HEIGHT - 8}
-                    textAnchor="middle"
-                    fontSize="12"
-                    fill="var(--color-ink)"
-                    className="font-mono"
-                  >
-                    {transitionLabel(key)}
-                  </text>
+                  {/*
+                    Labels only on the slowest few. Twenty `a → b` labels across this width overlap
+                    into an unreadable smear, and the chart's job is the *shape* — where the slow
+                    ones are. The exact figure for every transition is already in the table below,
+                    which is also what makes the chart readable without relying on colour, so
+                    crowding the axis buys nothing and costs legibility.
+                  */}
+                  {i < LABELLED_BARS ? (
+                    <text
+                      x={x + width / 2}
+                      y={HEIGHT - 8}
+                      textAnchor="middle"
+                      fontSize="12"
+                      fill="var(--color-ink)"
+                      className="font-mono"
+                    >
+                      {transitionLabel(key)}
+                    </text>
+                  ) : null}
                 </g>
               )
             })}

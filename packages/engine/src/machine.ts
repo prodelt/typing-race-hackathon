@@ -2,14 +2,22 @@ import type { ErrorMode } from '@typing-race/domain'
 import type { AttemptState, EngineView } from './types'
 
 const STRAIGHT_APOSTROPHE = "'"
-const CURLY_APOSTROPHE = '’'
 
 /**
- * Storage is U+0027 and display is U+2019, so both must judge each other as correct (FR-007).
+ * Every apostrophe a keyboard can produce, folded onto the stored U+0027 (FR-007).
+ *
+ * U+2019 is the display form. **U+02BC is what macOS produces** on a Ukrainian layout, and
+ * U+2018 arrives from text pasted out of a word processor. A learner typing the apostrophe
+ * correctly on a Mac must not be told they are wrong, and the three lookalikes are visually
+ * indistinguishable in the typing line, so judging them apart would be judging something the
+ * learner cannot see.
+ *
  * Nothing else is folded: `і`, `ї`, `є`, `ґ` are judged as themselves and never substituted (FR-006).
  */
+const APOSTROPHES = new Set(['’', 'ʼ', '‘', '´'])
+
 export function foldApostrophe(char: string): string {
-  return char === CURLY_APOSTROPHE ? STRAIGHT_APOSTROPHE : char
+  return APOSTROPHES.has(char) ? STRAIGHT_APOSTROPHE : char
 }
 
 export function judge(typed: string, awaited: string): boolean {
