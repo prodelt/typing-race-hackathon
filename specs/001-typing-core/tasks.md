@@ -14,6 +14,11 @@ description: "Task list for F1 001-typing-core"
 and a Playwright end-to-end test per acceptance scenario part of the Definition of Done. Test tasks
 below are therefore first-class and precede their implementation.
 
+**Gate boundaries (constitution v2.1.0, [ADR-0009](../../docs/adr/0009-test-gates-bind-per-phase-not-per-task.md))**:
+a task closes on a green **local** `pnpm test`; a **phase** and a pull request close on a linked green
+CI run. A lane may iterate on Chromium; the full three-engine matrix binds at the pull request and on
+`main`, except input-path specs, which run on all three from their first commit.
+
 **Organization**: grouped by user story so each is implemented and tested independently.
 
 ## Format: `[ID] [P?] [Story] Description`
@@ -57,7 +62,7 @@ VIII calls a hot file. None of it may be touched again in a story lane.
 - [ ] T005 [P] Configure Biome in `biome.json` for lint and format across the workspace
 - [ ] T006 Configure Vite in `vite.config.ts` with the workspace aliases and the 150 KB initial-JS budget from ticket 15
 - [ ] T007 [P] Configure Vitest in `vitest.config.ts` as a workspace, one project per package, with fast-check wired in
-- [ ] T008 Configure Playwright in `playwright.config.ts`: projects `chromium`, `firefox`, `webkit` against the production build, plus `cdp` (Chromium only, for tagged tests) and `latency` (Chromium, frame-rate limiting and GPU vsync off)
+- [ ] T008 Configure Playwright in `playwright.config.ts`: projects `chromium`, `firefox`, `webkit` against the production build, plus `cdp` (Chromium only, for tagged tests) and `latency` (Chromium, frame-rate limiting and GPU vsync off). Default the local run to `chromium`; the full matrix is what CI runs on a pull request and on `main`, with input-path specs opted into all three engines by tag (constitution v2.1.0, [ADR-0009](../../docs/adr/0009-test-gates-bind-per-phase-not-per-task.md))
 - [ ] T009 [P] Add `.env.example` stating plainly that F1 needs no environment variable, and extend `.gitignore` for build and test output (FR-072)
 - [ ] T010 Add `.github/workflows/ci.yml` with the jobs typecheck · lint · unit · e2e (three engines) · e2e-cdp · latency · axe · build · secret-scan · dictionary-checksum (present, nothing to verify in F1)
 - [ ] T011 Add a Biome lint rule forbidding IndexedDB, the Cache API, `performance.now()`, `Math.random()` and DOM input events anywhere outside `apps/web/src/seams/` — this is what keeps Constitution III true past day one, per [plan.md](./plan.md#agreed-test-seams)
@@ -176,7 +181,7 @@ the first and absent in the second, and both attempts reach completion.
 - [ ] T072 [P] [US1] Engine property tests in `packages/engine/src/engine.test.ts` for every obligation in [contracts/engine.md](./contracts/engine.md): `errorCount` monotonically non-decreasing; `cursor` within bounds; typing the text exactly gives zero errors and `completed`; inserting `ignored` events changes only the log length; under stop-on-letter `cursor` never advances while marked
 - [ ] T073 [P] [US1] Engine example tests covering each spec edge case: wrong key on the first character; Backspace at position zero; Backspace held across the exercise; a composition replacing several characters; a dead key plus base letter giving one character; apostrophe folding U+0027 against U+2019 (FR-007)
 - [ ] T074 [P] [US1] Test in `packages/engine/src/unicode.test.ts` that `і`, `ї`, `є` and `ґ` are judged as themselves and never substituted — FR-006 and the requirements' §8.5 check
-- [ ] T075 [US1] `e2e/exercise.spec.ts` named after the Independent Test above, covering acceptance scenarios 1–7, 9 and 10 across all three engines, including that nothing outside the typing line changes between keystrokes (FR-069)
+- [ ] T075 [US1] `e2e/exercise.spec.ts` named after the Independent Test above, covering acceptance scenarios 1–7, 9 and 10 — tagged as an **input-path spec, so all three engines from the first commit**, per ADR-0009, including that nothing outside the typing line changes between keystrokes (FR-069)
 - [ ] T076 [US1] Acceptance scenario 8 in `e2e/exercise.spec.ts`, tagged CDP-only and Chromium-only: a Ukrainian exercise opened while the system layout is English reports the mismatch and does not start
 - [ ] T077 [US1] Axe audit and a motion-off visual comparison for the typing screen in both modes
 

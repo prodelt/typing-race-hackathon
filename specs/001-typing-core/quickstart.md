@@ -37,7 +37,10 @@ pnpm test:latency               # keystroke-to-paint, Chromium, frame-rate limit
 pnpm build                      # must succeed
 ```
 
-Every one of these is a CI job, and a task is not done without a link to a green run.
+Every one of these is a CI job. A **task** closes on a green local `pnpm test`; a **phase** and a pull
+request close on a linked green CI run (constitution v2.1.0,
+[ADR-0009](../../docs/adr/0009-test-gates-bind-per-phase-not-per-task.md)). Locally, `pnpm test:e2e`
+defaults to Chromium; CI runs the full matrix.
 
 ## Validating each user story
 

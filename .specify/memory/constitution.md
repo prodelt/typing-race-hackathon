@@ -13,15 +13,17 @@ Scope changes update `specs/roadmap.md` first, then the affected feature's artif
 
 ### II. Test-Driven Development & Definition of Done
 
-Domain logic — metrics (SPM/CPM/WPM, accuracy, delays), error counting, the keystroke state machine, key and transition confidence, unlock rules, word filtering, race state transitions — MUST be developed Red-Green-Refactor and MUST carry property-based tests alongside example tests. A task is not done until its tests are green.
+Domain logic — metrics (SPM/CPM/WPM, accuracy, delays), error counting, the keystroke state machine, key and transition confidence, unlock rules, word filtering, race state transitions — MUST be developed Red-Green-Refactor and MUST carry property-based tests alongside example tests. A task is not done until its tests pass locally; a **phase** is not done until CI is green on it. Per-task CI runs are not required — see item 5.
 
 A user story is not done until all of the following hold:
 
 1. Every user-visible acceptance scenario in the spec is covered by a Playwright E2E test, run against the **production build**, named after the story's "Independent Test" line in `tasks.md`.
-2. The E2E matrix is Chromium, Firefox and WebKit, **except** tests tagged CDP-only, which simulate a physical keyboard layout through the Chrome DevTools Protocol and therefore run in Chromium alone.
+2. The full E2E matrix is Chromium, Firefox and WebKit. It binds at the **pull-request and `main`** gate, not on every iteration inside a lane: a lane may run Chromium alone while building. Two exceptions, both narrower than the rule:
+   - tests tagged CDP-only simulate a physical keyboard layout through the Chrome DevTools Protocol and therefore run in Chromium alone, always;
+   - tests that exercise the **input path** run on all three engines from the first commit that touches it, because the engines genuinely differ there — Firefox ignores `preventDefault()` on `beforeinput` — and a Chromium-only green run would be actively misleading.
 3. Server features are tested against local Supabase in Docker; race features are tested across several browser contexts.
 4. Accessibility checks report zero axe violations, and visual checks run with animation disabled.
-5. CI is green: typecheck, lint, unit, E2E, build, dictionary checksum verification and secret scan.
+5. CI is green — typecheck, lint, unit, E2E, build, dictionary checksum verification and secret scan — on every **phase** boundary and on every pull request. Individual tasks close on a green local run, so a link to a CI run is required per phase and per PR, not per task.
 
 Tests are opt-in in Spec Kit, so every `/speckit-specify` and `/speckit-tasks` run MUST state this Definition of Done explicitly.
 
@@ -76,7 +78,7 @@ Then, per story, in its own worktree: `/speckit-implement` scoped to that story 
 |---|---|---|
 | G0 Artifacts | main checkout | `/speckit-analyze`: no CRITICAL, no unaddressed HIGH |
 | G1 Requirements | main checkout | `/speckit-checklist` items ticked |
-| G2 Story | lane worktree | all story tasks done, Independent Test passes locally |
+| G2 Story | lane worktree | all story tasks done, Independent Test passes locally, phase CI green |
 | G3 Diff | lane worktree | `/code-review <merge-base>`: every finding fixed or waived in the PR body |
 | G4 CI | PR | all jobs green, plus E2E re-run against the Vercel preview |
 | G5 Merge | PR | human squash merge; branch and worktree removed |
@@ -91,6 +93,6 @@ Other skills keep single, non-overlapping jobs: `wayfinder` before a spec exists
 - The Constitution supersedes ad-hoc coding patterns. `/speckit-analyze` reports any MUST violation as CRITICAL.
 - **Waivers.** A MUST may be waived for a single PR when the gate is wrong for that specific case, never to save effort. A waiver requires a `Waived: <principle> — <reason>` line in the PR body and a matching note in the feature's `plan.md`. A principle waived twice is a defect in the principle: amend it instead.
 - Amendments require updating this document, bumping the version, and recording an ADR. MAJOR removes or redefines a principle; MINOR adds one or materially expands guidance; PATCH clarifies wording.
-- This version is recorded in [ADR-0008](../../docs/adr/0008-canonical-agent-workflow.md), which supersedes part of [ADR-0001](../../docs/adr/0001-project-tooling-spec-kit-and-agent-skills.md).
+- Version 2.0.0 is recorded in [ADR-0008](../../docs/adr/0008-canonical-agent-workflow.md), which supersedes part of [ADR-0001](../../docs/adr/0001-project-tooling-spec-kit-and-agent-skills.md). The 2.1.0 amendment to principle II — when the three-engine matrix binds, and per-phase rather than per-task CI — is recorded in [ADR-0009](../../docs/adr/0009-test-gates-bind-per-phase-not-per-task.md).
 
-**Version**: 2.0.0 | **Ratified**: 2026-09-03 | **Last Amended**: 2026-09-22
+**Version**: 2.1.0 | **Ratified**: 2026-09-03 | **Last Amended**: 2026-09-30

@@ -273,12 +273,16 @@ so that `/speckit-tasks` emits test tasks — in Spec Kit they are opt-in.
    Mastery Rule, and the unlock rules.
 2. Every user-visible acceptance scenario in the spec has a Playwright E2E against the **production
    build**, named after its story's Independent Test line in `tasks.md`.
-3. The E2E matrix is Chromium, Firefox and WebKit. The one exception is CDP-only tests, which
-   simulate a physical layout and run in Chromium alone — US1 scenario 8 is the only one in F1.
+3. The **full** E2E matrix is Chromium, Firefox and WebKit, binding at the pull request and on `main`
+   (constitution v2.1.0, [ADR-0009](../../docs/adr/0009-test-gates-bind-per-phase-not-per-task.md));
+   a lane may iterate on Chromium. CDP-only tests run in Chromium alone always — US1 scenario 8 is the
+   only one in F1 — and **input-path tests run on all three engines from their first commit**, because
+   research 06 found the engines genuinely disagree there.
 4. Cyrillic is driven through text-input events, never the keyboard API, which cannot type it.
 5. Zero axe violations; visual comparisons run with motion off.
-6. CI green: typecheck, lint, unit, E2E, build, secret scan. The dictionary-checksum job exists and
-   has nothing to verify in F1.
+6. CI green **at every phase boundary and on every pull request**: typecheck, lint, unit, E2E, build,
+   secret scan. A task closes on a green local run (constitution v2.1.0). The dictionary-checksum job
+   exists and has nothing to verify in F1.
 7. Keystroke-to-paint p95 ≤ 16 ms in its own Chromium project with frame-rate limiting off, measured
    per [research.md R8](./research.md#r8-measuring-keystroke-to-paint). A regression fails the build.
 8. The requirements document's own mandatory checks: formulas verified on fixed examples; a corrected
@@ -295,6 +299,13 @@ the PR body (G3) → CI green plus the E2E re-run against the Vercel preview (G4
 
 Every F1 PR body carries the story id, the tasks covered, the Independent Test, the `code-review`
 summary, the CI run link, and the line `Waived: VII — authentication arrives in F2`.
+
+**Foundational runs on `main`** and not behind a pull request: it owns every hot file by definition,
+no other lane is open to race it, and a pull request would have no reviewer and no conflict to
+prevent ([ADR-0009](../../docs/adr/0009-test-gates-bind-per-phase-not-per-task.md)). **Branch
+protection is enabled before the first story lane opens** — the moment ticket 01 meant when it
+recorded protection as due at the first code task. Every phase after Foundational uses a worktree and
+a pull request, as principle VIII requires.
 
 ## Complexity Tracking
 
