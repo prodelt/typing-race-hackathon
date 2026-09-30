@@ -5,27 +5,77 @@ import { computeMetrics } from '@typing-race/metrics'
 import { json, preflight } from '../_shared/cors.ts'
 
 /**
- * `finish-race` — the only place a race result becomes a result (ADR-0006).
+ * `finish-race` — the only place a race finish becomes a Validated Result.
  *
- * Training attempts get plausibility checks; **race finishes get replayed**. The asymmetry is
- * deliberate and it is about consequences: an inflated personal number costs one learner a little
- * self-knowledge, while an unearned place on a leaderboard costs everyone else the point of
- * having one. Replay is expensive, so it is spent where it buys something.
+ * Training attempts get plausibility checks; race finishes get **replayed**. The client's log is
+ * read for what was typed and when, and nothing else: whether each keystroke was right is decided
+ * here, against the room's own text, never taken from the `correct` flags the client sent. A log
+ * that does not reach the end of the room's text is not a slow race; it is a different race.
  *
- * The replay is the same code the browser ran — `computeMetrics` from `packages/metrics`,
- * imported unchanged (ADR-0007) — run against the **room's** text rather than the text the client
- * says it typed. A log that cannot produce the room's text is not a slow race; it is a different
- * race.
+ * The metrics are the same `computeMetrics` the browser ran (bundled from `packages/metrics`), fed
+ * the replayed log, so the number on the results screen is the number the server computed.
  */
 
-/** Ticket 14: speed weighted by accuracy, with a floor. Fast and dirty must not beat clean. */
+/** Speed weighted by accuracy, with a floor: fast and dirty must not beat clean. */
 const ACCURACY_FLOOR = 0.9
+
+/** Slack for the round trip and for a timer that started a frame early. */
+const CLOCK_SLACK_MS = 2_000
+
+/** A human does not sustain more than this; faster is a script. */
+const MAX_PLAUSIBLE_SPM = 1_500
+
+const APOSTROPHES = new Set(['’', 'ʼ', '‘', '´'])
+const fold = (char: string): string => (APOSTROPHES.has(char) ? "'" : char)
 
 export function scoreOf(spm: number, accuracy: number): number {
   if (accuracy < ACCURACY_FLOOR) return 0
-  // Squared, so the gap between 92% and 99% matters more than the gap between 60% and 67% would
-  // if it were linear — and the curriculum's whole claim is that accuracy comes first.
+  // Squared, so the gap between 92% and 99% matters more than a linear weight would make it.
   return Math.round(spm * accuracy * accuracy * 100) / 100
+}
+
+/**
+ * Re-judges every character keystroke against the text under the race's error mode (stop on the
+ * letter: a wrong key does not advance, Backspace neither advances nor retreats). Returns the log
+ * with the server's own `correct` flags and how far into the text it got.
+ */
+export function replay(
+  log: KeystrokeEventLog,
+  text: string,
+): { log: KeystrokeEventLog; reached: number } {
+  const awaited = Array.from(text)
+  const length = Math.min(log.kind.length, log.dt.length, log.char.length)
+  const dt: number[] = []
+  const kind: KeystrokeEventLog['kind'][number][] = []
+  const char: (string | null)[] = []
+  const correct: boolean[] = []
+  let cursor = 0
+
+  for (let i = 0; i < length; i++) {
+    const k = log.kind[i]
+    const delta = Number(log.dt[i])
+    if (!Number.isFinite(delta) || delta < 0) continue
+    if (k === 'char') {
+      const typed = log.char[i]
+      if (typeof typed !== 'string' || typed.length === 0 || cursor >= awaited.length) continue
+      const right = fold(typed) === fold(awaited[cursor] ?? '')
+      dt.push(delta)
+      kind.push('char')
+      char.push(fold(typed))
+      correct.push(right)
+      if (right) cursor += 1
+    } else if (k === 'backspace' || k === 'ignored') {
+      dt.push(delta)
+      kind.push(k)
+      char.push(null)
+      correct.push(false)
+    }
+  }
+
+  return {
+    log: { formatVersion: log.formatVersion, dt, kind, char, correct },
+    reached: cursor,
+  }
 }
 
 Deno.serve(async (request) => {
@@ -42,28 +92,67 @@ Deno.serve(async (request) => {
   )
   const { data: auth } = await asCaller.auth.getUser()
   if (!auth?.user) return json({ error: 'not signed in' }, 401)
+  const userId = auth.user.id
 
   const service = createClient(
     Deno.env.get('SUPABASE_URL') ?? '',
     Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
   )
 
-  let body: { roomId?: string; attemptId?: string; log?: KeystrokeEventLog; elapsedMs?: number }
+  let body: { roomId?: string; log?: KeystrokeEventLog; elapsedMs?: number }
   try {
     body = await request.json()
   } catch {
     return json({ error: 'body is not JSON' }, 400)
   }
 
-  const { roomId, attemptId, log, elapsedMs } = body
-  if (!roomId || !log || typeof elapsedMs !== 'number') {
+  const { roomId, log, elapsedMs } = body
+  if (
+    typeof roomId !== 'string' ||
+    !log ||
+    !Array.isArray(log.dt) ||
+    !Array.isArray(log.kind) ||
+    !Array.isArray(log.char) ||
+    typeof elapsedMs !== 'number' ||
+    !Number.isFinite(elapsedMs) ||
+    elapsedMs <= 0
+  ) {
     return json({ error: 'roomId, log and elapsedMs are required' }, 400)
   }
+
+  const { data: seat } = await service
+    .from('race_participants')
+    .select('role')
+    .eq('room_id', roomId)
+    .eq('user_id', userId)
+    .maybeSingle()
+  if (!seat) return json({ error: 'not in this room' }, 403)
+
+  // A result is immutable: a retry, or a second submission, gets the first answer back.
+  const { data: earlier } = await service
+    .from('race_results')
+    .select('spm, accuracy, score, validated, rejection_reason')
+    .eq('room_id', roomId)
+    .eq('user_id', userId)
+    .maybeSingle()
+  if (earlier) {
+    return json({
+      result: {
+        spm: Number(earlier.spm),
+        accuracy: Number(earlier.accuracy),
+        score: Number(earlier.score),
+      },
+      validated: earlier.validated,
+      ...(earlier.rejection_reason ? { reason: earlier.rejection_reason } : {}),
+    })
+  }
+
+  if (seat.role !== 'racer') return json({ error: 'spectators do not finish' }, 409)
 
   // The room's own text and language. Not the client's copy of them: that is the point.
   const { data: room } = await service
     .from('race_rooms')
-    .select('id, language, starts_at, race_texts ( body )')
+    .select('id, language, state, starts_at, race_texts ( body )')
     .eq('id', roomId)
     .maybeSingle()
 
@@ -73,31 +162,49 @@ Deno.serve(async (request) => {
   const text = (room.race_texts as unknown as { body: string } | null)?.body
   if (!text) return json({ error: 'room has no text' }, 500)
 
-  const layoutId: LayoutId = room.language === 'uk' ? 'yq' : 'qwerty'
-  const metrics = computeMetrics({ log, text, layout: layouts[layoutId], elapsedMs })
+  const startedAt = Date.parse(room.starts_at)
+  const sinceStart = Date.now() - startedAt
+  const replayed = replay(log, text)
+  const loggedMs = replayed.log.dt.reduce((sum, delta) => sum + delta, 0)
 
-  const typed = log.char.filter((_, i) => log.kind[i] === 'char').join('')
-  const validated = typed.length >= [...text].length
-  const reason = validated ? null : 'text_mismatch'
+  const layoutId: LayoutId = room.language === 'uk' ? 'yq' : 'qwerty'
+  const metrics = computeMetrics({ log: replayed.log, text, layout: layouts[layoutId], elapsedMs })
+
+  let reason: string | null = null
+  if (replayed.reached < Array.from(text).length) reason = 'text_mismatch'
+  else if (sinceStart + CLOCK_SLACK_MS < elapsedMs) reason = 'future_timestamp'
+  else if (loggedMs > elapsedMs + CLOCK_SLACK_MS) reason = 'log_malformed'
+  else if (metrics.spm > MAX_PLAUSIBLE_SPM) reason = 'too_fast'
+
+  const validated = reason === null
   const score = validated ? scoreOf(metrics.spm, metrics.accuracy) : 0
+  // numeric(7, 2): a rejected, absurd speed is still stored, just clamped to fit.
+  const spm = Math.min(99_999, Math.round(metrics.spm * 100) / 100)
+  const accuracy = Math.round(metrics.accuracy * 10_000) / 10_000
 
   const { error } = await service.from('race_results').upsert(
     {
       room_id: roomId,
-      user_id: auth.user.id,
-      attempt_id: attemptId ?? null,
-      spm: metrics.spm,
-      accuracy: metrics.accuracy,
+      user_id: userId,
+      spm,
+      accuracy,
       score,
       validated,
       rejection_reason: reason,
     },
-    { onConflict: 'room_id,user_id' },
+    { onConflict: 'room_id,user_id', ignoreDuplicates: true },
   )
   if (error) return json({ error: error.message }, 500)
 
+  await service.rpc('race_notify', {
+    p_room: roomId,
+    p_event: 'result',
+    p_payload: { userId },
+  })
+  await service.rpc('settle_race', { p_room: roomId })
+
   return json({
-    result: { spm: metrics.spm, accuracy: metrics.accuracy, score },
+    result: { spm, accuracy, score },
     validated,
     ...(reason ? { reason } : {}),
   })

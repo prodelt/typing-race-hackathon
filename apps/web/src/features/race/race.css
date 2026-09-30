@@ -1,0 +1,697 @@
+/*
+ * Races, in the b-red system: Unbounded for everything that should feel like a race (the title,
+ * the countdown, the code, the places), Onest for everything that should be read, and red as the
+ * one accent, spent on the learner's own lane, the countdown and the first place. The typing line
+ * itself is the exercise screen's, untouched: calm and legible while everything around it moves.
+ *
+ * Every duration is a token, so the motion-off flag stills all of it at once.
+ */
+
+.race-display {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  line-height: 0.92;
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+}
+
+.race-lede {
+  margin: 0;
+  max-width: 52ch;
+  font-family: var(--font-ui);
+  font-size: clamp(16px, 1.3vw, 19px);
+  font-weight: 500;
+  line-height: 1.45;
+  color: var(--color-ink-soft);
+  text-wrap: pretty;
+}
+
+.race-error {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-weight: 600;
+  color: var(--color-terracotta-ink);
+}
+
+.race-note {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-weight: 600;
+  color: var(--color-ink-soft);
+}
+
+@keyframes race-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------------------------
+   Lobby
+   --------------------------------------------------------------------------------------------- */
+
+.race-lobby {
+  display: grid;
+  gap: 36px;
+  padding-block: 8px 64px;
+}
+
+.race-lobby__head {
+  display: grid;
+  gap: 16px;
+  animation: race-rise var(--dur-reveal) var(--ease-enter) both;
+}
+
+.race-lobby__title {
+  font-size: clamp(48px, 6.4vw, 104px);
+}
+
+.race-lobby__setup {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: 32px;
+  align-items: end;
+}
+
+.race-lang {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.race-lang__legend {
+  margin-bottom: 6px;
+  font-family: var(--font-ui);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.race-lang__option {
+  position: relative;
+  display: grid;
+  gap: 2px;
+  padding: 14px 20px;
+  border: var(--border-hairline) solid var(--color-hairline-strong);
+  border-radius: var(--radius-field);
+  background: var(--color-paper-raised);
+  cursor: pointer;
+  overflow: hidden;
+  transition: border-color var(--dur-base) var(--ease-enter);
+}
+
+.race-lang__option::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 4px;
+  background: var(--color-accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--dur-slow) var(--ease-enter);
+}
+
+.race-lang__option[data-on] {
+  border-color: var(--color-ink);
+}
+
+.race-lang__option[data-on]::before {
+  transform: scaleX(1);
+}
+
+.race-lang__option:has(:focus-visible) {
+  outline: 3px solid var(--color-ink);
+  outline-offset: 3px;
+}
+
+.race-lang__big {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.race-lang__small {
+  font-family: var(--font-ui);
+  font-size: 0.875rem;
+  color: var(--color-muted);
+}
+
+.race-lobby__ways {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  gap: 24px;
+}
+
+.race-way {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  padding: clamp(28px, 3vw, 44px);
+  border: var(--border-hairline) solid var(--color-hairline);
+  border-radius: var(--radius-panel);
+  background: var(--color-paper-raised);
+  animation: race-rise var(--dur-reveal) var(--ease-enter) both;
+  animation-delay: calc(var(--dur-quick) * 1);
+}
+
+.race-way--quick {
+  background: var(--color-ink);
+  color: var(--color-paper-raised);
+  border-color: var(--color-ink);
+  animation-delay: 0ms;
+}
+
+.race-way--quick .index__n {
+  color: var(--color-accent-soft);
+}
+
+.race-way__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(26px, 2.4vw, 38px);
+  font-weight: 700;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+}
+
+.race-way--quick .race-way__title {
+  font-size: clamp(34px, 3.4vw, 56px);
+}
+
+.race-way__body {
+  margin: 0 0 12px;
+  max-width: 40ch;
+  font-family: var(--font-ui);
+  font-size: 1rem;
+  line-height: 1.45;
+  color: var(--color-ink-soft);
+}
+
+.race-way.race-way--quick .race-way__body {
+  color: color-mix(in srgb, var(--color-paper-raised) 78%, transparent);
+}
+
+.race-way__join {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: end;
+  width: 100%;
+  margin-top: 8px;
+  padding-top: 20px;
+  border-top: var(--border-hairline) solid var(--color-hairline);
+}
+
+.race-code-input {
+  font-family: var(--font-display);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* ---------------------------------------------------------------------------------------------
+   Calm states: loading, unavailable, joining by link
+   --------------------------------------------------------------------------------------------- */
+
+.race-calm {
+  display: grid;
+  justify-items: start;
+  gap: 24px;
+  padding-block: 48px 64px;
+}
+
+.race-calm__title {
+  font-size: clamp(48px, 6vw, 96px);
+}
+
+.race-join {
+  display: grid;
+  grid-template-columns: minmax(0, 360px) auto;
+  gap: 12px;
+  align-items: end;
+}
+
+/* ---------------------------------------------------------------------------------------------
+   The room
+   --------------------------------------------------------------------------------------------- */
+
+.race-room {
+  position: relative;
+  display: grid;
+  gap: 32px;
+  padding-block: 24px 64px;
+}
+
+.race-room__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding-bottom: 14px;
+  border-bottom: var(--border-hairline) solid var(--color-hairline);
+}
+
+.race-room__lang {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--color-muted);
+}
+
+.race-gather {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  gap: 48px;
+  align-items: start;
+}
+
+.race-gather__main {
+  display: grid;
+  justify-items: start;
+  gap: 20px;
+}
+
+.race-gather__title {
+  font-size: clamp(48px, 6vw, 96px);
+}
+
+.race-gather__label {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-muted);
+}
+
+.race-code {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(56px, 7.5vw, 120px);
+  font-weight: 800;
+  line-height: 0.9;
+  letter-spacing: 0.06em;
+  color: var(--color-ink);
+}
+
+.race-gather__bar {
+  width: 100%;
+  height: 4px;
+  background: var(--color-accent);
+  transform-origin: left;
+  transition: transform var(--dur-base) var(--ease-linear);
+}
+
+.race-gather__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.race-roster {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: var(--border-hairline) solid var(--color-ink);
+}
+
+.race-roster__row {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 12px;
+  padding: 16px 0;
+  border-bottom: var(--border-hairline) solid var(--color-hairline);
+  font-family: var(--font-ui);
+  animation: race-rise var(--dur-slow) var(--ease-enter) both;
+}
+
+.race-roster__name {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  overflow-wrap: anywhere;
+}
+
+.race-roster__tag {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-terracotta-ink);
+}
+
+.race-roster__row--empty {
+  animation: none;
+}
+
+.race-roster__row--empty .race-roster__name {
+  font-family: var(--font-ui);
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--color-ink-faint);
+}
+
+/* ---------------------------------------------------------------------------------------------
+   Countdown
+   --------------------------------------------------------------------------------------------- */
+
+.race-countdown {
+  position: absolute;
+  /* Over the whole room below its header: the lanes wait under the veil too. */
+  inset: 64px 0 0;
+  z-index: 2;
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  padding-top: clamp(16px, 4vh, 48px);
+  pointer-events: none;
+}
+
+.race-countdown::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, var(--color-paper) 88%, transparent);
+}
+
+.race-countdown__n {
+  position: relative;
+  font-family: var(--font-display);
+  font-size: clamp(180px, 24vw, 340px);
+  font-weight: 800;
+  line-height: 0.8;
+  letter-spacing: -0.06em;
+  color: var(--color-accent);
+  animation: race-count var(--dur-slow) var(--ease-enter) both;
+}
+
+@keyframes race-count {
+  from {
+    opacity: 0.35;
+    transform: scale(1.35);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------------------------
+   The run: live speed, then the typing line (unchanged), then the track
+   --------------------------------------------------------------------------------------------- */
+
+.race-run {
+  display: grid;
+  gap: 12px;
+}
+
+.race-run__meter {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.race-run__spm {
+  font-family: var(--font-display);
+  font-size: clamp(48px, 5vw, 80px);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-ink);
+}
+
+.race-run__spm-unit {
+  font-family: var(--font-ui);
+  font-weight: 600;
+  color: var(--color-muted);
+}
+
+.race-run__line {
+  opacity: 0.45;
+  transition: opacity var(--dur-base) var(--ease-enter);
+}
+
+.race-run__line[data-live] {
+  opacity: 1;
+}
+
+/* ---------------------------------------------------------------------------------------------
+   Track
+   --------------------------------------------------------------------------------------------- */
+
+.race-track {
+  display: grid;
+  gap: 10px;
+}
+
+.race-track__lanes {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: var(--border-hairline) solid var(--color-ink);
+}
+
+.race-lane {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 180px) minmax(0, 1fr) 104px;
+  align-items: center;
+  gap: 16px;
+  min-height: 60px;
+  border-bottom: var(--border-hairline) solid var(--color-hairline);
+  font-family: var(--font-ui);
+}
+
+.race-lane__n {
+  font-family: var(--font-ui);
+  font-size: 0.875rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-terracotta-ink);
+}
+
+.race-lane__name {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.race-lane__you {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-terracotta-ink);
+}
+
+/* The road: a dashed centre line; the racer's fill runs over it. */
+.race-lane__road {
+  position: relative;
+  height: 14px;
+  background:
+    repeating-linear-gradient(90deg, var(--color-hairline-strong) 0 14px, transparent 14px 26px)
+    center / 100% 2px no-repeat;
+}
+
+.race-lane__fill {
+  position: absolute;
+  inset: 2px 0;
+  border-radius: var(--radius-pill);
+  background: var(--color-ink);
+  transform-origin: left;
+  transition: transform var(--dur-slow) var(--ease-enter);
+}
+
+.race-lane__rider {
+  position: absolute;
+  inset: 0;
+  transition: transform var(--dur-slow) var(--ease-enter);
+}
+
+.race-lane__rider::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 22px;
+  height: 22px;
+  border: 3px solid var(--color-paper-raised);
+  border-radius: 50%;
+  background: var(--color-ink);
+  transform: translate(-50%, -50%);
+}
+
+.race-lane--me .race-lane__name {
+  color: var(--color-accent-deep);
+}
+
+.race-lane--me .race-lane__fill,
+.race-lane--me .race-lane__rider::before {
+  background: var(--color-accent);
+}
+
+.race-lane--me .race-lane__road {
+  height: 20px;
+}
+
+.race-lane__spm {
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 6px;
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.race-lane__unit {
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-muted);
+}
+
+.race-track__caption {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 0.875rem;
+  color: var(--color-muted);
+}
+
+/* ---------------------------------------------------------------------------------------------
+   Results
+   --------------------------------------------------------------------------------------------- */
+
+.race-results__head {
+  display: grid;
+  gap: 16px;
+  animation: race-rise var(--dur-reveal) var(--ease-enter) both;
+}
+
+.race-results__title {
+  font-size: clamp(56px, 7.5vw, 120px);
+}
+
+.race-results {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: var(--border-hairline) solid var(--color-ink);
+}
+
+.race-result {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 24px;
+  padding: 18px 16px 18px 0;
+  border-bottom: var(--border-hairline) solid var(--color-hairline);
+  font-family: var(--font-ui);
+  animation: race-rise var(--dur-slow) var(--ease-enter) both;
+}
+
+.race-result__place {
+  font-family: var(--font-display);
+  font-size: 56px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.05em;
+  text-align: center;
+}
+
+.race-result:first-child .race-result__place {
+  color: var(--color-accent);
+}
+
+.race-result__name {
+  font-family: var(--font-display);
+  font-size: clamp(20px, 2vw, 28px);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  overflow-wrap: anywhere;
+}
+
+.race-result__figure {
+  display: grid;
+  justify-items: end;
+  min-width: 110px;
+}
+
+.race-result__figure strong {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.race-result__figure span {
+  font-size: 0.8rem;
+  color: var(--color-muted);
+}
+
+.race-result__why {
+  font-weight: 600;
+  color: var(--color-muted);
+}
+
+.race-result--me {
+  background: var(--color-accent-pale);
+}
+
+.race-result.race-result--out .race-result__place {
+  font-size: 32px;
+  color: var(--color-ink-faint);
+}
+
+.race-honest {
+  margin: 0;
+  max-width: 70ch;
+  padding-left: 16px;
+  border-left: 4px solid var(--color-accent);
+  font-family: var(--font-ui);
+  line-height: 1.5;
+  color: var(--color-ink-soft);
+}
+
+/* ---------------------------------------------------------------------------------------------
+   Skeleton
+   --------------------------------------------------------------------------------------------- */
+
+.race-skeleton {
+  border-radius: var(--radius-card);
+  background: var(--color-paper-deep);
+}
+
+.race-skeleton--title {
+  width: min(560px, 70%);
+  height: 96px;
+}
+
+.race-skeleton--lane {
+  height: 56px;
+}
+
+@media (max-width: 1100px) {
+  .race-lobby__setup,
+  .race-lobby__ways,
+  .race-gather {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

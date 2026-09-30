@@ -118,6 +118,25 @@ const aboutRoute = createRoute({
   component: lazyRouteComponent(() => import('../features/public/index.js'), 'AboutPage'),
 })
 
+/** Live races. Lazy like every screen, which keeps `@supabase/supabase-js` out of the entry. */
+const racesRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/races',
+  component: lazyRouteComponent(() => import('../features/race/index.js'), 'RacesScreen'),
+})
+
+const raceRoomRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/races/room/$roomId',
+  component: lazyRouteComponent(() => import('../features/race/index.js'), 'RoomScreen'),
+})
+
+const raceJoinRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/races/join/$code',
+  component: lazyRouteComponent(() => import('../features/race/index.js'), 'JoinScreen'),
+})
+
 /**
  * The public pages are reachable without a learner. Everything else is behind sign-in from F2
  * onward; in F1 there is no sign-in, and `plan.md`'s waiver records why.
@@ -150,6 +169,9 @@ export function buildRouteTree(pages: { readonly product: FunctionComponent }) {
     licencesRoute,
     privacyRoute,
     aboutRoute,
+    racesRoute,
+    raceRoomRoute,
+    raceJoinRoute,
   ])
 }
 

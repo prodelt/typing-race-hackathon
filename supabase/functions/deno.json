@@ -1,11 +1,10 @@
 {
-  "//": "Edge Functions run on Deno, which the rest of this repository does not.",
+  "//": "Edge Functions run on Deno. The workspace packages are bundled into _shared/vendor by `pnpm supabase:functions` (tools/bundle-functions.ts), because a deploy uploads only this directory.",
   "imports": {
-    "@typing-race/domain": "../../packages/domain/src/index.ts",
-    "@typing-race/metrics": "../../packages/metrics/src/index.ts",
-    "@typing-race/curriculum": "../../packages/curriculum/src/index.ts"
+    "@typing-race/domain": "./_shared/vendor/domain.js",
+    "@typing-race/metrics": "./_shared/vendor/metrics.js",
+    "@typing-race/curriculum": "./_shared/vendor/curriculum.js"
   },
-  "unstable": ["sloppy-imports"],
   "compilerOptions": {
     "lib": ["deno.window", "esnext"],
     "strict": true

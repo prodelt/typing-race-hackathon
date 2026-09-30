@@ -5,6 +5,7 @@
   "type": "module",
   "description": "The Typing-Race single-page application.",
   "dependencies": {
+    "@supabase/supabase-js": "^2.117.2",
     "@tanstack/react-query": "^5.104.0",
     "@tanstack/react-router": "^1.170.40",
     "@typing-race/curriculum": "workspace:*",
