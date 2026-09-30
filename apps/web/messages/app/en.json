@@ -70,5 +70,6 @@
   "cmd_formulas": "Open the formulas page",
   "cmd_toggle_theme": "Toggle the theme",
   "cmd_toggle_motion": "Turn motion on or off",
-  "command_palette_close": "Close"
+  "command_palette_close": "Close",
+  "narrow_window_notice": "Typing-Race is built for a computer with a physical keyboard, from 1024 pixels wide. Touch typing cannot be learned on an on-screen keyboard, so we show this instead of a broken typing line. Open the app on a laptop or desktop — or simply widen this window."
 }

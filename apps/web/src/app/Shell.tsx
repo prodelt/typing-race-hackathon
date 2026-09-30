@@ -134,7 +134,20 @@ export function Shell() {
         )}
       </header>
 
-      <main id="main" className="mx-auto w-full max-w-6xl flex-1 px-6 py-8">
+      {/*
+        FR-067. Below 1024 px the learner is *told the target platform*, not shown a broken typing
+        line. A media query rather than a JavaScript check, because it must be right on the first
+        paint and must follow a window resize with no re-render — and because the typing screen
+        below it is genuinely unusable, not merely cramped: ticket 20's rail plus a full keyboard
+        guide does not fit, and a squeezed guide teaches the wrong finger positions.
+      */}
+      <div className="hidden max-[1023px]:block px-6 py-10">
+        <p className="mx-auto max-w-md text-center font-ui leading-relaxed text-ink">
+          {m.narrow_window_notice()}
+        </p>
+      </div>
+
+      <main id="main" className="mx-auto w-full max-w-6xl flex-1 px-6 py-8 max-[1023px]:hidden">
         <BootGate>
           <Outlet />
         </BootGate>
