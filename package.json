@@ -1,0 +1,37 @@
+{
+  "name": "typing-race",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Touch-typing trainer for Ukrainian and English, with live races and group leaderboards",
+  "license": "MIT",
+  "packageManager": "pnpm@12.8.1",
+  "engines": {
+    "node": ">=24.19.0"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @typing-race/web dev",
+    "build": "pnpm --filter @typing-race/web build",
+    "preview": "pnpm --filter @typing-race/web preview",
+    "typecheck": "tsc --build --force",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "format": "biome format --write .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test --project=chromium",
+    "test:e2e:all": "playwright test --project=chromium --project=firefox --project=webkit",
+    "test:e2e:cdp": "playwright test --project=cdp",
+    "test:latency": "playwright test --project=latency",
+    "check": "pnpm typecheck && pnpm lint && pnpm test"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
+    "@biomejs/biome": "2.5.14",
+    "@playwright/test": "1.63.0",
+    "fast-check": "4.10.2",
+    "typescript": "7.0.2",
+    "vite": "8.3.1",
+    "vitest": "5.0.2"
+  }
+}

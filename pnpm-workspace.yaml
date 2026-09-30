@@ -1,0 +1,11 @@
+packages:
+  - "packages/*"
+  - "apps/*"
+
+# pnpm 10+ blocks lifecycle scripts unless a dependency is listed here.
+# Keep this list minimal and justified — each entry is code we let run at install time.
+onlyBuiltDependencies:
+  - "@biomejs/biome" # ships a platform-native binary
+# Verified on the first install: Vite 8 bundles with Rolldown, not esbuild, and
+# TypeScript 7 arrives as the native @typescript/typescript-<platform> binary.
+# Neither needs a lifecycle script, so neither is listed.

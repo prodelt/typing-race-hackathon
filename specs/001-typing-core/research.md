@@ -275,6 +275,37 @@ the frame callback, which runs before paint, and would under-report.
 
 ---
 
+## R9. What T001 found in the live documentation (2026-09-30)
+
+`AGENTS.md` requires fetching current documentation before writing against a library. Run through
+`npx ctx7@0.5.12` rather than a global install, since the tool was not present on the machine. Three
+findings changed the plan; recorded here because R1–R3 above were written from the registry alone.
+
+- **Tailwind 4 has no JavaScript config.** Setup is the first-party `@tailwindcss/vite` plugin — a
+  **separate package**, also at 4.3.3 — plus `@import "tailwindcss"` and a `@theme` block in CSS.
+  There is no `tailwind.config.js` to own. So the hot file is the **CSS token entry**, not a JS config,
+  and the ownership table says so. `@theme static` forces every variable into the build rather than
+  only the used ones, which is what the dark and low-vision themes need, since they redefine variables
+  the light theme may never reference.
+- **Paraglide 2 is a compiler with generated output.** `paraglideVitePlugin({ project, outdir })` from
+  `@inlang/paraglide-js`, a `project.inlang/settings.json` listing the `@inlang/plugin-message-format`
+  and `@inlang/plugin-m-function-matcher` modules, messages read from `messages/{locale}.json`, and
+  code importing `m` from the **generated** `outdir`. Two consequences: the generated directory is
+  build output and must be gitignored, and `modules` should point at local `./node_modules/...` paths
+  rather than the jsDelivr URLs the CLI scaffolds, so the build does not fetch at build time.
+- **Paraglide's message catalogue is an ownership problem, and it is unresolved.** The documented
+  `pathPattern` is a single string per locale, so all six story lanes would edit one
+  `messages/uk.json`. The documentation shows no array form. **Decision: attempt an array or glob
+  `pathPattern` at T062 and verify it against the installed plugin; if it is unsupported, fall back to
+  one file per locale partitioned by a per-lane key prefix** — `exercise.*`, `result.*`, `path.*`,
+  `formulas.*`, `settings.*`, `session.*` — each lane appending only its own contiguous block, with
+  conflicts resolved by keeping both sides. That is the rule the constitution already applies to
+  `tasks.md`, so it is a known-good pattern rather than a new one. Either way the file is named in the
+  ownership table as shared-append rather than owned.
+- TanStack Router's code-based form is confirmed as recalled: `createRootRoute`, `createRoute` with
+  `getParentRoute`, `rootRoute.addChildren([...])`, `createRouter({ routeTree })`. No generated file,
+  which is the property R1 chose it for.
+
 ## Consequences for the plan
 
 - `packages/metrics` owns R4 and R5, is free of browser and Node APIs, and is therefore importable

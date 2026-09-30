@@ -30,8 +30,10 @@ this plan adds is the eight decisions in [research.md](./research.md), the seams
 [research.md R3](./research.md#r3-toolchain-versions) and costs one `tsconfig` change.
 
 **Primary Dependencies**: Vite 8.3.1 · React 19.3.0 · TanStack Router 1.170.40 (code-based routes) ·
-Zustand 5.0.15 with hand-written typed reducers · Tailwind CSS 4.3.3 with the tokens as CSS custom
-properties · Paraglide 2.25.4 · Biome 2.5.14. TanStack Query 5.104.0 is installed but idle: F1 has no
+Zustand 5.0.15 with hand-written typed reducers · Tailwind CSS 4.3.3 **plus the separate
+`@tailwindcss/vite` 4.3.3 plugin**, configured CSS-first with `@theme` and no JavaScript config
+([research R9](./research.md#r9-what-t001-found-in-the-live-documentation-2026-09-30)) · Paraglide
+2.25.4, a compiler whose output is generated and gitignored · Biome 2.5.14. TanStack Query 5.104.0 is installed but idle: F1 has no
 server to fetch from, and it is present so F2 does not touch the lockfile in a story lane.
 
 **Storage**: the browser only. IndexedDB behind the `ProgressStore` seam for progress, aggregates,
@@ -191,7 +193,8 @@ consumers cannot live in a lane.
 
 | Paths | Contents |
 |---|---|
-| `package.json`, `pnpm-workspace.yaml`, `pnpm-lock.yaml`, `tsconfig*.json`, `biome.json`, `vite.config.ts`, `playwright.config.ts`, `vitest.config.ts`, `.env.example` | toolchain; pnpm established via Corepack and pinned in `packageManager` |
+| `package.json`, `pnpm-workspace.yaml`, `pnpm-lock.yaml`, `tsconfig*.json`, `biome.json`, `vite.config.ts`, `playwright.config.ts`, `vitest.config.ts`, `.env.example` | toolchain; pnpm established via Corepack and pinned in `packageManager`. Tailwind 4 has **no** JavaScript config, so its hot file is the CSS token entry in `packages/ui` |
+| `apps/web/project.inlang/**`, `apps/web/messages/{locale}.json` | Paraglide project settings, and the message catalogue — **shared-append, not owned**: each lane appends only its own key prefix (`exercise.*`, `result.*`, `path.*`, `formulas.*`, `settings.*`, `session.*`) and conflicts resolve by keeping both sides, exactly as for `tasks.md`. `apps/web/src/paraglide/**` is generated output and is gitignored |
 | `.github/workflows/ci.yml` | typecheck · lint · unit · E2E ×3 engines · latency · axe · build · secret scan · dictionary-checksum stub |
 | `packages/ui/**` | Serene Script tokens as custom properties, the three themes, finger colours, primitives, icons, the motion flag |
 | `packages/metrics/**` | R4 Confidence, R5 Rhythm Consistency, SPM/CPM/WPM, accuracy, error counting, IKI, Attempt Aggregates |
