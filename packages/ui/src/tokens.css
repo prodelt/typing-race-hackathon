@@ -153,3 +153,48 @@
   transition-duration: 0.01ms !important;
   scroll-behavior: auto !important;
 }
+
+/*
+ * Route transitions — docs/design/motion.md, the frame layer.
+ *
+ * The whole document crossfades while the main column rises 8 px, which gives navigation a
+ * direction without animating anything the learner is reading. It is deliberately **not** applied
+ * during an attempt: `main` is excluded from the transition while `[data-attempt="running"]` is
+ * set, because FR-069 forbids anything outside the typing line from changing between keystrokes,
+ * and a route change mid-attempt would be the largest change of all.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: var(--dur-base);
+    animation-timing-function: var(--ease-standard);
+  }
+
+  ::view-transition-new(root) {
+    animation-name: route-enter;
+  }
+
+  ::view-transition-old(root) {
+    animation-name: route-exit;
+  }
+}
+
+@keyframes route-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@keyframes route-exit {
+  to {
+    opacity: 0;
+  }
+}
+
+/* The motion flag beats the media query: a learner who turned motion off gets no transition even
+   if the operating system has no opinion. */
+:root[data-motion="off"]::view-transition-old(root),
+:root[data-motion="off"]::view-transition-new(root) {
+  animation: none;
+}

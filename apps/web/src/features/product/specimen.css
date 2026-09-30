@@ -1,0 +1,131 @@
+/*
+ * The hero specimen. Deliberately shares the typing line's treatment — same font, same size, same
+ * mark — so the advert cannot drift from the product.
+ *
+ * Everything animated here is `transform` and `opacity` or a colour, and every duration is a token,
+ * so the app-level motion flag turns it off with everything else (FR-064).
+ */
+
+.specimen {
+  margin: 0;
+}
+
+.specimen__frame {
+  position: relative;
+  padding: 2.25rem 2rem 1.5rem;
+  border-radius: var(--radius-card);
+  border: var(--border-hairline) solid var(--color-hairline);
+  background: var(--color-paper-raised);
+  box-shadow: var(--shadow-raised);
+  overflow: hidden;
+}
+
+/* A single ruled line under the text, the way paper is ruled. This is the whole "paper" device:
+   no texture image, no gradient, one hairline. */
+.specimen__frame::after {
+  content: "";
+  position: absolute;
+  left: 2rem;
+  right: 2rem;
+  top: 5.1rem;
+  height: var(--border-hairline);
+  background: var(--color-hairline);
+}
+
+.specimen__line {
+  margin: 0;
+  font-family: var(--font-typing);
+  font-size: clamp(1.5rem, 2.4vw, 2rem);
+  line-height: var(--leading-typing);
+  letter-spacing: var(--tracking-typing);
+  white-space: nowrap;
+}
+
+.specimen__char {
+  position: relative;
+  transition: color var(--dur-instant) var(--ease-standard);
+}
+
+.specimen__char[data-state="typed"] {
+  color: var(--color-sage);
+}
+
+.specimen__char[data-state="upcoming"] {
+  color: color-mix(in srgb, var(--color-ink) 42%, var(--color-paper));
+}
+
+/* The error mark: colour, tint and an underline drawn as an inset shadow so no box model changes
+   and **nothing moves** (FR-016). A shake or a nudge here would be the exact thing the product
+   promises not to do. */
+.specimen__char[data-state="marked"] {
+  color: var(--color-terracotta);
+  background: var(--color-terracotta-tint);
+  box-shadow: inset 0 -3px 0 0 var(--color-terracotta);
+  border-radius: 2px;
+}
+
+.specimen__caret {
+  position: absolute;
+  left: -1px;
+  top: 0.1em;
+  bottom: 0.1em;
+  width: 2px;
+  background: var(--color-sage);
+  animation: specimen-blink 1.1s steps(2, start) infinite;
+}
+
+/* The wrong character the learner actually pressed, shown above the line it failed to become.
+   It never enters the text, which is the point: a wrong keystroke never becomes the right one. */
+.specimen__typed-wrong {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 2px);
+  transform: translateX(-50%);
+  font-family: var(--font-mono);
+  font-size: 0.5em;
+  font-style: normal;
+  color: var(--color-terracotta);
+  animation: specimen-rise var(--dur-quick) var(--ease-enter) both;
+}
+
+.specimen__readout {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin-top: 1.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--color-terracotta);
+}
+
+.specimen__readout b {
+  font-size: 1.5rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.specimen__note {
+  color: var(--color-muted);
+}
+
+@keyframes specimen-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes specimen-rise {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .specimen__caret {
+    animation: none;
+  }
+  .specimen__typed-wrong {
+    animation: none;
+  }
+}

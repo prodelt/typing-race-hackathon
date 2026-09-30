@@ -1,0 +1,64 @@
+/*
+ * Product-page motion. Everything here animates `transform` and `opacity` only, and every duration
+ * is a token, so the app-level flag turns the page still along with the rest of the product.
+ */
+
+/* Hero entrance. Two elements, staggered, so the eye reads the claim and then sees it happen. */
+.product__enter {
+  animation: product-enter var(--dur-slow) var(--ease-enter) both;
+}
+
+.product__enter--late {
+  animation-delay: 140ms;
+}
+
+/* Scroll reveal. **Never hides the content** — a translate only, and only once the script has
+   armed the section. The default paint is the final position, so a crawler, a print stylesheet or
+   a screenshot that resizes instead of scrolling sees a finished page. The first version of this
+   used `opacity: 0` and produced a blank page below the hero in exactly that situation. */
+.product__reveal[data-armed="true"] {
+  transform: translateY(20px);
+  transition: transform var(--dur-slow) var(--ease-enter);
+}
+
+.product__reveal[data-armed="true"][data-shown="true"] {
+  transform: none;
+}
+
+/* The stage ladder. Stage 1 is the live one and says so by weight, not by a badge alone. */
+.product__stage[data-available="false"] {
+  color: var(--color-muted);
+}
+
+.product__stage[data-available="false"] .product__stage-n {
+  color: var(--color-muted);
+}
+
+.product__stage-n {
+  color: var(--color-sage-ink);
+  letter-spacing: 0.04em;
+}
+
+/* Each principle gets a rule rather than a card: four boxes on one screen is a dashboard, and this
+   is a page of prose with icons. */
+.product__principle {
+  padding-top: 1.25rem;
+  border-top: var(--border-hairline) solid var(--color-hairline);
+}
+
+@keyframes product-enter {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .product__enter {
+    animation: none;
+  }
+  .product__reveal[data-armed="true"] {
+    transform: none;
+    transition: none;
+  }
+}

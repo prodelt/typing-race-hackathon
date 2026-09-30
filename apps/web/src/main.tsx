@@ -35,6 +35,10 @@ installLatencyProbe()
 const router = createRouter({
   routeTree: buildRouteTree({ product: ProductPage }),
   defaultPreload: 'intent',
+  // The View Transitions API, per docs/design/motion.md's frame layer: a cross-document fade with
+  // an 8 px rise on the main column. CSS-only, so it costs no JavaScript, and browsers without it
+  // simply swap the page — which is what they do today anyway.
+  defaultViewTransition: true,
 })
 
 declare module '@tanstack/react-router' {

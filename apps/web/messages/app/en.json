@@ -45,7 +45,7 @@
   "product_stage2_body": "Next you type real words made only of keys you have already unlocked: not one letter your fingers do not know yet.",
   "product_stage3_title": "Academy: n-grams, morphemes, tempo",
   "product_stage3_body": "Your weakest transitions between letters, common n-grams, morphemes and work on tempo. The trainer picks out whatever you type most slowly.",
-  "product_principles_title": "The principles it stands on",
+  "product_principles_title": "What it stands on",
   "product_p_blind_title": "No peeking",
   "product_p_blind_body": "In test attempts the on-screen keyboard, the next-key highlight and the live readouts are not shown at all. Only time, errors and progress remain.",
   "product_p_speed_title": "Speed never blocks progress",
@@ -71,5 +71,10 @@
   "cmd_toggle_theme": "Toggle the theme",
   "cmd_toggle_motion": "Turn motion on or off",
   "command_palette_close": "Close",
-  "narrow_window_notice": "Typing-Race is built for a computer with a physical keyboard, from 1024 pixels wide. Touch typing cannot be learned on an on-screen keyboard, so we show this instead of a broken typing line. Open the app on a laptop or desktop — or simply widen this window."
+  "narrow_window_notice": "Typing-Race is built for a computer with a physical keyboard, from 1024 pixels wide. Touch typing cannot be learned on an on-screen keyboard, so we show this instead of a broken typing line. Open the app on a laptop or desktop — or simply widen this window.",
+  "product_stage_now": "available",
+  "product_stage_later": "next",
+  "product_audit_title": "Every number is open to audit",
+  "product_audit_body": "Speed, accuracy, rhythm, confidence and even the ambiguous spot in the requirements on transition difficulty: every formula is published on a page of its own. You do not need to sign in to read it.",
+  "product_audit_link": "Open the formulas"
 }
