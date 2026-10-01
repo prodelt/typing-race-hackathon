@@ -397,12 +397,128 @@ optional hardening (previews would then need a pattern check in code).
 
 ## 8. Security and Performance Advisors
 
-_TBD_
+Advisors are deterministic SQL lints run against the live schema; the same checks back Studio
+(Advisors → Security / Performance), the CLI, the Management API (`GET /v1/security-advisors`,
+`GET /v1/performance-advisors`) and MCP `get_advisors`.
+(https://supabase.com/docs/guides/observability/advisors,
+https://supabase.com/docs/guides/database/database-advisors) Lint catalogue (code, level):
+
+| Lint | Level | Checks |
+|---|---|---|
+| 0001 unindexed_foreign_keys | INFO | FK columns without an index |
+| 0002 auth_users_exposed | ERROR | view exposes `auth.users` to the API |
+| 0003 auth_rls_initplan | WARN | policy re-evaluates `auth.uid()`/`auth.jwt()` per row (the `(select …)` fix) |
+| 0004 no_primary_key | INFO | table without PK |
+| 0005 unused_index | INFO | index never used |
+| 0006 multiple_permissive_policies | WARN | several permissive policies for one role/action |
+| 0007 policy_exists_rls_disabled | INFO | policies but RLS off |
+| 0008 rls_enabled_no_policy | INFO | RLS on, no policy |
+| 0009 duplicate_index | WARN | identical indexes |
+| 0010 security_definer_view | ERROR | view bypasses RLS |
+| 0011 function_search_path_mutable | WARN | function without fixed `search_path` |
+| 0012 auth_allow_anonymous_sign_ins | INFO | anonymous users share `authenticated`; policies may admit them |
+| 0013 rls_disabled_in_public | ERROR | public table without RLS |
+| 0014 extension_in_public | WARN | extension in `public` |
+| 0015 rls_references_user_metadata | ERROR | policy trusts `user_metadata` |
+| 0016 materialized_view_in_api / 0017 foreign_table_in_api | WARN | bypass RLS |
+| 0018 unsupported_reg_types | WARN | blocks `pg_upgrade` |
+| 0019 insecure_queue_exposed_in_api | ERROR | queue without access control |
+| 0020 table_bloat | WARN | dead tuples |
+| 0021 fkey_to_auth_unique | ERROR | FK to an auth unique constraint |
+| 0022 extension_versions_outdated | WARN | extension needs update |
+| 0023 sensitive_columns_exposed | ERROR | password/SSN/card-like columns exposed |
+| 0024 permissive_rls_policy | WARN | always-true policy condition |
+| 0025 public_bucket_allows_listing | WARN | storage listing |
+| 0026 / 0027 pg_graphql_{anon,authenticated}_table_exposed | WARN | GraphQL introspection exposure |
+| 0028 anon_security_definer_function_executable | WARN | `security definer` function callable with the anon key |
+| 0029 authenticated_security_definer_function_executable | WARN | … callable by any signed-in user |
+| 0030 autovacuum_disabled | INFO | autovacuum off |
+
+Source for the list: https://supabase.com/docs/guides/database/database-advisors (lint SQL lives in
+https://github.com/supabase/splinter).
+
+**CLI.** `supabase db advisors [--linked | --local | --db-url <url>] [--type all|security|performance]
+[--level info|warn|error] [--fail-on none|info|warn|error] [--output-format json]` — from
+`supabase db advisors --help` on the installed CLI v2.116.0 (the docs page lists `--type`,
+`--linked`, `--local`; https://supabase.com/docs/guides/observability/advisors). CI gate example:
+`supabase db advisors --local --type all --fail-on error` after `supabase db reset`. (The older
+`supabase db lint` is a plpgsql_check linter, not the advisors.
+https://supabase.com/docs/reference/cli/supabase-db-lint)
+
+**Expected findings on our schema (not yet run):** 0003 on the five owner policies
+(`core.sql:39,42,106,132,155`); 0029 (and 0028 where `anon` still has EXECUTE) on every
+`security definer` RPC in `public` — expected by design, but each must check `auth.uid()` itself
+and we should `revoke execute … from anon` on all except `leaderboard`; 0012 because anonymous
+sign-ins are on; 0024 on `lb_global_select`/`lb_weekly_select` `using (true)`
+(`races.sql:326-327`); possibly 0001 on FK columns such as `race_rooms.text_id`
+(`races.sql:90`) and `race_rooms.host_id` (`race_flow.sql:48`). Functions already pin
+`search_path = ''`, so 0011 should be clean.
 
 ## Implications for our architecture
 
-_TBD_
+1. **Keep anonymous-first; upgrade in place.** `linkIdentity` preserves the user id, so every
+   table keyed on `auth.uid()` survives the Google upgrade unchanged. Turn on *manual linking* and
+   Google in the dashboard and in `config.toml` (`enable_manual_linking = true`,
+   `[auth.external.google]`).
+2. **Switch the client to `flowType: 'pkce'`** and add one "auth return" handler that reads
+   `error_code` from the URL, cleans it with `history.replaceState`, and routes
+   `identity_already_exists` to the merge flow.
+3. **Merge = our code.** Build a `merge-account` Edge Function (service role) that requires proof
+   of both identities (current JWT + old anonymous JWT / signed ticket), moves rows with
+   conflict rules per table, then deletes the anonymous user. Design per-table merge rules now
+   (`progress` "best of", `attempts` re-key, leaderboard rows recomputed from `race_results`).
+4. **`delete-account` Edge Function** using `auth.admin.deleteUser`; cascade already covers all
+   tables. Decide on owned groups (transfer vs delete). Optional `pg_cron` purge of anonymous users
+   older than 30 days.
+5. **RLS hardening migration:** `(select auth.uid())` + `to authenticated` on owner policies;
+   `revoke execute … from anon` on non-public RPCs; restrictive `is_anonymous` policies (or checks
+   inside RPCs) for anything gated behind Google (e.g. public boards, groups).
+6. **Rate limits:** raise *anonymous sign-ins per hour* above 30 before the jury demo (shared
+   NAT); add a per-user window check inside `submit-attempt`/`finish-race`; Upstash only if IP
+   limiting is needed. Optional Turnstile.
+7. **Headers:** add CSP (Report-Only first), `nosniff`, `Referrer-Policy`, `Permissions-Policy`,
+   `frame-ancestors 'none'` via `vercel.json`; HSTS is already sent by Vercel.
+8. **Advisors in CI:** `supabase db advisors --local --fail-on error` after migrations.
+9. **Redirect allow list** on the hosted project: `https://<prod-domain>/**`,
+   `https://*-<team-slug>.vercel.app/**`, `http://localhost:5173/**`, `http://localhost:4173/**`;
+   Site URL = `https://<prod-domain>`.
 
 ## Google OAuth checklist
 
-_TBD_
+Placeholders: `<project-ref>` (Supabase), `<prod-domain>` (Vercel production domain),
+`<team-slug>` (Vercel team/account slug), `<support-email>`.
+
+1. Google Cloud console → create or pick a project (a dedicated one is cleanest).
+2. Google Auth Platform → **Branding**: app name `Typing-Race`, user support email
+   `<support-email>`, developer contact email; **skip the logo** for now (a logo can trigger brand
+   verification); app home page `https://<prod-domain>`; authorized domain: `<prod-domain>`'s
+   registrable domain (and `supabase.co` only if Google asks for the redirect host's domain).
+3. **Audience**: User type **External**. Leave in *Testing* while developing and add test
+   accounts (max 100, consent expires after 7 days); press **Publish app → In production** before
+   the demo.
+4. **Data Access**: add scopes `openid`, `.../auth/userinfo.email`, `.../auth/userinfo.profile`.
+   Nothing else.
+5. **Clients → Create client → Web application**, name `typing-race-supabase`.
+   - Authorized JavaScript origins: `https://<prod-domain>`, `http://localhost:5173`
+     (remove localhost later if you like).
+   - Authorized redirect URIs: `https://<project-ref>.supabase.co/auth/v1/callback` and, for the
+     local stack, `http://127.0.0.1:54321/auth/v1/callback`.
+   - Copy the Client ID and Client Secret (store the secret in a password manager, never in git).
+6. Supabase Dashboard → Authentication → **Sign In / Providers → Google**: enable, paste Client ID
+   and Secret, save. Confirm the callback URL shown there matches step 5.
+7. Supabase Dashboard → Authentication → settings: **Allow anonymous sign-ins** on, **Allow manual
+   linking** on.
+8. Supabase Dashboard → Authentication → **URL Configuration**: Site URL `https://<prod-domain>`;
+   Redirect URLs `https://<prod-domain>/**`, `https://*-<team-slug>.vercel.app/**`,
+   `http://localhost:5173/**`, `http://localhost:4173/**`.
+9. Supabase Dashboard → Authentication → **Rate Limits**: raise anonymous sign-ins per hour (e.g.
+   to a few hundred) for the demo.
+10. Local: put `SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_SECRET=<secret>` in an untracked env file and
+    add `[auth.external.google] enabled = true, client_id = "<client-id>",
+    secret = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_SECRET)"` plus
+    `enable_manual_linking = true` to `supabase/config.toml`.
+11. Test: anonymous session on device A → "Save with Google" → returns signed in, same user id,
+    `is_anonymous` false. Device B anonymous → same Google account → expect
+    `identity_already_exists` on return → merge flow.
+12. Optional later: custom auth domain (consent screen then shows your domain instead of
+    `<project-ref>.supabase.co`), then add its `/auth/v1/callback` to step 5.
