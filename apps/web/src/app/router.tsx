@@ -39,10 +39,33 @@ const todayRoute = createRoute({
   },
 })
 
+/**
+ * The Map: Path and Academy as one route through three regions. `stage` opens it on a region and
+ * `course` picks the Academy course (absent, the typing language decides).
+ */
+const mapRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/map',
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): { stage?: 1 | 2 | 3; course?: 'uk' | 'en' } => {
+    const stage = Number(search['stage'])
+    const course = search['course']
+    return {
+      ...(stage === 1 || stage === 2 || stage === 3 ? { stage } : {}),
+      ...(course === 'uk' || course === 'en' ? { course } : {}),
+    }
+  },
+  component: lazyRouteComponent(() => import('../features/map/index.js'), 'MapScreen'),
+})
+
+/** The Path became the Map; the old address still works. */
 const pathRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/path',
-  component: lazyRouteComponent(() => import('../features/path/index.js'), 'PathScreen'),
+  beforeLoad: () => {
+    throw redirect({ to: '/map', replace: true })
+  },
 })
 
 /**
@@ -59,13 +82,19 @@ const exerciseRoute = createRoute({
   component: lazyRouteComponent(() => import('../features/exercise/index.js'), 'ExerciseScreen'),
 })
 
-/** Stage 3. `course` picks the Ukrainian or English course; absent, the typing language decides. */
+/** Stage 3 is the Map's third region; the old address opens the Map there, course and all. */
 const academyRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/academy',
   validateSearch: (search: Record<string, unknown>): { course?: 'uk' | 'en' } =>
     search['course'] === 'uk' || search['course'] === 'en' ? { course: search['course'] } : {},
-  component: lazyRouteComponent(() => import('../features/academy/index.js'), 'AcademyScreen'),
+  beforeLoad: ({ search }) => {
+    throw redirect({
+      to: '/map',
+      search: { stage: 3, ...(search.course === undefined ? {} : { course: search.course }) },
+      replace: true,
+    })
+  },
 })
 
 const academyExerciseRoute = createRoute({
@@ -233,6 +262,7 @@ export function buildRouteTree(pages: { readonly home: FunctionComponent }) {
   return rootRoute.addChildren([
     homeRoute,
     todayRoute,
+    mapRoute,
     pathRoute,
     exerciseRoute,
     academyRoute,

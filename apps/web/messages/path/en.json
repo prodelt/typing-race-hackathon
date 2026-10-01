@@ -139,7 +139,7 @@
   "path_words_goal_focus_key": "The key “{key}”, {finger}: it is in every word.",
   "path_words_goal_label": "What this drill trains",
   "path_words_exercise_loading": "Preparing the words…",
-  "path_words_exercise_locked": "These words cannot be typed yet: some of their keys are still locked. Open them on the Path.",
+  "path_words_exercise_locked": "These words cannot be typed yet: some of their keys are still locked. Open them on the map.",
   "path_words_unlock_title": "New words with “{key}”",
   "path_words_unlock_lead": "These words are now made only of open keys:",
   "path_words_unlock_start": "Type the words",

@@ -68,7 +68,7 @@ test.describe('the game shell', () => {
     await expect(page.getByTestId('home-continue')).toBeVisible()
 
     const steps = [
-      ['2', /\/path$/, 'Мапа'],
+      ['2', /\/map$/, 'Мапа'],
       ['3', /\/races$/, 'Перегони'],
       ['4', /\/groups$/, 'Спільнота'],
       ['5', /\/profile$/, 'Профіль'],
@@ -117,7 +117,7 @@ test.describe('the game shell', () => {
     await expect(pause).toBeVisible()
     await expect(rail(page)).toBeHidden()
     await pause.getByRole('button', { name: 'Залишити спробу' }).click()
-    await expect(page).toHaveURL(/\/path$/)
+    await expect(page).toHaveURL(/\/map$/)
     await expect(rail(page)).toBeVisible()
     await expect(statusBar(page)).toBeVisible()
   })

@@ -1,0 +1,872 @@
+/* The Map (direction B): a head, the route through three regions, and the selected block below.
+   Like Home it fills the stage and does not scroll as a page at desktop sizes; the block's list
+   scrolls inside its own panel. Every colour is a theme token. */
+
+.stage__content:has(> .map) {
+  max-width: none;
+  height: 100%;
+  padding: 8px;
+}
+
+.map {
+  --map-gap: 8px;
+  --map-pad: clamp(16px, 1.7vw, 28px);
+  --map-dot: 36px;
+  --map-dot-font: 15px;
+  --map-dot-cur: 50px;
+  --map-dot-cur-font: 19px;
+  --map-dot-review: 28px;
+  --map-dot-finish: 32px;
+  --map-halo: 7px;
+  --map-name-font: 12.5px;
+  height: 100%;
+  min-height: 640px;
+  display: grid;
+  gap: var(--map-gap);
+  grid-template-rows: auto auto minmax(0, 1fr);
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.map-red {
+  color: var(--color-terracotta-ink);
+}
+
+/* ---- Head ---- */
+
+.map-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 20px;
+  padding: 14px var(--map-pad);
+  background: var(--color-paper-raised);
+}
+
+.map-head__title {
+  margin: 0;
+  font: 700 26px / 1 var(--font-display);
+  letter-spacing: -0.045em;
+}
+
+.map-head__here {
+  flex: 1;
+  min-width: 16em;
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-ink-soft);
+}
+
+.map-head__here b {
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.map-head__here .map-red {
+  color: var(--color-terracotta-ink);
+}
+
+.map-head__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ---- The route ---- */
+
+.map-route {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 10px 10px 12px;
+  background: var(--color-paper-raised);
+}
+
+.map-route__area {
+  position: relative;
+  height: clamp(290px, 33vh, 310px);
+}
+
+.map-route__area > .route {
+  position: absolute;
+  inset: 0;
+}
+
+.map-region {
+  position: absolute;
+  top: 0;
+  padding: 14px 16px 0;
+  pointer-events: none;
+}
+
+.map-region__name {
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font: 600 16px / 1.15 var(--font-display);
+  letter-spacing: -0.035em;
+  color: var(--color-ink);
+}
+
+.map-region__n {
+  font-weight: 500;
+  color: var(--color-terracotta-ink);
+}
+
+.map-region__status {
+  margin: 5px 0 0;
+  font-size: 12.5px;
+  color: var(--color-muted);
+}
+
+.map-region[data-status="here"] .map-region__word {
+  font-weight: 600;
+  color: var(--color-terracotta-ink);
+}
+
+.map-region[data-status="done"] .map-region__word {
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.map-region[data-status="locked"] .map-region__name,
+.map-region[data-status="locked"] .map-region__n {
+  color: var(--color-muted);
+}
+
+/* Nodes are real buttons laid over the drawing, so focus, labels and hit areas are HTML. Each kind
+   and state only sets custom properties on the button; the dot reads them in one rule. */
+.map-nodes {
+  position: absolute;
+  inset: 0;
+}
+
+.mnode2 {
+  --dot: var(--map-dot);
+  --dot-bg: var(--color-ink);
+  --dot-fg: var(--color-paper-raised);
+  --dot-radius: 50%;
+  --dot-font: var(--map-dot-font);
+  --dot-turn: 0deg;
+  --dot-scale: 1;
+  --dot-inset: 0 0 0 0 transparent;
+  --dot-sel: 0 0 0 0 transparent;
+  --dot-halo: 0 0 0 0 transparent;
+  --label-gap: 4px;
+  position: absolute;
+  width: 48px;
+  height: 48px;
+  margin: -24px 0 0 -24px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+
+.mnode2:focus-visible {
+  outline: 3px solid var(--color-ink);
+  outline-offset: 2px;
+  border-radius: 50%;
+}
+
+.mnode2:hover {
+  --dot-scale: 1.08;
+}
+
+.mnode2--step[data-node-state="done"] {
+  --dot-bg: var(--color-accent);
+  --dot-fg: var(--color-on-accent);
+}
+
+.mnode2--step[data-node-state="locked"] {
+  --dot-bg: var(--color-paper-raised);
+  --dot-fg: var(--color-muted);
+  --dot-inset: inset 0 0 0 2px var(--color-hairline-strong);
+}
+
+/* «Ти тут»: B's square with one rounded corner, a soft halo, and a ring that breathes. */
+.mnode2--step[data-node-state="current"] {
+  --dot: var(--map-dot-cur);
+  --dot-radius: 0 14px 0 0;
+  --dot-bg: var(--color-accent);
+  --dot-fg: var(--color-on-accent);
+  --dot-font: var(--map-dot-cur-font);
+  --dot-halo: 0 0 0 var(--map-halo) color-mix(in srgb, var(--color-accent) 20%, transparent);
+  --label-gap: 10px;
+}
+
+/* A review stop: a white diamond drawn in red. */
+.mnode2--review {
+  --dot: var(--map-dot-review);
+  --dot-radius: 3px;
+  --dot-turn: 45deg;
+  --dot-bg: var(--color-paper-raised);
+  --dot-fg: var(--color-accent);
+  --dot-inset: inset 0 0 0 2.5px var(--color-accent);
+}
+
+/* A region's finish line: a dark flag, red once the Stage is complete. */
+.mnode2--finish {
+  --dot: var(--map-dot-finish);
+  --dot-radius: 2px;
+}
+
+.mnode2--finish[data-node-state="done"] {
+  --dot-bg: var(--color-accent);
+  --dot-fg: var(--color-on-accent);
+}
+
+/* The selected node: an ink ring around the dot and its name underlined. */
+.mnode2.is-selected {
+  --dot-sel: 0 0 0 3px var(--color-paper-raised), 0 0 0 5.5px var(--color-ink);
+}
+
+.mnode2.is-selected[data-node-state="current"] {
+  --dot-sel: 0 0 0 4px var(--color-paper-raised), 0 0 0 6.5px var(--color-ink);
+}
+
+.mnode2__dot {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: var(--dot);
+  height: var(--dot);
+  border-radius: var(--dot-radius);
+  background: var(--dot-bg);
+  color: var(--dot-fg);
+  box-shadow: var(--dot-inset), var(--dot-sel), var(--dot-halo);
+  transform: rotate(var(--dot-turn)) scale(var(--dot-scale));
+  font: 600 var(--dot-font) / 1 var(--font-display);
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+  transition:
+    transform var(--dur-quick) var(--ease-enter),
+    box-shadow var(--dur-quick) var(--ease-enter);
+}
+
+.mnode2__dot svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transform: rotate(calc(-1 * var(--dot-turn)));
+}
+
+.mnode2--step[data-node-state="current"] .mnode2__dot::after {
+  content: "";
+  position: absolute;
+  inset: calc(-1 * var(--map-halo));
+  border: 2px solid var(--color-accent);
+  border-radius: 0 18px 0 0;
+  opacity: 0;
+  animation: map-ring 2.4s var(--ease-enter) infinite;
+}
+
+@keyframes map-ring {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(1.35);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mnode2--step[data-node-state="current"] .mnode2__dot::after {
+    animation: none;
+  }
+}
+
+:root[data-motion="off"] .mnode2--step[data-node-state="current"] .mnode2__dot::after,
+:root[data-motion="reduced"] .mnode2--step[data-node-state="current"] .mnode2__dot::after {
+  animation: none;
+}
+
+.mnode2__label {
+  position: absolute;
+  top: calc(100% + var(--label-gap));
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: var(--label-w, 120px);
+  display: grid;
+  gap: 1px;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.mnode2[data-side="above"] .mnode2__label {
+  top: auto;
+  bottom: calc(100% + var(--label-gap));
+}
+
+.mnode2__name {
+  font-size: var(--map-name-font);
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.mnode2[data-node-state="locked"] .mnode2__name {
+  color: var(--color-ink-soft);
+  font-weight: 500;
+}
+
+.mnode2.is-selected .mnode2__name {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+
+.mnode2__count {
+  font-size: 12px;
+  color: var(--color-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.mnode2__here {
+  justify-self: center;
+  margin-top: 3px;
+  padding: 2px 9px 3px;
+  border-radius: 999px;
+  background: var(--color-ink);
+  color: var(--color-paper-raised);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ---- Legend ---- */
+
+.map-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 18px;
+  padding: 10px 8px 0;
+  font-size: 12.5px;
+  color: var(--color-ink-soft);
+}
+
+.map-legend > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.map-legend > .map-legend__keys {
+  margin-left: auto;
+  gap: 5px;
+}
+
+.lg2 {
+  display: inline-block;
+  flex: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.lg2--done {
+  background: var(--color-accent);
+}
+
+.lg2--cur {
+  border-radius: 0 5px 0 0;
+  background: var(--color-accent);
+}
+
+.lg2--open {
+  background: var(--color-ink);
+}
+
+.lg2--lock {
+  background: var(--color-paper-raised);
+  box-shadow: inset 0 0 0 1.5px var(--color-hairline-strong);
+}
+
+.lg2--review {
+  width: 10px;
+  height: 10px;
+  border-radius: 1px;
+  transform: rotate(45deg);
+  background: var(--color-paper-raised);
+  box-shadow: inset 0 0 0 2px var(--color-accent);
+}
+
+.lg2--finish {
+  border-radius: 1px;
+  background: var(--color-ink);
+}
+
+/* ---- The selected block ---- */
+
+.map-detail,
+.map-level {
+  min-height: 0;
+  background: var(--color-paper-raised);
+}
+
+.map-level {
+  overflow: auto;
+  padding: 8px;
+}
+
+.map-detail {
+  display: grid;
+  grid-template-columns: minmax(250px, 300px) minmax(0, 1fr);
+  gap: var(--map-gap);
+}
+
+.md-info {
+  min-height: 0;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  padding: var(--map-pad);
+  background: var(--color-paper);
+}
+
+.md-kick {
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-muted);
+}
+
+.md-n {
+  font: 500 13px / 1 var(--font-display);
+  color: var(--color-terracotta-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.md-title {
+  margin: 10px 0 0;
+  font: 700 clamp(22px, 2vw, 30px) / 1.05 var(--font-display);
+  letter-spacing: -0.045em;
+}
+
+.md-goal {
+  margin: 10px 0 0;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--color-ink-soft);
+}
+
+.md-meter {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.md-meter__bar {
+  flex: 1;
+  height: 6px;
+  border-radius: 9px;
+  background: var(--color-paper-deep);
+  overflow: hidden;
+}
+
+.md-meter__bar i {
+  display: block;
+  height: 100%;
+  background: var(--color-accent);
+}
+
+.md-meter__lab {
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.md-go {
+  margin-top: auto;
+  padding-top: 18px;
+  display: grid;
+  gap: 10px;
+  justify-items: start;
+}
+
+.md-next {
+  margin: 0;
+  font-size: 13px;
+  color: var(--color-muted);
+}
+
+.md-next b {
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.md-state {
+  margin: auto 0 0;
+  padding-top: 18px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.md-note {
+  margin: 14px 0 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--color-muted);
+}
+
+.md-switch {
+  display: inline-flex;
+  align-self: flex-start;
+  gap: 2px;
+  margin-top: 16px;
+  padding: 3px;
+  border-radius: 999px;
+  background: var(--color-paper-deep);
+}
+
+.md-switch__option {
+  height: 30px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--color-ink-soft);
+  font: 600 13px / 1 var(--font-ui);
+  cursor: pointer;
+}
+
+.md-switch__option[aria-pressed="true"] {
+  background: var(--color-ink);
+  color: var(--color-paper-raised);
+}
+
+.md-body {
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 6px 6px 6px 0;
+}
+
+.md-split {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  gap: var(--map-gap);
+}
+
+.md-split--keys {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.md-split--words {
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 300px);
+}
+
+.md-split--academy {
+  grid-template-columns: minmax(200px, 260px) minmax(0, 1fr);
+}
+
+.md-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.md-scroll,
+.md-split > .md-list {
+  min-height: 0;
+  overflow: auto;
+}
+
+.md-body > .md-list {
+  min-height: 0;
+  overflow: auto;
+}
+
+.mrow {
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr) auto 96px;
+  align-items: center;
+  gap: 4px 12px;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--color-hairline);
+}
+
+.mrow__n {
+  font: 500 13px / 1 var(--font-display);
+  color: var(--color-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.mrow__main {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.mrow__name {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.mrow__tempo {
+  font-weight: 500;
+  color: var(--color-muted);
+}
+
+.mrow__sub {
+  font-size: 12.5px;
+  color: var(--color-muted);
+}
+
+.mrow__text {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.mrow__state {
+  font-size: 12.5px;
+  color: var(--color-ink-soft);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.mrow__go {
+  justify-self: end;
+}
+
+.mrow__go--pair {
+  display: inline-flex;
+  gap: 2px;
+}
+
+.mrow--academy {
+  grid-template-columns: 30px minmax(0, 1fr) auto auto;
+}
+
+.mrow__word {
+  font-size: 12.5px;
+  color: var(--color-ink-soft);
+}
+
+.mrow[data-state="complete"] .mrow__n,
+.mrow[data-mastered] .mrow__n,
+.mrow[data-node-state="done"] .mrow__n {
+  color: var(--color-terracotta-ink);
+}
+
+.mrow[data-state="complete"] .mrow__state,
+.mrow[data-mastered] .mrow__state {
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.mrow[data-state="locked"] .mrow__name,
+.mrow[data-state="lockedKeys"] .mrow__name,
+.mrow[data-state="lockedAfter"] .mrow__name {
+  color: var(--color-ink-soft);
+  font-weight: 500;
+}
+
+.md-more,
+.md-empty {
+  margin: 0;
+  padding: 14px 10px;
+  font-size: 13.5px;
+  color: var(--color-ink-soft);
+}
+
+/* Stage 1: the keyboard beside the list, at a size that fits next to it. */
+.md-keys {
+  min-height: 0;
+  overflow: auto;
+  padding: 14px 16px;
+  background: var(--color-paper);
+  font-size: 13px;
+}
+
+.md-keys [data-testid="keyboard"] {
+  zoom: 0.6;
+  overflow: visible;
+}
+
+/* Stage 2: the words the next drill draws, large. */
+.md-words {
+  min-height: 0;
+  overflow: hidden;
+  padding: 16px 18px;
+  background: var(--color-accent-tint);
+}
+
+.md-words__title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-ink-soft);
+}
+
+.md-words__list {
+  margin: 12px 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  font: 600 clamp(20px, 1.7vw, 26px) / 1.15 var(--font-display);
+  letter-spacing: -0.03em;
+  color: var(--color-ink);
+}
+
+/* Stage 3: the block's modules, and the open module's exercises. */
+.md-modules {
+  min-height: 0;
+  overflow: auto;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  align-content: start;
+  gap: 4px;
+}
+
+.mmod {
+  width: 100%;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 3px 10px;
+  padding: 10px 12px;
+  border: 0;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.mmod:hover {
+  background: var(--color-paper-deep);
+}
+
+.mmod.is-open {
+  background: var(--color-ink);
+  color: var(--color-paper-raised);
+}
+
+.mmod__n {
+  grid-row: 1 / 4;
+  font: 500 13px / 1.3 var(--font-display);
+  color: var(--color-terracotta-ink);
+}
+
+.mmod.is-open .mmod__n {
+  color: var(--color-accent-pale);
+}
+
+.mmod__title {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.mmod__count {
+  font-size: 12px;
+  color: var(--color-muted);
+}
+
+.mmod.is-open .mmod__count {
+  color: inherit;
+  opacity: 0.8;
+}
+
+.mmod__bar {
+  height: 3px;
+  background: color-mix(in srgb, currentColor 16%, transparent);
+}
+
+.mmod__bar i {
+  display: block;
+  height: 100%;
+  background: var(--color-accent);
+}
+
+/* Review: the weakest spots, large. */
+.md-spots {
+  margin: 0;
+  padding: 10px;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--map-gap);
+}
+
+.md-spots li {
+  display: grid;
+  gap: 6px;
+  padding: 14px 16px;
+  background: var(--color-paper);
+}
+
+.md-spots b {
+  font: 600 28px / 1 var(--font-display);
+  letter-spacing: -0.04em;
+}
+
+.md-spots span {
+  font-size: 13px;
+  color: var(--color-ink-soft);
+}
+
+/* Narrow or short windows: the stage scrolls and the block takes its natural height, rather than
+   squeezing the list into a slot too small to read. */
+@media (max-width: 1240px), (max-height: 820px) {
+  .map {
+    height: auto;
+    grid-template-rows: auto auto auto;
+  }
+
+  .md-info,
+  .md-scroll,
+  .md-split > .md-list,
+  .md-body > .md-list,
+  .md-modules,
+  .md-keys {
+    overflow: visible;
+  }
+
+  .map-detail {
+    min-height: 420px;
+  }
+}
+
+@media (max-width: 1240px) {
+  .map {
+    --map-dot: 30px;
+    --map-dot-font: 13.5px;
+    --map-dot-cur: 40px;
+    --map-dot-cur-font: 16px;
+    --map-dot-review: 24px;
+    --map-dot-finish: 28px;
+    --map-halo: 5px;
+    --map-name-font: 12px;
+  }
+
+  .md-split--keys,
+  .md-split--words {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .map-legend > .map-legend__keys {
+    margin-left: 0;
+  }
+}

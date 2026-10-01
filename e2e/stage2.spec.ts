@@ -4,7 +4,7 @@ import { typeText } from './harness/type.js'
 
 /**
  * Stage 2, "words from unlocked keys". A learner whose home row is open sees real words on the
- * Path, types a word drill made only of home-row characters, has it recorded, and — the jury's
+ * Map, types a word drill made only of home-row characters, has it recorded, and — the jury's
  * demo step 3 — sees a newly opened key bring its own words with it.
  */
 
@@ -74,16 +74,22 @@ async function seedHomeRow(page: Page, passesOnK = 0): Promise<void> {
  * In-app navigation only after the first load: the seed is an init script, so a full page load
  * would write it again over everything the test has just typed.
  */
-async function openPath(page: Page): Promise<void> {
+async function openPath(page: Page, block: 'ladder' | 'keys' | 'sets' = 'ladder'): Promise<void> {
   await page
     .getByRole('navigation', { name: 'Основна навігація' })
     .getByRole('link', { name: 'Мапа' })
     .click()
-  await expect(page).toHaveURL(/\/path$/)
+  await expect(page).toHaveURL(/\/map$/)
+  await openBlock(page, block)
+}
+
+/** Selects one Stage 2 block on the Map's route; its drills open below. */
+async function openBlock(page: Page, block: 'ladder' | 'keys' | 'sets'): Promise<void> {
+  await page.locator(`[data-node="s2-${block}"]`).click()
 }
 
 function wordsRegion(page: Page) {
-  return page.getByRole('region', { name: 'Слова з відкритих клавіш' })
+  return page.getByTestId('map-detail')
 }
 
 /** Starts the attempt already on screen, types its whole text and waits for the result. */
@@ -101,17 +107,20 @@ test('home row open: Stage 2 words appear, type only home-row letters, and count
   page,
 }) => {
   await seedHomeRow(page)
-  await page.goto('/path')
+  await page.goto('/map')
+  await openBlock(page, 'ladder')
 
   const words = wordsRegion(page)
   await expect(words).toBeVisible()
   await expect(words.getByTestId('words-featured')).toContainText('Перші справжні слова')
   await expect(words.locator('[data-drill-id="yq.words.length.short"]')).toBeVisible()
   // Keys past the home row stay closed, and say which key opens them.
+  await openBlock(page, 'keys')
   await expect(words.locator('[data-drill-id="yq.words.key.KeyR"]')).toHaveAttribute(
     'data-state',
     'lockedKeys',
   )
+  await openBlock(page, 'ladder')
 
   await words.getByRole('button', { name: 'Почати вправу «Перші слова»' }).click()
   await expect(page).toHaveURL(/\/exercise\/yq\.words\.first/)
@@ -137,7 +146,7 @@ test('home row open: Stage 2 words appear, type only home-row letters, and count
 
   await openPath(page)
   await expect(
-    wordsRegion(page).getByTestId('words-featured'),
+    wordsRegion(page).locator('[data-drill-id="yq.words.first"]'),
     'the passing test attempt is recorded as progress on the drill',
   ).toContainText('1 з 3')
 })
@@ -158,11 +167,12 @@ test('opening a new key brings real words containing it', async ({ page }) => {
     for (const char of word) expect(HOME_ROW.has(char) || char === 'к', word).toBe(true)
   }
 
-  // The Path now leads with the new key's words, and its drill types only open keys.
-  await openPath(page)
+  // The Map's new-keys block now leads with the new key's words, and its drill types only open
+  // keys.
+  await openPath(page, 'keys')
   const featured = wordsRegion(page).getByTestId('words-featured')
   await expect(featured).toContainText('Нові слова з «к»')
-  await featured.getByRole('button', { name: 'Почати вправу «Слова з «к»»' }).click()
+  await wordsRegion(page).getByRole('button', { name: 'Почати вправу «Слова з «к»»' }).click()
   await expect(page).toHaveURL(/\/exercise\/yq\.words\.key\.KeyR/)
   await page.getByRole('button', { name: 'Почати', exact: true }).click()
   const text = (await page.getByTestId('typing-line').locator('p.sr-only').textContent()) ?? ''

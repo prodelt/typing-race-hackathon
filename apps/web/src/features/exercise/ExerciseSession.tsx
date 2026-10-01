@@ -87,7 +87,7 @@ function Locked() {
 
 export function BackToPath() {
   return (
-    <Link to="/path" className="mt-6 inline-block font-ui text-sage underline underline-offset-4">
+    <Link to="/map" className="mt-6 inline-block font-ui text-sage underline underline-offset-4">
       {m.exercise_back_to_path()}
     </Link>
   )
@@ -203,7 +203,7 @@ export function ExerciseRun({
               layout={layout}
               lastError={engine.view.lastError}
               onResume={resume}
-              onLeave={() => void navigate({ to: '/path' })}
+              onLeave={() => void navigate({ to: '/map' })}
             />
           ) : null}
         </>

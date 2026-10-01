@@ -92,8 +92,8 @@ export function AcademyNextCard({ attempt }: { readonly attempt: AttemptSummary 
       </p>
       {target === null ? (
         <Link
-          to="/academy"
-          search={{ course: language }}
+          to="/map"
+          search={{ stage: 3, course: language }}
           className={`${buttonClass('primary', 'lg')} mt-4`}
         >
           {m.academy_back()}
@@ -110,8 +110,8 @@ export function AcademyNextCard({ attempt }: { readonly attempt: AttemptSummary 
       )}
       <p className="mt-4">
         <Link
-          to="/academy"
-          search={{ course: language }}
+          to="/map"
+          search={{ stage: 3, course: language }}
           className="font-ui text-sm text-ink underline underline-offset-4"
         >
           {m.academy_back()}

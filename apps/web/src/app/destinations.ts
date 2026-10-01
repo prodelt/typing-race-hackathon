@@ -11,7 +11,7 @@ export interface Destination {
   readonly id: DestinationId
   /** 1-based; it is both the rail's index number and the key that opens it. */
   readonly key: 1 | 2 | 3 | 4 | 5
-  readonly to: '/' | '/path' | '/races' | '/groups' | '/profile'
+  readonly to: '/' | '/map' | '/races' | '/groups' | '/profile'
   /** Route prefixes that light this destination up in the rail. */
   readonly owns: readonly string[]
 }
@@ -21,8 +21,8 @@ export const DESTINATIONS: readonly Destination[] = [
   {
     id: 'map',
     key: 2,
-    to: '/path',
-    owns: ['/path', '/academy', '/review', '/exercise', '/session', '/result'],
+    to: '/map',
+    owns: ['/map', '/path', '/academy', '/review', '/exercise', '/session', '/result'],
   },
   { id: 'races', key: 3, to: '/races', owns: ['/races'] },
   { id: 'community', key: 4, to: '/groups', owns: ['/groups', '/leaderboards'] },
@@ -43,7 +43,7 @@ export function destinationOf(pathname: string): DestinationId | null {
  * Routes that need a physical keyboard. On a phone they show a calm notice instead; profile,
  * leaderboards, groups, the races lobby and the reference pages stay readable.
  */
-const TRAINING = ['/today', '/path', '/academy', '/review', '/exercise', '/session']
+const TRAINING = ['/today', '/map', '/path', '/academy', '/review', '/exercise', '/session']
 
 export function needsKeyboard(pathname: string): boolean {
   if (pathname === '/') return true

@@ -9,13 +9,15 @@ import {
 } from '@typing-race/curriculum'
 import type { Language, NextAction, Scale } from '@typing-race/domain'
 import { Button, IconFlame } from '@typing-race/ui'
-import { useLayoutEffect, useMemo, useRef } from 'react'
+import { useMemo, useRef } from 'react'
 import { LiveGradient } from '../../app/LiveGradient.js'
 import { useScreenKeys } from '../../app/screenKeys.js'
 import { useGameStats } from '../../app/state/gameStats.js'
 import { useAppStore, useDerived } from '../../app/state/index.js'
 import { m } from '../../paraglide/messages.js'
 import { getLocale } from '../../paraglide/runtime.js'
+import { routeGeometry } from '../map/model.js'
+import { RouteLine, useSize } from '../map/RouteLine.js'
 import { keyLabel, nextActionText } from '../path/labels.js'
 import { MASTERY_STREAK, streakFor, totalKeyCount, unlockedKeyCount } from '../path/model.js'
 import { StartingLevel } from '../path/StartingLevel.js'
@@ -290,24 +292,21 @@ function RacePanel(props: {
 
 /* ---- 03 The mini-map --------------------------------------------------------------------- */
 
-/** B's route, one band per stage. Nodes are placed along it once it is in the DOM. */
-const ROUTE =
-  'M24 184 H 120 A 40 40 0 0 0 160 144 V 114 A 40 40 0 0 1 200 74 H 340 A 40 40 0 0 1 380 114 V 144 A 40 40 0 0 0 420 184 H 460 A 40 40 0 0 0 500 144 V 114 A 40 40 0 0 1 540 74 H 580'
-
 type NodeKind = 'done' | 'cur' | 'lock' | 'open' | 'goal' | 'goal-lock'
 interface MapNode {
   readonly kind: NodeKind
   readonly label: string
-  /** Where along the route, 0–1 within the band. */
   readonly band: 0 | 1 | 2
-  readonly at: number
 }
 
+/**
+ * The mini-map: the Map's route line (`RouteLine`, `routeGeometry`) at Home's size, with the last
+ * few keys of Stage 1, the door to Stage 2 and the goal. The full route is destination 2.
+ */
 function MapPanel() {
   const { progress, layout } = useDerived()
-  const route = useRef<SVGPathElement>(null)
-  const done = useRef<SVGPathElement>(null)
-  const group = useRef<SVGGElement>(null)
+  const box = useRef<HTMLDivElement>(null)
+  const { width, height } = useSize(box)
 
   const unlocked = progress?.unlockedSet ?? []
   const view = keyWindow(layout, unlocked, { done: 3, later: 0 })
@@ -317,55 +316,37 @@ function MapPanel() {
   const words = stage2Open(layout, unlocked)
   const stage1Done = progress?.stage.stage1Complete ?? false
 
-  const band1: MapNode[] = [
-    ...view.done.map((char) => ({ kind: 'done' as const, label: keyLabel(char) })),
+  const nodes: MapNode[] = [
+    ...view.done.map((char) => ({
+      kind: 'done' as const,
+      label: keyLabel(char),
+      band: 0 as const,
+    })),
     ...(view.current === undefined
       ? []
-      : [{ kind: 'cur' as const, label: keyLabel(view.current) }]),
-    ...view.later.map((char) => ({ kind: 'lock' as const, label: keyLabel(char) })),
-  ].map((node, i, all) => ({ ...node, band: 0 as const, at: (i + 0.5) / all.length }))
-  const nodes: MapNode[] = [
-    ...band1,
-    { kind: words ? 'open' : 'lock', label: 'аб', band: 1, at: 0.55 },
-    { kind: 'goal', label: '', band: 2, at: 0.85 },
+      : [{ kind: 'cur' as const, label: keyLabel(view.current), band: 0 as const }]),
+    { kind: words ? 'open' : 'lock', label: 'аб', band: 1 },
+    { kind: 'goal', label: '', band: 2 },
   ]
-  const nodesKey = nodes.map((node) => `${node.kind}:${node.label}`).join('|')
-
-  // Places the nodes on the route and draws the walked part up to "you are here". `nodesKey`
-  // stands in for `nodes`, which is rebuilt on every render.
-  // biome-ignore lint/correctness/useExhaustiveDependencies: nodesKey is the stable form of nodes
-  useLayoutEffect(() => {
-    const path = route.current
-    const g = group.current
-    if (path === null || g === null || typeof path.getTotalLength !== 'function') return
-    const length = path.getTotalLength()
-    const crossing = (x: number): number => {
-      let lo = 0
-      let hi = length
-      for (let i = 0; i < 24; i++) {
-        const mid = (lo + hi) / 2
-        if (path.getPointAtLength(mid).x < x) lo = mid
-        else hi = mid
-      }
-      return lo
-    }
-    const bands = [
-      [0, crossing(196)],
-      [crossing(204), crossing(400)],
-      [crossing(408), length],
-    ] as const
-    let walked = 0
-    const parts = Array.from(g.children) as SVGGElement[]
-    nodes.forEach((node, i) => {
-      const [from, to] = bands[node.band]
-      const at = from + (to - from) * node.at
-      const point = path.getPointAtLength(at)
-      parts[i]?.setAttribute('transform', `translate(${point.x.toFixed(1)} ${point.y.toFixed(1)})`)
-      if (node.kind === 'cur' || node.kind === 'done') walked = Math.max(walked, at)
-    })
-    if (stage1Done) walked = Math.max(walked, bands[0][1])
-    done.current?.style.setProperty('stroke-dasharray', `${walked} ${length + 10}`)
-  }, [nodesKey, stage1Done])
+  const geometry = routeGeometry({
+    width,
+    regions: [0, 1, 2].map((band) => nodes.filter((n) => n.band === band).map(() => 1)),
+    levels: [height - 34, 92, height - 34],
+    gap: 12,
+    radius: 32,
+    pad: 26,
+    minShare: 1 / 3,
+  })
+  const placed = nodes.map((node) => {
+    const index = nodes.filter((n) => n.band === node.band).indexOf(node)
+    return { node, point: geometry.points[node.band]?.[index] }
+  })
+  const cur = placed.find((p) => p.node.kind === 'cur')?.point?.at
+  const walked = Math.max(
+    cur ?? placed.filter((p) => p.node.kind === 'done').at(-1)?.point?.at ?? 0,
+    stage1Done ? (geometry.points[1]?.[0]?.at ?? 0) - 40 : 0,
+  )
+  const bandX = (i: number) => (geometry.bands[i]?.x ?? 0) + 12
 
   return (
     <section className="hub-panel hub-map" aria-labelledby="hub-map-title" data-testid="home-map">
@@ -388,59 +369,51 @@ function MapPanel() {
           </>
         )}
       </p>
-      <svg
+      <div
         className="hub-map__svg"
-        viewBox="0 0 600 214"
-        preserveAspectRatio="xMidYMid meet"
+        ref={box}
         role="img"
         aria-label={m.home_map_aria({ unlocked: open, total })}
       >
-        <rect
-          className={`m-band${stage1Done ? '' : ' m-band--cur'}`}
-          x="0"
-          y="0"
-          width="192"
-          height="214"
-        />
-        <rect
-          className={`m-band${words ? '' : ' m-band--lock'}`}
-          x="204"
-          y="0"
-          width="192"
-          height="214"
-        />
-        <rect className="m-band" x="408" y="0" width="192" height="214" />
-        <text className="m-n" x="12" y="28">
-          01
-        </text>
-        <text className="m-name" x="46" y="28">
-          {m.home_stage_1()}
-        </text>
-        <text className={`m-n${words ? '' : ' m-dim'}`} x="216" y="28">
-          02
-        </text>
-        <text className={`m-name${words ? '' : ' m-dim'}`} x="250" y="28">
-          {m.home_stage_2()}
-        </text>
-        <text className="m-n" x="420" y="28">
-          03
-        </text>
-        <text className="m-name" x="454" y="28">
-          {m.home_stage_3()}
-        </text>
-        <path ref={route} className="m-route m-route--todo" d={ROUTE} />
-        <path
-          ref={done}
-          className="m-route m-route--done"
-          d={ROUTE}
-          style={{ strokeDasharray: '0 9999' }}
-        />
-        <g ref={group}>
-          {nodes.map((node) => (
-            <MapGlyph key={`${node.band}-${node.kind}-${node.label}`} node={node} />
-          ))}
-        </g>
-      </svg>
+        <RouteLine
+          geometry={geometry}
+          width={width}
+          height={height}
+          walked={walked}
+          bandClass={(i) =>
+            i === 0 && !stage1Done ? 'is-cur' : i === 1 && !words ? 'is-lock' : ''
+          }
+        >
+          <text className="m-n" x={bandX(0)} y={28}>
+            01
+          </text>
+          <text className="m-name" x={bandX(0) + 34} y={28}>
+            {m.home_stage_1()}
+          </text>
+          <text className={`m-n${words ? '' : ' m-dim'}`} x={bandX(1)} y={28}>
+            02
+          </text>
+          <text className={`m-name${words ? '' : ' m-dim'}`} x={bandX(1) + 34} y={28}>
+            {m.home_stage_2()}
+          </text>
+          <text className="m-n" x={bandX(2)} y={28}>
+            03
+          </text>
+          <text className="m-name" x={bandX(2) + 34} y={28}>
+            {m.home_stage_3()}
+          </text>
+          {placed.map(({ node, point }) =>
+            point === undefined ? null : (
+              <g
+                key={`${node.band}-${node.kind}-${node.label}`}
+                transform={`translate(${point.x} ${point.y})`}
+              >
+                <MapGlyph node={node} />
+              </g>
+            ),
+          )}
+        </RouteLine>
+      </div>
       <div className="hub-legend">
         <span>
           <i className="lg lg--done" />
@@ -458,7 +431,7 @@ function MapPanel() {
           <i className="lg lg--lock" />
           {m.home_legend_locked()}
         </span>
-        <Link to="/path" className="hub-link" aria-keyshortcuts="2">
+        <Link to="/map" className="hub-link" aria-keyshortcuts="2">
           {m.home_map_all()}
           <span className="kbd" aria-hidden="true">
             2

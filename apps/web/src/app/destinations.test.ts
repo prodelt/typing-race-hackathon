@@ -16,6 +16,7 @@ describe('the five destinations', () => {
   it.each([
     ['/', 'home'],
     ['/today', 'home'],
+    ['/map', 'map'],
     ['/path', 'map'],
     ['/academy', 'map'],
     ['/academy/uk.m1.e1', 'map'],
@@ -35,7 +36,7 @@ describe('the five destinations', () => {
   })
 
   it('asks for a physical keyboard on training routes only', () => {
-    for (const path of ['/', '/path', '/exercise/x', '/session', '/races/room/r']) {
+    for (const path of ['/', '/map', '/path', '/exercise/x', '/session', '/races/room/r']) {
       expect(needsKeyboard(path)).toBe(true)
     }
     for (const path of [

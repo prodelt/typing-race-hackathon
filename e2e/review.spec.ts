@@ -85,15 +85,12 @@ test.describe('weak-spot review', () => {
     test.setTimeout(90_000)
     await seed(page, history())
     await page.goto('/today')
-    // Weak-spot review lives on the Map: the destination, then its «Слабкі місця» tab.
+    // Weak-spot review opens from the Map: the destination, then its «Повторення» action.
     await page
       .getByRole('navigation', { name: 'Основна навігація' })
       .getByRole('link', { name: 'Мапа' })
       .click()
-    await page
-      .getByRole('navigation', { name: 'Розділи мапи' })
-      .getByRole('link', { name: 'Слабкі місця' })
-      .click()
+    await page.getByRole('button', { name: 'Повторення', exact: true }).click()
     await expect(page).toHaveURL(/\/review$/)
     await expect(page.getByRole('heading', { level: 1, name: /Повторення/ })).toBeVisible()
 
@@ -138,7 +135,7 @@ test.describe('weak-spot review', () => {
     await expect(empty).toContainText('Слабких місць поки не видно')
     await expect(empty).toContainText('після п’яти натискань')
     await expect(page.getByRole('link', { name: 'Повторити слабкі місця' })).toHaveCount(0)
-    await empty.getByRole('link', { name: 'До Шляху' }).click()
-    await expect(page).toHaveURL(/\/path$/)
+    await empty.getByRole('link', { name: 'До мапи' }).click()
+    await expect(page).toHaveURL(/\/map$/)
   })
 })

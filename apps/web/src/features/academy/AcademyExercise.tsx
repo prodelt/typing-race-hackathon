@@ -59,7 +59,11 @@ export function AcademyExerciseScreen() {
       <section className="mx-auto max-w-xl py-16">
         <h1 className="font-display text-3xl font-bold">{m.academy_not_found_title()}</h1>
         <p className="mt-3 font-ui leading-relaxed">{m.academy_not_found_body()}</p>
-        <Link to="/academy" className={cx(buttonClass('secondary', 'md'), 'mt-6')}>
+        <Link
+          to="/map"
+          search={{ stage: 3 }}
+          className={cx(buttonClass('secondary', 'md'), 'mt-6')}
+        >
           {m.academy_back()}
         </Link>
       </section>
@@ -242,7 +246,9 @@ function AcademySession({ course, module, exercise, mode }: SessionProps) {
               layout={layout}
               lastError={engine.view.lastError}
               onResume={resume}
-              onLeave={() => void navigate({ to: '/academy', search: { course: course.language } })}
+              onLeave={() =>
+                void navigate({ to: '/map', search: { stage: 3, course: course.language } })
+              }
             />
           ) : null}
         </>
@@ -361,7 +367,11 @@ function PreStart({
         >
           {other === 'test' ? m.academy_ex_to_test() : m.academy_ex_to_practice()}
         </Link>
-        <Link to="/academy" search={{ course: layout.language }} className="academy-pre__back">
+        <Link
+          to="/map"
+          search={{ stage: 3, course: layout.language }}
+          className="academy-pre__back"
+        >
           {m.academy_back()}
         </Link>
       </div>
