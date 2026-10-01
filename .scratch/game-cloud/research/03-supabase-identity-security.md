@@ -253,7 +253,47 @@ board, creating groups). Do not authorise on `raw_user_meta_data` — the user c
 
 ## 5. Rate limiting
 
-_TBD_
+**Edge Functions — documented options.**
+
+- **Upstash Redis** (`@upstash/ratelimit` over Upstash's HTTP Redis client), keyed by the
+  Supabase Auth user id or by IP. This is the one official Edge Function example.
+  (https://supabase.com/docs/guides/functions/examples/rate-limiting) Adds a third-party service
+  and a secret.
+- **Data API (PostgREST) pre-request function** — `pgrst.db_pre_request` checking a
+  `private.rate_limits` table keyed by `split_part(x-forwarded-for, ',', 1)`; only `POST/PUT/PATCH/
+  DELETE` can be limited ("GET and HEAD requests run in read-only mode"), and it applies only to
+  Data API requests, so it covers our RPCs (`rpc/join_quick_match` etc. are POSTs) but not Edge
+  Functions. (https://supabase.com/docs/guides/api/securing-your-api)
+- Not a documented Supabase pattern but derivable from the above: inside `submit-attempt` /
+  `finish-race`, which already hold a service-role client (`submit-attempt/index.ts:141`), count
+  the caller's rows in the last N seconds (`attempts.user_id`, `created_at`) and return 429. Our
+  writes are already per-user and idempotent (`submit-attempt/index.ts:35,210`), so a per-user
+  window in Postgres is enough for a hackathon; Upstash only if we need IP-level limiting.
+- `verify_jwt = true` (`config.toml:390-396`) already rejects calls without a valid project JWT.
+
+**Auth built-in limits** (https://supabase.com/docs/guides/auth/rate-limits):
+
+| Operation | Default | Scope |
+|---|---|---|
+| Emails (built-in SMTP) | 2 / hour | project (raise via custom SMTP) |
+| SMS | 30 / hour | project |
+| Sign-ups + sign-ins (incl. OAuth) | 30 / 5 min | IP |
+| **Anonymous sign-ins** | **30 / hour** | IP |
+| Token refresh | 150 / 5 min | IP |
+| Verifications | 30 / 5 min | IP |
+| MFA challenges | 15 / min (fixed) | IP |
+| Web3 | 30 / 5 min | IP |
+
+Changed in Dashboard → Authentication → Rate Limits or via Management API `PATCH /config/auth`;
+locally `[auth.rate_limit]` (`config.toml:197-211`). Exceeding gives `over_request_rate_limit`
+(https://supabase.com/docs/guides/auth/debugging/error-codes). **Jury risk:** everybody on one
+office NAT shares the 30 anonymous sign-ins per hour — raise it before the demo.
+
+**CAPTCHA.** Supabase "strongly recommends" invisible CAPTCHA or Cloudflare Turnstile for
+anonymous sign-ins (https://supabase.com/docs/guides/auth/auth-anonymous). Enable under Auth →
+Bot and Abuse Protection (hCaptcha or Turnstile, secret key), then pass `options: { captchaToken }`
+to the auth call (https://supabase.com/docs/guides/auth/auth-captcha). Turnstile would also need
+CSP entries (§7). Optional for us.
 
 ## 6. "Delete my data"
 
