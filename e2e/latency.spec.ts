@@ -36,7 +36,7 @@ test('keystroke-to-paint stays inside the 16 ms budget at p95', async ({ page })
     },
   })
 
-  await page.goto('/path')
+  await page.goto('/map')
 
   const probePresent = await page.evaluate(() => window.__typingRaceLatency !== undefined)
   test.skip(

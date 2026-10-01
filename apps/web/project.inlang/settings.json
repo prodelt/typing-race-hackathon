@@ -20,7 +20,8 @@
       "./messages/community/{locale}.json",
       "./messages/review/{locale}.json",
       "./messages/shell/{locale}.json",
-      "./messages/home/{locale}.json"
+      "./messages/home/{locale}.json",
+      "./messages/map/{locale}.json"
     ]
   }
 }

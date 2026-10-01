@@ -319,7 +319,7 @@ test.describe('US5 settings', () => {
     )
     await expect(page).toHaveURL(/\/result\//)
 
-    await page.goto('/path')
+    await page.goto('/map')
     await expect(page.getByTestId('keyboard').locator('[data-code="KeyQ"]')).toHaveText(/^й$/i)
     const row = page.locator('li[data-state]').filter({ hasText: 'Ряд · п' }).first()
     await expect(row).toContainText('Серія 1 з 3')
@@ -598,7 +598,7 @@ test.describe('US5 keyboard only (scenario 8, FR-066)', () => {
   for (const [name, path] of [
     ['the product page', '/'],
     ['Today', '/today'],
-    ['Path', '/path'],
+    ['Map', '/map'],
     ['the exercise pre-start', `/exercise/${ANCHORS}?mode=practice`],
     ['a result', '/result/r1'],
     ['the session intro', '/session'],
@@ -704,7 +704,7 @@ test.describe('US5 accessibility audit of every screen (SC-011)', () => {
   for (const [name, path] of [
     ['the product page', '/'],
     ['Today', '/today'],
-    ['Path', '/path'],
+    ['Map', '/map'],
     ['the exercise pre-start', `/exercise/${ANCHORS}?mode=practice`],
     ['a result', '/result/r1'],
     ['the session intro', '/session'],
@@ -751,7 +751,7 @@ test.describe('US5 accessibility audit of every screen (SC-011)', () => {
   for (const theme of ['dark', 'lowVision'] as const) {
     for (const [name, path] of [
       ['Today', '/today'],
-      ['Path', '/path'],
+      ['Map', '/map'],
       ['a result', '/result/r1'],
       ['Settings', '/settings'],
       ['Formulas', '/formulas'],

@@ -3,8 +3,8 @@ import { expect, MOTION_OFF_SETTINGS, seedStore, test } from './harness/fixtures
 import { typeText } from './harness/type.js'
 
 /**
- * The Academy, Stage 3 (requirements §3.3, §4.1, demo §9.4): the course page shows its modules in
- * difficulty order with progress, a bigram exercise runs as a zero-peek test and moves the module's
+ * The Academy, Stage 3 (requirements §3.3, §4.1, demo §9.4): the Map's third region shows its
+ * modules in difficulty order with progress, a bigram exercise runs as a zero-peek test and moves the module's
  * progress, and a module whose every exercise is mastered reads as complete.
  */
 
@@ -51,9 +51,13 @@ async function seedLearner(page: Page, attempts: readonly SeedAttempt[] = []): P
   } as Parameters<typeof seedStore>[1])
 }
 
+/** A module's tab in the Map's Stage 3 block. */
 function moduleRow(page: Page, id: string) {
-  return page.getByTestId(`module-${id}`)
+  return page.locator(`[data-module="${id}"]`)
 }
+
+/** The Stage 3 blocks on the Map's route, in order. */
+const ACADEMY_NODES = ['s3-keys', 's3-syllables', 's3-phrases', 's3-text'] as const
 
 test.describe('Academy', () => {
   test('a learner opens the Academy, passes a bigram test and sees the module move (§9.4)', async ({
@@ -62,22 +66,33 @@ test.describe('Academy', () => {
     await seedLearner(page)
     await page.goto('/academy')
 
-    await expect(page.getByRole('heading', { name: 'Академія', level: 1 })).toBeVisible()
-    // Stage 1 is not complete: the page says the Academy assumes every key, and lets them in.
-    await expect(page.getByText('Академія розрахована на всі клавіші')).toBeVisible()
-    // Modules are visible, numbered, in the §3.3 order, with their completion state.
-    const titles = await page.locator('.academy-module__title').allInnerTexts()
+    // The old address opens the Map on Stage 3.
+    await expect(page).toHaveURL(/\/map\?stage=3$/)
+    await expect(page.getByRole('heading', { name: 'Мапа', level: 1 })).toBeVisible()
+    await expect(page.getByTestId('map-detail')).toHaveAttribute('data-stage', '3')
+    // Stage 1 is not complete: the region says the Academy is best after it, and lets them in.
+    await expect(page.getByTestId('map-region-3')).toContainText('радимо після етапу 1')
+    // Modules are visible, numbered, in the §3.3 order, block by block along the route.
+    const titles: string[] = []
+    for (const node of ACADEMY_NODES) {
+      await page.locator(`[data-node="${node}"]`).click()
+      await expect(page.locator('.mmod__title').first()).toBeVisible()
+      titles.push(...(await page.locator('.mmod__title').allInnerTexts()))
+    }
     expect(titles.length).toBeGreaterThanOrEqual(14)
     expect(titles.indexOf('Найчастотніші біграми')).toBeLessThan(titles.indexOf('Речення'))
     expect(titles.indexOf('Речення')).toBeLessThan(titles.indexOf('Темпові серії'))
 
+    await page.locator('[data-node="s3-keys"]').click()
     const bigrams = moduleRow(page, 'bigrams')
     await expect(bigrams.getByTestId('module-count')).toHaveText('0 з 6 опановано')
-    await expect(bigrams.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '0')
 
-    await bigrams.getByRole('button', { name: /Показати вправи/ }).click()
-    await bigrams.getByRole('link', { name: 'Залік: на · не' }).click()
+    await bigrams.click()
+    await page.getByTestId('module-bigrams').getByRole('link', { name: 'Залік: на · не' }).click()
     await expect(page).toHaveURL(/\/academy\/academy\.uk\.bigrams\.1\?mode=test/)
+    // The exercise screen is a lazy chunk: wait until it has replaced the Map, whose own start
+    // button has the same name.
+    await expect(page.getByTestId('map-detail')).toHaveCount(0)
 
     await page.getByRole('button', { name: 'Почати', exact: true }).click()
     await expect(page.getByTestId('typing-line')).toBeVisible()
@@ -96,14 +111,15 @@ test.describe('Academy', () => {
 
     // In-app navigation: a reload would re-run the seed script and erase the attempt just made.
     await next.getByRole('link', { name: 'До Академії' }).click()
-    const after = moduleRow(page, 'bigrams')
-    await after.getByRole('button', { name: /Показати вправи/ }).click()
+    await expect(page).toHaveURL(/\/map\?stage=3&course=uk$/)
+    await moduleRow(page, 'bigrams').click()
     await expect(
-      after.getByTestId('exercise-academy.uk.bigrams.1').getByTestId('exercise-state'),
+      page
+        .getByTestId('module-bigrams')
+        .getByTestId('exercise-academy.uk.bigrams.1')
+        .getByTestId('exercise-state'),
     ).toHaveText('Залік 1 з 3')
-    const value = Number(await after.getByRole('progressbar').getAttribute('aria-valuenow'))
-    expect(value).toBeGreaterThan(0)
-    await expect(after).not.toHaveAttribute('data-complete')
+    await expect(moduleRow(page, 'bigrams')).not.toHaveAttribute('data-complete')
   })
 
   test('a module whose every exercise is mastered reads as complete', async ({ page }) => {
@@ -115,20 +131,28 @@ test.describe('Academy', () => {
 
     const bigrams = moduleRow(page, 'bigrams')
     await expect(bigrams).toHaveAttribute('data-complete', 'true')
-    await expect(bigrams.getByTestId('module-complete')).toHaveText('Завершено')
     await expect(bigrams.getByTestId('module-count')).toHaveText('6 з 6 опановано')
-    await expect(page.getByTestId('academy-modules-complete')).toContainText('1')
+    await expect(page.getByTestId('map-region-3')).toContainText('1 з 17 модулів')
     // A neighbouring module is untouched.
     await expect(moduleRow(page, 'same-finger')).not.toHaveAttribute('data-complete')
   })
 
-  test('Stage 3 is a real stage on the Path', async ({ page }) => {
+  test('Stage 3 is a real region of the Map, and the old address still opens it', async ({
+    page,
+  }) => {
     await seedLearner(page)
-    await page.goto('/path')
-    const stage = page.getByTestId('academy-stage')
-    await expect(stage).toContainText('Етап 3. Академія')
-    await expect(stage).toContainText('0 з 17 модулів завершено')
-    await stage.getByRole('link', { name: 'Перейти до Академії' }).click()
-    await expect(page).toHaveURL(/\/academy$/)
+    await page.goto('/map')
+    const stage = page.getByTestId('map-region-3')
+    await expect(stage).toContainText('Етап 3 · Академія')
+    await expect(stage).toContainText('0 з 17 модулів')
+
+    // `/academy` lands on the Map with Stage 3 open, and `?course=` keeps picking the course.
+    await page.goto('/academy?course=en')
+    await expect(page).toHaveURL(/\/map\?stage=3&course=en$/)
+    await expect(page.getByTestId('map-detail')).toHaveAttribute('data-stage', '3')
+    await expect(page.getByRole('button', { name: 'English' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
   })
 })

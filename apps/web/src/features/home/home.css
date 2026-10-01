@@ -327,23 +327,16 @@
 }
 
 .hub-map__svg {
+  position: relative;
   flex: 1;
-  min-height: 0;
+  min-height: 150px;
   width: 100%;
   margin-top: 10px;
-  overflow: visible;
 }
 
-.hub-map .m-band {
-  fill: var(--color-paper-deep);
-}
-
-.hub-map .m-band--cur {
-  fill: var(--color-accent-tint);
-}
-
-.hub-map .m-band--lock {
-  fill: var(--color-paper);
+.hub-map__svg > .route {
+  position: absolute;
+  inset: 0;
 }
 
 .hub-map .m-n {
@@ -360,22 +353,6 @@
 
 .hub-map .m-dim {
   fill: var(--color-muted);
-}
-
-.hub-map .m-route {
-  fill: none;
-  stroke-width: 4;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.hub-map .m-route--todo {
-  stroke: var(--color-hairline-strong);
-  stroke-dasharray: 1 10;
-}
-
-.hub-map .m-route--done {
-  stroke: var(--color-accent);
 }
 
 .mnode text {

@@ -37,7 +37,7 @@ export function CommandPalette() {
   const commands = useMemo<Command[]>(() => {
     const list: Command[] = [
       { id: 'today', label: m.cmd_today(), run: () => void navigate({ to: '/' }) },
-      { id: 'path', label: m.cmd_path(), run: () => void navigate({ to: '/path' }) },
+      { id: 'path', label: m.cmd_path(), run: () => void navigate({ to: '/map' }) },
       { id: 'settings', label: m.cmd_settings(), run: () => void navigate({ to: '/settings' }) },
       { id: 'formulas', label: m.cmd_formulas(), run: () => void navigate({ to: '/formulas' }) },
       {

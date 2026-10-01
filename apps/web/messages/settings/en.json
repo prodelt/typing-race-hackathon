@@ -34,7 +34,7 @@
   "settings_errors_freeBackspace": "Correct freely",
   "settings_errors_freeBackspace_hint": "The caret moves on and you fix a mistake with Backspace.",
   "settings_typing_legend": "Typing language",
-  "settings_typing_hint": "Path and the exercise catalogue switch to this language. Progress in the other language is kept.",
+  "settings_typing_hint": "The map and the exercise catalogue switch to this language. Progress in the other language is kept.",
   "settings_layout_legend": "Keyboard layout",
   "settings_layout_hint": "The layout normally follows the typing language, but you can change it on its own.",
   "settings_layout_yq": "ЙЦУКЕН",

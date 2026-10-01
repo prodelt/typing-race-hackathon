@@ -54,7 +54,10 @@ function useDestinationKeys(enabled: boolean): void {
   }, [enabled, navigate])
 }
 
-/** Map and Community each hold more than one screen; a quiet tab strip reaches the others. */
+/**
+ * Community holds two screens; a quiet tab strip reaches the other. The Map needs none: Path and
+ * Academy are one screen now, and review opens from the Map itself (its review stops and `R`).
+ */
 function StageTabs({
   active,
   pathname,
@@ -63,24 +66,15 @@ function StageTabs({
   readonly pathname: string
 }) {
   const tabs =
-    active === 'map'
+    active === 'community'
       ? {
-          label: m.shell_tabs_map(),
+          label: m.shell_tabs_community(),
           items: [
-            { to: '/path', label: m.shell_tab_route() },
-            { to: '/academy', label: m.shell_tab_academy() },
-            { to: '/review', label: m.shell_tab_review() },
+            { to: '/groups', label: m.shell_tab_groups() },
+            { to: '/leaderboards', label: m.shell_tab_leaderboards() },
           ] as const,
         }
-      : active === 'community'
-        ? {
-            label: m.shell_tabs_community(),
-            items: [
-              { to: '/groups', label: m.shell_tab_groups() },
-              { to: '/leaderboards', label: m.shell_tab_leaderboards() },
-            ] as const,
-          }
-        : null
+      : null
   if (tabs === null) return null
   // Only on the section screens themselves; inside an exercise or a group the tabs would crowd it.
   if (!tabs.items.some((item) => item.to === pathname)) return null

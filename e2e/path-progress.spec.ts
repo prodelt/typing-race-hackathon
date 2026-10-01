@@ -249,7 +249,7 @@ test.describe('US3 the path and mastery', () => {
     page,
   }) => {
     await seedLearner(page)
-    await page.goto('/path')
+    await page.goto('/map')
 
     await expect(page.getByTestId('keyboard-summary')).toContainText(
       /Відкрито 8 з \d+ клавіш\. Наступна до відкриття: п\./,
@@ -269,6 +269,13 @@ test.describe('US3 the path and mastery', () => {
     const afterNext = scaleRow(page, 'Ряд · р')
     await expect(afterNext).toHaveAttribute('data-state', 'locked')
     await expect(afterNext).toContainText('Відкриється, коли опануєте клавішу р')
+    // The Map opens on «ти тут»; the top-row block is the next one along the route, still closed.
+    await expect(page.locator('[data-node="s1-home"]')).toHaveAttribute(
+      'data-node-state',
+      'current',
+    )
+    await expect(page.locator('[data-node="s1-top"]')).toHaveAttribute('data-node-state', 'locked')
+    await page.locator('[data-node="s1-top"]').click()
     const needsKey = scaleRow(page, 'Вертикальний рух · е')
     await expect(needsKey).toHaveAttribute('data-state', 'locked')
     await expect(needsKey).toContainText('Спершу відкрийте: п')
@@ -276,22 +283,27 @@ test.describe('US3 the path and mastery', () => {
       page.getByRole('button', { name: 'Почати вправу Вертикальний рух · е' }),
     ).toHaveCount(0)
 
-    // Stage 2 is on the Path but closed until the home row is open, and says which keys it needs.
+    // Stage 2 is on the Map but closed until the home row is open, and says which keys it needs.
+    await expect(page.getByTestId('map-region-2')).toContainText('відкриється з клавішами п р є')
+    await page.locator('[data-node="s2-ladder"]').click()
+    await expect(page.getByTestId('words-closed')).toContainText('Бракує клавіш: п р є')
+    // Stage 3, the Academy, is a real stage with a way in: its exercises start from the Map.
+    await expect(page.getByTestId('map-region-3')).toContainText('Етап 3 · Академія')
+    await page.locator('[data-node="s3-keys"]').click()
+    await expect(page.getByTestId('map-detail')).toContainText('Клавіші й пари')
     await expect(
-      region(page, 'Слова з відкритих клавіш').getByTestId('words-closed'),
-    ).toContainText('Бракує клавіш: п р є')
-    // Stage 3, the Academy, is a real stage with a way in.
-    const later = region(page, 'Далі')
-    await expect(later.getByTestId('academy-stage')).toContainText('Етап 3. Академія')
-    await expect(later.getByRole('link', { name: 'Перейти до Академії' })).toBeVisible()
-    await expect(later.getByRole('button')).toHaveCount(0)
+      page
+        .getByTestId('map-detail')
+        .getByRole('link', { name: /^Тренування: / })
+        .first(),
+    ).toBeVisible()
   })
 
   test('a third passing Test Attempt completes the exercise and unlocks exactly its key (scenarios 2 and 6)', async ({
     page,
   }) => {
     await seedLearner(page, passes(FIRST_KEY, 2))
-    await page.goto('/path')
+    await page.goto('/map')
     const before = await unlockedKeyCount(page)
     await expect(scaleRow(page, 'Ряд · п')).toHaveAttribute('data-state', 'inProgress')
     await expect(scaleRow(page, 'Ряд · п')).toContainText('Серія 2 з 3')
@@ -348,7 +360,7 @@ test.describe('US3 the path and mastery', () => {
         (): SeedAttempt => ({ scaleId: FIRST_KEY, mode: 'test', accuracy: 0.97, spm: 3 }),
       ),
     )
-    await page.goto('/path')
+    await page.goto('/map')
 
     await expect(scaleRow(page, 'Ряд · п')).toHaveAttribute('data-state', 'complete')
     await expect(page.getByTestId('keyboard-summary')).toContainText('Наступна до відкриття: р')
@@ -467,23 +479,27 @@ test.describe('US3 the path and mastery', () => {
     await primaryNavigation(page).getByRole('link', { name: 'Мапа' }).click()
     expect(await unlockedKeyCount(page)).toBe(never)
 
-    // ...and choosing the third later opens more, never fewer.
+    // ...and choosing the third later, from the Map's starting-level control, opens more, never
+    // fewer.
+    await page.getByRole('button', { name: 'Початковий рівень' }).click()
     await page.getByRole('radio', { name: /Друкую наосліп, хочу точності/ }).check()
     await page.getByRole('button', { name: 'Зберегти вибір' }).click()
-    await expect(page.getByTestId('keyboard-summary')).toContainText(
-      new RegExp(`Відкрито ${accuracy} з`),
-    )
-    expect(await unlockedKeyCount(page)).toBe(accuracy)
 
     // Having opened more, the lower answers are no longer offered: no answer takes a key away.
     await expect(page.getByRole('radio', { name: /Ще не друкую наосліп/ })).toBeDisabled()
     await expect(page.getByRole('radio', { name: /Знаю домашній ряд/ })).toBeDisabled()
     await expect(page.getByText('Вже відкрито більше, ніж дасть цей варіант').first()).toBeVisible()
+
+    await page.getByRole('button', { name: 'Повернутися до мапи' }).click()
+    await expect(page.getByTestId('keyboard-summary')).toContainText(
+      new RegExp(`Відкрито ${accuracy} з`),
+    )
+    expect(await unlockedKeyCount(page)).toBe(accuracy)
   })
 
-  test('Path and Today have no accessibility violations (T110)', async ({ page }) => {
+  test('the Map and Home have no accessibility violations (T110)', async ({ page }) => {
     await seedLearner(page, passes(FIRST_KEY, 2))
-    for (const route of ['/today', '/path']) {
+    for (const route of ['/today', '/map']) {
       await page.goto(route)
       await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
       await audit(page)
@@ -531,7 +547,7 @@ async function snapshot(page: Page, resultPaths: readonly string[]): Promise<Sna
     where: await page.getByTestId('home-map').innerText(),
   }
 
-  await page.goto('/path')
+  await page.goto('/map')
   await expect(page.getByTestId('keyboard-summary')).toBeVisible()
   const path = {
     summary: await page.getByTestId('keyboard-summary').innerText(),
@@ -643,7 +659,7 @@ test.describe('US3 practice with the network away (§8.10)', () => {
     context,
   }) => {
     await seedLearner(page)
-    await page.goto('/path')
+    await page.goto('/map')
     await expect(page.getByTestId('keyboard-summary')).toBeVisible()
     await registerWorker(page)
 
@@ -660,8 +676,8 @@ test.describe('US3 practice with the network away (§8.10)', () => {
     expect(reached).toBe('offline')
 
     // The learner opens the app again: a fresh navigation, answered by the worker.
-    await page.goto('/path')
-    await expect(page.getByRole('heading', { name: 'Шлях' })).toBeVisible()
+    await page.goto('/map')
+    await expect(page.getByRole('heading', { name: 'Мапа' })).toBeVisible()
     await expect(page.getByTestId('keyboard-summary')).toBeVisible()
 
     // An unlocked exercise starts...
@@ -684,7 +700,7 @@ test.describe('US3 practice with the network away (§8.10)', () => {
     page,
   }) => {
     await seedLearner(page)
-    await page.goto('/path')
+    await page.goto('/map')
     await expect(page.getByTestId('keyboard-summary')).toBeVisible()
 
     // `seams/cache.ts` says "exactly one test opts into the real adapter". That sentence assumes

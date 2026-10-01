@@ -34,7 +34,7 @@
   "settings_errors_freeBackspace": "Виправляти вільно",
   "settings_errors_freeBackspace_hint": "Курсор іде далі, а виправити помилку можна клавішею Backspace.",
   "settings_typing_legend": "Мова набору",
-  "settings_typing_hint": "Шлях і каталог вправ перемикаються на цю мову. Прогрес в іншій мові не губиться.",
+  "settings_typing_hint": "Мапа й каталог вправ перемикаються на цю мову. Прогрес в іншій мові не губиться.",
   "settings_layout_legend": "Розкладка",
   "settings_layout_hint": "Зазвичай розкладка йде за мовою набору, але її можна змінити окремо.",
   "settings_layout_yq": "ЙЦУКЕН",

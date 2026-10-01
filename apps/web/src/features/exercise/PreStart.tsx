@@ -129,7 +129,7 @@ export function PreStart({
             {m.exercise_start()}
           </Button>
           <ModeToggle scaleId={scale.id} mode={mode} testIsPrimary={testIsPrimary} />
-          <Link to="/path" className="font-ui text-sm text-sage underline underline-offset-4">
+          <Link to="/map" className="font-ui text-sm text-sage underline underline-offset-4">
             {m.exercise_back_to_path()}
           </Link>
         </div>

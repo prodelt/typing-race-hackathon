@@ -372,7 +372,7 @@ test.describe('US6 a guided session', () => {
     page,
   }) => {
     await seedLearner(page, SLOW)
-    await page.goto('/path')
+    await page.goto('/map')
     await page.getByRole('button', { name: 'Почати вправу Дзеркало · о' }).click()
     await expect(page).toHaveURL(/\/exercise\/yq\.mirror\.anchors/)
 
@@ -431,7 +431,7 @@ test.describe('US6 a session interrupted by a restart (FR-078)', () => {
 
       // Every other way out still works.
       await primaryNavigation(after).getByRole('link', { name: 'Мапа' }).click()
-      await expect(after.getByRole('heading', { level: 1, name: 'Шлях' })).toBeVisible()
+      await expect(after.getByRole('heading', { level: 1, name: 'Мапа' })).toBeVisible()
       await primaryNavigation(after).getByRole('link', { name: 'Головна' }).click()
       await expect(after.getByTestId('next-action')).toBeVisible()
 

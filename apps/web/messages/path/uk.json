@@ -139,7 +139,7 @@
   "path_words_goal_focus_key": "Клавіша «{key}», {finger}: вона є в кожному слові.",
   "path_words_goal_label": "Що тренує ця вправа",
   "path_words_exercise_loading": "Готуємо слова…",
-  "path_words_exercise_locked": "Цих слів поки не набрати: частина їхніх клавіш ще закрита. Відкрийте їх на Шляху.",
+  "path_words_exercise_locked": "Цих слів поки не набрати: частина їхніх клавіш ще закрита. Відкрийте їх на мапі.",
   "path_words_unlock_title": "Нові слова з «{key}»",
   "path_words_unlock_lead": "Тепер ці слова складаються лише з відкритих клавіш:",
   "path_words_unlock_start": "Друкувати слова",
