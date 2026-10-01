@@ -76,8 +76,15 @@ const pathRoute = createRoute({
 const exerciseRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/exercise/$scaleId',
-  validateSearch: (search: Record<string, unknown>): { mode: 'practice' | 'test' } => ({
+  // `start` opens the run straight into Play Mode (the first run's last step); without it the
+  // pre-start screen comes first, as it always has.
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): { mode: 'practice' | 'test'; start?: true } => ({
     mode: search['mode'] === 'test' ? 'test' : 'practice',
+    ...(search['start'] === true || search['start'] === 1 || search['start'] === '1'
+      ? { start: true as const }
+      : {}),
   }),
   component: lazyRouteComponent(() => import('../features/exercise/index.js'), 'ExerciseScreen'),
 })
@@ -164,6 +171,13 @@ const aboutProjectRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/about/project',
   component: lazyRouteComponent(() => import('../features/public/index.js'), 'AboutPage'),
+})
+
+/** Settings' "start over": the first run again, history kept. */
+const startRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/start',
+  component: lazyRouteComponent(() => import('../features/firstrun/index.js'), 'FirstRunScreen'),
 })
 
 /** Profile, destination 05. */
@@ -271,6 +285,7 @@ export function buildRouteTree(pages: { readonly home: FunctionComponent }) {
     resultRoute,
     sessionRoute,
     settingsRoute,
+    startRoute,
     formulasRoute,
     licencesRoute,
     privacyRoute,

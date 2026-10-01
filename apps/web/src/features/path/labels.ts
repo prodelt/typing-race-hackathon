@@ -1,5 +1,5 @@
 import { SHIFT_TOKEN } from '@typing-race/curriculum'
-import type { Finger, NextAction, Scale, ScaleType } from '@typing-race/domain'
+import type { Finger, NextAction, Scale, ScaleType, StartingLevelChoice } from '@typing-race/domain'
 import { m } from '../../paraglide/messages.js'
 import { displayChar } from './model.js'
 
@@ -78,3 +78,31 @@ export function nextActionText(
       return action.template
   }
 }
+
+export interface StartingLevelOption {
+  readonly choice: StartingLevelChoice
+  readonly title: () => string
+  readonly body: () => string
+}
+
+/**
+ * FR-048's three answers, in the order they are offered: least to most experienced. Shared by the
+ * Map's starting-level control and the first run, so both say the same thing.
+ */
+export const STARTING_LEVELS: readonly StartingLevelOption[] = [
+  {
+    choice: 'neverTouchTyped',
+    title: () => m.path_start_never_title(),
+    body: () => m.path_start_never_body(),
+  },
+  {
+    choice: 'knowsHomeRow',
+    title: () => m.path_start_home_title(),
+    body: () => m.path_start_home_body(),
+  },
+  {
+    choice: 'touchTypesWantsAccuracy',
+    title: () => m.path_start_accuracy_title(),
+    body: () => m.path_start_accuracy_body(),
+  },
+]

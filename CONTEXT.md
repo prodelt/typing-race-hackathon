@@ -77,6 +77,8 @@ Comprehensive domain model and conceptual glossary for the Typing-Race touch-typ
   _Avoid_: Path, course list
 - **Play Mode (Режим гри)**: The state while an attempt or race runs: navigation and the status bar leave the screen and only the run remains.
   _Avoid_: focus mode, fullscreen
+- **First Run (Перший запуск)**: The steps a learner without a starting level walks before the first exercise — typing language, starting level (picked, or suggested by a short skippable check), the finger scheme — ending in that exercise in Play Mode. **Start over** walks it again from Settings and deletes nothing.
+  _Avoid_: onboarding wizard, sign-up
 - **Level (Рівень)**: A learner's standing derived from mastery alone (keys unlocked, Academy modules completed); speed never raises it.
 - **Experience / XP (Досвід)**: Points earned only by Test Attempts that clear the level's accuracy floor; they fill the bar toward the next Level.
   _Avoid_: score, coins

@@ -1,4 +1,5 @@
 import type { Browser, BrowserContext, Page } from '@playwright/test'
+import { openLevelStep, walkFirstRun } from './harness/firstRun.js'
 import {
   expect,
   expectNoAxeViolations,
@@ -194,13 +195,13 @@ async function completeAttempt(
   return new URL(page.url()).pathname
 }
 
-/** Answers the first-run question as the first option and lands on Today. */
+/** Walks the first run with the first level and lands on Today. */
 async function startFromEmpty(page: Page): Promise<void> {
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.goto('/today')
-  await expect(page.getByRole('heading', { name: 'З чого почнемо?' })).toBeVisible()
-  await page.getByRole('radio', { name: /Ще не друкую наосліп/ }).check()
-  await page.getByRole('button', { name: 'Обрати й почати' }).click()
+  await walkFirstRun(page)
+  // The first run ends in a running exercise; leaving it records nothing.
+  await page.goto('/')
   await expect(page.getByTestId('home-continue')).toBeVisible()
 }
 
@@ -454,17 +455,16 @@ test.describe('US3 the path and mastery', () => {
   }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' })
     await page.goto('/today')
-    await expect(page.getByRole('heading', { name: 'З чого почнемо?' })).toBeVisible()
+    await openLevelStep(page)
 
     const options = page.getByRole('radio')
     await expect(options).toHaveCount(3)
 
     const opens = async (title: RegExp): Promise<number> => {
       const label = page.locator('label').filter({ has: page.getByRole('radio', { name: title }) })
-      const text = await label.innerText()
-      const match = /Відкриває клавіш: (\d+)/.exec(text)
-      if (match === null) throw new Error(`no key count in: ${text}`)
-      return Number(match[1])
+      const count = await label.locator('[data-opens]').getAttribute('data-opens')
+      if (count === null) throw new Error(`no key count on: ${title}`)
+      return Number(count)
     }
     const never = await opens(/Ще не друкую наосліп/)
     const home = await opens(/Знаю домашній ряд/)
@@ -475,7 +475,10 @@ test.describe('US3 the path and mastery', () => {
 
     // Choosing the first opens exactly its count...
     await page.getByRole('radio', { name: /Ще не друкую наосліп/ }).check()
-    await page.getByRole('button', { name: 'Обрати й почати' }).click()
+    await page.getByTestId('first-run-next').click()
+    await page.getByTestId('first-run-next').click()
+    await expect(page).toHaveURL(/\/exercise\//)
+    await page.goto('/')
     await primaryNavigation(page).getByRole('link', { name: 'Мапа' }).click()
     expect(await unlockedKeyCount(page)).toBe(never)
 
@@ -603,8 +606,8 @@ test.describe('US3 progress survives a restart (§8.9)', () => {
     baseURL,
   }) => {
     // Genuinely long: four typed attempts, then the same eight-screen reading three times (live,
-    // after a reload, after a restart), about 25 full page loads.
-    test.setTimeout(60_000)
+    // after a reload, after a restart), about 25 full page loads, after the first run's walk.
+    test.setTimeout(90_000)
     await startFromEmpty(page)
 
     // Three test attempts on the scale for п, the first with a corrected-away wrong key so that

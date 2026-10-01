@@ -1,4 +1,5 @@
 import type { Browser, BrowserContext, Locator, Page } from '@playwright/test'
+import { openLevelStep, walkFirstRun } from './harness/firstRun.js'
 import {
   expect,
   expectNoAxeViolations,
@@ -61,11 +62,12 @@ function primaryNavigation(page: Page) {
   return page.getByRole('navigation', { name: 'Основна навігація' })
 }
 
-/** Answers the first-run question with the given option and lands on Today. */
-async function startFromEmpty(page: Page, option = /Ще не друкую наосліп/): Promise<void> {
+/** Walks the first run with the given level and lands on Today. */
+async function startFromEmpty(page: Page, level = /Ще не друкую наосліп/): Promise<void> {
   await page.goto('/today')
-  await page.getByRole('radio', { name: option }).check()
-  await page.getByRole('button', { name: 'Обрати й почати' }).click()
+  await walkFirstRun(page, { level })
+  // The first run ends in a running exercise; leaving it records nothing.
+  await page.goto('/')
   await expect(page.getByTestId('home-continue')).toBeVisible()
 }
 
@@ -403,6 +405,8 @@ test.describe('US5 settings', () => {
     browser,
     baseURL,
   }) => {
+    // Three full app starts plus the walk through the first run's steps.
+    test.setTimeout(45_000)
     await page.emulateMedia({ reducedMotion: 'no-preference', colorScheme: 'light' })
     await startFromEmpty(page)
     await page.goto('/settings')
@@ -722,10 +726,20 @@ test.describe('US5 accessibility audit of every screen (SC-011)', () => {
     })
   }
 
-  test('the starting-level question has no accessibility violations', async ({ page }) => {
+  test('every step of the first run has no accessibility violations', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' })
     await page.goto('/today')
-    await expect(page.getByRole('heading', { name: 'З чого почнемо?' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Якою мовою друкуємо?' })).toBeVisible()
+    await audit(page)
+    await openLevelStep(page)
+    await audit(page)
+    await page.getByRole('button', { name: /Не знаю — перевірити себе/ }).click()
+    await expect(page.getByRole('heading', { name: 'Надрукуй рядок' })).toBeVisible()
+    await audit(page)
+    await page.keyboard.press('Escape')
+    await page.getByRole('radio', { name: /Ще не друкую наосліп/ }).check()
+    await page.getByTestId('first-run-next').click()
+    await expect(page.getByRole('heading', { name: 'Кожна клавіша — своєму пальцю' })).toBeVisible()
     await audit(page)
   })
 

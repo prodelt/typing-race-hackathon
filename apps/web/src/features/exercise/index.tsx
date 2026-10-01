@@ -46,5 +46,12 @@ export function ExerciseScreen() {
     )
   }
 
-  return <ExerciseSession key={`${scale.id}:${mode}`} scale={scale} mode={mode} />
+  return (
+    <ExerciseSession
+      key={`${scale.id}:${mode}`}
+      scale={scale}
+      mode={mode}
+      autostart={search.start === true}
+    />
+  )
 }

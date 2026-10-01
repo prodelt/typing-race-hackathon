@@ -5,6 +5,7 @@ import { ErrorMode } from './ErrorMode.js'
 import { Interface } from './Interface.js'
 import { Language } from './Language.js'
 import { Motion } from './Motion.js'
+import { StartOver } from './StartOver.js'
 import { TextSize } from './TextSize.js'
 import { Theme } from './Theme.js'
 import './settings.css'
@@ -35,6 +36,9 @@ export function SettingsScreen() {
           </Panel>
           <Panel id="set-language" title={m.settings_group_language()}>
             <Interface />
+          </Panel>
+          <Panel id="set-start" title={m.settings_group_start()}>
+            <StartOver />
           </Panel>
         </div>
         <div className="set-col">

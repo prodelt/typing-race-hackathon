@@ -13,6 +13,8 @@ import { useScreenKeys } from '../../app/screenKeys.js'
 import { useAppStore, useDerived } from '../../app/state/index.js'
 import { m } from '../../paraglide/messages.js'
 import { useAcademyCourse } from '../academy/data.js'
+import { FirstRun } from '../firstrun/FirstRun.js'
+import { useFirstRunHold } from '../firstrun/hold.js'
 import { scaleName } from '../path/labels.js'
 import { scaleRows, totalKeyCount, unlockedKeyCount } from '../path/model.js'
 import { StartingLevel } from '../path/StartingLevel.js'
@@ -49,7 +51,9 @@ import './map.css'
  */
 export function MapScreen() {
   const { progress } = useDerived()
-  if (progress === null) return <StartingLevel mode="first" />
+  const holding = useFirstRunHold((state) => state.holding)
+  // A fresh profile is walked through the first run here too, not handed an empty map.
+  if (holding || progress === null) return <FirstRun mode="first" />
   return <MapBody />
 }
 

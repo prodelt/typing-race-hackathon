@@ -45,6 +45,11 @@ const EXEMPT = [
   // Single-key accelerators on Home and the result screen: the same kind, mounted only on
   // screens where no attempt runs, and silent while focus is in a field.
   'apps/web/src/app/screenKeys.ts',
+  // The first run's step keys (Enter, Esc, digits) and its finger scheme, which lights the
+  // finger of a pressed *physical* key (`event.code`): accelerators again, reading no character
+  // and feeding no engine. Its typed check goes through InputSource like any attempt.
+  'apps/web/src/features/firstrun/FirstRun.tsx',
+  'apps/web/src/features/firstrun/FingerScheme.tsx',
 ]
 
 interface Rule {

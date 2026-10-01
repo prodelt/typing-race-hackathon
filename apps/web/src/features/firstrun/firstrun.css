@@ -1,0 +1,749 @@
+/* First run (direction B): a game's onboarding inside the frame. A head bar with the step
+   indicator, one white stage panel per step, and a foot bar with Back and Next. The chosen option
+   is the screen's one red block, with the signature corner; everything else is paper and ink.
+   Every colour is a theme token, so dark and low-vision follow without a second set of rules. */
+
+.stage__content:has(> .fr) {
+  max-width: none;
+  height: 100%;
+  padding: 8px;
+}
+
+.fr {
+  --fr-gap: 8px;
+  --fr-pad: clamp(16px, 1.7vw, 28px);
+  /* B's finger zones: white at the pinkies, deepening to the index fingers. */
+  --fz-0: var(--color-paper-raised);
+  --fz-1: color-mix(in srgb, var(--color-accent) 8%, var(--color-paper-raised));
+  --fz-2: color-mix(in srgb, var(--color-accent) 16%, var(--color-paper-raised));
+  --fz-3: color-mix(in srgb, var(--color-accent) 27%, var(--color-paper-raised));
+  height: 100%;
+  min-height: 560px;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: var(--fr-gap);
+  font-size: 15px;
+  line-height: 1.4;
+  color: var(--color-ink);
+}
+
+.fr .num {
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+/* ---- Head bar: kicker, step indicator, count ------------------------------------------- */
+
+.fr-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 12px 24px;
+  min-height: 64px;
+  padding: 10px var(--fr-pad);
+  background: var(--color-paper-raised);
+}
+
+.fr-kicker {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-ink-soft);
+}
+
+.fr-idx {
+  font-size: 12.5px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-muted);
+}
+
+.fr-count {
+  margin: 0;
+  justify-self: end;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-muted);
+}
+
+.fr-steps {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.fr-steps__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-muted);
+  white-space: nowrap;
+}
+
+/* The connector between two steps: solid once walked, dotted ahead — the play screen's track. */
+.fr-steps__item + .fr-steps__item::before {
+  content: "";
+  width: clamp(24px, 3vw, 56px);
+  height: 0;
+  margin: 0 10px;
+  border-top: 2px dotted var(--color-hairline-strong);
+}
+
+.fr-steps__item[data-status="done"] + .fr-steps__item::before,
+.fr-steps__item[data-status="now"]::before {
+  border-top-style: solid;
+  border-top-color: var(--color-ink);
+}
+
+.fr-steps__n {
+  display: inline-grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  border: 2px solid var(--color-hairline-strong);
+  font-size: 13px;
+}
+
+.fr-steps__item[data-status="done"] {
+  color: var(--color-ink-soft);
+}
+
+.fr-steps__item[data-status="done"] .fr-steps__n {
+  border-color: var(--color-ink);
+  background: var(--color-ink);
+  color: var(--color-paper-raised);
+}
+
+.fr-steps__item[data-status="now"] {
+  color: var(--color-ink);
+}
+
+.fr-steps__item[data-status="now"] .fr-steps__n {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+.fr-steps__flag {
+  width: 14px;
+  height: 14px;
+  background: var(--color-ink);
+  opacity: 0.35;
+}
+
+/* ---- The stage panel ------------------------------------------------------------------- */
+
+.fr-body {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(20px, 2.6vw, 44px) clamp(20px, 3vw, 52px);
+  background: var(--color-paper-raised);
+  overflow: auto;
+  animation: fr-enter var(--dur-base) var(--ease-enter);
+}
+
+@keyframes fr-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fr-body {
+    animation: none;
+  }
+}
+
+.fr-step {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto auto auto;
+  align-content: start;
+  gap: clamp(16px, 3.2vh, 36px);
+}
+
+.fr-intro {
+  display: grid;
+  gap: 10px;
+}
+
+.fr-title {
+  margin: 0;
+  font: 700 clamp(28px, 3.1vw, 50px) / 1.04 var(--font-display);
+  letter-spacing: -0.045em;
+  outline: none;
+}
+
+.fr-lead {
+  margin: 0;
+  max-width: 54em;
+  font-size: clamp(15px, 1.1vw, 17px);
+  line-height: 1.5;
+  color: var(--color-ink-soft);
+  text-wrap: pretty;
+}
+
+/* ---- Option tiles ---------------------------------------------------------------------- */
+
+.fr-choices {
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  display: grid;
+  gap: var(--fr-gap);
+}
+
+/* The tiles take a good share of the stage's height, and grow past it only to fit their text. */
+.fr-choices--2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-rows: minmax(clamp(240px, 44vh, 420px), auto);
+}
+
+.fr-choices--4 {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(0, 0.9fr);
+  grid-auto-rows: minmax(clamp(240px, 38vh, 360px), auto);
+}
+
+.fr-choice {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding: clamp(16px, 1.8vw, 28px);
+  border: 0;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background-color var(--dur-quick) var(--ease-enter),
+    color var(--dur-quick) linear,
+    border-radius var(--dur-base) var(--ease-enter);
+}
+
+.fr-choice:hover {
+  background: var(--color-paper-deep);
+}
+
+.fr-choice:has(:focus-visible),
+.fr-choice:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+/* The chosen tile is the one loud block: deep red, the signature corner, white type. */
+.fr-choice.is-on {
+  border-radius: 0 72px 0 0;
+  background: var(--color-accent-deep);
+  color: var(--color-on-accent);
+  cursor: default;
+}
+
+.fr-choice.is-on:has(:focus-visible) {
+  outline-color: var(--color-ink);
+}
+
+.fr-choice.is-off {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.fr-choice.is-off:hover {
+  background: var(--color-paper);
+}
+
+.fr-choice__radio {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: inherit;
+}
+
+.fr-choice__top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 24px;
+}
+
+.fr-choice .kbd {
+  min-width: 26px;
+  height: 24px;
+  font-size: 12.5px;
+}
+
+.fr-choice.is-on .kbd {
+  background: color-mix(in srgb, currentColor 18%, transparent);
+  color: inherit;
+  box-shadow: none;
+}
+
+.fr-choice__code {
+  margin-left: auto;
+  font-size: clamp(36px, 4.2vw, 68px);
+  font-weight: 600;
+  letter-spacing: -0.05em;
+}
+
+.fr-choice__name {
+  font-size: clamp(17px, 1.35vw, 21px);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+}
+
+.fr-choice--lang .fr-choice__name {
+  margin-top: auto;
+  font: 700 clamp(22px, 2vw, 32px) / 1.1 var(--font-display);
+  letter-spacing: -0.045em;
+}
+
+.fr-choice__sub {
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--color-muted);
+  text-wrap: pretty;
+}
+
+.fr-choice.is-on .fr-choice__sub {
+  color: var(--color-accent-pale);
+}
+
+.fr-tag {
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  margin-left: auto;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: var(--color-ink);
+  color: var(--color-paper-raised);
+  font-size: 12.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.fr-choice.is-on .fr-tag {
+  background: var(--color-on-accent);
+  color: var(--color-accent-deep);
+}
+
+/* The home row the fingers will rest on, on the language tiles. */
+.fr-home {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: clamp(8px, 2vh, 20px);
+}
+
+.fr-home__key {
+  display: inline-grid;
+  place-items: center;
+  width: 38px;
+  height: 34px;
+  background: var(--color-paper-raised);
+  box-shadow: inset 0 -3px 0 rgb(20 20 20 / 10%);
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--color-ink-soft);
+}
+
+.fr-home__key--gap {
+  margin-left: 18px;
+}
+
+.fr-choice.is-on .fr-home__key {
+  background: rgb(255 255 255 / 14%);
+  box-shadow: inset 0 -3px 0 rgb(0 0 0 / 18%);
+  color: var(--color-on-accent);
+}
+
+.fr-choice__opens {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-muted);
+}
+
+.fr-choice__opens .num {
+  font-size: clamp(30px, 2.6vw, 44px);
+  color: var(--color-ink);
+}
+
+.fr-choice.is-on .fr-choice__opens,
+.fr-choice.is-on .fr-choice__opens .num {
+  color: var(--color-on-accent);
+}
+
+/* The check: a quieter, outlined tile — it opens a step rather than picking an answer. */
+.fr-choice--check {
+  background: transparent;
+  box-shadow: inset 0 0 0 2px var(--color-hairline-strong);
+}
+
+.fr-choice--check:hover {
+  background: var(--color-paper);
+  box-shadow: inset 0 0 0 2px var(--color-ink);
+}
+
+.fr-check__line {
+  display: flex;
+  gap: 6px;
+  max-width: 100%;
+  overflow: hidden;
+  margin-top: auto;
+  padding-top: 8px;
+}
+
+.fr-check__line span {
+  flex: none;
+  width: 12px;
+  height: 4px;
+  background: var(--color-hairline-strong);
+}
+
+.fr-check__line span:nth-child(-n + 4) {
+  background: var(--color-ink);
+}
+
+.fr-check__line span:nth-child(5) {
+  background: var(--color-accent);
+}
+
+.fr-advice {
+  margin: 0;
+  padding: 12px 16px;
+  background: var(--color-paper);
+  box-shadow: inset 3px 0 0 var(--color-ink);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* ---- The check: one typed line --------------------------------------------------------- */
+
+.fr-run {
+  position: relative;
+  align-self: center;
+  padding: clamp(16px, 2.4vh, 28px) clamp(18px, 2vw, 32px);
+  background: var(--color-paper);
+  cursor: text;
+}
+
+.fr-run__focus {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  background: color-mix(in srgb, var(--color-paper) 82%, transparent);
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.fr-warn {
+  margin: 0;
+  padding: 12px 16px;
+  background: var(--color-terracotta-tint);
+  box-shadow: inset 3px 0 0 var(--color-accent);
+  font-weight: 600;
+  color: var(--color-terracotta-ink);
+}
+
+/* ---- The finger scheme ----------------------------------------------------------------- */
+
+.fr-scheme {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--fr-gap) clamp(16px, 2.2vw, 32px);
+}
+
+.fr-kb-wrap {
+  container-type: inline-size;
+  min-width: 0;
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+  padding: clamp(14px, 2vw, 28px);
+  background: var(--color-paper);
+}
+
+/* The key size follows the space the keyboard has (13 keys and a half-key stagger per row), and
+   the screen's height, so the scheme never overflows its well or the stage. */
+.fr-kb {
+  --k: max(28px, min(60px, 6.2vh, calc((100cqi - 72px) / 13.9)));
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fr-kb__row {
+  display: flex;
+  gap: 6px;
+}
+
+.fr-kb__row[data-row="top"] {
+  margin-left: calc(var(--k) * 0.5);
+}
+
+.fr-kb__row[data-row="home"] {
+  margin-left: calc(var(--k) * 0.75);
+}
+
+.fr-kb__row[data-row="space"] {
+  margin-left: calc(var(--k) * 3);
+}
+
+.fr-key {
+  position: relative;
+  flex: none;
+  width: var(--k);
+  height: calc(var(--k) * 0.88);
+  display: grid;
+  place-items: center;
+  background: var(--fz, var(--fz-0));
+  box-shadow: inset 0 -3px 0 rgb(20 20 20 / 10%);
+  font: 500 calc(var(--k) * 0.36) / 1 var(--font-ui);
+  color: var(--color-ink-soft);
+  transition:
+    background-color var(--dur-quick) var(--ease-enter),
+    color var(--dur-quick) linear,
+    transform var(--dur-quick) var(--ease-enter);
+}
+
+.fr-key--wide {
+  width: calc(var(--k) * 1.3);
+  font-size: calc(var(--k) * 0.27);
+}
+
+.fr-key--space {
+  width: calc(var(--k) * 6.4);
+  font-size: 12.5px;
+  color: var(--color-muted);
+}
+
+.fr-key--bump::after {
+  content: "";
+  position: absolute;
+  bottom: calc(var(--k) * 0.14);
+  width: calc(var(--k) * 0.24);
+  height: 2px;
+  background: currentColor;
+  opacity: 0.55;
+}
+
+[data-zone="0"],
+[data-zone="thumb"] {
+  --fz: var(--fz-0);
+}
+
+[data-zone="1"] {
+  --fz: var(--fz-1);
+}
+
+[data-zone="2"] {
+  --fz: var(--fz-2);
+}
+
+[data-zone="3"] {
+  --fz: var(--fz-3);
+}
+
+.fr-key[data-on] {
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  box-shadow: inset 0 -3px 0 var(--color-accent-deep);
+  transform: translateY(1px);
+}
+
+.fr-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 18px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+  color: var(--color-ink-soft);
+}
+
+.fr-legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.fr-legend i {
+  width: 14px;
+  height: 14px;
+  background: var(--fz);
+  box-shadow:
+    inset 0 -2px 0 rgb(20 20 20 / 14%),
+    0 0 0 1px var(--color-hairline);
+}
+
+.fr-hands {
+  width: clamp(220px, 21vw, 300px);
+  display: grid;
+  gap: 12px;
+  padding: clamp(14px, 1.8vh, 20px) 18px;
+  border-radius: 0 40px 0 0;
+  background: var(--color-paper);
+}
+
+.fr-hands__say {
+  min-height: 3.2em;
+  margin: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: end;
+  gap: 12px;
+  font-size: 14px;
+  line-height: 1.35;
+  color: var(--color-ink-soft);
+}
+
+.fr-hands__say b {
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.fr-hands__key {
+  flex: none;
+  padding-bottom: 4px;
+  font: 600 40px / 0.85 var(--font-display);
+  letter-spacing: -0.06em;
+  color: var(--color-ink);
+  box-shadow: inset 0 -4px 0 var(--color-accent);
+}
+
+.fr-hands__svg {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.fr-finger {
+  fill: var(--fz);
+  stroke: color-mix(in srgb, var(--color-ink) 18%, transparent);
+  stroke-width: 1;
+  transition: fill var(--dur-quick) var(--ease-enter);
+}
+
+.fr-finger[data-on] {
+  fill: var(--color-accent);
+  stroke: var(--color-accent);
+}
+
+.fr-palm {
+  fill: var(--color-paper-deep);
+}
+
+.fr-hands__cap {
+  display: flex;
+  justify-content: space-around;
+  font-size: 12.5px;
+  color: var(--color-ink-soft);
+}
+
+/* ---- Foot bar -------------------------------------------------------------------------- */
+
+.fr-foot {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px 24px;
+  min-height: 76px;
+  padding: 10px var(--fr-pad);
+  background: var(--color-paper-raised);
+}
+
+.fr-foot > :first-child {
+  justify-self: start;
+}
+
+.fr-foot > :last-child {
+  justify-self: end;
+}
+
+.fr-keys {
+  margin: 0;
+  font-size: 13px;
+  color: var(--color-muted);
+  text-align: center;
+  text-wrap: balance;
+}
+
+/* ---- Narrower desktops ----------------------------------------------------------------- */
+
+@media (max-width: 1180px) {
+  .fr-head {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .fr-count {
+    display: none;
+  }
+
+  .fr-choice {
+    padding: 16px;
+  }
+}
+
+/* ---- Phone: the frame shows its keyboard notice; this only keeps the flow readable -------- */
+
+@media (max-width: 767px) {
+  .stage__content:has(> .fr) {
+    height: auto;
+    padding: 0 0 8px;
+  }
+
+  .fr {
+    height: auto;
+    min-height: 0;
+  }
+
+  .fr-head,
+  .fr-foot {
+    grid-template-columns: 1fr;
+  }
+
+  .fr-choices--2,
+  .fr-choices--4,
+  .fr-scheme {
+    grid-template-columns: 1fr;
+  }
+}

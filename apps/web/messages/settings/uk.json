@@ -51,5 +51,8 @@
   "settings_data_confirm_body": "Це не можна скасувати. Усі спроби, розблоковані клавіші та впевненість буде втрачено.",
   "settings_data_confirm_yes": "Так, видалити",
   "settings_data_cancel": "Скасувати",
-  "settings_data_done": "Локальні дані видалено."
+  "settings_data_done": "Локальні дані видалено.",
+  "settings_group_start": "Перший запуск",
+  "settings_start_over_body": "Мова, рівень і схема пальців ще раз. Спроби й прогрес лишаються.",
+  "settings_start_over": "Почати спочатку"
 }
