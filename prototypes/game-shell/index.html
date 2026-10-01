@@ -1,0 +1,71 @@
+<!doctype html>
+<!-- PROTOTYPE, throwaway: five v4 directions of the game shell, switchable via ?variant= & ?screen=. -->
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Game Shell Prototype</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #111; overflow: hidden; }
+  iframe { border: 0; width: 100%; height: 100%; display: block; }
+  .bar {
+    position: fixed; left: 50%; bottom: 14px; transform: translateX(-50%); z-index: 9;
+    display: flex; align-items: center; gap: 6px; padding: 6px; border-radius: 999px;
+    background: #fffde8; color: #111; font: 600 13px/1 system-ui, sans-serif;
+    box-shadow: 0 6px 24px rgba(0,0,0,.45), 0 0 0 2px #111; opacity: .35; transition: opacity .15s;
+  }
+  .bar:hover, .bar:focus-within { opacity: 1; }
+  .bar button { all: unset; cursor: pointer; padding: 7px 11px; border-radius: 999px; }
+  .bar button:hover, .bar button:focus-visible { background: #111; color: #fffde8; }
+  .bar .on { background: #111; color: #fffde8; }
+  .label { min-width: 150px; text-align: center; }
+  .sep { width: 1px; height: 18px; background: #0003; }
+</style>
+</head>
+<body>
+<iframe id="f" title="variant"></iframe>
+<div class="bar" role="toolbar" aria-label="Перемикач прототипу">
+  <button id="prev" title="← попередній">◀</button>
+  <span class="label" id="label"></span>
+  <button id="next" title="→ наступний">▶</button>
+  <span class="sep"></span>
+  <button id="home">Головна</button>
+  <button id="play">Гра</button>
+</div>
+<script>
+  const VARIANTS = [
+    ['a-calm', 'A · Спокійний'], ['b-red', 'B · Бренд-червоний'], ['c-route', 'C · Маршрут'],
+    ['d-cold', 'D · Холодна вітрина'], ['v2', 'v2 · Шейдер'],
+  ];
+  const f = document.getElementById('f');
+  const params = new URLSearchParams(location.search);
+  let i = Math.max(0, VARIANTS.findIndex(([k]) => k === params.get('variant')));
+  let screen = params.get('screen') === 'play' ? 'play' : 'home';
+
+  function render(reload) {
+    const [key, name] = VARIANTS[i];
+    document.getElementById('label').textContent = name;
+    document.getElementById('home').classList.toggle('on', screen === 'home');
+    document.getElementById('play').classList.toggle('on', screen === 'play');
+    history.replaceState(null, '', `?variant=${key}&screen=${screen}`);
+    if (reload) f.src = `${key}.html?screen=${screen}`;
+    else f.contentWindow?.postMessage({ screen }, '*');
+  }
+  const go = (d) => { i = (i + d + VARIANTS.length) % VARIANTS.length; render(true); };
+  const show = (s) => { screen = s; render(false); };
+  document.getElementById('prev').onclick = () => go(-1);
+  document.getElementById('next').onclick = () => go(1);
+  document.getElementById('home').onclick = () => show('home');
+  document.getElementById('play').onclick = () => show('play');
+  const keys = (e) => {
+    if (e.key === 'ArrowLeft' && e.altKey) go(-1);
+    if (e.key === 'ArrowRight' && e.altKey) go(1);
+  };
+  addEventListener('keydown', keys);
+  f.addEventListener('load', () => {
+    try { f.contentWindow.addEventListener('keydown', keys); } catch {}
+  });
+  render(true);
+</script>
+</body>
+</html>
