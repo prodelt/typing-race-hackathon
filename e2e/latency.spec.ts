@@ -30,13 +30,27 @@ test('keystroke-to-paint stays inside the 16 ms budget at p95', async ({ page })
       sound: 'off',
       textSizePx: 28,
       errorMode: 'freeBackspace',
-      typingLanguage: 'uk',
-      layoutId: 'yq',
+      typingLanguage: 'en',
+      layoutId: 'qwerty',
       interfaceLanguage: 'uk',
     },
+    // A learner who has answered the first run, or every route opens the first run instead.
+    startingLevelByLanguage: { uk: 'neverTouchTyped', en: 'neverTouchTyped' },
+  } as never)
+  // The exercise screen's textarea carries no test id; see the note in exercise.spec.ts.
+  await page.addInitScript(() => {
+    new MutationObserver(() => {
+      for (const node of document.querySelectorAll('main textarea')) {
+        if (node.getAttribute('data-testid') !== 'typing-input') {
+          node.setAttribute('data-testid', 'typing-input')
+        }
+      }
+    }).observe(document, { childList: true, subtree: true })
   })
 
-  await page.goto('/map')
+  // The Play screen of a Practice Attempt: the typing line *and* the keyboard guide, the heaviest
+  // thing that repaints per keystroke.
+  await page.goto('/exercise/qwerty.run.anchors?mode=practice')
 
   const probePresent = await page.evaluate(() => window.__typingRaceLatency !== undefined)
   test.skip(
@@ -44,12 +58,27 @@ test('keystroke-to-paint stays inside the 16 ms budget at p95', async ({ page })
     'The latency probe is compiled out of this build. Run against the dev server, or build with VITE_LATENCY_PROBE=true.',
   )
 
-  // Reach a typing surface. The route is stable; which scale it opens is not part of this gate.
-  await page
-    .getByRole('link', { name: /вправ|exercise|практ|practi/i })
-    .first()
-    .click()
+  await page.getByRole('button', { name: 'Почати', exact: true }).click()
+  await expect(page.getByTestId('keyboard-guide')).toBeVisible()
   await expect(typingSurface(page)).toBeAttached()
+
+  // The instrument's own floor on this machine: the same rAF-then-macrotask wait from a random
+  // moment with no keystroke at all. Where the flags above take effect it is near zero; where the
+  // compositor still runs at 60 Hz (headless Chromium on some Windows hosts) it is most of a frame,
+  // and a p95 near 16 ms says more about the display than about the typing path. Logged, not
+  // gated, so a failing number can be read against it.
+  const floor = await page.evaluate(async () => {
+    const waits: number[] = []
+    for (let i = 0; i < 200; i += 1) {
+      await new Promise((resolve) => setTimeout(resolve, Math.random() * 30))
+      const t0 = performance.now()
+      await new Promise((resolve) => requestAnimationFrame(() => setTimeout(resolve, 0)))
+      waits.push(performance.now() - t0)
+    }
+    waits.sort((x, y) => x - y)
+    return waits[189] ?? 0
+  })
+  console.log(`instrument floor with no keystroke: p95 ${floor.toFixed(2)} ms`)
 
   await page.evaluate(() => {
     window.__typingRaceLatency?.startLatencyProbe()
@@ -58,7 +87,7 @@ test('keystroke-to-paint stays inside the 16 ms budget at p95', async ({ page })
   // Free correction, so a wrong character never stops the run: this spec measures paint latency,
   // not judging. The characters themselves are irrelevant — only that each is one real keystroke.
   for (let i = 0; i < KEYSTROKES; i += 1) {
-    await typeChar(page, 'ф')
+    await typeChar(page, 'f')
   }
 
   // The macrotask that carries `t1` lags the keystroke by at least a frame, so the last samples
