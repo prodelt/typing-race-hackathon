@@ -12,6 +12,7 @@
 
 export * from './academy/index.js'
 export * from './coach/index.js'
+export * from './game/index.js'
 export * from './layout/index.js'
 export * from './levels/index.js'
 export * from './progress/index.js'
