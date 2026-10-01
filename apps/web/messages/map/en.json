@@ -77,5 +77,13 @@
   "map_mastery": "Mastered means {target} test attempts in a row at {floor}% accuracy or more. Speed never blocks.",
   "map_exercises": "Exercises in this block",
   "map_modules": "Modules in this block",
-  "map_module_exercises": "Exercises of the module “{title}”"
+  "map_module_exercises": "Exercises of the module “{title}”",
+  "map_review_empty_title": "Nothing to review yet — and that is fine",
+  "map_review_step1_title": "Train on the map",
+  "map_review_step1_body": "Any exercise counts: scales, words or the Academy.",
+  "map_review_step2_title": "Five presses",
+  "map_review_step2_body": "A key or a move is judged only after five presses on it.",
+  "map_review_step3_title": "Weak spots appear here",
+  "map_review_step3_body": "The slowest and most-missed ones show up here, with one exercise on exactly those.",
+  "map_review_empty_free": "Real text from your open keys only, off the route."
 }

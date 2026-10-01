@@ -227,6 +227,7 @@ function MapBody() {
           data={data}
           onStart={start}
           onReview={review}
+          onFree={free}
           targetName={(target) => targetName(target, data)}
           steps={view.nodes.filter((node): node is StepNode => node.kind === 'step')}
         />
@@ -238,7 +239,10 @@ function MapBody() {
 /* ---- The route ---------------------------------------------------------------------------- */
 
 const HEADER = 58
-const LABEL_ROOM = 70
+/** Below a low run: the dot, a name on up to two lines and the count or «ти тут» pill, plus air. */
+const LABEL_ROOM = 84
+/** How far apart the high and low runs sit: two arcs and a short vertical. */
+const RISE = 90
 
 function regionMeta(region: RegionView, data: MapData): string {
   const steps = region.nodes.filter((node): node is StepNode => node.kind === 'step')
@@ -292,7 +296,13 @@ function RoutePanel(props: {
       routeGeometry({
         width,
         regions: view.regions.map((region) => region.nodes.map(slotWeight)),
-        levels: [height - LABEL_ROOM, HEADER + 64, height - LABEL_ROOM],
+        // Both runs sit around the middle of the band, so no band is a tall empty field above
+        // its nodes; the low run still leaves the room its names need below.
+        levels: (() => {
+          const low = Math.min(Math.round((HEADER + height) / 2 + RISE / 2), height - LABEL_ROOM)
+          // The high run keeps clear of the region header for the names drawn above it.
+          return [low, Math.max(HEADER + 66, low - RISE), low]
+        })(),
         gap: 8,
         radius: width < 1000 ? 28 : 40,
         pad: width < 1000 ? 22 : 34,

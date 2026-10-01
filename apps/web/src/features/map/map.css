@@ -85,7 +85,7 @@
 
 .map-route__area {
   position: relative;
-  height: clamp(290px, 33vh, 310px);
+  height: clamp(290px, 33vh, 300px);
 }
 
 .map-route__area > .route {
@@ -823,6 +823,69 @@
 }
 
 .md-spots span {
+  font-size: 13px;
+  color: var(--color-ink-soft);
+}
+
+/* Review with nothing measured yet: three steps to how it fills up, and free practice. */
+.md-rempty {
+  height: 100%;
+  min-height: 300px;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 14px;
+  padding: 14px 10px 10px;
+}
+
+.md-rempty__title {
+  margin: 0;
+  font: 600 18px / 1.2 var(--font-display);
+  letter-spacing: -0.03em;
+}
+
+.md-rempty__steps {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--map-gap);
+}
+
+.md-rempty__steps li {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px 18px 18px;
+  background: var(--color-paper);
+}
+
+/* The step number is the tile's weight: big, at the foot, like the hub's numbered panels. */
+.md-rempty__n {
+  order: 3;
+  margin-top: auto;
+  padding-top: 14px;
+  font: 600 clamp(36px, 3.4vw, 52px) / 0.9 var(--font-display);
+  letter-spacing: -0.05em;
+  color: var(--color-terracotta-ink);
+}
+
+.md-rempty__steps b {
+  font-size: 14.5px;
+  font-weight: 600;
+}
+
+.md-rempty__steps li > span:last-child {
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--color-ink-soft);
+}
+
+.md-rempty__free {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
   font-size: 13px;
   color: var(--color-ink-soft);
 }

@@ -50,6 +50,7 @@ interface DetailProps {
   readonly data: MapData
   readonly onStart: (target: StartTarget) => void
   readonly onReview: () => void
+  readonly onFree: () => void
   readonly targetName: (target: StartTarget) => string
   /** Every block on the route, for the finish line's summary. */
   readonly steps: readonly StepNode[]
@@ -593,7 +594,7 @@ function ReviewDetail(props: DetailProps) {
       }
     >
       {spots.length === 0 ? (
-        <p className="md-empty">{m.home_weak_none()}</p>
+        <ReviewEmpty onFree={props.onFree} />
       ) : (
         <ol className="md-spots">
           {spots.map((spot) => (
@@ -605,6 +606,36 @@ function ReviewDetail(props: DetailProps) {
         </ol>
       )}
     </Frame>
+  )
+}
+
+const HOW_REVIEW_FILLS = [
+  [m.map_review_step1_title, m.map_review_step1_body],
+  [m.map_review_step2_title, m.map_review_step2_body],
+  [m.map_review_step3_title, m.map_review_step3_body],
+] as const
+
+/** No weak spot yet: how review fills up, and something to type meanwhile. */
+function ReviewEmpty({ onFree }: { readonly onFree: () => void }) {
+  return (
+    <div className="md-rempty" data-testid="map-review-empty">
+      <p className="md-rempty__title">{m.map_review_empty_title()}</p>
+      <ol className="md-rempty__steps">
+        {HOW_REVIEW_FILLS.map(([title, body], i) => (
+          <li key={title()}>
+            <span className="md-rempty__n">{i + 1}</span>
+            <b>{title()}</b>
+            <span>{body()}</span>
+          </li>
+        ))}
+      </ol>
+      <div className="md-rempty__free">
+        <Button variant="secondary" size="sm" hint="P" aria-keyshortcuts="P" onClick={onFree}>
+          {m.map_free()}
+        </Button>
+        <span>{m.map_review_empty_free()}</span>
+      </div>
+    </div>
   )
 }
 
