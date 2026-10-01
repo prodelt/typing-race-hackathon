@@ -138,3 +138,11 @@
   outline-color: var(--color-terracotta);
 }
 
+/* The instant of a theme change (theme.ts): a swap, not a fade. A kill switch, so it has to win
+ * over every component's own transition. */
+:root[data-theme-swap] *,
+:root[data-theme-swap] *::before,
+:root[data-theme-swap] *::after {
+  /* biome-ignore lint/complexity/noImportantStyles: a kill switch must beat every component's own transition */
+  transition: none !important;
+}
