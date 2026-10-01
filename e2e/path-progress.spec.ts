@@ -378,7 +378,7 @@ test.describe('US3 the path and mastery', () => {
     await expect(page).toHaveURL(/\/result\//)
     // Practice never unlocks anything, however clean.
     await expect(region(page, 'Нова клавіша відкрита')).toHaveCount(0)
-    await region(page, 'Що робити далі').getByRole('button', { name: 'Почати' }).click()
+    await region(page, 'Що робити далі').getByRole('button', { name: 'Далі' }).click()
     await expect(page).toHaveURL(/\/exercise\/yq\.run\.KeyG\?mode=practice/)
 
     // Now "take the test attempt" is the filled action, and Start has stepped back.
@@ -676,7 +676,7 @@ test.describe('US3 practice with the network away (§8.10)', () => {
 
     // ...and its result is read.
     await expect(page).toHaveURL(/\/result\//)
-    await expect(page.getByRole('heading', { name: 'Результат спроби' })).toBeVisible()
+    await expect(page.getByTestId('result-score')).toBeVisible()
     await expect(region(page, 'Головні показники')).toContainText(/Помилки\s*0/)
   })
 

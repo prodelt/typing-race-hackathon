@@ -1,0 +1,161 @@
+/* The attempt in Play Mode (direction B): one centred block, HUD on top, the typing line, and in
+   a Practice Attempt the keyboard beside the next-key card. The rail and the status bar are gone
+   (Shell), so this block owns the whole stage. */
+
+.play {
+  position: relative;
+  width: min(1240px, 100%);
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(18px, 4.4vh, 44px);
+}
+
+.play-hud {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 20px;
+}
+
+.play-hud__left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.play-hud__mid {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-ink-soft);
+  white-space: nowrap;
+}
+
+.play-hud__mid b {
+  color: var(--color-ink);
+  font-weight: 600;
+}
+
+.play-hud__right {
+  min-height: 1px;
+}
+
+.play-hud__mid {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+}
+
+.play-hud__mid p {
+  margin: 0;
+}
+
+.play-hud__last {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-size: 12.5px;
+  color: var(--color-muted);
+}
+
+.play-hud__last dl {
+  display: flex;
+  gap: 12px;
+  margin: 0;
+}
+
+.play-hud__last dl > div {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.play-hud__last dd {
+  order: -1;
+  margin: 0;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-ink-soft);
+}
+
+.play-hud__last dt {
+  color: var(--color-muted);
+}
+
+/* The live readouts are part of the typing line (the one region a keystroke repaints), placed in
+   the HUD's right corner like B's. Position only; nothing about them is re-rendered. */
+.play .typing-line {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.play .typing-line__readouts {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  gap: clamp(18px, 2.4vw, 36px);
+  min-width: 0;
+}
+
+.play .typing-line__readouts > div {
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: flex-end;
+  gap: 5px;
+}
+
+.play__zero {
+  max-width: 34rem;
+  margin: 0 auto;
+  font-size: 13px;
+  line-height: 1.45;
+  text-align: center;
+  color: var(--color-ink-soft);
+}
+
+.stage__content:has(.play) {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.play__line {
+  padding-top: 8px;
+}
+
+.play__guide {
+  display: grid;
+  grid-template-columns: auto auto;
+  justify-content: center;
+  align-items: start;
+  column-gap: clamp(16px, 2.2vw, 32px);
+  row-gap: 12px;
+}
+
+.play__next {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: clamp(230px, 21vw, 300px);
+}
+
+@media (max-width: 1100px) {
+  .play-hud {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .play-hud__mid {
+    display: none;
+  }
+
+  .play__guide {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+  }
+
+  .play__next {
+    flex-direction: row;
+    width: auto;
+  }
+}

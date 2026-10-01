@@ -1,5 +1,4 @@
-import { useNavigate } from '@tanstack/react-router'
-import { Button, Card } from '@typing-race/ui'
+import { Button } from '@typing-race/ui'
 import { m } from '../../paraglide/messages.js'
 import { coachSentence, type ResultModel } from './model.js'
 
@@ -12,32 +11,26 @@ import { coachSentence, type ResultModel } from './model.js'
  * affordance. It always starts in Practice mode: the Test Attempt becomes the primary action on the
  * exercise screen once practice clears the floor (FR-039).
  */
-export function NextActionCard({ model }: { readonly model: ResultModel }) {
-  const navigate = useNavigate()
+export function NextActionCard({
+  model,
+  onStart,
+}: {
+  readonly model: ResultModel
+  readonly onStart: () => void
+}) {
   const { next } = model
 
   return (
-    <Card aria-labelledby="result-next" role="region" raised className="p-5">
-      <h2 id="result-next" className="font-ui text-lg font-bold">
+    <section aria-labelledby="result-next" className="reward-next">
+      <h2 id="result-next" className="reward-next__title">
         {m.result_next_heading()}
       </h2>
-      <p className="mt-3 font-ui text-lg leading-relaxed" data-rule={next.rule}>
+      <p className="reward-next__say" data-rule={next.rule}>
         {coachSentence(model)}
       </p>
-      <Button
-        variant="primary"
-        size="lg"
-        className="mt-4"
-        onClick={() => {
-          void navigate({
-            to: '/exercise/$scaleId',
-            params: { scaleId: next.startsScaleId },
-            search: { mode: 'practice' },
-          })
-        }}
-      >
-        {m.result_next_start()}
+      <Button variant="primary" size="lg" hint="Enter" aria-keyshortcuts="Enter" onClick={onStart}>
+        {m.result_next_go()}
       </Button>
-    </Card>
+    </section>
   )
 }

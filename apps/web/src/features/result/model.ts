@@ -19,6 +19,7 @@ import {
 } from '@typing-race/domain'
 import { confidenceOf, foldConfidence } from '@typing-race/metrics'
 import { m } from '../../paraglide/messages.js'
+import { type Reward, rewardFor } from './reward.js'
 
 /**
  * The pure half of the result screen: everything it shows that is not a raw metric is decided
@@ -55,6 +56,8 @@ export interface ResultModel {
   readonly next: NextAction
   /** The keystroke log of this attempt has aged out of the retention window — FR-081. */
   readonly logPruned: boolean
+  /** What the top of the screen celebrates. */
+  readonly reward: Reward
 }
 
 export interface ModelInput {
@@ -107,6 +110,7 @@ export function buildResultModel(input: ModelInput): ResultModel | null {
     unlock: unlockOn(attempt, before.unlockedSet, after.unlockedSet, layout, scales, next),
     next,
     logPruned: attempts.length - 1 - index >= LOG_RETENTION_COUNT,
+    reward: rewardFor({ earlier: attempts.slice(0, index), attempt, after, layout }),
   }
 }
 

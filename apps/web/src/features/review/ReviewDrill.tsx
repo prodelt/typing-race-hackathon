@@ -75,7 +75,7 @@ function Run(props: {
   readonly bank: WordBank | null
   readonly mode: AttemptMode
 }) {
-  const { layout, progress, nextAction } = useDerived()
+  const { layout, progress } = useDerived()
   const attempts = useAppStore((state) => state.attempts)
 
   // Decided once: the store changes when the attempt ends, and a recomputed text would hand the
@@ -105,7 +105,6 @@ function Run(props: {
       last: attempts.at(-1) ?? null,
       keyConfidence: progress?.keyConfidence ?? {},
       testIsPrimary: false,
-      thisScaleIsNext: nextAction === null ? null : nextAction.startsScaleId === props.drillId,
     }
   })
 

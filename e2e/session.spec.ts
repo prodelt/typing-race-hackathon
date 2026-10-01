@@ -437,7 +437,7 @@ test.describe('US6 a session interrupted by a restart (FR-078)', () => {
 
       // The attempt recorded before the restart is still there, result and all.
       await after.goto(recorded)
-      await expect(after.getByRole('heading', { name: 'Результат спроби' })).toBeVisible()
+      await expect(after.getByTestId('result-score')).toBeVisible()
       await expect(after.getByRole('region', { name: 'Головні показники' })).toBeVisible()
     } finally {
       await restarted.context.close()

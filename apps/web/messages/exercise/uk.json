@@ -38,18 +38,12 @@
   "exercise_time": "Час",
   "exercise_errors": "Помилки",
   "exercise_progress": "Прогрес",
-  "exercise_rail_label": "Про вправу",
-  "exercise_rail_last_title": "Останнє завершене заняття",
   "exercise_rail_last_frozen": "Значення змінюються між вправами, а не під час спроби.",
-  "exercise_rail_last_none": "Завершених вправ ще немає. Тут з’явиться результат першої.",
   "exercise_metric_speed": "Швидкість",
   "exercise_metric_speed_unit": "зн/хв",
   "exercise_metric_accuracy": "Точність",
   "exercise_metric_errors": "Помилки",
   "exercise_metric_time": "Час",
-  "exercise_rail_next_title": "Наступна дія",
-  "exercise_rail_next_this": "Ця гама і є вашою наступною дією.",
-  "exercise_rail_next_later": "Після гами ви побачите рівно одну наступну дію.",
   "exercise_rail_zero_peek": "Без підказок: клавіатура, підсвітка клавіші, пальці й живі показники не показуються. Час, помилки й прогрес лишаються.",
   "exercise_guide_label": "Екранна клавіатура",
   "exercise_key_space": "Пробіл",
@@ -69,5 +63,8 @@
   "exercise_pause_resume": "Продовжити",
   "exercise_pause_leave": "Залишити спробу",
   "exercise_pause_leave_note": "Залишена спроба не записується.",
-  "exercise_pace_label": "Темп {spm} SPM · крок {step} з {steps}"
+  "exercise_pace_label": "Темп {spm} SPM · крок {step} з {steps}",
+  "exercise_hud_label": "Стан спроби",
+  "exercise_hud_pause": "Пауза",
+  "exercise_hud_last": "Минулого разу"
 }

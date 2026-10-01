@@ -11,6 +11,7 @@ import type { Language, NextAction, Scale } from '@typing-race/domain'
 import { Button, IconFlame } from '@typing-race/ui'
 import { useLayoutEffect, useMemo, useRef } from 'react'
 import { LiveGradient } from '../../app/LiveGradient.js'
+import { useScreenKeys } from '../../app/screenKeys.js'
 import { useGameStats } from '../../app/state/gameStats.js'
 import { useAppStore, useDerived } from '../../app/state/index.js'
 import { m } from '../../paraglide/messages.js'
@@ -21,7 +22,6 @@ import { StartingLevel } from '../path/StartingLevel.js'
 import { spotLabel } from '../review/format.js'
 import { composeSession, type SessionPlan } from '../session/compose.js'
 import { useSessionStore } from '../session/store.js'
-import { useHomeKeys } from './keys.js'
 import { goalChart, keyWindow, sessionXp, stepMinutes, weakTrend } from './model.js'
 import './home.css'
 
@@ -124,7 +124,7 @@ function Hub({ nextAction }: { readonly nextAction: NextAction }) {
     })
   }
 
-  useHomeKeys({
+  useScreenKeys({
     Enter: start,
     KeyQ: () => race('quick', 'uk'),
     KeyW: () => race('quick', 'en'),
