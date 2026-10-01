@@ -1,4 +1,3 @@
-import { Chip } from '@typing-race/ui'
 import { m } from '../../paraglide/messages.js'
 import { Block, Formula, P, Section } from './Formula.js'
 
@@ -15,7 +14,7 @@ export function Speed() {
 
       <Block
         title={m.formulas_wpm_title()}
-        aside={<Chip tone="muted">{m.formulas_secondary()}</Chip>}
+        aside={<span className="scr-tag">{m.formulas_secondary()}</span>}
       >
         <Formula>{'WPM = SPM / 5'}</Formula>
         <P>{m.formulas_wpm_body()}</P>

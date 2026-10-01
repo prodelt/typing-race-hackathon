@@ -18,30 +18,30 @@ export function ClearData() {
   }
 
   return (
-    <div className="flex flex-col gap-3">
-      <p className="font-ui text-sm text-ink/80">{m.settings_data_body()}</p>
+    <div className="set-stack">
+      <p className="set-hint">{m.settings_data_body()}</p>
       {step === 'confirming' ? (
-        <div role="alert" className="flex flex-col gap-3">
-          <p className="font-ui font-semibold text-ink">{m.settings_data_confirm_title()}</p>
-          <p className="font-ui text-sm text-ink/80">{m.settings_data_confirm_body()}</p>
-          <div className="flex gap-3">
-            <Button variant="danger" onClick={() => void confirm()}>
+        <div role="alert" className="set-confirm">
+          <p className="set-confirm__title">{m.settings_data_confirm_title()}</p>
+          <p className="set-hint">{m.settings_data_confirm_body()}</p>
+          <div className="set-row">
+            <Button variant="danger" size="sm" onClick={() => void confirm()}>
               {m.settings_data_confirm_yes()}
             </Button>
-            <Button variant="secondary" onClick={() => setStep('idle')}>
+            <Button variant="secondary" size="sm" onClick={() => setStep('idle')}>
               {m.settings_data_cancel()}
             </Button>
           </div>
         </div>
       ) : (
         <div>
-          <Button variant="secondary" onClick={() => setStep('confirming')}>
+          <Button variant="secondary" size="sm" onClick={() => setStep('confirming')}>
             {m.settings_data_clear()}
           </Button>
         </div>
       )}
       {step === 'done' && (
-        <p role="status" className="font-ui text-sm font-semibold text-ink">
+        <p role="status" className="set-status">
           {m.settings_data_done()}
         </p>
       )}

@@ -1,0 +1,342 @@
+/* The meta screens (direction B): Profile, Community, Settings and the reference pages share the
+   Map's vocabulary — a head bar, numbered white panels on the frame's paper with 8 px between them,
+   Unbounded for names and numbers, Onest for everything read, and red spent once. Every colour is
+   a theme token, so dark and low-vision follow without a second set of rules. */
+
+.stage__content:has(> .scr) {
+  max-width: none;
+  min-height: 100%;
+  padding: 8px;
+}
+
+.scr {
+  --scr-gap: 8px;
+  --scr-pad: clamp(16px, 1.7vw, 28px);
+  display: grid;
+  gap: var(--scr-gap);
+  align-content: start;
+  min-width: 0;
+  font-size: 15px;
+  line-height: 1.4;
+  color: var(--color-ink);
+}
+
+/* A screen that fills the stage: its last row takes the height left, so no paper shows below
+   the panels at desktop sizes. On a phone it falls back to natural height. */
+.stage__content:has(> .scr--fill) {
+  height: 100%;
+}
+
+.scr--fill {
+  min-height: 100%;
+  grid-template-rows: auto 1fr;
+}
+
+.scr .num {
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.scr-red {
+  color: var(--color-terracotta-ink);
+}
+
+/* ---- Head bar ---------------------------------------------------------------------------- */
+
+.scr-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 20px;
+  min-height: 64px;
+  padding: 12px var(--scr-pad);
+  background: var(--color-paper-raised);
+}
+
+.scr-head__title {
+  margin: 0;
+  font: 700 26px / 1 var(--font-display);
+  letter-spacing: -0.045em;
+  overflow-wrap: anywhere;
+}
+
+.scr-head__lead {
+  flex: 1;
+  min-width: 16em;
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-ink-soft);
+  text-wrap: pretty;
+}
+
+.scr-head__lead b {
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.scr-head__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+/* ---- Panels ------------------------------------------------------------------------------ */
+
+.scr-panel {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: var(--scr-pad);
+  background: var(--color-paper-raised);
+}
+
+.scr-panel__head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.scr-idx {
+  font-size: 12.5px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-muted);
+}
+
+.scr-panel__title {
+  margin: 0;
+  font: 600 16px / 1.2 var(--font-ui);
+  letter-spacing: -0.015em;
+}
+
+.scr-panel__meta {
+  margin-left: auto;
+  font-size: 13px;
+  color: var(--color-muted);
+  text-align: right;
+}
+
+.scr-say {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-ink-soft);
+  text-wrap: pretty;
+}
+
+.scr-say b {
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+/* The one loud block: deep red, the signature corner, white type. */
+.scr-loud {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: 0 96px 0 0;
+  background: var(--color-accent-deep);
+  color: var(--color-on-accent);
+}
+
+.scr-loud .scr-idx {
+  color: var(--color-accent-pale);
+}
+
+.scr-loud :focus-visible {
+  outline-color: var(--color-on-accent);
+}
+
+/* ---- Segmented control and tabs: the status bar's pills -------------------------------- */
+
+.scr-seg {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  min-width: 0;
+  margin: 0;
+  padding: 3px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--color-paper);
+}
+
+.scr-seg__btn {
+  display: inline-flex;
+  align-items: center;
+  height: 34px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-ink-soft);
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color var(--dur-base) var(--ease-enter),
+    color var(--dur-quick) linear;
+}
+
+.scr-seg__btn:hover {
+  background: var(--color-paper-deep);
+  color: var(--color-ink);
+}
+
+.scr-seg__btn[aria-pressed="true"],
+.scr-seg__btn[aria-current="page"] {
+  background: var(--color-ink);
+  color: var(--color-paper-raised);
+  cursor: default;
+}
+
+.scr-seg__btn .kbd {
+  height: 20px;
+  min-width: 20px;
+  margin: 0 -6px 0 8px;
+  padding: 0 5px;
+  border-radius: 999px;
+  box-shadow: none;
+}
+
+.scr-seg__btn[aria-pressed="true"] .kbd,
+.scr-seg__btn[aria-current="page"] .kbd {
+  background: color-mix(in srgb, currentColor 18%, transparent);
+  color: inherit;
+}
+
+/* ---- Lists ------------------------------------------------------------------------------- */
+
+.scr-rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 2px;
+}
+
+.scr-row {
+  display: grid;
+  align-items: center;
+  gap: 12px;
+  min-height: 52px;
+  padding: 8px 12px;
+  background: var(--color-paper);
+  color: inherit;
+  text-decoration: none;
+}
+
+a.scr-row {
+  transition:
+    background-color var(--dur-quick) var(--ease-enter),
+    color var(--dur-quick) linear;
+}
+
+a.scr-row:hover {
+  background: var(--color-paper-deep);
+}
+
+.scr-tag {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: var(--color-paper-deep);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-ink-soft);
+  white-space: nowrap;
+}
+
+.scr-tag--ink {
+  background: var(--color-ink);
+  color: var(--color-paper-raised);
+}
+
+.scr-tag--red {
+  background: var(--color-accent-tint);
+  color: var(--color-terracotta-ink);
+}
+
+.scr-note {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--color-muted);
+  text-wrap: pretty;
+}
+
+.scr-error {
+  margin: 0;
+  font-weight: 600;
+  color: var(--color-terracotta-ink);
+}
+
+.scr-empty {
+  display: grid;
+  justify-items: start;
+  align-content: center;
+  gap: 14px;
+  flex: 1;
+  padding: 8px 0;
+}
+
+.scr-skeleton {
+  height: 52px;
+  background: var(--color-paper);
+}
+
+/* A field sits on the white panel, so it takes the paper as its well. */
+.scr input[type="text"],
+.scr input:not([type]) {
+  background: var(--color-paper);
+}
+
+/* ---- Phone: panels run edge to edge, the head wraps ------------------------------------- */
+
+@media (max-width: 767px) {
+  .stage__content:has(> .scr) {
+    padding: 0 0 8px;
+  }
+
+  .stage__content:has(> .scr--fill) {
+    height: auto;
+  }
+
+  .scr--fill {
+    min-height: 0;
+  }
+
+  .scr {
+    --scr-pad: 16px;
+  }
+
+  .scr-head__title {
+    font-size: 22px;
+  }
+
+  .scr-head__lead {
+    flex-basis: 100%;
+    min-width: 0;
+  }
+
+  .scr-head__actions {
+    margin-left: 0;
+  }
+
+  .scr-loud {
+    border-radius: 0 48px 0 0;
+  }
+}

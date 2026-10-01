@@ -17,7 +17,13 @@ interface ChoiceGroupProps<T extends string> {
 /**
  * One native radio group: a fieldset with a legend, real radios, real labels. A native group gives
  * arrow-key traversal and a visible focus ring for free (FR-066), and the checked state is carried
- * by the radio dot as well as by the tint, so selection is never colour alone.
+ * by shape as well as tint — a tile's radio dot and ink ring, a strip's filled ink pill — so
+ * selection is never colour alone.
+ *
+ * Two looks, picked by the options themselves. Options that are each explained (the error modes)
+ * are tiles, one per row, the explanation inside. Short options are a segmented strip, like the
+ * status bar's layout switch; when one of them still needs a word of explanation (the low-vision
+ * preset) it is said under the strip and tied to that radio by `aria-describedby`.
  *
  * `value` comes from the store on every render and no copy is kept here, so the control cannot
  * drift from what `theme.ts` is applying (FR-049).
@@ -31,41 +37,46 @@ export function ChoiceGroup<T extends string>({
 }: ChoiceGroupProps<T>) {
   const name = useId()
   const hintId = `${name}-hint`
+  const tiles = options.every((option) => option.hint !== undefined)
+  const notes = tiles ? [] : options.filter((option) => option.hint !== undefined)
+  const noteId = (option: ChoiceOption<T>) => `${name}-${option.value}-note`
 
   return (
-    <fieldset
-      className="m-0 border-0 p-0"
-      aria-describedby={hint === undefined ? undefined : hintId}
-    >
-      <legend className="mb-1 font-ui text-base font-semibold text-ink">{legend}</legend>
+    <fieldset className="set-group" aria-describedby={hint === undefined ? undefined : hintId}>
+      <legend className="set-group__legend">{legend}</legend>
       {hint !== undefined && (
-        <p id={hintId} className="mb-3 font-ui text-sm text-ink/80">
+        <p id={hintId} className="set-hint">
           {hint}
         </p>
       )}
-      <div className="flex flex-wrap gap-3">
+      <div className={tiles ? 'set-choices' : 'set-seg'} data-count={options.length}>
         {options.map((option) => (
-          <label
-            key={option.value}
-            className="flex min-w-44 max-w-80 flex-1 cursor-pointer items-start gap-3 rounded-[var(--radius-field)] border-[length:var(--border-hairline)] border-hairline-strong bg-paper-raised p-3 has-[:checked]:border-sage has-[:checked]:bg-sage-tint"
-          >
+          <label key={option.value} className={tiles ? 'set-choice' : 'set-seg__opt'}>
             <input
               type="radio"
               name={name}
               value={option.value}
               checked={value === option.value}
               onChange={() => onChange(option.value)}
-              className="mt-1 size-4 accent-[var(--color-sage)]"
+              aria-describedby={!tiles && option.hint !== undefined ? noteId(option) : undefined}
+              className="set-choice__radio"
             />
-            <span className="flex flex-col gap-0.5">
-              <span className="font-ui font-semibold text-ink">{option.label}</span>
-              {option.hint !== undefined && (
-                <span className="font-ui text-sm text-ink/80">{option.hint}</span>
-              )}
-            </span>
+            {tiles ? (
+              <span className="set-choice__text">
+                <span className="set-choice__label">{option.label}</span>
+                <span className="set-choice__hint">{option.hint}</span>
+              </span>
+            ) : (
+              <span className="set-seg__label">{option.label}</span>
+            )}
           </label>
         ))}
       </div>
+      {notes.map((option) => (
+        <p key={option.value} id={noteId(option)} className="set-note">
+          <b>{option.label}</b> — {option.hint}
+        </p>
+      ))}
     </fieldset>
   )
 }

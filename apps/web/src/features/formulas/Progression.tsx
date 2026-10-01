@@ -6,7 +6,6 @@ import {
   STAGE1_WINDOW,
 } from '@typing-race/curriculum'
 import type { Level } from '@typing-race/domain'
-import { Chip } from '@typing-race/ui'
 import { m } from '../../paraglide/messages.js'
 import { getLocale } from '../../paraglide/runtime.js'
 import { Block, Formula, P, Section } from './Formula.js'
@@ -24,8 +23,6 @@ function speedCell(benchmark: Level['spmBenchmark']): string {
 /** Whole percent, the way the requirements' table prints it. */
 const percent = (fraction: number) => `${Math.round(fraction * 100)} %`
 
-const CELL = 'px-4 py-2'
-
 /**
  * The level table, rendered from the curriculum's one level config (`levels.json`) — names, goals,
  * benchmarks and floors alike — so the page cannot drift from the values in force, then the Mastery Rule, Stage 1 completion, and the statement that speed gates
@@ -36,50 +33,31 @@ export function Progression() {
   return (
     <Section id="progression" title={m.formulas_progress_title()}>
       <Block title={m.formulas_levels_title()}>
-        <div className="overflow-hidden rounded-[var(--radius-card)] border-[length:var(--border-hairline)] border-hairline-strong">
-          <table className="w-full border-collapse text-left font-ui text-base text-ink">
+        <div className="ref-table-wrap">
+          <table className="ref-table">
             <caption className="sr-only">{m.formulas_levels_caption()}</caption>
-            <thead className="bg-sage-tint">
+            <thead>
               <tr>
-                <th scope="col" className={`${CELL} font-semibold`}>
-                  {m.formulas_col_level()}
-                </th>
-                <th scope="col" className={`${CELL} font-semibold`}>
-                  {m.formulas_col_speed()}
-                </th>
-                <th scope="col" className={`${CELL} font-semibold`}>
-                  {m.formulas_col_floor()}
-                </th>
-                <th scope="col" className={`${CELL} font-semibold`}>
-                  {m.formulas_col_goal()}
-                </th>
-                <th scope="col" className={`${CELL} font-semibold`}>
-                  {m.formulas_col_status()}
-                </th>
+                <th scope="col">{m.formulas_col_level()}</th>
+                <th scope="col">{m.formulas_col_speed()}</th>
+                <th scope="col">{m.formulas_col_floor()}</th>
+                <th scope="col">{m.formulas_col_goal()}</th>
+                <th scope="col">{m.formulas_col_status()}</th>
               </tr>
             </thead>
             <tbody>
               {levels.map((level) => {
                 const inForce = level.id === introductionLevel.id
                 return (
-                  <tr
-                    key={level.id}
-                    className="border-t-[length:var(--border-hairline)] border-hairline"
-                  >
-                    <th scope="row" className={`${CELL} font-semibold`}>
-                      {level.name[language()]}
-                    </th>
-                    <td className={`${CELL} font-mono text-[0.95rem]`}>
-                      {speedCell(level.spmBenchmark)}
-                    </td>
-                    <td className={`${CELL} font-mono text-[0.95rem]`}>
-                      {percent(level.accuracyFloor)}
-                    </td>
-                    <td className={CELL}>{level.goal[language()]}</td>
-                    <td className={CELL}>
-                      <Chip tone={inForce ? 'sage' : 'muted'}>
+                  <tr key={level.id}>
+                    <th scope="row">{level.name[language()]}</th>
+                    <td className="ref-table__mono">{speedCell(level.spmBenchmark)}</td>
+                    <td className="ref-table__mono">{percent(level.accuracyFloor)}</td>
+                    <td>{level.goal[language()]}</td>
+                    <td>
+                      <span className={inForce ? 'scr-tag scr-tag--ink' : 'scr-tag'}>
                         {inForce ? m.formulas_status_in_force() : m.formulas_status_informational()}
-                      </Chip>
+                      </span>
                     </td>
                   </tr>
                 )

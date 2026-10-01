@@ -8,7 +8,7 @@ import { m } from '../../paraglide/messages.js'
  */
 export function Formula({ children }: { readonly children: ReactNode }) {
   return (
-    <div className="my-3 rounded-[var(--radius-field)] border-[length:var(--border-hairline)] border-hairline-strong bg-paper px-4 py-3 font-mono text-[0.95rem] leading-relaxed break-words whitespace-pre-wrap text-ink">
+    <div className="ref-formula">
       <span className="sr-only">{m.formulas_formula_label()}: </span>
       <code>{children}</code>
     </div>
@@ -26,11 +26,11 @@ export function Section({
   readonly children: ReactNode
 }) {
   return (
-    <section aria-labelledby={`${id}-title`} id={id} className="scroll-mt-8 py-8">
-      <h2 id={`${id}-title`} className="mb-4 font-ui text-2xl font-semibold text-ink">
+    <section aria-labelledby={`${id}-title`} id={id} className="ref-section">
+      <h2 id={`${id}-title`} className="ref-h2">
         {title}
       </h2>
-      <div className="space-y-6">{children}</div>
+      <div className="ref-stack">{children}</div>
     </section>
   )
 }
@@ -47,15 +47,15 @@ export function Block({
 }) {
   return (
     <div>
-      <h3 className="mb-2 flex flex-wrap items-center gap-3 font-ui text-lg font-semibold text-ink">
+      <h3 className="ref-h3">
         {title}
         {aside}
       </h3>
-      <div className="space-y-2">{children}</div>
+      <div className="ref-stack ref-stack--tight">{children}</div>
     </div>
   )
 }
 
 export function P({ children }: { readonly children: ReactNode }) {
-  return <p className="max-w-[68ch] font-ui text-base leading-relaxed text-ink">{children}</p>
+  return <p className="ref-p">{children}</p>
 }

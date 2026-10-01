@@ -8,7 +8,6 @@
   "community_name_label": "Your name",
   "community_name_hint": "The same name you race under. 2 to 32 characters.",
   "community_name_invalid": "The name must be 2 to 32 characters.",
-
   "groups_title": "Groups",
   "groups_lede": "A class, a team or friends. Create a group, share the code, and everyone gets their own ranking.",
   "groups_create_index": "New",
@@ -29,7 +28,6 @@
   "groups_members_count": "Members: {count}",
   "groups_role_owner": "owner",
   "groups_you": "you",
-
   "group_back": "All groups",
   "group_code_label": "Join code",
   "group_copy_link": "Copy invite link",
@@ -45,7 +43,6 @@
   "group_leave_owner_note": "If you leave, the group passes to the member who joined earliest.",
   "group_not_member": "You are not in this group. Ask the owner for the code.",
   "group_join_title": "Group invitation",
-
   "lb_title": "Leaderboards",
   "lb_lede": "Every racer's best server-validated race result.",
   "lb_scope_label": "Ranking",
@@ -67,5 +64,22 @@
   "lb_no_group": "You are not in a group yet. Create one or join by code, and your group ranking appears here.",
   "lb_no_group_action": "Go to groups",
   "lb_week_since": "since Monday, {date}",
-  "lb_honest": "Rankings are built only from race results the server has validated: it replays every keystroke against the room's text and computes the speed itself. Places go by speed weighted by accuracy; results below 90% accuracy do not count. Practice attempts stay in your browser and are never ranked."
+  "lb_honest": "Rankings are built only from race results the server has validated: it replays every keystroke against the room's text and computes the speed itself. Places go by speed weighted by accuracy; results below 90% accuracy do not count. Practice attempts stay in your browser and are never ranked.",
+  "groups_player_title": "Player",
+  "groups_mine_lede": "A group sees its own race ranking. Create one for a class or friends, or join with a code from its owner.",
+  "group_members_meta": "{count} in the group",
+  "group_code_hint": "Send the code or the link — whoever opens it joins the group.",
+  "lb_me_title": "Your place",
+  "lb_me_place": "of {of}",
+  "lb_me_ahead": "{gap} cpm behind {name}.",
+  "lb_me_first": "You are first. Hold the place in your next race.",
+  "lb_me_none": "You are not on this board yet. Finish a race at 90% accuracy or better and your place appears here.",
+  "lb_me_race": "To the races",
+  "lb_how_title": "How we rank",
+  "lb_board_title": "Standings",
+  "lb_board_meta": "racers: {count}",
+  "groups_steps_label": "How it works",
+  "groups_step_1": "Create a group — you get a six-character code.",
+  "groups_step_2": "Send the code or the link to your class or friends.",
+  "groups_step_3": "Race — the group sees its own ranking."
 }
