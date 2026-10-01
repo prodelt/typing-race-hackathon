@@ -14,7 +14,7 @@ export function Language() {
   const changeSettings = useAppStore((state) => state.changeSettings)
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="set-stack set-stack--wide">
       <ChoiceGroup<LanguageId>
         legend={m.settings_typing_legend()}
         hint={m.settings_typing_hint()}

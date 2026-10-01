@@ -1,6 +1,7 @@
 import { Link } from '@tanstack/react-router'
 import { buttonClass } from '@typing-race/ui'
 import { type ReactNode, useEffect, useState } from 'react'
+import { Screen } from '../../app/Screen.js'
 import { m } from '../../paraglide/messages.js'
 import { GroupError, type GroupsBackend, groupsBackend } from '../../sync/groups.js'
 import type { Identity } from '../../sync/race.js'
@@ -34,20 +35,24 @@ export function WithGroups({
 
   if (status.kind === 'loading') {
     return (
-      <div className="cm-calm" aria-busy="true">
-        <p className="cm-lede">{m.community_loading()}</p>
-      </div>
+      <Screen>
+        <div className="scr-panel cm-calm" aria-busy="true">
+          <p className="scr-say">{m.community_loading()}</p>
+        </div>
+      </Screen>
     )
   }
   if (status.kind === 'unavailable') {
     return (
-      <div className="cm-calm" data-testid="community-unavailable">
-        <h1 className="cm-display cm-calm__title">{m.community_unavailable_title()}</h1>
-        <p className="cm-lede">{m.community_unavailable()}</p>
-        <Link to="/" className={buttonClass('primary', 'md')}>
-          {m.community_unavailable_action()}
-        </Link>
-      </div>
+      <Screen>
+        <div className="scr-panel cm-calm" data-testid="community-unavailable">
+          <h1 className="cm-calm__title">{m.community_unavailable_title()}</h1>
+          <p className="scr-say">{m.community_unavailable()}</p>
+          <Link to="/" className={buttonClass('primary', 'md')}>
+            {m.community_unavailable_action()}
+          </Link>
+        </div>
+      </Screen>
     )
   }
   return <>{children(status.backend)}</>
@@ -107,6 +112,31 @@ export function useIdentity(backend: GroupsBackend): {
   }
 
   return { identity, name, setName, ensure }
+}
+
+/**
+ * Community holds two screens; this strip in each head bar reaches the other. It is the status
+ * bar's pill switch, so a learner reads it as "which of the two", not as navigation away.
+ */
+export function CommunityTabs({ current }: { readonly current: '/groups' | '/leaderboards' }) {
+  const items = [
+    { to: '/groups', label: m.shell_tab_groups() },
+    { to: '/leaderboards', label: m.shell_tab_leaderboards() },
+  ] as const
+  return (
+    <nav className="scr-seg" aria-label={m.shell_tabs_community()}>
+      {items.map((item) => (
+        <Link
+          key={item.to}
+          to={item.to}
+          className="scr-seg__btn"
+          aria-current={item.to === current ? 'page' : undefined}
+        >
+          {item.label}
+        </Link>
+      ))}
+    </nav>
+  )
 }
 
 export function inviteLink(code: string): string {

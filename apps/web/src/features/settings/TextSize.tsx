@@ -22,12 +22,12 @@ export function TextSize() {
   const valueText = m.settings_size_value({ px: textSizePx })
 
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex items-baseline justify-between gap-4">
-        <label htmlFor={id} className="font-ui text-base font-semibold text-ink">
+    <div className="set-size">
+      <div className="set-size__top">
+        <label htmlFor={id} className="set-group__legend">
           {m.settings_size_label()}
         </label>
-        <output htmlFor={id} className="font-mono text-sm text-ink">
+        <output htmlFor={id} className="set-size__value">
           {valueText}
         </output>
       </div>
@@ -41,20 +41,18 @@ export function TextSize() {
         aria-valuetext={valueText}
         aria-describedby={hintId}
         onChange={(event) => void changeSettings({ textSizePx: Number(event.target.value) })}
-        className="w-full accent-[var(--color-sage)]"
+        className="set-size__range"
       />
-      <p id={hintId} className="font-ui text-sm text-ink/80">
+      <p id={hintId} className="set-hint">
         {m.settings_size_hint()}
       </p>
-      <div className="rounded-[var(--radius-field)] border-[length:var(--border-hairline)] border-hairline bg-paper-raised p-4">
-        <p className="font-ui text-xs font-semibold text-ink/80">
-          {m.settings_size_preview_label()}
-        </p>
+      <div className="set-preview">
+        <p className="set-preview__label">{m.settings_size_preview_label()}</p>
         <p
           data-testid="text-size-preview"
           lang={typingLanguage}
           style={{ fontFamily: 'var(--font-typing)', fontSize: `${textSizePx}px`, lineHeight: 1.5 }}
-          className="mt-1 text-ink"
+          className="set-preview__text"
         >
           {m.settings_size_preview_text({}, { locale: typingLanguage })}
         </p>

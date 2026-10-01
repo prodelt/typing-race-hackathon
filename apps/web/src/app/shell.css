@@ -432,6 +432,12 @@
   flex: none;
 }
 
+/* No rating yet: the stat keeps its place, quieter, and its tooltip says why. */
+.sb--absent .num,
+.sb--absent .swords {
+  color: var(--color-muted);
+}
+
 .bar__right {
   margin-left: auto;
   display: flex;
@@ -651,36 +657,6 @@
 .frame[data-play] .stage__content {
   max-width: calc(1240px + 2 * clamp(16px, 2.6vw, 40px));
   padding-top: clamp(24px, 5vh, 56px);
-}
-
-/* The tab strip of Map and Community. */
-.tabs {
-  display: flex;
-  gap: 4px;
-  margin-bottom: 20px;
-}
-
-.tabs__item {
-  display: inline-flex;
-  align-items: center;
-  height: 36px;
-  padding: 0 14px;
-  border-radius: 999px;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--color-ink-soft);
-  background: color-mix(in srgb, var(--color-paper-raised) 60%, transparent);
-  text-decoration: none;
-  transition: background-color 200ms var(--ease-enter);
-}
-
-.tabs__item:hover {
-  background: var(--color-paper-raised);
-}
-
-.tabs__item[aria-current="page"] {
-  background: var(--color-ink);
-  color: var(--color-paper-raised);
 }
 
 /* ---- The live gradient: slow, soft, and still in Play ------------------------------------ */

@@ -3,13 +3,7 @@ import { useEffect } from 'react'
 import { m } from '../paraglide/messages.js'
 import { BootGate } from './BootGate.js'
 import { CommandPalette } from './CommandPalette.js'
-import {
-  DESTINATIONS,
-  type DestinationId,
-  destinationOf,
-  isOutsideFrame,
-  needsKeyboard,
-} from './destinations.js'
+import { DESTINATIONS, destinationOf, isOutsideFrame, needsKeyboard } from './destinations.js'
 import { LiveGradient } from './LiveGradient.js'
 import { usePlayMode } from './playMode.js'
 import { Rail } from './Rail.js'
@@ -52,47 +46,6 @@ function useDestinationKeys(enabled: boolean): void {
     document.addEventListener('keydown', onKeyDown)
     return () => document.removeEventListener('keydown', onKeyDown)
   }, [enabled, navigate])
-}
-
-/**
- * Community holds two screens; a quiet tab strip reaches the other. The Map needs none: Path and
- * Academy are one screen now, and review opens from the Map itself (its review stops and `R`).
- */
-function StageTabs({
-  active,
-  pathname,
-}: {
-  readonly active: DestinationId | null
-  readonly pathname: string
-}) {
-  const tabs =
-    active === 'community'
-      ? {
-          label: m.shell_tabs_community(),
-          items: [
-            { to: '/groups', label: m.shell_tab_groups() },
-            { to: '/leaderboards', label: m.shell_tab_leaderboards() },
-          ] as const,
-        }
-      : null
-  if (tabs === null) return null
-  // Only on the section screens themselves; inside an exercise or a group the tabs would crowd it.
-  if (!tabs.items.some((item) => item.to === pathname)) return null
-
-  return (
-    <nav className="tabs" aria-label={tabs.label}>
-      {tabs.items.map((item) => (
-        <Link
-          key={item.to}
-          to={item.to}
-          className="tabs__item"
-          aria-current={item.to === pathname ? 'page' : undefined}
-        >
-          {item.label}
-        </Link>
-      ))}
-    </nav>
-  )
 }
 
 export function Shell() {
@@ -138,7 +91,6 @@ export function Shell() {
           {/* biome-ignore lint/a11y/noNoninteractiveTabindex: a scrollable region must be reachable by keyboard */}
           <div className="stage__scroll" data-stage-scroll="" tabIndex={0}>
             <div className="stage__content">
-              <StageTabs active={active} pathname={pathname} />
               <BootGate>
                 <Outlet />
               </BootGate>

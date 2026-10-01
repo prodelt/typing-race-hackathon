@@ -1,60 +1,455 @@
-import { Link } from '@tanstack/react-router'
-import { buttonClass } from '@typing-race/ui'
-import { useGameStats } from '../../app/state/gameStats.js'
+import { Link, useNavigate } from '@tanstack/react-router'
+import {
+  academyProgress,
+  catalogue,
+  findExercise,
+  resolveWordDrill,
+  stage2Gate,
+  stage2Open,
+} from '@typing-race/curriculum'
+import type { AttemptSummary } from '@typing-race/domain'
+import { IconFlame } from '@typing-race/ui'
+import { useMemo } from 'react'
+import { Panel, Screen, ScreenHead } from '../../app/Screen.js'
+import { useScreenKeys } from '../../app/screenKeys.js'
+import { localDay, useGameStats } from '../../app/state/gameStats.js'
+import { useAppStore, useDerived } from '../../app/state/index.js'
 import { m } from '../../paraglide/messages.js'
+import { getLocale } from '../../paraglide/runtime.js'
+import { type CourseState, useAcademyCourse } from '../academy/data.js'
+import { keyLabel, scaleName } from '../path/labels.js'
+import { totalKeyCount, unlockedKeyCount } from '../path/model.js'
+import { drillName } from '../words/labels.js'
+import { attemptKind, careerTotals, RECENT_WINDOW, recentAttempts, speedTrend } from './model.js'
+import './profile.css'
 
 /**
- * Profile, destination 05. A minimal placeholder until the cloud tickets add sign-in, history and
- * achievements: who is playing and the four game numbers, readable on a phone too.
+ * Profile, destination 05: who is playing, the game numbers, how far along the route they are, and
+ * the history of attempts — readable on a phone too. The red block is the Level; everything else
+ * is quiet. The Account panel says plainly that sign-in has not arrived yet.
  */
+
+const HISTORY_ROWS = 8
+const TREND_POINTS = 20
+
 export function ProfileScreen() {
+  const navigate = useNavigate()
   const stats = useGameStats()
-  const figures = [
-    { label: m.profile_level(), value: String(stats.level) },
+  const attempts = useAppStore((state) => state.attempts)
+  const language = useAppStore((state) => state.settings.typingLanguage)
+  const course = useAcademyCourse(language)
+  const totals = useMemo(() => careerTotals(attempts, localDay), [attempts])
+
+  useScreenKeys({ KeyS: () => void navigate({ to: '/settings' }) })
+
+  return (
+    <Screen className="prof">
+      <ScreenHead title={m.profile_title()} titleId="profile-title">
+        <div className="prof-who">
+          <span className="prof-who__avatar" aria-hidden="true">
+            {m.prof_guest().slice(0, 1)}
+          </span>
+          <span className="prof-who__text">
+            <b>{m.prof_guest()}</b>
+            <span>{m.prof_guest_sub()}</span>
+          </span>
+        </div>
+        <Link to="/settings" className="scr-seg__btn prof-settings" aria-keyshortcuts="S">
+          {m.prof_settings()}
+          <span className="kbd" aria-hidden="true">
+            S
+          </span>
+        </Link>
+      </ScreenHead>
+
+      <div className="prof-grid">
+        <LevelBlock
+          level={stats.level}
+          have={stats.xpInLevel}
+          need={stats.xpForNextLevel}
+          tests={totals.tests}
+        />
+        <Numbers stats={stats} totals={totals} />
+        <Mastery course={course} />
+        <History attempts={attempts} course={course} />
+        <Account />
+      </div>
+    </Screen>
+  )
+}
+
+/* ---- 01 Level: the one loud block ---------------------------------------------------------- */
+
+function LevelBlock(props: {
+  readonly level: number
+  readonly have: number
+  readonly need: number
+  readonly tests: number
+}) {
+  const fill = props.need === 0 ? 1 : Math.min(1, props.have / props.need)
+  return (
+    <section
+      className="scr-panel scr-loud prof-level"
+      aria-labelledby="prof-level-title"
+      data-testid="profile-level"
+    >
+      <div className="scr-panel__head">
+        <span className="scr-idx">01</span>
+        <h2 className="scr-panel__title" id="prof-level-title">
+          {m.prof_level_title()}
+        </h2>
+      </div>
+      <p className="prof-level__n num">{props.level}</p>
+      <div className="prof-level__bar" aria-hidden="true">
+        <i style={{ width: `${fill * 100}%` }} />
+      </div>
+      <p className="prof-level__xp">
+        <b>{m.prof_level_xp({ have: props.have, need: props.need })}</b>{' '}
+        {m.prof_level_next({ next: props.level + 1, left: Math.max(0, props.need - props.have) })}
+      </p>
+      <p className="prof-level__say">{m.prof_level_explain()}</p>
+    </section>
+  )
+}
+
+/* ---- 02 Numbers ------------------------------------------------------------------------- */
+
+function Numbers({
+  stats,
+  totals,
+}: {
+  readonly stats: ReturnType<typeof useGameStats>
+  readonly totals: ReturnType<typeof careerTotals>
+}) {
+  const cells = [
     {
-      label: m.profile_streak(),
-      value: m.profile_streak_value({ days: String(stats.streak.days) }),
+      id: 'streak',
+      label: m.prof_streak(),
+      value: (
+        <>
+          <IconFlame size={18} className="prof-flame" aria-hidden="true" />
+          {m.prof_streak_value({ days: stats.streak.days })}
+        </>
+      ),
+      sub: m.prof_streak_sub({ n: stats.streak.freezes }),
     },
     {
-      label: m.profile_goal(),
-      value: m.profile_goal_value({
-        today: String(stats.dailyGoal.minutesToday),
-        goal: String(stats.dailyGoal.goalMinutes),
+      id: 'goal',
+      label: m.prof_goal(),
+      value: m.prof_goal_value({
+        today: stats.dailyGoal.minutesToday,
+        goal: stats.dailyGoal.goalMinutes,
       }),
+      sub: m.prof_goal_sub(),
     },
     {
-      label: m.profile_rating(),
-      value: stats.raceRating === null ? m.profile_rating_none() : String(stats.raceRating),
+      id: 'rating',
+      label: m.prof_rating(),
+      value: stats.raceRating === null ? m.prof_rating_none() : String(stats.raceRating),
+      sub: stats.raceRating === null ? m.prof_rating_sub_none() : m.prof_rating_sub(),
+    },
+    {
+      id: 'best',
+      label: m.prof_best(),
+      value: totals.bestSpm === null ? '—' : String(totals.bestSpm),
+      sub: totals.bestSpm === null ? m.prof_best_none() : m.prof_best_sub(),
+    },
+    {
+      id: 'accuracy',
+      label: m.prof_accuracy(),
+      value: totals.recentAccuracy === null ? '—' : `${(totals.recentAccuracy * 100).toFixed(1)}%`,
+      sub: m.prof_accuracy_sub({ n: Math.min(RECENT_WINDOW, Math.max(1, totals.attempts)) }),
+    },
+    {
+      id: 'time',
+      label: m.prof_time(),
+      value: m.prof_time_value({ minutes: totals.minutes }),
+      sub: m.prof_time_sub({ attempts: totals.attempts, days: totals.days }),
     },
   ]
 
   return (
-    <section className="grid max-w-3xl gap-6" aria-labelledby="profile-title">
-      <header>
-        <h1 id="profile-title" className="font-display text-3xl font-semibold tracking-[-0.04em]">
-          {m.profile_title()}
-        </h1>
-        <p className="mt-2 font-ui text-ink-soft">{m.profile_lead()}</p>
-      </header>
-
-      <dl className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-        {figures.map((figure) => (
-          <div key={figure.label} className="bg-paper-raised p-4">
-            <dt className="font-ui text-sm font-medium text-muted">{figure.label}</dt>
-            <dd className="mt-2 font-display text-2xl font-medium tracking-[-0.04em]">
-              {figure.value}
-            </dd>
+    <Panel id="prof-stats-title" n={2} title={m.prof_stats_title()} className="prof-stats">
+      <dl className="prof-cells">
+        {cells.map((cell) => (
+          <div key={cell.id} className="prof-cell" data-testid={`profile-${cell.id}`}>
+            <dt>{cell.label}</dt>
+            <dd className="prof-cell__value num">{cell.value}</dd>
+            <dd className="prof-cell__sub">{cell.sub}</dd>
           </div>
         ))}
       </dl>
+    </Panel>
+  )
+}
 
-      <p className="font-ui text-ink-soft">{m.profile_soon()}</p>
+/* ---- 03 Mastery ------------------------------------------------------------------------- */
 
-      <div>
-        <Link to="/settings" className={buttonClass('secondary', 'md')}>
-          {m.shell_settings()}
+function Mastery({ course }: { readonly course: CourseState }) {
+  const { progress, layout } = useDerived()
+  const attempts = useAppStore((state) => state.attempts)
+  const academy = useMemo(
+    () => (course.status === 'ready' ? academyProgress(course.course, attempts) : null),
+    [course, attempts],
+  )
+
+  if (progress === null) {
+    return (
+      <Panel id="prof-mastery-title" n={3} title={m.prof_mastery_title()} className="prof-mastery">
+        <p className="scr-say">{m.prof_mastery_none()}</p>
+      </Panel>
+    )
+  }
+
+  const keys = { have: unlockedKeyCount(progress), total: totalKeyCount(layout) }
+  const words = stage2Open(layout, progress.unlockedSet)
+  const missing = stage2Gate(layout).filter((char) => !progress.unlockedSet.includes(char))
+  const modules =
+    course.status === 'ready' && academy !== null
+      ? { have: academy.modulesComplete, total: course.course.modules.length }
+      : null
+
+  const rows = [
+    {
+      n: '01',
+      name: m.prof_mastery_stage1(),
+      value: m.prof_mastery_stage1_value(keys),
+      fill: keys.total === 0 ? 0 : keys.have / keys.total,
+    },
+    {
+      n: '02',
+      name: m.prof_mastery_stage2(),
+      value: words
+        ? m.prof_mastery_stage2_open()
+        : m.prof_mastery_stage2_locked({ keys: missing.map(keyLabel).join(' ') }),
+      fill: words ? 1 : 0,
+    },
+    {
+      n: '03',
+      name: m.prof_mastery_stage3(),
+      value:
+        modules === null ? m.prof_mastery_stage3_loading() : m.prof_mastery_stage3_value(modules),
+      fill: modules === null || modules.total === 0 ? 0 : modules.have / modules.total,
+    },
+  ]
+
+  return (
+    <Panel
+      id="prof-mastery-title"
+      n={3}
+      title={m.prof_mastery_title()}
+      meta={
+        <Link to="/map" className="prof-link" aria-keyshortcuts="2">
+          {m.prof_mastery_map()}
+          <span className="kbd" aria-hidden="true">
+            2
+          </span>
         </Link>
-      </div>
-    </section>
+      }
+      className="prof-mastery"
+      testId="profile-mastery"
+    >
+      <ol className="prof-stages">
+        {rows.map((row) => (
+          <li key={row.n} className="prof-stage">
+            <span className="prof-stage__n">{row.n}</span>
+            <b className="prof-stage__name">{row.name}</b>
+            <span className="prof-stage__value">{row.value}</span>
+            <span className="prof-stage__bar" aria-hidden="true">
+              <i style={{ width: `${row.fill * 100}%` }} />
+            </span>
+          </li>
+        ))}
+      </ol>
+    </Panel>
+  )
+}
+
+/* ---- 04 History ------------------------------------------------------------------------- */
+
+function attemptName(attempt: AttemptSummary, course: CourseState): string {
+  switch (attemptKind(attempt.scaleId)) {
+    case 'academy': {
+      const found =
+        course.status === 'ready' ? findExercise(course.course, attempt.scaleId) : undefined
+      return found === undefined
+        ? m.prof_kind_academy()
+        : `${m.prof_kind_academy()} · ${found.exercise.title}`
+    }
+    case 'words': {
+      const drill = resolveWordDrill(attempt.scaleId)
+      return drill === undefined ? m.prof_kind_words() : drillName(drill)
+    }
+    case 'review':
+      return m.prof_kind_review()
+    default: {
+      const scale = catalogue[attempt.layoutId].find((s) => s.id === attempt.scaleId)
+      return scale === undefined ? attempt.scaleId : scaleName(scale)
+    }
+  }
+}
+
+function when(ms: number): string {
+  return new Intl.DateTimeFormat(getLocale() === 'en' ? 'en-GB' : 'uk-UA', {
+    day: 'numeric',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(new Date(ms))
+}
+
+function History({
+  attempts,
+  course,
+}: {
+  readonly attempts: readonly AttemptSummary[]
+  readonly course: CourseState
+}) {
+  const rows = recentAttempts(attempts, HISTORY_ROWS)
+  const trend = speedTrend(attempts, TREND_POINTS)
+
+  return (
+    <Panel
+      id="prof-history-title"
+      n={4}
+      title={m.prof_history_title()}
+      meta={
+        attempts.length === 0
+          ? undefined
+          : m.prof_history_meta({ n: rows.length, total: attempts.length })
+      }
+      className="prof-history"
+      testId="profile-history"
+    >
+      {rows.length === 0 ? (
+        <div className="scr-empty">
+          <p className="scr-say">{m.prof_history_empty()}</p>
+          <Link to="/" className="scr-seg__btn prof-start">
+            {m.prof_history_start()}
+          </Link>
+        </div>
+      ) : (
+        <>
+          {trend.length >= 2 ? <Trend points={trend} /> : null}
+          <div className="prof-hist__heads" aria-hidden="true">
+            <span />
+            <span>{m.prof_col_spm()}</span>
+            <span>{m.prof_col_accuracy()}</span>
+          </div>
+          <ol className="scr-rows prof-hist">
+            {rows.map((attempt) => {
+              const name = attemptName(attempt, course)
+              const date = when(attempt.completedAt)
+              return (
+                <li key={attempt.id}>
+                  <Link
+                    to="/result/$attemptId"
+                    params={{ attemptId: attempt.id }}
+                    className="scr-row prof-hist__row"
+                    aria-label={m.prof_history_open({ name, date })}
+                    data-testid="profile-attempt"
+                  >
+                    <span className="prof-hist__what">
+                      <b>{name}</b>
+                      <span>
+                        {date}
+                        <span
+                          className={`scr-tag${attempt.mode === 'test' ? ' scr-tag--ink' : ''}`}
+                        >
+                          {attempt.mode === 'test'
+                            ? m.prof_history_test()
+                            : m.prof_history_practice()}
+                        </span>
+                      </span>
+                    </span>
+                    <span className="prof-hist__fig num">{Math.round(attempt.metrics.spm)}</span>
+                    <span className="prof-hist__fig prof-hist__fig--acc num">
+                      {(Math.floor(attempt.metrics.accuracy * 1000) / 10).toFixed(1)}%
+                    </span>
+                  </Link>
+                </li>
+              )
+            })}
+          </ol>
+        </>
+      )}
+    </Panel>
+  )
+}
+
+function Trend({ points }: { readonly points: readonly number[] }) {
+  const lo = Math.min(...points) * 0.9
+  const hi = Math.max(...points) * 1.05 || 1
+  const y = (value: number) => 56 - ((value - lo) / Math.max(1, hi - lo)) * 50
+  const x = (i: number) => 4 + (i * 392) / Math.max(1, points.length - 1)
+  const line = points.map((value, i) => `${x(i)},${y(value).toFixed(1)}`).join(' ')
+  return (
+    <figure className="prof-trend">
+      <svg
+        viewBox="0 0 400 60"
+        preserveAspectRatio="none"
+        role="img"
+        aria-label={m.prof_history_trend_aria({ values: points.join(', ') })}
+      >
+        <polygon className="prof-trend__area" points={`4,60 ${line} 396,60`} />
+        <polyline className="prof-trend__line" points={line} vectorEffect="non-scaling-stroke" />
+      </svg>
+      <figcaption className="scr-note">
+        {m.prof_history_trend({
+          n: points.length,
+          from: points[0] ?? 0,
+          to: points.at(-1) ?? 0,
+        })}
+      </figcaption>
+    </figure>
+  )
+}
+
+/* ---- 05 Account: an honest placeholder -------------------------------------------------- */
+
+function Account() {
+  return (
+    <Panel
+      id="prof-account-title"
+      n={5}
+      title={m.prof_account_title()}
+      meta={
+        <span className="prof-account__row">
+          <button
+            type="button"
+            className="prof-google"
+            disabled
+            aria-describedby="prof-account-soon"
+          >
+            <svg width="16" height="16" viewBox="0 0 48 48" aria-hidden="true">
+              <path
+                fill="#EA4335"
+                d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.6 5.4 2.7 13.3l7.9 6.1C12.5 13.6 17.8 9.5 24 9.5z"
+              />
+              <path
+                fill="#4285F4"
+                d="M46.1 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.4c-.5 2.9-2.2 5.3-4.6 6.9l7.4 5.7c4.3-4 6.9-9.9 6.9-17.1z"
+              />
+              <path
+                fill="#FBBC05"
+                d="M10.6 28.6c-.5-1.4-.8-3-.8-4.6s.3-3.2.8-4.6l-7.9-6.1C1 16.6 0 20.2 0 24s1 7.4 2.7 10.7l7.9-6.1z"
+              />
+              <path
+                fill="#34A853"
+                d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.4-5.7c-2.1 1.4-4.8 2.3-8.5 2.3-6.2 0-11.5-4.1-13.4-9.9l-7.9 6.1C6.6 42.6 14.6 48 24 48z"
+              />
+            </svg>
+            {m.prof_account_action()}
+          </button>
+          <span className="scr-tag" id="prof-account-soon">
+            {m.prof_account_action_soon()}
+          </span>
+        </span>
+      }
+      className="prof-account"
+      testId="profile-account"
+    >
+      <p className="scr-say">{m.prof_account_body()}</p>
+    </Panel>
   )
 }

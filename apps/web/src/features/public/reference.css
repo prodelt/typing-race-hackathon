@@ -1,0 +1,361 @@
+/*
+ * The reference pages (Formulas, Licences, Privacy, About the project) in direction B: a side
+ * panel with the «Про гру» pages and the page's sections, and the text in a white panel at a
+ * reading measure — Unbounded for the headings, Onest for everything read, the mono face only for
+ * formulas. Nothing moves behind the text.
+ */
+
+.ref-grid {
+  display: grid;
+  gap: var(--scr-gap);
+  grid-template-columns: minmax(200px, 3fr) minmax(0, 9fr);
+}
+
+/* ---- The side panel ---------------------------------------------------------------------- */
+
+.ref-aside {
+  padding-block: 18px;
+}
+
+/* The panel runs the page's full height; what is in it stays in view while the text scrolls. */
+.ref-aside__in {
+  position: sticky;
+  top: 18px;
+  display: grid;
+  gap: 22px;
+}
+
+.ref-nav ul,
+.ref-nav ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 2px;
+}
+
+.ref-nav__title {
+  margin: 0 0 8px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--color-muted);
+}
+
+.ref-nav__link {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 9px 12px;
+  background: var(--color-paper);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--color-ink);
+  text-decoration: none;
+  transition:
+    background-color var(--dur-quick) var(--ease-enter),
+    color var(--dur-quick) linear;
+}
+
+.ref-nav__link:hover {
+  background: var(--color-paper-deep);
+}
+
+.ref-nav__link[aria-current="page"] {
+  background: var(--color-ink);
+  color: var(--color-paper-raised);
+}
+
+.ref-nav--toc .ref-nav__link {
+  background: none;
+  padding-inline: 0;
+  font-weight: 500;
+  color: var(--color-ink-soft);
+}
+
+.ref-nav--toc .ref-nav__link:hover {
+  background: none;
+  color: var(--color-ink);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.ref-nav__n {
+  font: 500 13px / 1 var(--font-display);
+  letter-spacing: -0.03em;
+  color: var(--color-terracotta-ink);
+}
+
+/* ---- The reading panel ------------------------------------------------------------------- */
+
+.ref-read {
+  padding: clamp(24px, 3vw, 48px) clamp(20px, 3.4vw, 56px) clamp(32px, 4vw, 56px);
+  font-size: 15.5px;
+  line-height: 1.6;
+}
+
+.ref-section {
+  scroll-margin-top: 16px;
+  margin-top: 32px;
+  padding-top: 28px;
+  border-top: var(--border-hairline) solid var(--color-hairline);
+}
+
+.ref-section:first-child {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.ref-sources {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 2px;
+}
+
+.ref-read > * {
+  max-width: 70ch;
+}
+
+.ref-read > .ref-section,
+.ref-read > .ref-sources {
+  max-width: 76ch;
+}
+
+.ref-lead {
+  margin: 0;
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--color-ink);
+  text-wrap: pretty;
+}
+
+.ref-h2 {
+  margin: 0 0 16px;
+  font: 700 22px / 1.15 var(--font-display);
+  letter-spacing: -0.04em;
+  color: var(--color-ink);
+}
+
+.ref-lead + .ref-h2 {
+  margin-top: 32px;
+}
+
+.ref-h3 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 8px;
+  font: 600 16px / 1.3 var(--font-ui);
+  color: var(--color-ink);
+}
+
+.ref-stack {
+  display: grid;
+  gap: 24px;
+}
+
+.ref-stack--tight {
+  gap: 10px;
+}
+
+.ref-p {
+  margin: 0;
+  max-width: 68ch;
+  color: var(--color-ink-soft);
+  text-wrap: pretty;
+}
+
+.ref-list {
+  margin: 0;
+  padding-left: 1.3em;
+  display: grid;
+  gap: 4px;
+  color: var(--color-ink-soft);
+}
+
+.ref-formula {
+  margin: 4px 0;
+  padding: 12px 16px;
+  background: var(--color-paper);
+  box-shadow: inset 3px 0 0 var(--color-ink);
+  font-family: var(--font-mono);
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--color-ink);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.ref-callout {
+  display: grid;
+  gap: 6px;
+  padding: 16px 18px;
+  background: var(--color-paper);
+}
+
+.ref-callout__title {
+  margin: 0;
+  font: 600 15px / 1.3 var(--font-ui);
+  color: var(--color-ink);
+}
+
+.ref-steps {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 2px;
+}
+
+.ref-step {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--color-paper);
+  color: var(--color-ink-soft);
+}
+
+.ref-step__n {
+  font: 500 16px / 1.5 var(--font-display);
+  letter-spacing: -0.03em;
+  color: var(--color-terracotta-ink);
+}
+
+.ref-more {
+  margin-top: 12px;
+}
+
+.ref-more a {
+  font-weight: 600;
+  color: var(--color-ink);
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 4px;
+}
+
+/* ---- The level table --------------------------------------------------------------------- */
+
+.ref-table-wrap {
+  overflow-x: auto;
+}
+
+.ref-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  line-height: 1.4;
+  text-align: left;
+}
+
+.ref-table th,
+.ref-table td {
+  padding: 9px 12px;
+  vertical-align: top;
+}
+
+.ref-table thead th {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--color-muted);
+  border-bottom: var(--border-hairline) solid var(--color-ink);
+}
+
+.ref-table tbody tr {
+  border-bottom: var(--border-hairline) solid var(--color-hairline);
+}
+
+.ref-table tbody th {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.ref-table td {
+  color: var(--color-ink-soft);
+}
+
+.ref-table__mono {
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  white-space: nowrap;
+}
+
+/* ---- Licences ---------------------------------------------------------------------------- */
+
+.ref-source {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px 16px;
+  padding: 14px 16px;
+  background: var(--color-paper);
+}
+
+.ref-source__name {
+  font-weight: 600;
+  color: var(--color-ink);
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 4px;
+  overflow-wrap: anywhere;
+}
+
+.ref-source__licence {
+  align-self: start;
+  justify-self: end;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: var(--color-paper-deep);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--color-ink-soft);
+  text-align: right;
+}
+
+.ref-source__use {
+  grid-column: 1 / -1;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-ink-soft);
+}
+
+/* ---- Narrower ---------------------------------------------------------------------------- */
+
+@media (max-width: 1023px) {
+  .ref-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ref-aside__in {
+    position: static;
+  }
+
+  .ref-nav ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .ref-nav ul .ref-nav__link {
+    border-radius: 999px;
+    padding: 8px 14px;
+  }
+
+  .ref-nav--toc {
+    display: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .ref-source {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ref-source__licence {
+    justify-self: start;
+  }
+}

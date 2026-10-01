@@ -4,7 +4,6 @@ import {
   REFERENCE_IKI_MS,
   RHYTHM_BREAK_MS,
 } from '@typing-race/metrics'
-import { Card } from '@typing-race/ui'
 import { m } from '../../paraglide/messages.js'
 import { Block, Formula, P, Section } from './Formula.js'
 
@@ -44,12 +43,10 @@ export function Rhythm() {
         <P>{m.formulas_conf_decay({ half: CONFIDENCE_HALF_LIFE })}</P>
         <P>{m.formulas_conf_timing()}</P>
         <P>{m.formulas_conf_unmeasured({ min: CONFIDENCE_MIN_SAMPLES })}</P>
-        <Card className="border-sage p-5">
-          <h4 className="mb-1 font-ui text-base font-semibold text-sage">
-            {m.formulas_conf_gates_head()}
-          </h4>
+        <div className="ref-callout">
+          <h4 className="ref-callout__title">{m.formulas_conf_gates_head()}</h4>
           <P>{m.formulas_conf_gates_body()}</P>
-        </Card>
+        </div>
       </Block>
     </Section>
   )

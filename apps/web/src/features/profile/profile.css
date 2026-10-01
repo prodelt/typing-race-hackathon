@@ -1,0 +1,451 @@
+/* Profile (direction B): the Level is the one red block; the numbers, the route, the history and
+   the account sit around it in white panels. At desktop sizes it fills the stage and only the
+   history list scrolls, inside its own panel. */
+
+.stage__content:has(> .prof) {
+  height: 100%;
+}
+
+.prof {
+  min-height: 100%;
+  grid-template-rows: auto 1fr;
+}
+
+/* ---- Head: who is playing ---------------------------------------------------------------- */
+
+.prof-who {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.prof-who__avatar {
+  width: 40px;
+  height: 40px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--color-accent-pale);
+  color: var(--color-accent-deep);
+  font: 600 16px / 1 var(--font-display);
+  letter-spacing: -0.04em;
+}
+
+.prof-who__text {
+  display: grid;
+  min-width: 0;
+}
+
+.prof-who__text b {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.prof-who__text span {
+  font-size: 12.5px;
+  color: var(--color-muted);
+}
+
+.prof-settings {
+  background: var(--color-paper);
+}
+
+/* ---- The grid ---------------------------------------------------------------------------- */
+
+.prof-grid {
+  min-height: 0;
+  display: grid;
+  gap: var(--scr-gap);
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  grid-template-rows: auto auto 1fr;
+  grid-template-areas:
+    "level stats"
+    "mastery history"
+    "account history";
+}
+
+.prof-level {
+  grid-area: level;
+}
+
+.prof-stats {
+  grid-area: stats;
+}
+
+.prof-mastery {
+  grid-area: mastery;
+}
+
+.prof-history {
+  grid-area: history;
+  /* Sized by its neighbours, never by its own list: the list scrolls inside the panel. */
+  height: 0;
+  min-height: 100%;
+}
+
+.prof-account {
+  grid-area: account;
+}
+
+/* ---- 01 Level ---------------------------------------------------------------------------- */
+
+.prof-level .scr-panel__title {
+  color: var(--color-on-accent);
+}
+
+.prof-level__n {
+  margin: auto 0 0;
+  font-size: clamp(64px, 7vw, 104px);
+  font-weight: 600;
+}
+
+.prof-level__bar {
+  position: relative;
+  height: 8px;
+  margin-top: 16px;
+  background: rgb(255 255 255 / 22%);
+}
+
+.prof-level__bar i {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: var(--color-on-accent);
+  transition: width var(--dur-slow) var(--ease-enter);
+}
+
+.prof-level__xp {
+  margin: 10px 0 0;
+  font-size: 14px;
+  color: var(--color-accent-pale);
+}
+
+.prof-level__xp b {
+  color: var(--color-on-accent);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.prof-level__say {
+  margin: 8px 0 0;
+  max-width: 44em;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--color-accent-pale);
+}
+
+/* ---- 02 Numbers -------------------------------------------------------------------------- */
+
+.prof-cells {
+  flex: 1;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-auto-rows: minmax(0, 1fr);
+  gap: var(--scr-gap);
+}
+
+.prof-cell {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 10px 14px 11px;
+  background: var(--color-paper);
+}
+
+.prof-cell dt {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--color-ink-soft);
+}
+
+.prof-cell__value {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: auto 0 0;
+  padding-top: 8px;
+  font-size: clamp(24px, 2.1vw, 30px);
+  white-space: nowrap;
+}
+
+.prof-flame {
+  color: var(--color-accent);
+  flex: none;
+}
+
+.prof-cell__sub {
+  margin: 6px 0 0;
+  font-size: 12.5px;
+  color: var(--color-muted);
+}
+
+/* ---- 03 Mastery -------------------------------------------------------------------------- */
+
+.prof-stages {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 14px;
+}
+
+.prof-stage {
+  display: grid;
+  grid-template-columns: 28px auto minmax(0, 1fr);
+  align-items: baseline;
+  gap: 4px 8px;
+}
+
+.prof-stage__n {
+  font: 500 14px / 1 var(--font-display);
+  letter-spacing: -0.03em;
+  color: var(--color-terracotta-ink);
+}
+
+.prof-stage__name {
+  font: 600 16px / 1.15 var(--font-display);
+  letter-spacing: -0.035em;
+}
+
+.prof-stage__value {
+  justify-self: end;
+  font-size: 13px;
+  color: var(--color-ink-soft);
+  text-align: right;
+}
+
+.prof-stage__bar {
+  grid-column: 2 / 4;
+  position: relative;
+  height: 6px;
+  background: var(--color-paper);
+}
+
+.prof-stage__bar i {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: var(--color-ink);
+}
+
+.prof-link {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-ink);
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 4px;
+}
+
+/* ---- 04 History -------------------------------------------------------------------------- */
+
+.prof-trend {
+  margin: 0 0 12px;
+}
+
+.prof-trend svg {
+  display: block;
+  width: 100%;
+  height: 56px;
+}
+
+.prof-trend__area {
+  fill: var(--color-accent-tint);
+}
+
+.prof-trend__line {
+  fill: none;
+  stroke: var(--color-accent);
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+.prof-trend figcaption {
+  margin-top: 6px;
+}
+
+.prof-hist__heads,
+.prof-hist__row {
+  grid-template-columns: minmax(0, 1fr) 64px 76px;
+}
+
+.prof-hist__heads {
+  display: grid;
+  gap: 12px;
+  padding: 0 12px 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-muted);
+  text-align: right;
+}
+
+.prof-hist {
+  flex: 1;
+  min-height: 120px;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.prof-hist__what {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.prof-hist__what b {
+  overflow: hidden;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.prof-hist__what > span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  color: var(--color-muted);
+}
+
+.prof-hist__what .scr-tag {
+  height: 18px;
+  font-size: 11.5px;
+}
+
+.prof-hist__fig {
+  font-size: 18px;
+  text-align: right;
+}
+
+.prof-hist__fig--acc {
+  font-size: 15px;
+  color: var(--color-ink-soft);
+}
+
+.prof-start {
+  background: var(--color-ink);
+  color: var(--color-paper-raised);
+}
+
+/* ---- 05 Account -------------------------------------------------------------------------- */
+
+.prof-account .scr-panel__head {
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.prof-account__row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+}
+
+.prof-google {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 16px 0 12px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  box-shadow: inset 0 0 0 1.5px var(--color-hairline-strong);
+  color: var(--color-ink-soft);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: not-allowed;
+}
+
+/* ---- Compact (1024×768) ------------------------------------------------------------------ */
+
+@media (max-width: 1200px), (max-height: 820px) {
+  .prof-level__say {
+    display: none;
+  }
+
+  .prof-cell {
+    padding: 10px 12px;
+  }
+
+  .prof-stages {
+    gap: 10px;
+  }
+
+  .prof-level__n {
+    font-size: 64px;
+  }
+
+  .prof-cell__value {
+    padding-top: 6px;
+    font-size: 24px;
+  }
+}
+
+/* ---- Phone: one column, the page scrolls ------------------------------------------------- */
+
+@media (max-width: 767px) {
+  .stage__content:has(> .prof) {
+    height: auto;
+  }
+
+  .prof {
+    height: auto;
+    min-height: 0;
+  }
+
+  .prof-grid {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: none;
+    grid-template-areas:
+      "level"
+      "stats"
+      "history"
+      "mastery"
+      "account";
+  }
+
+  .prof-who__text span {
+    display: none;
+  }
+
+  .prof-level__n {
+    margin-top: 8px;
+    font-size: 64px;
+  }
+
+  .prof-settings .kbd {
+    display: none;
+  }
+
+  .prof-level__say {
+    display: block;
+  }
+
+  .prof-cells {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .prof-history {
+    height: auto;
+    min-height: 0;
+  }
+
+  .prof-hist {
+    overflow: visible;
+  }
+
+  .prof-hist__heads,
+  .prof-hist__row {
+    grid-template-columns: minmax(0, 1fr) 48px 64px;
+    gap: 8px;
+  }
+}
