@@ -99,6 +99,7 @@
   "race_results_rating_delta": "{delta} from this race",
   "race_results_rating_pending": "The rating updates once everyone has finished.",
   "race_results_rating_none": "This race did not change the rating: only one racer was on the start line.",
+  "race_results_rating_unchanged": "This race did not change the rating.",
   "race_results_your_speed": "your speed",
   "race_results_your_accuracy": "your accuracy",
   "race_gather_seats": "Racers · {n} of 5"
