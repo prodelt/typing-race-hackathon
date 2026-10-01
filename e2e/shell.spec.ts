@@ -43,7 +43,7 @@ test.describe('the game shell', () => {
   }) => {
     await seedStore(page, LEARNER)
     await page.goto('/')
-    await expect(page.getByRole('heading', { level: 1, name: 'Сьогодні' })).toBeVisible()
+    await expect(page.getByTestId('home-continue')).toBeVisible()
     await expect(rail(page).getByRole('link', { name: 'Головна' })).toHaveAttribute(
       'aria-current',
       'page',
@@ -65,7 +65,7 @@ test.describe('the game shell', () => {
   test('keys 1–5 switch destinations, but not from inside a field', async ({ page }) => {
     await seedStore(page, LEARNER)
     await page.goto('/')
-    await expect(page.getByRole('heading', { level: 1, name: 'Сьогодні' })).toBeVisible()
+    await expect(page.getByTestId('home-continue')).toBeVisible()
 
     const steps = [
       ['2', /\/path$/, 'Мапа'],
@@ -148,7 +148,7 @@ test.describe('the game shell', () => {
     await expect(
       page.getByRole('heading', { level: 1, name: 'Потрібна фізична клавіатура' }),
     ).toBeVisible()
-    await expect(page.getByRole('heading', { level: 1, name: 'Сьогодні' })).toBeHidden()
+    await expect(page.getByTestId('home-continue')).toBeHidden()
 
     await rail(page).getByRole('link', { name: 'Профіль' }).click()
     await expect(page.getByRole('heading', { level: 1, name: 'Профіль' })).toBeVisible()

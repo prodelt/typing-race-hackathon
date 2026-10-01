@@ -201,7 +201,7 @@ async function startFromEmpty(page: Page): Promise<void> {
   await expect(page.getByRole('heading', { name: 'З чого почнемо?' })).toBeVisible()
   await page.getByRole('radio', { name: /Ще не друкую наосліп/ }).check()
   await page.getByRole('button', { name: 'Обрати й почати' }).click()
-  await expect(page.getByRole('heading', { name: 'Сьогодні' })).toBeVisible()
+  await expect(page.getByTestId('home-continue')).toBeVisible()
 }
 
 async function unlockedKeyCount(page: Page): Promise<number> {
@@ -323,14 +323,14 @@ test.describe('US3 the path and mastery', () => {
   }) => {
     await seedLearner(page, passes(FIRST_KEY, 2))
     await page.goto('/today')
-    await expect(region(page, 'Де ви зараз')).toContainText(/Серія цієї вправи\s*2 з 3/)
+    await expect(page.getByTestId('home-streak')).toContainText(/Серія цієї вправи\s*2 з 3/)
 
     // Four wrong keystrokes on a 60-character scale is under 95%.
     await completeAttempt(page, FIRST_KEY, 'test', 4)
     await expect(region(page, 'Головні показники')).toContainText(/Помилки\s*4/)
 
     await primaryNavigation(page).getByRole('link', { name: 'Головна' }).click()
-    await expect(region(page, 'Де ви зараз')).toContainText(/Серія цієї вправи\s*0 з 3/)
+    await expect(page.getByTestId('home-streak')).toContainText(/Серія цієї вправи\s*0 з 3/)
     await primaryNavigation(page).getByRole('link', { name: 'Мапа' }).click()
     await expect(scaleRow(page, 'Ряд · п')).not.toHaveAttribute('data-state', 'complete')
     await expect(scaleRow(page, 'Ряд · п')).not.toContainText('Серія')
@@ -392,20 +392,21 @@ test.describe('US3 the path and mastery', () => {
     await expect(page.getByTestId('keyboard-summary')).toContainText('Наступна до відкриття: п')
   })
 
-  test('Today shows one Next Action with its button, the stage and the unlocked key count (scenario 8)', async ({
+  test('Home shows one Next Action with its button, the stage and the unlocked key count (scenario 8)', async ({
     page,
   }) => {
     await seedLearner(page, [{ scaleId: ANCHORS, mode: 'test', accuracy: 0.98 }])
     await page.goto('/today')
 
-    const next = region(page, 'Наступна дія')
+    const next = page.getByTestId('home-continue')
     await expect(page.getByTestId('next-action')).toHaveCount(1)
     await expect(page.getByTestId('next-action')).toBeVisible()
     await expect(next.getByRole('button')).toHaveCount(1)
+    await expect(next).toContainText('Стадія 1 · Гами')
 
-    const where = region(page, 'Де ви зараз')
-    await expect(where).toContainText('Стадія 1: гами на відкритих клавішах')
-    await expect(where).toContainText(/Відкрито клавіш\s*8 з \d+/)
+    const where = page.getByTestId('home-map')
+    await expect(where).toContainText('Ти тут:')
+    await expect(where).toContainText(/8 з \d+ клавіш відкрито/)
 
     await next.getByRole('button', { name: 'Почати' }).click()
     await expect(page).toHaveURL(/\/exercise\/.+\?mode=practice/)
@@ -432,7 +433,7 @@ test.describe('US3 the path and mastery', () => {
     )
     await seedLearner(page, [...YQ_SCALES.flatMap((scaleId) => passes(scaleId, 3)), ...last])
     await page.goto('/today')
-    await expect(region(page, 'Де ви зараз')).toBeVisible()
+    await expect(page.getByTestId('home-map')).toBeVisible()
     await expect(page.getByText('Стадію 1 завершено.')).toHaveCount(0)
   })
 
@@ -527,7 +528,7 @@ async function snapshot(page: Page, resultPaths: readonly string[]): Promise<Sna
   await expect(page.getByTestId('next-action')).toBeVisible()
   const today = {
     action: await page.getByTestId('next-action').innerText(),
-    where: await region(page, 'Де ви зараз').innerText(),
+    where: await page.getByTestId('home-map').innerText(),
   }
 
   await page.goto('/path')

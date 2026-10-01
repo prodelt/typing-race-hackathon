@@ -1,0 +1,696 @@
+/* Home, the hub (direction B). Five panels on one grid that fills the stage. Every colour is a
+   theme token, so the dark and low-vision themes follow without a second set of rules. */
+
+.stage__content:has(> .hub),
+.stage__content:has(> * > .hub) {
+  max-width: none;
+  height: 100%;
+  padding: 8px;
+}
+
+.hub {
+  --hub-gap: 8px;
+  --hub-pad: clamp(16px, 1.7vw, 28px);
+  height: 100%;
+  min-height: 600px;
+  display: grid;
+  gap: var(--hub-gap);
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  grid-template-rows: minmax(0, 1.08fr) minmax(0, 1fr);
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.hub .num {
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.hub-idx {
+  font-size: 12.5px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-muted);
+}
+
+.on-red .hub-idx {
+  color: var(--color-accent-pale);
+}
+
+.hub-red {
+  color: var(--color-terracotta-ink);
+}
+
+/* ---- Panels ---- */
+
+.hub-panel {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: var(--hub-pad);
+  background: var(--color-paper-raised);
+}
+
+.hub-panel__head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.hub-panel__title {
+  margin: 0;
+  font: 600 16px / 1.2 var(--font-ui);
+  letter-spacing: -0.015em;
+}
+
+.hub-panel__meta {
+  margin-left: auto;
+  font-size: 13px;
+  color: var(--color-muted);
+  white-space: nowrap;
+}
+
+.hub-say {
+  margin: 12px 0 0;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--color-ink-soft);
+}
+
+.hub-say b {
+  color: var(--color-ink);
+  font-weight: 600;
+}
+
+.hub-say .hub-red {
+  color: var(--color-terracotta-ink);
+}
+
+/* ---- 01 Continue: the one loud block ---- */
+
+.hub-go {
+  position: relative;
+  isolation: isolate;
+  grid-column: 1;
+  grid-row: 1;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(20px, 2.4vw, 36px) clamp(22px, 2.6vw, 40px);
+  border-radius: 0 96px 0 0;
+  background: var(--color-accent-deep);
+  color: var(--color-on-accent);
+}
+
+.hub-go__top {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-accent-pale);
+}
+
+.hub-go__title {
+  margin: auto 0 0;
+  font: 700 clamp(30px, 3.4vw, 56px) / 1.02 var(--font-display);
+  letter-spacing: -0.045em;
+}
+
+.hub-go__what {
+  margin: 12px 0 0;
+  max-width: 44em;
+  font-size: clamp(15px, 1.15vw, 18px);
+  font-weight: 500;
+  color: var(--color-accent-pale);
+}
+
+.hub-steps {
+  margin: clamp(14px, 2.2vh, 22px) 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--hub-gap);
+}
+
+.hub-step {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 10px;
+  align-items: baseline;
+  padding: 10px 12px 11px;
+  background: rgb(255 255 255 / 12%);
+}
+
+.hub-step:first-child {
+  background: rgb(255 255 255 / 20%);
+}
+
+.hub-step__n {
+  grid-row: 1 / 3;
+  font-size: 15px;
+}
+
+.hub-step b {
+  min-width: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.hub-step span:last-child {
+  font-size: 12.5px;
+  color: var(--color-accent-pale);
+}
+
+.hub-go__bot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  margin-top: clamp(14px, 2.2vh, 22px);
+}
+
+.hub-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  height: 60px;
+  padding: 0 10px 0 30px;
+  border: 0;
+  border-radius: 999px;
+  font: 600 18px / 1 var(--font-ui);
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color var(--dur-quick) var(--ease-enter);
+}
+
+.hub-btn .kbd {
+  height: 40px;
+  padding: 0 14px;
+  border-radius: 999px;
+  box-shadow: none;
+}
+
+.hub-btn--inverse {
+  background: var(--color-on-accent);
+  color: var(--color-accent-deep);
+}
+
+.hub-btn--inverse .kbd {
+  background: color-mix(in srgb, var(--color-accent-deep) 12%, transparent);
+  color: var(--color-accent-deep);
+}
+
+.hub-btn--inverse:hover {
+  background: color-mix(in srgb, var(--color-on-accent) 88%, var(--color-accent));
+}
+
+.on-red :focus-visible {
+  outline-color: var(--color-on-accent);
+}
+
+.hub-chip {
+  display: inline-flex;
+  align-items: center;
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 16%);
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ---- 02 Races ---- */
+
+.hub-race {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.hub-race__lead {
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: var(--color-muted);
+}
+
+.hub-tiles {
+  flex: 1;
+  min-height: 0;
+  margin-top: clamp(10px, 1.6vh, 16px);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-auto-rows: minmax(0, 1fr);
+  gap: var(--hub-gap);
+}
+
+.hub-tile {
+  position: relative;
+  min-height: 72px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 10px 46px 10px 14px;
+  border: 0;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background-color var(--dur-quick) var(--ease-enter),
+    color var(--dur-quick) linear;
+}
+
+.hub-tile:hover {
+  background: var(--color-ink);
+  color: var(--color-paper-raised);
+}
+
+.hub-tile__name {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.hub-tile__name em {
+  font-style: normal;
+  font-weight: 700;
+}
+
+.hub-tile__sub {
+  font-size: 12.5px;
+  color: var(--color-muted);
+}
+
+.hub-tile:hover .hub-tile__sub {
+  color: inherit;
+}
+
+.hub-tile .kbd {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+}
+
+.hub-tile:hover .kbd {
+  background: color-mix(in srgb, currentColor 18%, transparent);
+  color: inherit;
+  box-shadow: none;
+}
+
+.hub-race__foot {
+  display: flex;
+  margin-top: var(--hub-gap);
+}
+
+.hub-race__foot > * {
+  flex: 1;
+}
+
+/* ---- 03 The mini-map ---- */
+
+.hub-map {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.hub-map__svg {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  margin-top: 10px;
+  overflow: visible;
+}
+
+.hub-map .m-band {
+  fill: var(--color-paper-deep);
+}
+
+.hub-map .m-band--cur {
+  fill: var(--color-accent-tint);
+}
+
+.hub-map .m-band--lock {
+  fill: var(--color-paper);
+}
+
+.hub-map .m-n {
+  font: 500 17px var(--font-display);
+  letter-spacing: -0.04em;
+  fill: var(--color-accent);
+}
+
+.hub-map .m-name {
+  font: 600 17px var(--font-display);
+  letter-spacing: -0.04em;
+  fill: var(--color-ink);
+}
+
+.hub-map .m-dim {
+  fill: var(--color-muted);
+}
+
+.hub-map .m-route {
+  fill: none;
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.hub-map .m-route--todo {
+  stroke: var(--color-hairline-strong);
+  stroke-dasharray: 1 10;
+}
+
+.hub-map .m-route--done {
+  stroke: var(--color-accent);
+}
+
+.mnode text {
+  font: 600 16px var(--font-display);
+  letter-spacing: -0.04em;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+.mnode--done circle {
+  fill: var(--color-accent);
+}
+
+.mnode--done text,
+.mnode--cur text {
+  fill: var(--color-on-accent);
+}
+
+.mnode--lock circle {
+  fill: var(--color-paper-deep);
+  stroke: var(--color-hairline-strong);
+  stroke-width: 1.5;
+}
+
+.mnode--lock text {
+  fill: var(--color-muted);
+}
+
+.mnode--open circle {
+  fill: var(--color-ink);
+}
+
+.mnode--open text {
+  fill: var(--color-paper-raised);
+  font-size: 13px;
+}
+
+.mnode--cur .halo {
+  fill: var(--color-accent);
+  opacity: 0.2;
+}
+
+.mnode--cur .core {
+  fill: var(--color-accent);
+}
+
+.mnode--cur text {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.mnode--goal rect {
+  fill: var(--color-ink);
+}
+
+.mnode--goal path {
+  fill: none;
+  stroke: var(--color-paper-raised);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.hub-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 16px;
+  margin-top: 10px;
+  font-size: 12.5px;
+  color: var(--color-ink-soft);
+}
+
+.hub-legend > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.lg {
+  display: inline-block;
+  flex: none;
+  width: 12px;
+  height: 12px;
+}
+
+.lg--done {
+  border-radius: 50%;
+  background: var(--color-accent);
+}
+
+.lg--cur {
+  border-radius: 0 5px 0 0;
+  background: var(--color-accent);
+}
+
+.lg--open {
+  border-radius: 50%;
+  background: var(--color-ink);
+}
+
+.lg--lock {
+  border-radius: 50%;
+  background: var(--color-paper-deep);
+  box-shadow: inset 0 0 0 1.5px var(--color-hairline-strong);
+}
+
+.hub-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-ink);
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 4px;
+  white-space: nowrap;
+}
+
+.hub-link:hover {
+  color: var(--color-accent-deep);
+}
+
+/* ---- 04 + 05 ---- */
+
+.hub__pair {
+  grid-column: 2;
+  grid-row: 2;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--hub-gap);
+}
+
+.hub-weak > button {
+  align-self: flex-start;
+  margin-top: auto;
+}
+
+.hub-spark {
+  flex: 1;
+  width: 100%;
+  min-height: 44px;
+  max-height: 120px;
+  margin-top: 12px;
+}
+
+.hub-spark__bg {
+  fill: var(--color-paper);
+}
+
+.hub-spark__goal {
+  stroke: var(--color-ink);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 4;
+  opacity: 0.6;
+}
+
+.hub-spark__line {
+  fill: none;
+  stroke: var(--color-accent);
+  stroke-width: 3;
+  stroke-linejoin: round;
+}
+
+.hub-spark__lab {
+  margin: 6px 0 12px;
+  font-size: 12.5px;
+  color: var(--color-muted);
+}
+
+.hub-left {
+  color: var(--color-terracotta-ink);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.hub-chart {
+  position: relative;
+  flex: 1;
+  min-height: 70px;
+  margin-top: 16px;
+  padding-bottom: 20px;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+}
+
+.hub-chart__goal {
+  position: absolute;
+  z-index: 1;
+  left: 0;
+  right: 0;
+  border-top: 2px dashed color-mix(in srgb, var(--color-ink) 60%, transparent);
+  pointer-events: none;
+}
+
+.hub-chart__goal span {
+  position: absolute;
+  top: -19px;
+  right: 0;
+  padding-left: 4px;
+  background: var(--color-paper-raised);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-ink-soft);
+}
+
+.hub-day {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.hub-day__fill {
+  display: block;
+  background: var(--color-accent-soft);
+}
+
+.hub-day.is-today .hub-day__fill {
+  background: var(--color-accent);
+}
+
+.hub-day__rest {
+  display: block;
+  background: repeating-linear-gradient(
+    135deg,
+    var(--color-accent-tint) 0 4px,
+    transparent 4px 8px
+  );
+}
+
+.hub-day em {
+  position: absolute;
+  left: -3px;
+  right: -3px;
+  bottom: -20px;
+  font-style: normal;
+  font-size: 12px;
+  text-align: center;
+  color: var(--color-muted);
+}
+
+.hub-day.is-today em {
+  color: var(--color-ink);
+  font-weight: 700;
+}
+
+.hub-streak {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 6px;
+  margin: 10px 0 0;
+  font-size: 12.5px;
+  color: var(--color-ink-soft);
+}
+
+.hub-streak svg {
+  color: var(--color-accent);
+}
+
+.hub-streak b {
+  font-weight: 600;
+}
+
+.hub-dotted {
+  text-decoration: underline dotted 1.5px;
+  text-underline-offset: 3px;
+  cursor: help;
+}
+
+@media (max-width: 1240px) {
+  .hub-steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .hub-step {
+    padding: 7px 10px 8px;
+  }
+}
+
+/* Below desktop size the grid stacks and the stage scrolls, rather than squeezing panels. */
+@media (max-width: 1000px), (max-height: 640px) {
+  .hub {
+    height: auto;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: none;
+  }
+
+  .hub-go,
+  .hub-race,
+  .hub-map,
+  .hub__pair {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  .hub-go {
+    min-height: 420px;
+  }
+
+  .hub-tiles {
+    min-height: 150px;
+  }
+
+  .hub-map__svg {
+    min-height: 200px;
+  }
+
+  .hub__pair {
+    min-height: 300px;
+  }
+}

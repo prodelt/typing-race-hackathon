@@ -112,13 +112,13 @@ function primaryNavigation(page: Page) {
 /** Back to the session through the application's own links, so nothing reloads. */
 async function toSession(page: Page): Promise<void> {
   await primaryNavigation(page).getByRole('link', { name: 'Головна' }).click()
-  await page.getByRole('link', { name: 'Кероване заняття' }).click()
+  await page.getByRole('button', { name: /Продовжити заняття/ }).click()
   await expect(page.getByRole('heading', { level: 1, name: 'Сесія' })).toBeVisible()
 }
 
+/** The session's own screen, with its plan before the first block. Home starts it directly. */
 async function openSessionFromToday(page: Page): Promise<void> {
-  await page.goto('/today')
-  await page.getByRole('link', { name: 'Кероване заняття' }).click()
+  await page.goto('/session')
   await expect(page.getByRole('heading', { level: 1, name: 'Сесія' })).toBeVisible()
 }
 
@@ -350,7 +350,7 @@ test.describe('US6 a guided session', () => {
     await primaryNavigation(page).getByRole('link', { name: 'Головна' }).click()
 
     // Resumable: the session is still there, and it knows one attempt is done.
-    await page.getByRole('link', { name: 'Кероване заняття' }).click()
+    await page.getByRole('button', { name: /Продовжити заняття/ }).click()
     await expectBlock(page, 1, 'Розминка', 1, 2)
     await expect(page.getByRole('button', { name: 'Почати спробу 2 з 2' })).toBeVisible()
 
@@ -378,8 +378,12 @@ test.describe('US6 a guided session', () => {
 
     await typeExerciseThroughToResult(page)
 
-    // No session was started by doing that: the session screen is still at its intro.
-    await toSession(page)
+    // No session was started by doing that: Home offers a fresh start, not a resume, and the
+    // session screen is still at its intro.
+    await primaryNavigation(page).getByRole('link', { name: 'Головна' }).click()
+    await expect(page.getByRole('button', { name: 'Почати', exact: true })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Продовжити заняття' })).toHaveCount(0)
+    await openSessionFromToday(page)
     await expect(page.getByRole('button', { name: 'Почати першу вправу' })).toBeVisible()
     await expect(page.getByText(/Блок \d з 4/)).toHaveCount(0)
   })
