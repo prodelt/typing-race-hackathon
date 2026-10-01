@@ -198,7 +198,58 @@ All steps from https://supabase.com/docs/guides/auth/social-login/auth-google un
 
 ## 4. RLS patterns
 
-_TBD_
+Sources: https://supabase.com/docs/guides/database/postgres/row-level-security (RLS),
+https://supabase.com/docs/guides/troubleshooting/rls-performance-and-best-practices-Z5Jjwv (perf),
+https://supabase.com/docs/guides/auth/auth-anonymous (anonymous).
+
+**Per-user private rows** — always name the role and wrap `auth.uid()`:
+
+```sql
+create policy attempts_select_own on public.attempts
+  for select to authenticated
+  using ((select auth.uid()) = user_id);
+-- insert: with check ((select auth.uid()) = user_id)
+-- update: using (...) with check (...)   -- with check stops re-assigning user_id
+-- delete: using (...)
+```
+
+Index every column a policy filters on (`user_id` leading in a btree). (RLS doc)
+
+**Public read of leaderboard aggregates.** Pattern: `for select to anon, authenticated using
+(true)` on a table that holds *only* public columns, granting `select` only. "A policy that reads
+to anon using (true) grants every unauthenticated visitor read access to every row." (RLS doc)
+Views bypass RLS by default; on Postgres 15+ create them `with (security_invoker = true)`, or keep
+them out of exposed schemas / revoke `anon`,`authenticated`. (RLS doc) Our alternative — a
+`security definer` RPC that returns only public fields (`groups_leaderboards.sql:248`) — is
+equally valid and lets us keep `profiles` private; it just must be written carefully (fixed
+`search_path = ''`, which we do) because it bypasses RLS. Functions used in RLS or exposed in
+`public` "can be called from the API" — move helpers whose result would leak into a non-exposed
+schema. (perf doc) Today `is_group_member`, `is_race_participant`, `race_topic_allowed` live in
+`public` (`races.sql:43,118`; `race_flow.sql:365`); they leak only a boolean about the caller,
+acceptable, but the advisors will list them (§8).
+
+**`auth.uid()` performance tip.** Write `(select auth.uid())`, not `auth.uid()`: Postgres runs it
+once as an `initPlan` and caches the value for the statement instead of calling it per row.
+Benchmarks: 179 ms → 9 ms; with a helper function 11 000 ms → 10 ms; indexing `user_id`
+171 ms → <0.1 ms; `to authenticated` when `anon` queries: 170 ms → <0.1 ms. Only valid when the
+value does not depend on the row. (perf doc) Our current policies (`core.sql:39,42,106,132,155`)
+use the unwrapped form and omit `to authenticated` — a cheap fix migration.
+
+**Anonymous vs permanent users.** Anonymous users use the `authenticated` role; distinguish them
+via the JWT claim, typically as a **restrictive** policy layered over the permissive ones:
+
+```sql
+create policy "Only permanent users can post"
+on news_feed as restrictive for insert
+to authenticated
+with check ((select (auth.jwt()->>'is_anonymous')::boolean) is false);
+```
+
+(anonymous doc) Use it for anything we want to gate behind Google (e.g. appearing on the public
+board, creating groups). Do not authorise on `raw_user_meta_data` — the user can edit it; use
+`raw_app_meta_data` for roles. (RLS doc) Relevant to us: `handle_new_user` reads `nickname`
+(and `is_test`) from user metadata (`core.sql:46-60`); `profiles_keep_test_flag`
+(`groups_leaderboards.sql:47`) already guards the flag after insert.
 
 ## 5. Rate limiting
 
