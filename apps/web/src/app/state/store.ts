@@ -4,6 +4,7 @@ import { create } from 'zustand'
 import type { OutboxStore, ProgressStore } from '../../seams/index.js'
 import { indexedDbOutbox, indexedDbStore, memoryOutbox } from '../../seams/index.js'
 import { createSync, type Sync, setAppSync } from '../../sync/index.js'
+import { missingFrom } from '../../sync/policy.js'
 import { type DerivedState, derive } from './derive.js'
 import { type AppAction, type AppState, initialState, reduce } from './reduce.js'
 
@@ -86,8 +87,19 @@ export const useAppStore = create<AppStore>()((set, get) => ({
 
   async reload() {
     const loaded = await progressStore.load()
-    if (loaded === 'empty') get().dispatch({ type: 'store/reset' })
-    else if (typeof loaded !== 'string') get().dispatch({ type: 'store/loaded', envelope: loaded })
+    if (loaded === 'empty') {
+      get().dispatch({ type: 'store/reset' })
+      return
+    }
+    if (typeof loaded === 'string') return
+    // An attempt finished while the read was in flight is in memory but maybe not yet on disk;
+    // a reload must not make it vanish from the screen.
+    const unsaved = missingFrom(loaded.attempts, get().attempts)
+    const attempts =
+      unsaved.length === 0
+        ? loaded.attempts
+        : [...loaded.attempts, ...unsaved].sort((x, y) => x.completedAt - y.completedAt)
+    get().dispatch({ type: 'store/loaded', envelope: { ...loaded, attempts } })
   },
 
   async chooseStartingLevel(choice) {
