@@ -157,15 +157,152 @@ Takeaways:
 3. The results screen is the bridge back to meta: it shows the run's numbers, then the rewards
    landing in the HUD, then one primary next action (Next / Rematch / Retry).
 ## 5. Transitions and motion
-TODO
+
+- **A shared motion vocabulary is part of the brand.** Riot ships CSS animations "with preset
+  timings and easing functions to give animations that Hextech feel, client-wide", and uses
+  state-machine-driven video for key states such as match "accept"
+  ([Riot tech blog](https://www.riotgames.com/en/news/under-hood-league-client%E2%80%99s-hextech-ui)).
+- **Durations.** NN/g: most UI animation should sit in 100–500 ms; simple feedback ~100 ms; larger
+  moves such as a modal 200–300 ms; 400 ms is already slow; "at 500ms, animations start to feel like
+  a real drag". Exits can be slightly shorter than entrances; ease-out for entering, ease-in for
+  leaving; the more often an animation is seen, the shorter and subtler it must be
+  ([NN/g: Animation duration](https://www.nngroup.com/articles/animation-duration/)).
+- **Respect reduced motion.** WCAG 2.3.3 asks that interaction-triggered motion can be disabled
+  unless essential; the W3C technique is the `prefers-reduced-motion` media query; colour and
+  opacity changes are not "motion" under the criterion
+  ([Deque on 2.3.3](https://dequeuniversity.com/resources/wcag2.1/2.3.3-animations-from-interactions);
+  [Silktide](https://silktide.com/accessibility-guide/the-wcag-standard/2-3/seizures-and-physical-reactions/2-3-3-animation-from-interactions/)).
+- **Video transitions are a client luxury.** Riot can use HTML5 video because the client is
+  installed locally ([Riot tech blog](https://www.riotgames.com/en/news/under-hood-league-client%E2%80%99s-hextech-ui));
+  a browser app under a JS budget should get the same effect from CSS transforms/opacity and the
+  View Transitions API *(observation)*.
+
+Takeaways:
+
+1. Define 3–4 motion tokens (e.g. `instant 100ms`, `ui 200ms`, `stage 320ms`, `celebrate 600ms+`
+   only for rare moments) and use them everywhere.
+2. Meta → run: the frame recedes (HUD slides up/fades) and the stage scales in; run → results:
+   numbers count up, then rewards fly into the HUD chips. These are the two transitions that sell
+   "game"; spend the motion budget there, keep nav switches fast (≤200 ms).
+3. Under `prefers-reduced-motion`, replace movement with opacity/colour, never remove feedback.
+
 ## 6. Feedback, sound, juice and their limits
-TODO
+
+- **Juice.** Jonasson and Purho's GDC Europe 2012 talk took a grey Breakout clone and added
+  particles, tweening, screen shake and sound effect by effect until it felt alive
+  ([GDC Vault: Juice It or Lose It](https://www.gdcvault.com/play/1016487/juice-it-or-lose)).
+  The counterpoint talk warns indies to resist juicing for its own sake
+  ([Game Developer: resist the urge to juice it](https://www.gamedeveloper.com/design/video-indies-resist-the-urge-to-juice-it-or-lose-it-)).
+- **Feedback must be perceptible and immediate.** Hodent lists clear feedback and signs among the
+  usability pillars ([GDC16 onboarding notes](https://celiahodent.com/gamers-brain-ux-onboarding/));
+  Swink's "real-time control" requires input to elicit a reaction as fast as possible
+  ([Swink ch. 1](http://mycours.es/gamedesign2014/files/2014/10/Game-Feel-Steve-Swink-chapter-1.pdf)).
+- **Celebration is measured, not guessed.** Duolingo added streak-extension and milestone
+  animations to "make the act of extending your streak feel as satisfying as possible"; this raised
+  7-day return of new learners by 1.7 % ([Duolingo blog: streak](https://blog.duolingo.com/how-duolingo-streak-builds-habit)).
+  Duolingo's characters react to correct answers with small animations
+  ([Apple: Behind the Design – Duolingo](https://developer.apple.com/news/?id=jhkvppla)).
+- **Sound is a system with channels.** The League client routes audio through Web Audio with
+  separate channels (UI SFX, notifications, music, voice-over), ducks music under VO and respects
+  per-channel volume ([Riot tech blog](https://www.riotgames.com/en/news/under-hood-league-client%E2%80%99s-hextech-ui)).
+  Monkeytype makes typing sounds a user setting ([Monkeytype repo](https://github.com/monkeytypegame/monkeytype)).
+- **Instruments stay calm in-run.** Monkeytype, chess.com focus mode and lichess zen mode all *remove*
+  things during play (sections 1, 4). Hodent's working-memory limit applies
+  ([GDC16 notes](https://celiahodent.com/gamers-brain-ux-onboarding/)).
+
+Limits for a typing line *(observation, derived from the above)*:
+
+- Never move, scale or shake the text being read. Error feedback = colour on the glyph (and an
+  optional short tick sound); a line shake is allowed only on the *finished* word or as a meta edge
+  tint, never on the caret line mid-word.
+- Per-keystroke effects must be ≤100 ms, colour/opacity only, and cost no layout.
+- Big juice (particles, count-ups, level-up burst, rank change) belongs to **boundaries**: race
+  start, finish line, results, level-up, streak extension.
+- Sound: off by default or on at low volume with a visible mute in the HUD; separate "keys" and
+  "UI/celebration" toggles; never autoplay music.
+
 ## 7. Progression display and its pitfalls for learning apps
-TODO
+
+What works:
+
+- **A visible path.** Duolingo's linear path interleaves lessons across skills and builds review
+  into forward motion, based on spaced repetition
+  ([Duolingo blog: home screen](https://blog.duolingo.com/new-duolingo-home-screen-design)).
+- **Unlock by mastery.** keybr starts with the most frequent letters and adds new ones "once you
+  reach the target speed with the current ones", and generates lessons that target the weakest keys
+  ([keybr repo](https://github.com/aradzie/keybr.com)).
+- **Show the lock before the key.** Hodent: "Show the lock, the purpose, the goal, before giving the
+  key, the rewards"; goals and rewards "must be meaningful to the player"; difficulty should rise
+  in a sawtooth so players notice their growth
+  ([GDC17 notes](https://celiahodent.com/gamers-brain-part-3-ux-engagement-immersion-retention-gdc17-talk/)).
+- **Streaks with a safety net.** Learners with a 7-day streak are 3.6× more likely to finish their
+  course; but a broken streak "can... feel quite demotivating", so Duolingo added Streak Freeze
+  ([Duolingo blog: streak](https://blog.duolingo.com/how-duolingo-streak-builds-habit)).
+- **Fair, small, resetting leaderboards.** Duolingo leagues are weekly boards of ~30 matched
+  learners with promotion/demotion across 10 tiers
+  ([Duolingo help: leaderboards](https://www.duolingo.com/help/2/leaderboards-and-league);
+  [Duolingo blog: leagues](https://blog.duolingo.com/duolingo-leagues-leaderboards/)).
+- **Ratings for races.** Chess sites show an Elo-style rating per time control; lichess even lets
+  players hide ratings in play to reduce anxiety ([lichess zen](https://lichess.org/page/zen)).
+
+Pitfalls:
+
+- **Overjustification.** Extrinsic rewards can undermine intrinsic motivation when they thwart
+  competence, autonomy or relatedness ([Hodent GDC17](https://celiahodent.com/gamers-brain-part-3-ux-engagement-immersion-retention-gdc17-talk/);
+  [NN/g: autonomy, relatedness, competence](https://www.nngroup.com/articles/autonomy-relatedness-competence/)).
+- **Badges + leaderboards in education can backfire.** Hanus & Fox's semester-long study found
+  gamified-course students' intrinsic motivation, satisfaction and exam scores fell versus control
+  ([Computers & Education 80, 2015](https://www.researchgate.net/publication/265644737_Assessing_the_effects_of_gamification_in_the_classroom_A_longitudinal_study_on_intrinsic_motivation_social_comparison_satisfaction_effort_and_academic_performance)).
+- **Global leaderboards demotivate the middle.** Comparisons across wildly different players create
+  resentment except at the top ([Growth Engineering](https://www.growthengineering.co.uk/dark-side-of-gamification/));
+  NN/g notes too-hard challenges lead to learned helplessness, too-easy to boredom
+  ([NN/g video: gamification in UX](https://www.nngroup.com/videos/gamification-user-experience/)).
+- **Linear paths cost autonomy.** Duolingo's switch from tree to path drew strong backlash
+  ([NBC News](https://www.nbcnews.com/tech/tech-news/duolingos-update-redesign-luis-von-ahn-interview-rcna44655)).
+- **XP for volume rewards grinding, not accuracy** *(observation)*. For touch typing the reward must
+  track the learning target (accuracy at target speed, mastery of the stage's keys), not keystrokes.
+
+Takeaways: XP and level from *mastery events* (key unlocked, stage criterion met, accuracy target
+held); streak with a freeze; rating only in races; leaderboards scoped to groups or a weekly
+small bracket, not one global table as the default view; a path map with free practice/review
+always open beside it (autonomy).
+
 ## 8. Onboarding
-TODO
+
+- **Play first, sign up later.** Duolingo lets users finish a full lesson before creating an
+  account; sign-up is optional and nudged as progress becomes worth saving; leaderboards stay
+  gated ([Appcues GoodUX: Duolingo onboarding](https://goodux.appcues.com/blog/duolingo-user-onboarding);
+  [Appcues: gradual engagement](https://www.appcues.com/blog/gradual-engagement-mobile-app-first-screen)).
+- **First hour matters.** About 20 % of players drop in the first hour; teach by doing; max ~3 new
+  things at once ([Hodent GDC16](https://celiahodent.com/gamers-brain-ux-onboarding/)).
+- **Pull help, don't push tutorials.** NN/g: tutorials do not reliably build competence; deliver
+  help when the user hits the situation ([NN/g: ARC](https://www.nngroup.com/articles/autonomy-relatedness-competence/)).
+- **Instant start.** TypeRacer practice starts on the first keystroke
+  ([TypeRacer blog](https://blog.typeracer.com/2024/03/06/new-feature-introducing-enhanced-practice-mode/)).
+
+Takeaways: first visit → pick language/layout → a 30-second placement run on the home row,
+immediately → result + "this is your path" reveal on the map → sign-in offered to save progress and
+unlock races/groups. Contextual hints (finger position, `Esc` to exit) appear the first time the
+situation arises, not as a carousel.
+
 ## 9. Desktop keyboard-first navigation
-TODO
+
+- **Monkeytype**: `Tab`/`Esc` quick-restart and a command line on `Esc` or `Ctrl/Cmd+Shift+P` to
+  reach every function without the mouse ([Monkeytype repo/site via search](https://github.com/monkeytypegame/monkeytype);
+  [discussion #3549](https://github.com/monkeytypegame/monkeytype/discussions/3549)).
+- **lichess**: single-letter shortcuts in game — `z` zen, `f` flip, arrows/`hjkl` for moves
+  ([lichess forum: keyboard shortcuts](https://lichess.org/forum/general-chess-discussion/keyboard-shortcuts)).
+- **TypeRacer**: practice via `Ctrl+Alt+O` ([TypeRacer wiki, search excerpt](https://typeracer.fandom.com/wiki/Keyboard_Shortcuts)).
+- **Steam Big Picture** hides the cursor in gamepad navigation and has invested in focus handling
+  and fast key repeat ([Steam client update notes](https://store.steampowered.com/oldnews/189167);
+  [GamingOnLinux](https://www.gamingonlinux.com/2022/11/valve-has-improved-the-new-big-picture-mode-for-desktop-quite-a-bit-in-a-new-beta/))
+  — focus is a first-class visual state, not the browser default outline *(observation)*.
+
+Takeaways: the user's hands are already on the keyboard — the whole loop must work without the
+mouse. `Enter` = primary action on every meta screen (Continue / Race / Next), `Esc` = back / exit
+run, `Tab` = restart in a solo run, digits or arrows select tiles, a visible styled focus ring,
+and shortcut hints printed on the buttons themselves (`Enter ↵`). Typing keys must never trigger
+navigation while a run is active.
 ## 10. Principles for Typing-Race
 TODO
 ## 11. Patterns that fit
