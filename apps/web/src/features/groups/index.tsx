@@ -1,13 +1,24 @@
 import { Link, useNavigate, useParams } from '@tanstack/react-router'
-import { Button, buttonClass, cx, Field, Index } from '@typing-race/ui'
+import { Button, buttonClass, cx, Field } from '@typing-race/ui'
 import { type FormEvent, useCallback, useEffect, useRef, useState } from 'react'
+import { Panel, Screen, ScreenHead } from '../../app/Screen.js'
 import { m } from '../../paraglide/messages.js'
 import type { GroupSnapshot, GroupSummary, GroupsBackend } from '../../sync/groups.js'
-import { describe, inviteLink, useIdentity, validName, WithGroups } from './shared.js'
+import {
+  CommunityTabs,
+  describe,
+  inviteLink,
+  useIdentity,
+  validName,
+  WithGroups,
+} from './shared.js'
 
 /**
  * Groups: create one and get a code, join one by code or by link, see who is in it. The router
  * imports these three names lazily, so none of this, nor the Supabase client, is in the entry.
+ *
+ * In direction B: the head bar with the Community switch, the learner's groups on the left, and
+ * the ways in — name, create, join — on the right. A group's join code is its one red block.
  */
 
 const CODE = /^[A-Z0-9]{6}$/
@@ -87,113 +98,131 @@ function Groups({ backend }: { readonly backend: GroupsBackend }) {
     void run('join', () => backend.joinGroup(clean))
   }
 
-  // A learner who already belongs somewhere sees their groups first; the ways in follow.
-  const returning = mine !== null && mine.length > 0
-  const mineSection = (
-    <section className="cm-mine" aria-labelledby="cm-mine">
-      <h2 id="cm-mine" className="cm-section-title">
-        {m.groups_mine_title()}
-      </h2>
-      {mine === null ? (
-        <div className="cm-skeleton" />
-      ) : mine.length === 0 ? (
-        <p className="cm-note">{m.groups_mine_empty()}</p>
-      ) : (
-        <ol className="cm-list">
-          {mine.map((group, index) => (
-            <li key={group.id}>
-              <Link
-                to="/groups/$groupId"
-                params={{ groupId: group.id }}
-                className="cm-list__row"
-                data-testid="my-group"
-              >
-                <span className="cm-list__n">[{String(index + 1).padStart(2, '0')}]</span>
-                <span className="cm-list__name">{group.name}</span>
-                <span className="cm-list__meta">
-                  {group.role === 'owner' ? (
-                    <span className="cm-tag">{m.groups_role_owner()}</span>
-                  ) : null}
-                  {m.groups_members_count({ count: group.members })}
-                </span>
-              </Link>
-            </li>
-          ))}
-        </ol>
-      )}
-    </section>
-  )
-
   return (
-    <div className="cm-page">
-      <header className="cm-head">
-        <h1 className="cm-display cm-head__title">{m.groups_title()}</h1>
-        <p className="cm-lede">{m.groups_lede()}</p>
-      </header>
+    <Screen className="cm scr--fill">
+      <ScreenHead title={m.groups_title()} lead={m.groups_lede()}>
+        <CommunityTabs current="/groups" />
+      </ScreenHead>
 
-      {returning ? mineSection : null}
+      <div className="cm-grid">
+        <Panel
+          id="cm-mine"
+          n={1}
+          title={m.groups_mine_title()}
+          meta={mine === null || mine.length === 0 ? undefined : String(mine.length)}
+          className="cm-mine"
+        >
+          {mine === null ? (
+            <div className="scr-rows" aria-busy="true">
+              <div className="scr-skeleton" />
+              <div className="scr-skeleton" />
+            </div>
+          ) : mine.length === 0 ? (
+            <div className="scr-empty cm-mine__empty">
+              <p className="cm-mine__none">{m.groups_mine_empty()}</p>
+              <p className="scr-say">{m.groups_mine_lede()}</p>
+              <ol className="cm-steps" aria-label={m.groups_steps_label()}>
+                {[m.groups_step_1(), m.groups_step_2(), m.groups_step_3()].map((step, i) => (
+                  <li key={step} className="cm-step">
+                    <span className="cm-step__n num">{i + 1}</span>
+                    {step}
+                  </li>
+                ))}
+              </ol>
+            </div>
+          ) : (
+            <ol className="scr-rows">
+              {mine.map((group, index) => (
+                <li key={group.id}>
+                  <Link
+                    to="/groups/$groupId"
+                    params={{ groupId: group.id }}
+                    className="scr-row cm-list__row"
+                    data-testid="my-group"
+                  >
+                    <span className="cm-list__n num">{String(index + 1).padStart(2, '0')}</span>
+                    <span className="cm-list__name">{group.name}</span>
+                    <span className="cm-list__meta">
+                      {group.role === 'owner' ? (
+                        <span className="scr-tag scr-tag--ink">{m.groups_role_owner()}</span>
+                      ) : null}
+                      {m.groups_members_count({ count: group.members })}
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ol>
+          )}
+        </Panel>
 
-      <div className="cm-name">
-        <Field
-          label={m.community_name_label()}
-          hint={m.community_name_hint()}
-          value={name}
-          maxLength={32}
-          autoComplete="nickname"
-          onChange={(event) => setName(event.target.value)}
-        />
-      </div>
-
-      <div className="cm-ways">
-        <form className="cm-way cm-way--lead" onSubmit={create} aria-labelledby="cm-create">
-          <Index n={1}>{m.groups_create_index()}</Index>
-          <h2 id="cm-create" className="cm-way__title">
-            {m.groups_create_title()}
-          </h2>
-          <div className="cm-way__row">
+        <div className="cm-ways">
+          <Panel id="cm-player" n={2} title={m.groups_player_title()}>
             <Field
-              label={m.groups_create_label()}
-              value={groupName}
-              maxLength={64}
-              autoComplete="off"
-              onChange={(event) => setGroupName(event.target.value)}
+              label={m.community_name_label()}
+              hint={m.community_name_hint()}
+              value={name}
+              maxLength={32}
+              autoComplete="nickname"
+              onChange={(event) => setName(event.target.value)}
             />
-            <Button type="submit" variant="primary" size="lg" disabled={busy !== null}>
-              {busy === 'create' ? m.groups_create_busy() : m.groups_create_action()}
-            </Button>
-          </div>
-        </form>
+          </Panel>
 
-        <form className="cm-way" onSubmit={join} aria-labelledby="cm-join">
-          <Index n={2}>{m.groups_join_index()}</Index>
-          <h2 id="cm-join" className="cm-way__title">
-            {m.groups_join_title()}
-          </h2>
-          <div className="cm-way__row">
-            <Field
-              label={m.groups_code_label()}
-              value={code}
-              maxLength={6}
-              autoComplete="off"
-              spellCheck={false}
-              className="cm-code-input"
-              onChange={(event) => setCode(event.target.value.toUpperCase())}
-            />
-            <Button type="submit" variant="secondary" size="lg" disabled={busy !== null}>
-              {busy === 'join' ? m.groups_join_busy() : m.groups_join_action()}
-            </Button>
-          </div>
-        </form>
+          <section className="scr-panel" aria-labelledby="cm-create">
+            <form className="cm-way" onSubmit={create}>
+              <div className="scr-panel__head">
+                <span className="scr-idx">03</span>
+                <h2 id="cm-create" className="scr-panel__title">
+                  {m.groups_create_title()}
+                </h2>
+              </div>
+              <div className="cm-way__row">
+                <Field
+                  label={m.groups_create_label()}
+                  value={groupName}
+                  maxLength={64}
+                  autoComplete="off"
+                  onChange={(event) => setGroupName(event.target.value)}
+                />
+                <Button type="submit" variant="primary" disabled={busy !== null}>
+                  {busy === 'create' ? m.groups_create_busy() : m.groups_create_action()}
+                </Button>
+              </div>
+            </form>
+          </section>
+
+          <section className="scr-panel" aria-labelledby="cm-join">
+            <form className="cm-way" onSubmit={join}>
+              <div className="scr-panel__head">
+                <span className="scr-idx">04</span>
+                <h2 id="cm-join" className="scr-panel__title">
+                  {m.groups_join_title()}
+                </h2>
+              </div>
+              <div className="cm-way__row">
+                <Field
+                  label={m.groups_code_label()}
+                  value={code}
+                  maxLength={6}
+                  autoComplete="off"
+                  spellCheck={false}
+                  className="cm-code-input"
+                  onChange={(event) => setCode(event.target.value.toUpperCase())}
+                />
+                <Button type="submit" variant="secondary" disabled={busy !== null}>
+                  {busy === 'join' ? m.groups_join_busy() : m.groups_join_action()}
+                </Button>
+              </div>
+            </form>
+          </section>
+
+          {error === null ? null : (
+            <p role="alert" className="scr-panel scr-error">
+              {error}
+            </p>
+          )}
+        </div>
       </div>
-
-      {error === null ? null : (
-        <p role="alert" className="cm-error">
-          {error}
-        </p>
-      )}
-
-      {returning ? null : mineSection}
-    </div>
+    </Screen>
   )
 }
 
@@ -242,18 +271,22 @@ function Group({
 
   if (group === null) {
     return error === null ? (
-      <div className="cm-page" aria-busy="true">
-        <div className="cm-skeleton cm-skeleton--panel" />
-      </div>
+      <Screen>
+        <div className="scr-panel cm-calm" aria-busy="true">
+          <div className="scr-skeleton" />
+        </div>
+      </Screen>
     ) : (
-      <div className="cm-calm">
-        <p role="alert" className="cm-lede">
-          {error}
-        </p>
-        <Link to="/groups" className={buttonClass('secondary', 'md')}>
-          {m.group_back()}
-        </Link>
-      </div>
+      <Screen>
+        <div className="scr-panel cm-calm">
+          <p role="alert" className="scr-say">
+            {error}
+          </p>
+          <Link to="/groups" className={buttonClass('secondary', 'md')}>
+            {m.group_back()}
+          </Link>
+        </div>
+      </Screen>
     )
   }
 
@@ -269,127 +302,134 @@ function Group({
   }
 
   return (
-    <div className="cm-page">
-      <Link to="/groups" className="cm-back">
-        {m.group_back()}
-      </Link>
-
-      <section className="cm-panel" aria-labelledby="cm-group-name">
-        <div className="cm-panel__main">
-          <h1 id="cm-group-name" className="cm-display cm-panel__title" data-testid="group-name">
-            {group.name}
-          </h1>
-          <p className="cm-panel__meta">
-            {m.groups_members_count({ count: group.members.length })}
-          </p>
-        </div>
-        <div className="cm-panel__code">
-          <p className="cm-panel__label">{m.group_code_label()}</p>
-          <p className="cm-panel__codeval" data-testid="group-code">
-            {group.joinCode}
-          </p>
-          <div className="cm-panel__actions">
-            <button type="button" className="cm-onred" onClick={() => void copy()}>
-              {copied ? m.group_copied() : m.group_copy_link()}
-            </button>
-            {owner ? (
-              <button
-                type="button"
-                className="cm-onred cm-onred--quiet"
-                title={m.group_regenerate_hint()}
-                disabled={busy}
-                onClick={() => void act(() => backend.regenerateCode(group.id))}
-              >
-                {m.group_regenerate()}
-              </button>
-            ) : null}
-          </div>
-        </div>
-      </section>
-
-      <section aria-labelledby="cm-members">
-        <h2 id="cm-members" className="cm-section-title">
-          {m.group_members_title()}
-        </h2>
-        <ol className="cm-members" data-testid="group-members">
-          {group.members.map((member, index) => (
-            <li
-              key={member.userId}
-              className={cx('cm-member', member.userId === group.me && 'cm-member--me')}
-              data-testid="group-member"
-            >
-              <span className="cm-member__n">{String(index + 1).padStart(2, '0')}</span>
-              <span className="cm-member__name">{member.nickname}</span>
-              <span className="cm-member__tags">
-                {member.role === 'owner' ? (
-                  <span className="cm-tag">{m.groups_role_owner()}</span>
-                ) : null}
-                {member.userId === group.me ? (
-                  <span className="cm-tag cm-tag--you">{m.groups_you()}</span>
-                ) : null}
-              </span>
-              {owner && member.userId !== group.me ? (
-                <Button
-                  variant="quiet"
-                  size="sm"
-                  disabled={busy}
-                  aria-label={m.group_remove_label({ name: member.nickname })}
-                  onClick={() => void act(() => backend.removeMember(group.id, member.userId))}
-                >
-                  {m.group_remove()}
-                </Button>
-              ) : (
-                <span />
-              )}
-            </li>
-          ))}
-        </ol>
-      </section>
-
-      {error === null ? null : (
-        <p role="alert" className="cm-error">
-          {error}
-        </p>
-      )}
-
-      <div className="cm-actions">
-        <Link
-          to="/leaderboards"
-          search={{ scope: 'group', group: group.id }}
-          className={buttonClass('primary', 'lg')}
-        >
-          {m.group_board_action()}
+    <Screen className="cm scr--fill">
+      <ScreenHead
+        title={<span data-testid="group-name">{group.name}</span>}
+        lead={m.groups_members_count({ count: group.members.length })}
+      >
+        <Link to="/groups" className="scr-seg__btn cm-back">
+          ← {m.group_back()}
         </Link>
-        {leaving ? (
-          <Button
-            variant="danger"
-            size="lg"
-            disabled={busy}
-            onClick={() =>
-              void (async () => {
-                setBusy(true)
-                try {
-                  await backend.leave(group.id)
-                  await navigate({ to: '/groups' })
-                } catch (caught) {
-                  setError(describe(caught))
-                  setBusy(false)
+      </ScreenHead>
+
+      <div className="cm-grid cm-grid--group">
+        <Panel
+          id="cm-members"
+          n={1}
+          title={m.group_members_title()}
+          meta={m.group_members_meta({ count: group.members.length })}
+          className="cm-members-panel"
+        >
+          <ol className="scr-rows" data-testid="group-members">
+            {group.members.map((member, index) => (
+              <li
+                key={member.userId}
+                className={cx('scr-row cm-member', member.userId === group.me && 'cm-member--me')}
+                data-testid="group-member"
+              >
+                <span className="cm-list__n num">{String(index + 1).padStart(2, '0')}</span>
+                <span className="cm-member__name">{member.nickname}</span>
+                <span className="cm-member__tags">
+                  {member.role === 'owner' ? (
+                    <span className="scr-tag scr-tag--ink">{m.groups_role_owner()}</span>
+                  ) : null}
+                  {member.userId === group.me ? (
+                    <span className="scr-tag">{m.groups_you()}</span>
+                  ) : null}
+                </span>
+                {owner && member.userId !== group.me ? (
+                  <Button
+                    variant="quiet"
+                    size="sm"
+                    disabled={busy}
+                    aria-label={m.group_remove_label({ name: member.nickname })}
+                    onClick={() => void act(() => backend.removeMember(group.id, member.userId))}
+                  >
+                    {m.group_remove()}
+                  </Button>
+                ) : (
+                  <span />
+                )}
+              </li>
+            ))}
+          </ol>
+        </Panel>
+
+        <div className="cm-ways">
+          <section className="scr-panel scr-loud cm-code" aria-labelledby="cm-code-title">
+            <div className="scr-panel__head">
+              <span className="scr-idx">02</span>
+              <h2 className="scr-panel__title" id="cm-code-title">
+                {m.group_code_label()}
+              </h2>
+            </div>
+            <p className="cm-code__value" data-testid="group-code">
+              {group.joinCode}
+            </p>
+            <p className="cm-code__hint">{m.group_code_hint()}</p>
+            <div className="cm-code__actions">
+              <button type="button" className="cm-onred" onClick={() => void copy()}>
+                {copied ? m.group_copied() : m.group_copy_link()}
+              </button>
+              {owner ? (
+                <button
+                  type="button"
+                  className="cm-onred cm-onred--quiet"
+                  title={m.group_regenerate_hint()}
+                  disabled={busy}
+                  onClick={() => void act(() => backend.regenerateCode(group.id))}
+                >
+                  {m.group_regenerate()}
+                </button>
+              ) : null}
+            </div>
+          </section>
+
+          <section className="scr-panel cm-actions" aria-label={m.group_board_action()}>
+            <Link
+              to="/leaderboards"
+              search={{ scope: 'group', group: group.id }}
+              className={buttonClass('secondary', 'md')}
+            >
+              {m.group_board_action()}
+            </Link>
+            {leaving ? (
+              <Button
+                variant="danger"
+                disabled={busy}
+                onClick={() =>
+                  void (async () => {
+                    setBusy(true)
+                    try {
+                      await backend.leave(group.id)
+                      await navigate({ to: '/groups' })
+                    } catch (caught) {
+                      setError(describe(caught))
+                      setBusy(false)
+                    }
+                  })()
                 }
-              })()
-            }
-          >
-            {m.group_leave_confirm()}
-          </Button>
-        ) : (
-          <Button variant="secondary" size="lg" onClick={() => setLeaving(true)}>
-            {m.group_leave()}
-          </Button>
-        )}
+              >
+                {m.group_leave_confirm()}
+              </Button>
+            ) : (
+              <Button variant="quiet" onClick={() => setLeaving(true)}>
+                {m.group_leave()}
+              </Button>
+            )}
+            {leaving && owner && group.members.length > 1 ? (
+              <p className="scr-note cm-actions__note">{m.group_leave_owner_note()}</p>
+            ) : null}
+          </section>
+
+          {error === null ? null : (
+            <p role="alert" className="scr-panel scr-error">
+              {error}
+            </p>
+          )}
+        </div>
       </div>
-      {leaving && owner && group.members.length > 1 ? (
-        <p className="cm-note">{m.group_leave_owner_note()}</p>
-      ) : null}
-    </div>
+    </Screen>
   )
 }
 
@@ -428,32 +468,40 @@ function Join({ backend, code }: { readonly backend: GroupsBackend; readonly cod
   })
 
   return (
-    <div className="cm-calm">
-      <p className="cm-panel__label cm-panel__label--ink">{m.group_join_title()}</p>
-      <h1 className="cm-bigcode">{code}</h1>
-      <form
-        className="cm-join"
-        onSubmit={(event) => {
-          event.preventDefault()
-          void go()
-        }}
-      >
-        <Field
-          label={m.community_name_label()}
-          value={name}
-          maxLength={32}
-          autoComplete="nickname"
-          onChange={(event) => setName(event.target.value)}
-        />
-        <Button type="submit" variant="primary" size="lg" disabled={busy}>
-          {busy ? m.groups_join_busy() : m.groups_join_action()}
-        </Button>
-      </form>
-      {error === null ? null : (
-        <p role="alert" className="cm-error">
-          {error}
-        </p>
-      )}
-    </div>
+    <Screen className="cm cm--center">
+      <div className="cm-invite">
+        <section className="scr-panel scr-loud cm-code" aria-labelledby="cm-invite-title">
+          <div className="scr-panel__head">
+            <p className="scr-panel__title" id="cm-invite-title">
+              {m.group_join_title()}
+            </p>
+          </div>
+          <h1 className="cm-code__value">{code}</h1>
+        </section>
+        <form
+          className="scr-panel cm-invite__form"
+          onSubmit={(event) => {
+            event.preventDefault()
+            void go()
+          }}
+        >
+          <Field
+            label={m.community_name_label()}
+            value={name}
+            maxLength={32}
+            autoComplete="nickname"
+            onChange={(event) => setName(event.target.value)}
+          />
+          <Button type="submit" variant="primary" disabled={busy}>
+            {busy ? m.groups_join_busy() : m.groups_join_action()}
+          </Button>
+          {error === null ? null : (
+            <p role="alert" className="scr-error cm-invite__error">
+              {error}
+            </p>
+          )}
+        </form>
+      </div>
+    </Screen>
   )
 }

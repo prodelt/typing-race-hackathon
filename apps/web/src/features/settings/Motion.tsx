@@ -21,7 +21,7 @@ export function Motion() {
   const blocked = motion === 'off'
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="set-stack">
       <ChoiceGroup<MotionSetting>
         legend={m.settings_motion_legend()}
         hint={m.settings_motion_hint()}
@@ -34,11 +34,11 @@ export function Motion() {
         onChange={(value) => void changeSettings({ motion: value })}
       />
       {blocked && (
-        <p role="status" className="font-ui text-sm font-semibold text-ink">
+        <p role="status" className="set-status">
           {m.settings_motion_off_consequence()}
         </p>
       )}
-      <div className="flex items-start gap-3">
+      <div className="set-check">
         <input
           id={soundId}
           type="checkbox"
@@ -46,13 +46,13 @@ export function Motion() {
           disabled={blocked}
           aria-describedby={soundHintId}
           onChange={(event) => void changeSettings({ sound: event.target.checked ? 'on' : 'off' })}
-          className="mt-1 size-4 accent-[var(--color-sage)]"
+          className="set-check__box"
         />
-        <div className="flex flex-col gap-0.5">
-          <label htmlFor={soundId} className="font-ui font-semibold text-ink">
+        <div className="set-check__text">
+          <label htmlFor={soundId} className="set-check__label">
             {m.settings_sound_label()}
           </label>
-          <p id={soundHintId} className="font-ui text-sm text-ink/80">
+          <p id={soundHintId} className="set-hint">
             {blocked ? m.settings_sound_blocked() : m.settings_sound_hint()}
           </p>
         </div>

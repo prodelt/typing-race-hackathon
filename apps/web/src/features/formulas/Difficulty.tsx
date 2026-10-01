@@ -23,7 +23,7 @@ export function Difficulty() {
 
       <Block title={m.formulas_row_example_title()}>
         <P>{m.formulas_row_example_rows()}</P>
-        <ul className="list-disc space-y-1 pl-6 font-ui text-base text-ink">
+        <ul className="ref-list">
           <li>{m.formulas_row_example_a()}</li>
           <li>{m.formulas_row_example_b()}</li>
         </ul>

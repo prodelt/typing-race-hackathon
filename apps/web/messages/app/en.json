@@ -58,7 +58,7 @@
   "page_licences_dwyl": "a second, independent English word filter.",
   "page_licences_fonts": "fonts, served from our own origin — the app makes no request to any third party.",
   "page_privacy_title": "Privacy",
-  "page_privacy_body": "This app has no accounts, sends nothing to a server and uses no third-party analytics. Everything you type stays in your browser's storage and leaves with it. You can clear it at any time from Settings.",
+  "page_privacy_body": "Typing-Race asks for no sign-up and has no third-party analytics, ads or trackers.",
   "page_about_title": "About",
   "page_about_body": "Typing-Race is a touch-typing trainer for Ukrainian and English. A three-stage curriculum leads from keyboard scales to words built only from the keys you have unlocked, and on to an Academy of rhythm and n-grams. Speed never gates progress: accuracy does.",
   "cmd_next_action": "Do the next action",
@@ -107,5 +107,15 @@
   "product_principles_b": "a calm line",
   "product_final_a": "Start on",
   "product_final_b": "the home row",
-  "product_final_lede": "No sign-up. Your progress stays in this browser only."
+  "product_final_lede": "No sign-up. Your progress stays in this browser only.",
+  "page_privacy_local_title": "Training",
+  "page_privacy_local": "Attempts, progress, settings and history are kept in your browser's storage only and are never sent to a server. You can clear them at any time in Settings: \"Data\" → \"Clear local data\".",
+  "page_privacy_server_title": "Races, groups and rankings",
+  "page_privacy_server": "The first time you enter a race or a group, the app creates an anonymous profile on our server: the name you gave, the groups you are in, and your race results. Each race's keystrokes go to the server too — it checks speed and accuracy itself before a result reaches a ranking. You can leave a group from its page.",
+  "page_about_stages_title": "Three stages",
+  "page_about_stage_1": "Scales — key by key, from the home row to numbers and symbols. The app generates the exercise text itself from the finger map.",
+  "page_about_stage_2": "Words — real words made only of the keys you have unlocked.",
+  "page_about_stage_3": "Academy — syllables, phrases and texts for rhythm and evenness.",
+  "page_about_rule_title": "The one rule",
+  "page_about_rule": "Accuracy leads on: an exercise counts once consecutive test attempts clear the accuracy floor. How every number is computed is on the Formulas page."
 }
