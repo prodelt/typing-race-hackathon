@@ -1,6 +1,6 @@
 # Research 02: what makes a browser app feel like an online game
 
-Ticket: `.scratch/game-cloud/issues/02-game-ux-research.md`. Status: in progress.
+Ticket: `.scratch/game-cloud/issues/02-game-ux-research.md`. Status: done (2026-10-01).
 
 Method: primary sources first (the products' own pages, help centres, blogs and repos; recognised
 designers' talks). Where a statement is my own reading of a product rather than something a source
@@ -304,10 +304,109 @@ run, `Tab` = restart in a solo run, digits or arrows select tiles, a visible sty
 and shortcut hints printed on the buttons themselves (`Enter ↵`). Typing keys must never trigger
 navigation while a run is active.
 ## 10. Principles for Typing-Race
-TODO
+
+1. **Shell, not page.** Fixed 100dvh frame, no document scroll; panels scroll internally. (§1)
+2. **Persistent HUD bar** on every meta screen: profile, level + XP bar, streak, race rating, sound
+   mute. Chips are live and clickable. (§2)
+3. **Home is a hub with one hero action** — `Continue` the path — and `Race` as the strong
+   secondary. No competing heroes, no marketing copy above it. (§3)
+4. **Two modes: meta and run.** In a run the HUD/nav collapse; only the text line, the track (races)
+   and optional keyboard remain. `Esc` exits. (§4)
+5. **Zero-friction start.** Solo runs start on the first keystroke; races use a synchronised 3-2-1;
+   quick race is a preset, not a form. (§3)
+6. **Rewards land in the frame.** Results count up, then XP flies into the HUD bar and the level
+   ticks there; the frame proves the run mattered. (§2, §5)
+7. **Motion tokens, spent at boundaries.** 100/200/320 ms tokens; big motion only on enter-run,
+   finish, results, level-up, streak; nav ≤200 ms; reduced-motion swaps movement for opacity. (§5)
+8. **The typing line is sacred.** It never moves, shakes or scales; per-key feedback is colour only,
+   ≤100 ms. (§6)
+9. **Sound as a channelled system,** quiet by default, separate key-click and UI/celebration
+   toggles, mute in the HUD. (§6)
+10. **Reward mastery, not volume.** XP and unlocks come from accuracy-at-target and stage criteria
+    (keybr-style unlocks), never raw keystrokes. Show the lock before the key. (§7)
+11. **Path with an open door.** A visible stage map for direction, plus weak-spot review and free
+    practice always reachable (autonomy). (§7)
+12. **Forgiving streaks, scoped competition.** Streak with a freeze; rating only in races;
+    leaderboards default to your group / small weekly bracket. (§7)
+13. **Play before sign-in.** First visit goes straight into a placement run; sign-in is offered to
+    save progress and unlock races/groups. Contextual help, no tutorial carousel. (§8)
+14. **Keyboard-complete.** `Enter` primary, `Esc` back, `Tab` restart, digits/arrows for tiles,
+    styled focus, shortcut hints on buttons. (§9)
+15. **One motion/visual vocabulary client-wide** (Riot's "Hextech feel"): the b-red tokens become
+    game tokens — the same easing, surfaces and accent everywhere, including results and races. (§5)
+
 ## 11. Patterns that fit
-TODO
+
+| Pattern | Use in Typing-Race | Reference |
+|---|---|---|
+| Fixed client shell with plugin-like screens | App frame + swappable stage | League client ([Riot](https://www.riotgames.com/en/news/under-hood-league-client%E2%80%99s-hextech-ui)) |
+| Top status bar with currency/XP chips | Level, XP, streak, rating | Duolingo, League client |
+| Landing in your "place" after login | Home hub showing your path position and avatar/car | Nitro Type Garage ([wiki](https://nitro.fandom.com/wiki/Garage)) |
+| Single giant play CTA | `Continue` / `Race` | TypeRacer ([help](https://teachmehelp.zendesk.com/hc/en-us/articles/5877690491543-How-to-play-TypeRacer)) |
+| Preset quick-pairing grid | Quick race tiles: UA/EN × short/medium | lichess ([forum](https://lichess.org/forum/general-chess-discussion/quick-pairing-vs-lobby)) |
+| Instant-start solo | Practice/lesson begins on first key | TypeRacer ([blog](https://blog.typeracer.com/2024/03/06/new-feature-introducing-enhanced-practice-mode/)) |
+| Focus / zen in-game mode | Run mode hides HUD/nav | chess.com, lichess, Monkeytype |
+| Quick restart + command palette | `Tab` restart, `Ctrl+K`/`Esc` palette | Monkeytype ([repo](https://github.com/monkeytypegame/monkeytype)) |
+| Diegetic progress (car on a track) | Race track = progress bar | Nitro Type, TypeRacer |
+| Linear path map with review built in | Stage 1–3 map with review nodes | Duolingo ([blog](https://blog.duolingo.com/new-duolingo-home-screen-design)) |
+| Mastery-gated unlocks of letters | Stage/lesson unlock criteria | keybr ([repo](https://github.com/aradzie/keybr.com)) |
+| Streak + freeze, milestone animation | Daily streak chip, celebration at 7/30 | Duolingo ([blog](https://blog.duolingo.com/how-duolingo-streak-builds-habit)) |
+| Weekly small leagues | Group / weekly bracket boards | Duolingo leagues ([help](https://www.duolingo.com/help/2/leaderboards-and-league)) |
+| Per-mode rating, hideable | Race rating chip, hidden in run | lichess/chess.com |
+| Results as reward screen | Count-up, rewards into HUD, `Enter` = next | Nitro Type racing rewards ([wiki](https://nitro.fandom.com/wiki/Racing_rewards)) |
+| Channelled UI audio | Keys / UI / celebration channels | League client ([Riot](https://www.riotgames.com/en/news/under-hood-league-client%E2%80%99s-hextech-ui)) |
+
 ## 12. Anti-patterns that make it look like a website
-TODO
+
+- A long scrolling document with a footer; the primary action below the fold.
+- A marketing hero ("Learn to type fast!") on the logged-in home instead of the user's own state.
+- Top nav of text links with an underline hover, identical to a blog; no persistent status.
+- Pages that reload/flash between screens; content that jumps when navigating; the frame
+  re-rendering.
+- Forms to start playing (dropdowns for language, length, mode) instead of preset tiles.
+- Results as a static table of numbers with a "Back" link — no count-up, no reward landing, no
+  `Enter` → next.
+- Progress shown only as percentages and lists; no map, no level, no visible unlock.
+- Stats/XP that change nothing in the frame (rewards you never see again).
+- Global all-time leaderboard as the default competitive view.
+- Default browser focus outline, mouse-only controls, or keys that do nothing outside the text box.
+- Animation everywhere at the same weight (or none at all); generic 300 ms fades on every element.
+- Sound absent entirely — or autoplaying.
+- Juice on the typing line itself (shaking text, bouncing caret) — the "game" made unreadable.
+- Badges/coins bolted on with nothing to spend them on (overjustification without meaning).
+- A tutorial carousel or sign-up wall before the first keystroke.
+
 ## Sources
-TODO
+
+Products and official material
+- Riot Games, Under the hood of the League Client's Hextech UI — https://www.riotgames.com/en/news/under-hood-league-client%E2%80%99s-hextech-ui
+- Duolingo blog, new home screen design — https://blog.duolingo.com/new-duolingo-home-screen-design
+- Duolingo blog, how the streak builds habit — https://blog.duolingo.com/how-duolingo-streak-builds-habit
+- Duolingo blog, leagues — https://blog.duolingo.com/duolingo-leagues-leaderboards/
+- Duolingo help, leaderboards and leagues — https://www.duolingo.com/help/2/leaderboards-and-league
+- Apple Developer, Behind the Design: Duolingo — https://developer.apple.com/news/?id=jhkvppla
+- TypeRacer blog, enhanced practice mode — https://blog.typeracer.com/2024/03/06/new-feature-introducing-enhanced-practice-mode/
+- TeachMe (TypeRacer) help, how to play — https://teachmehelp.zendesk.com/hc/en-us/articles/5877690491543-How-to-play-TypeRacer
+- chess.com help, focus mode — https://support.chess.com/en/articles/8588088-what-is-focus-mode-how-do-i-turn-it-on
+- lichess home — https://lichess.org/ ; zen mode — https://lichess.org/page/zen ; zen announcement — https://m.facebook.com/lichessdotorg/photos/new-feature-zen-mode-hides-your-opponents-rating-chat-and-scoreboard-only-the-bo/337570746685888/
+- lichess forum, quick pairing vs lobby — https://lichess.org/forum/general-chess-discussion/quick-pairing-vs-lobby ; auto-pairing pools — https://lichess.org/forum/lichess-feedback/on-auto-pairing-pools ; shortcuts — https://lichess.org/forum/general-chess-discussion/keyboard-shortcuts
+- Monkeytype repo — https://github.com/monkeytypegame/monkeytype ; discussion #3549 — https://github.com/monkeytypegame/monkeytype/discussions/3549
+- keybr repo — https://github.com/aradzie/keybr.com
+- Nitro Wiki (search excerpts; fetch blocked) — https://nitro.fandom.com/wiki/Garage , https://nitro.fandom.com/wiki/Cash , https://nitro.fandom.com/wiki/Racing_rewards
+- TypeRacer wiki (search excerpt) — https://typeracer.fandom.com/wiki/Keyboard_Shortcuts
+- Steam client update notes — https://store.steampowered.com/oldnews/189167 ; coverage — https://www.windowscentral.com/gaming/pc-gaming/valve-is-finally-replacing-big-picture-mode-on-desktops-with-the-steam-deck-ui , https://www.xda-developers.com/valve-overhauls-steam-big-picture-mode/ , https://www.gamingonlinux.com/2022/11/valve-has-improved-the-new-big-picture-mode-for-desktop-quite-a-bit-in-a-new-beta/
+- League client UI analysis — https://medium.com/@1537148253135/the-ui-of-league-of-legends-client-d6d8b947365a
+
+Designers, research and guidelines
+- Celia Hodent, The Gamer's Brain — https://thegamersbrain.com/ ; GDC16 onboarding — https://celiahodent.com/gamers-brain-ux-onboarding/ ; GDC17 engagement — https://celiahodent.com/gamers-brain-part-3-ux-engagement-immersion-retention-gdc17-talk/
+- Steve Swink, Game Feel ch. 1 — http://mycours.es/gamedesign2014/files/2014/10/Game-Feel-Steve-Swink-chapter-1.pdf
+- Jonasson & Purho, Juice It or Lose It (GDC Europe 2012) — https://www.gdcvault.com/play/1016487/juice-it-or-lose ; counterpoint — https://www.gamedeveloper.com/design/video-indies-resist-the-urge-to-juice-it-or-lose-it-
+- Fagerholt & Lorentzon, Beyond the HUD (2009) — https://www.researchgate.net/publication/277202228_Beyond_the_HUD_-_User_Interfaces_for_Increased_Player_Immersion_in_FPS_Games ; summary — https://nastyrodent.com/diegetic-and-non-diegetic-ui/
+- Nasty Rodent, game menu navigation — https://nastyrodent.com/game-menu-navigation/
+- NN/g, animation duration — https://www.nngroup.com/articles/animation-duration/ ; autonomy/relatedness/competence — https://www.nngroup.com/articles/autonomy-relatedness-competence/ ; gamification video — https://www.nngroup.com/videos/gamification-user-experience/
+- Hanus & Fox (2015), Computers & Education 80 — https://www.researchgate.net/publication/265644737_Assessing_the_effects_of_gamification_in_the_classroom_A_longitudinal_study_on_intrinsic_motivation_social_comparison_satisfaction_effort_and_academic_performance
+- Growth Engineering, dark side of gamification — https://www.growthengineering.co.uk/dark-side-of-gamification/
+- NBC News, Duolingo redesign backlash — https://www.nbcnews.com/tech/tech-news/duolingos-update-redesign-luis-von-ahn-interview-rcna44655
+- Appcues, Duolingo onboarding — https://goodux.appcues.com/blog/duolingo-user-onboarding ; gradual engagement — https://www.appcues.com/blog/gradual-engagement-mobile-app-first-screen
+- WCAG 2.3.3 — https://dequeuniversity.com/resources/wcag2.1/2.3.3-animations-from-interactions ; https://silktide.com/accessibility-guide/the-wcag-standard/2-3/seizures-and-physical-reactions/2-3-3-animation-from-interactions/
+- Game UI Database (reference library for screen flows) — https://www.gamedeveloper.com/design/game-ui-database-relaunches-with-new-features-video-support-and-over-55-000-screenshots
