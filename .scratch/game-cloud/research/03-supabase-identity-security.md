@@ -332,7 +332,68 @@ anonymous users the docs give
 
 ## 7. CSP and HSTS on Vercel
 
-_TBD_
+**What the app actually talks to.**
+
+- Own origin: JS/CSS/fonts/`sw.js`. The built `index.html` has **no inline scripts or styles** —
+  one `<script type="module" src="/assets/…">` plus `modulepreload`/stylesheet links (checked on
+  a local `apps/web/dist/index.html`), so `script-src 'self'` works without nonces.
+- Supabase REST/Auth/Functions: `https://<project-ref>.supabase.co` (`race.ts:133`).
+- Supabase Realtime: `wss://<project-ref>.supabase.co/realtime/v1/websocket`
+  (https://supabase.com/docs/guides/realtime/protocol).
+- Google OAuth: a **top-level navigation** to `https://<project-ref>.supabase.co/auth/v1/authorize`
+  → `accounts.google.com` → back. Top-level navigations are not governed by `connect-src`, which
+  covers only `fetch`, XHR, `WebSocket`, `EventSource`, `sendBeacon`, `<a ping>`
+  (https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Security-Policy/connect-src),
+  so the redirect flow needs no Google entry. (Only Google Identity Services / One Tap would need
+  `script-src`/`frame-src https://accounts.google.com`.)
+
+**`connect-src` and WebSockets.** `'self'` does not reliably cover `ws:`/`wss:` across browsers,
+so list the `wss://` host explicitly. (MDN connect-src, above)
+
+**`style-src`.** Without `'unsafe-inline'` CSP blocks `<style>` elements, `style="…"` attributes in
+markup, `setAttribute('style', …)` and `style.cssText`, but **not** per-property assignment on
+`element.style` (https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Security-Policy/style-src).
+React applies the `style` prop through per-property CSSOM writes, so our ~35 `style=` props in
+TSX should survive `style-src 'self'` — verify with Report-Only first.
+
+**Rollout.** Vercel: start with `Content-Security-Policy-Report-Only`, avoid `unsafe-inline` /
+`unsafe-eval`, prefer specific hosts over `*`
+(https://vercel.com/docs/cdn-security/security-headers).
+
+**HSTS.** Vercel already sends `Strict-Transport-Security: max-age=63072000; includeSubDomains;
+preload;` on `*.vercel.app` (which is preloaded) and `max-age=63072000;` on custom domains, and
+redirects HTTP→HTTPS with 308; the header can be overridden with custom headers. Note: "The WSS
+protocol doesn't support redirects." (https://vercel.com/docs/cdn-security/encryption) So for us
+HSTS is effectively done; add `includeSubDomains; preload` only if we own a custom apex and want
+preloading (`preload` needs `max-age ≥ 31536000` + `includeSubDomains`,
+https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Strict-Transport-Security).
+
+**`vercel.json` syntax.** `headers: [{ source, headers: [{ key, value }], has?, missing? }]`;
+`source` is a path pattern without the query string
+(https://vercel.com/docs/project-configuration/vercel-json). Proposed addition to our
+`vercel.json` (keep the existing two cache entries):
+
+```json
+{
+  "source": "/(.*)",
+  "headers": [
+    { "key": "Content-Security-Policy-Report-Only", "value": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://<project-ref>.supabase.co wss://<project-ref>.supabase.co; worker-src 'self'; manifest-src 'self'; frame-src 'none'; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests" },
+    { "key": "X-Content-Type-Options", "value": "nosniff" },
+    { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+    { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" }
+  ]
+}
+```
+
+Swap `-Report-Only` for the enforcing header once the browser console shows no violations
+(local `vite preview`, then a preview deployment, then prod). With a custom auth domain, replace
+both Supabase hosts. If Turnstile CAPTCHA is added (§5), it needs
+`script-src`/`frame-src https://challenges.cloudflare.com`. If the hackathon jury embeds the app in
+an iframe, relax `frame-ancestors`.
+
+Edge Function CORS: today `Access-Control-Allow-Origin: *` (`_shared/cors.ts:7`). Since calls
+need a valid JWT this is not an auth hole; narrowing to `https://<prod-domain>` plus localhost is
+optional hardening (previews would then need a pattern check in code).
 
 ## 8. Security and Performance Advisors
 
