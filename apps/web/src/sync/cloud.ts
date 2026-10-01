@@ -70,7 +70,8 @@ export function supabaseRemote(client: SupabaseClient, userId: string): Remote {
       }>('submit-attempt', {
         body: {
           attempts: withLog.map(({ log, metrics: _m, aggregates: _a, ...attempt }) => ({
-            attempt,
+            // `elapsed_ms` is an integer column, and the clock gives fractions of a millisecond.
+            attempt: { ...attempt, elapsedMs: Math.round(attempt.elapsedMs) },
             log,
           })),
         },

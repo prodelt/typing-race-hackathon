@@ -293,6 +293,37 @@ describe('sync — the outbox', () => {
     expect(a.sync.status().lastRejections).toEqual([{ id: 'fast', reason: 'too_fast' }])
   })
 
+  it('keeps an attempt whose exercise the server does not know yet, rather than losing it', async () => {
+    // An older server knows fewer exercise families. Its refusal says "not yet", not "never".
+    const cloud = fakeCloud()
+    const unaware: Remote = {
+      ...cloud.remote(),
+      push: async (attempts) => ({
+        accepted: [],
+        rejected: attempts.map((a) => ({ id: a.id, reason: 'unknown_scale' as const })),
+      }),
+    }
+    const a = device()
+    await a.sync.submitAttempt(attempt('words'))
+    await a.sync.connect(unaware)
+    expect(a.sync.status().pending).toBe(1)
+  })
+
+  it('still unions attempts when the settings half of a sync fails', async () => {
+    const cloud = fakeCloud()
+    cloud.attempts.set('c1', attempt('c1'))
+    const broken: Remote = {
+      ...cloud.remote(),
+      settings: async () => {
+        throw new Error('column profiles.settings does not exist')
+      },
+    }
+    const a = device()
+    await a.sync.connect(broken)
+    expect(await localIds(a.store)).toEqual(['c1'])
+    expect(a.onLocalChanged).toHaveBeenCalled()
+  })
+
   it('never touches a remote while disconnected: training stays local', async () => {
     const a = device()
     await a.sync.submitAttempt(attempt('a1'))

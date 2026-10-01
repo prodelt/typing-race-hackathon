@@ -217,7 +217,8 @@ Deno.serve(async (request) => {
       seed: attempt.seed,
       started_at: new Date(attempt.startedAt).toISOString(),
       completed_at: new Date(attempt.completedAt).toISOString(),
-      elapsed_ms: attempt.elapsedMs,
+      // An integer column; the client clock measures fractions of a millisecond.
+      elapsed_ms: Math.round(attempt.elapsedMs),
       metrics,
       aggregates,
       data_version: submission.dataVersion ?? null,

@@ -6,5 +6,5 @@
 -- so a stale device cannot overwrite a newer copy.
 
 alter table public.profiles
-  add column settings jsonb,
-  add column settings_updated_at timestamptz;
+  add column if not exists settings jsonb,
+  add column if not exists settings_updated_at timestamptz;

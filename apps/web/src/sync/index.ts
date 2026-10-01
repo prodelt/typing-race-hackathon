@@ -198,8 +198,11 @@ export function createSync(deps: SyncDeps): Sync {
     const queued = await deps.outbox.all()
     if (queued.length === 0) return { accepted: [], rejected: [], pending: 0 }
     const result = await target.push(queued)
-    // A refused attempt leaves the outbox too: the server would refuse it again forever.
-    await deps.outbox.remove([...result.accepted, ...result.rejected.map((r) => r.id)])
+    // A refused attempt leaves the outbox too: the server would refuse it again forever. The one
+    // exception is an exercise the server does not know yet — an older deploy — which is kept and
+    // re-sent, because dropping it would lose that attempt from the account for good.
+    const final = result.rejected.filter((r) => r.reason !== 'unknown_scale').map((r) => r.id)
+    await deps.outbox.remove([...result.accepted, ...final])
     lastRejections = result.rejected
     return { accepted: result.accepted, rejected: result.rejected, pending: await refreshPending() }
   }
@@ -238,9 +241,13 @@ export function createSync(deps: SyncDeps): Sync {
       announce()
       try {
         await upload(target)
-        const pulled = await pullAttempts(target)
-        const settingsApplied = await reconcileSettings(target)
-        if (pulled || settingsApplied) localChanged()
+        if (await pullAttempts(target)) localChanged()
+        try {
+          if (await reconcileSettings(target)) localChanged()
+        } catch {
+          // Settings are a convenience; a failure there must not hold the attempts hostage. The
+          // next sync reconciles them again.
+        }
         failures = 0
         clearRetry()
         phase = 'idle'
