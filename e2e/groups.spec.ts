@@ -1,6 +1,6 @@
 import { expect, type Page, test } from '@playwright/test'
 import { backendConfigured, learner } from './harness/backend.js'
-import { typeChar } from './harness/type.js'
+import { typeText } from './harness/type.js'
 
 /**
  * Groups and the group board against the real Supabase project: A creates a group, B joins it by
@@ -11,16 +11,14 @@ import { typeChar } from './harness/type.js'
  * Tagged `@backend` and skipped when the build has no Supabase configuration.
  */
 
+/** Paced inside the page; see the note on the same constant in race.spec.ts. */
 const KEY_DELAY_MS = 60
 
 async function race(page: Page): Promise<void> {
   await expect(page.locator('.race-run__line[data-live]')).toBeVisible({ timeout: 20_000 })
   const text = await page.locator('[data-testid="typing-line"] .sr-only').textContent()
   if (text === null || text.length === 0) throw new Error('no race text on the page')
-  for (const char of text) {
-    await typeChar(page, char)
-    await page.waitForTimeout(KEY_DELAY_MS)
-  }
+  await typeText(page, text, KEY_DELAY_MS)
   await expect(page.getByText('Заїзд завершено.')).toBeVisible({ timeout: 30_000 })
 }
 
