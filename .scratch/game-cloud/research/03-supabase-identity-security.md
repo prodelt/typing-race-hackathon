@@ -143,7 +143,58 @@ users. (https://supabase.com/docs/guides/auth/auth-anonymous)
 
 ## 3. Google Cloud OAuth client for Supabase
 
-_TBD_
+All steps from https://supabase.com/docs/guides/auth/social-login/auth-google unless noted.
+
+- **Where.** Create/choose a Google Cloud project, then the Google Auth Platform console
+  (https://console.cloud.google.com/auth/overview): Audience, Data Access (scopes), Branding,
+  Clients.
+- **Audience / user type.** External = any Google account; Internal = only your Workspace/Cloud
+  Identity org. (https://support.google.com/cloud/answer/15549945) We need External.
+- **Scopes.** `openid` (add manually), `.../auth/userinfo.email`, `.../auth/userinfo.profile`
+  (defaults). "If you add more scopes, especially those on the sensitive or restricted list your
+  application might be subject to verification which may take a long time."
+- **Branding.** App name, logo, support email, authorized domains. Supabase "strongly recommends"
+  a custom domain, because otherwise the consent screen shows `<project-ref>.supabase.co`, "which
+  does not inspire trust". Brand verification can take several business days.
+- **Client.** Clients → Create → type **Web application**
+  (https://console.cloud.google.com/auth/clients).
+  - *Authorized JavaScript origins*: the app origins — "These should also be configured as the
+    Site URL or redirect configuration in your project"; add `http://localhost:<port>` for local
+    dev and remove it in production. (Strictly only needed for Google's own JS libraries / ID-token
+    flow; harmless for the redirect flow.)
+  - *Authorized redirect URIs*: **the Supabase callback**, shown on the dashboard's Google provider
+    page: `https://<project-ref>.supabase.co/auth/v1/callback` (or
+    `https://<custom-auth-domain>/auth/v1/callback`); for the local stack
+    `http://127.0.0.1:54321/auth/v1/callback`. The app's own URLs do **not** go here — Google
+    returns to Supabase, Supabase returns to the app (redirect allow list, §1).
+  - Google's rules: HTTPS only (localhost exempt), no wildcards, no fragments, no userinfo, no raw
+    IPs except localhost. (https://developers.google.com/identity/protocols/oauth2/web-server)
+    Hence Vercel preview URLs can never be Google redirect URIs — fine, since only the Supabase
+    callback is registered with Google; previews are allowed on the Supabase side by glob.
+- **Supabase side.** Paste Client ID + Client Secret into Dashboard → Authentication → Providers
+  → Google. Locally:
+  ```toml
+  [auth.external.google]
+  enabled = true
+  client_id = "<client-id>"
+  secret = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_SECRET)"
+  skip_nonce_check = false
+  ```
+  (`skip_nonce_check` is commented in our `config.toml:332` as "Required for local sign in with
+  Google auth" — that applies to the ID-token flow, not the redirect flow.)
+- **Publishing status** (https://support.google.com/cloud/answer/15549945):
+  - *Testing*: "limited to up to 100 test users listed in the OAuth consent screen";
+    "Authorizations by a test user will expire seven days from the time of consent". Non-listed
+    accounts cannot sign in. Fine for a closed demo, not for a public app.
+  - *In production*: available to all Google accounts after pressing Publish; "may be subject to
+    verification before its name and logo are displayed" or before sensitive/restricted scopes can
+    be requested. With only `openid`/email/profile no scope verification is triggered (Supabase
+    note above); a logo on the consent screen triggers brand verification. Unverified apps with
+    sensitive scopes show warnings and a 100-user cap.
+  - Verification is not needed for personal-use apps (<100 users) or dev/testing/staging
+    projects. (https://support.google.com/cloud/answer/13464323)
+  - Practical choice: publish **In production** with the three basic scopes and **no logo**
+    (name only) to avoid any wait; add logo + brand verification later if wanted.
 
 ## 4. RLS patterns
 
