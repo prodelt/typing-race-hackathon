@@ -15,7 +15,7 @@ import { TypingSpecimen } from './TypingSpecimen.js'
 import './product.css'
 
 /** Where "Start practising" leads: Today asks a new learner where to begin. */
-const PRACTICE = '/today'
+const PRACTICE = '/'
 const FORMULAS = '/formulas'
 
 /** `--i` orders a staggered reveal; typed here once instead of casting at every use. */

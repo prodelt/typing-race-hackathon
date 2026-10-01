@@ -6,7 +6,7 @@ import { createRoot } from 'react-dom/client'
 import { buildRouteTree } from './app/router.js'
 import { DEFAULT_SETTINGS, useAppStore } from './app/state/index.js'
 import { applyPresentation, readEnvironment, watchSystemPreferences } from './app/theme.js'
-import { ProductPage } from './features/product/index.js'
+import { TodayScreen } from './features/path/TodayScreen.js'
 import { installLatencyProbe } from './instrument/latency.js'
 import { serviceWorkerCache } from './seams/index.js'
 
@@ -34,7 +34,7 @@ watchSystemPreferences((next) => {
 installLatencyProbe()
 
 const router = createRouter({
-  routeTree: buildRouteTree({ product: ProductPage }),
+  routeTree: buildRouteTree({ home: TodayScreen }),
   defaultPreload: 'intent',
   // The View Transitions API, per docs/design/motion.md's frame layer: a cross-document fade with
   // an 8 px rise on the main column. CSS-only, so it costs no JavaScript, and browsers without it

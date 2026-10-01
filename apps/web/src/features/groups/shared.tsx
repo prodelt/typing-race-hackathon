@@ -44,7 +44,7 @@ export function WithGroups({
       <div className="cm-calm" data-testid="community-unavailable">
         <h1 className="cm-display cm-calm__title">{m.community_unavailable_title()}</h1>
         <p className="cm-lede">{m.community_unavailable()}</p>
-        <Link to="/today" className={buttonClass('primary', 'md')}>
+        <Link to="/" className={buttonClass('primary', 'md')}>
           {m.community_unavailable_action()}
         </Link>
       </div>
