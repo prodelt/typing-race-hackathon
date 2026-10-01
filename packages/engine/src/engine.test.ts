@@ -21,6 +21,7 @@ describe('construction and lifecycle', () => {
       state: 'idle',
       cursor: 0,
       markedAt: null,
+      wrong: [],
       errorCount: 0,
       elapsedMs: 0,
       lastError: null,
@@ -205,6 +206,16 @@ describe('judging', () => {
       char: ['c', 'o', null, 'a', 't'],
       correct: [true, false, false, true, true],
     })
+  })
+
+  it('freeBackspace: every unerased wrong character stays in the view until erased', () => {
+    const { engine, input } = setup('abcd', 'freeBackspace')
+    input.emit(char('x', 1))
+    input.emit(char('b', 2))
+    input.emit(char('y', 3))
+    expect(engine.view).toMatchObject({ cursor: 3, markedAt: 0, wrong: [0, 2] })
+    input.emit(backspace(4))
+    expect(engine.view).toMatchObject({ cursor: 2, markedAt: 0, wrong: [0] })
   })
 
   it('freeBackspace: a wrong key occupies its place and must be erased', () => {
@@ -418,6 +429,7 @@ describe('view and segmentation', () => {
       'lastError',
       'markedAt',
       'state',
+      'wrong',
     ])
   })
 

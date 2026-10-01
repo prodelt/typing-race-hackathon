@@ -107,7 +107,21 @@ async function longestMotion(page: Page): Promise<number> {
 async function audit(page: Page): Promise<void> {
   await page.evaluate(() =>
     Promise.all(
-      document.getAnimations().map((animation) => animation.finished.then(() => undefined)),
+      document
+        .getAnimations()
+        // A deliberately endless animation (the live gradient, a caret) never finishes.
+        .filter(
+          (animation) =>
+            animation.effect?.getComputedTiming().iterations !== Number.POSITIVE_INFINITY &&
+            // Nor does one inside unrendered content (a closed <details>): it never runs.
+            ((animation.effect as KeyframeEffect | null)?.target?.checkVisibility() ?? true),
+        )
+        .map((animation) =>
+          animation.finished.then(
+            () => undefined,
+            () => undefined,
+          ),
+        ),
     ),
   )
   await expectNoAxeViolations(page)
@@ -193,6 +207,8 @@ test.describe('US5 settings', () => {
     await page.emulateMedia({ reducedMotion: 'no-preference' })
     await page.goto('/settings')
     await expect(html(page)).toHaveAttribute('data-motion', 'full')
+    // The attribute is written before React mounts; measure the screen, not the empty document.
+    await expect(page.getByRole('heading', { level: 1, name: 'Налаштування' })).toBeVisible()
     // A control: with motion on, something on this page does animate, so "none" below means
     // something rather than "the page never animated".
     expect(await longestMotion(page)).toBeGreaterThan(0.05)

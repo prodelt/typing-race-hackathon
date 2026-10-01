@@ -224,7 +224,21 @@ function scaleRow(page: Page, name: string) {
 async function audit(page: Page): Promise<void> {
   await page.evaluate(() =>
     Promise.all(
-      document.getAnimations().map((animation) => animation.finished.then(() => undefined)),
+      document
+        .getAnimations()
+        // A deliberately endless animation (the live gradient, a caret) never finishes.
+        .filter(
+          (animation) =>
+            animation.effect?.getComputedTiming().iterations !== Number.POSITIVE_INFINITY &&
+            // Nor does one inside unrendered content (a closed <details>): it never runs.
+            ((animation.effect as KeyframeEffect | null)?.target?.checkVisibility() ?? true),
+        )
+        .map((animation) =>
+          animation.finished.then(
+            () => undefined,
+            () => undefined,
+          ),
+        ),
     ),
   )
   await expectNoAxeViolations(page)
@@ -571,6 +585,9 @@ test.describe('US3 progress survives a restart (§8.9)', () => {
     browser,
     baseURL,
   }) => {
+    // Genuinely long: four typed attempts, then the same eight-screen reading three times (live,
+    // after a reload, after a restart), about 25 full page loads.
+    test.setTimeout(60_000)
     await startFromEmpty(page)
 
     // Three test attempts on the scale for п, the first with a corrected-away wrong key so that

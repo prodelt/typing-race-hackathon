@@ -1,12 +1,9 @@
 import type { AssetCache, AssetCacheStatus } from './index.js'
 
 /**
- * T023. The service worker behind a seam, so that the default in every test is **off**.
- *
- * That default is the point. A registered service worker serving a stale shell will happily make
- * a broken build pass its own end-to-end suite, and the failure mode is a green run against code
- * that is no longer there. Exactly one test — the offline scenario in US3 — opts into the real
- * adapter; everything else uses `noAssetCache`.
+ * The service worker behind a seam. `main.tsx` registers the real adapter in production builds;
+ * unit tests use `noAssetCache`. The worker is network-first for navigations and every asset URL is
+ * content-hashed, so a registered worker cannot serve an e2e run a stale build.
  *
  * This is the only file in the application permitted to register a worker or touch the Cache API
  * (Constitution III); the worker script itself, under `src/sw/`, is the other.

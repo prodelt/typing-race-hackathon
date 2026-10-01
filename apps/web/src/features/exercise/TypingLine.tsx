@@ -31,7 +31,10 @@ function TypingLineBase({ engine, text, sizePx }: TypingLineProps) {
   const errorsRef = useRef<HTMLSpanElement>(null)
   const fillRef = useRef<HTMLDivElement>(null)
   const meterRef = useRef<HTMLDivElement>(null)
-  const previous = useRef<{ cursor: number; marked: number | null }>({ cursor: -1, marked: null })
+  const previous = useRef<{ cursor: number; marks: ReadonlySet<number> }>({
+    cursor: -1,
+    marks: new Set(),
+  })
 
   const chars = Array.from(text)
 
@@ -67,10 +70,19 @@ function TypingLineBase({ engine, text, sizePx }: TypingLineProps) {
       meterRef.current?.setAttribute('aria-valuenow', String(Math.round(done * 100)))
     }
 
-    if (markedAt !== before.marked) {
-      const cleared = before.marked === null ? null : spans.item(before.marked)
+    // Every position holding a wrong character is marked, not only the earliest: under
+    // freeBackspace each wrong keystroke stays visibly wrong until the learner erases it. Under
+    // stopOnLetter `wrong` is empty and `markedAt` is the awaited character, marked in place.
+    const marks = new Set(view.wrong)
+    if (markedAt !== null) marks.add(markedAt)
+    for (const index of before.marks) {
+      if (marks.has(index)) continue
+      const cleared = spans.item(index)
       if (cleared instanceof HTMLElement) cleared.removeAttribute('data-mark')
-      const marked = markedAt === null ? null : spans.item(markedAt)
+    }
+    for (const index of marks) {
+      if (before.marks.has(index)) continue
+      const marked = spans.item(index)
       if (marked instanceof HTMLElement) marked.dataset['mark'] = 'wrong'
     }
 
@@ -80,7 +92,7 @@ function TypingLineBase({ engine, text, sizePx }: TypingLineProps) {
     }
     if (timeRef.current !== null) timeRef.current.textContent = formatElapsed(view.elapsedMs)
 
-    previous.current = { cursor, marked: markedAt }
+    previous.current = { cursor, marks }
   }, [])
 
   useEnginePaint(engine, paint)
@@ -101,7 +113,7 @@ function TypingLineBase({ engine, text, sizePx }: TypingLineProps) {
     let live = true
     void document.fonts?.ready.then(() => {
       if (!live) return
-      previous.current = { cursor: -1, marked: previous.current.marked }
+      previous.current = { cursor: -1, marks: previous.current.marks }
       paint(engine.view)
     })
     return () => {

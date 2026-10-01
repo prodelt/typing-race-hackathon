@@ -158,7 +158,21 @@ function minutesStated(text: string): number {
 async function audit(page: Page): Promise<void> {
   await page.evaluate(() =>
     Promise.all(
-      document.getAnimations().map((animation) => animation.finished.then(() => undefined)),
+      document
+        .getAnimations()
+        // A deliberately endless animation (the live gradient, a caret) never finishes.
+        .filter(
+          (animation) =>
+            animation.effect?.getComputedTiming().iterations !== Number.POSITIVE_INFINITY &&
+            // Nor does one inside unrendered content (a closed <details>): it never runs.
+            ((animation.effect as KeyframeEffect | null)?.target?.checkVisibility() ?? true),
+        )
+        .map((animation) =>
+          animation.finished.then(
+            () => undefined,
+            () => undefined,
+          ),
+        ),
     ),
   )
   await expectNoAxeViolations(page)

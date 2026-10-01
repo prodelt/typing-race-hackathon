@@ -13,6 +13,11 @@ export interface EngineView {
   readonly cursor: number
   /** Set while a wrong keystroke is unresolved (FR-016, FR-017). */
   readonly markedAt: number | null
+  /**
+   * `freeBackspace` only: every position still holding a wrong character, ascending. Each one stays
+   * visibly wrong in the typing line until it is erased; `markedAt` is only the earliest of them.
+   */
+  readonly wrong: readonly number[]
   /** Wrong character keystrokes, corrected or not. Never lowered (FR-024). */
   readonly errorCount: number
   /** Milliseconds spent running; excludes paused and unfocused time. */

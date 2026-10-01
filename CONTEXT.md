@@ -4,8 +4,10 @@ Comprehensive domain model and conceptual glossary for the Typing-Race touch-typ
 
 ## People
 
-- **Learner (Учень)**: The person progressing through the curriculum. There are no accounts; the learner's progress lives in this browser.
+- **Learner (Учень)**: The person progressing through the curriculum. Training needs no sign-in; without an Account the learner's progress lives in this browser only.
   _Avoid_: Guest, anonymous user, visitor
+- **Account (Акаунт)**: An optional Google sign-in attached to a Learner, so their attempts, settings and profile follow them to any device. Signing in never discards progress made before it.
+  _Avoid_: user, login, profile (the profile is what an Account shows, not the Account itself)
 
 ## Pedagogical Core Concepts
 

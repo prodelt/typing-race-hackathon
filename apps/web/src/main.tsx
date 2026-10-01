@@ -8,6 +8,7 @@ import { DEFAULT_SETTINGS, useAppStore } from './app/state/index.js'
 import { applyPresentation, readEnvironment, watchSystemPreferences } from './app/theme.js'
 import { ProductPage } from './features/product/index.js'
 import { installLatencyProbe } from './instrument/latency.js'
+import { serviceWorkerCache } from './seams/index.js'
 
 /**
  * The application entry point.
@@ -55,3 +56,13 @@ createRoot(rootElement).render(
     <RouterProvider router={router} />
   </StrictMode>,
 )
+
+// The offline promise: after one successful load the app opens, runs an exercise and shows its
+// result with the network away. Only a production build emits `/sw.js`, so the dev server never
+// registers anything. Registration waits for `load` so installing the precache never competes
+// with the first paint; a failed registration degrades the next visit and never this one.
+if (import.meta.env.PROD) {
+  const cache = serviceWorkerCache()
+  if (document.readyState === 'complete') void cache.register()
+  else window.addEventListener('load', () => void cache.register(), { once: true })
+}
