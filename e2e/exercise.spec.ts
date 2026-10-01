@@ -332,16 +332,18 @@ test.describe('US1 typing an exercise', { tag: '@input' }, () => {
     const text = [...(await exerciseText(page))]
     const first = text[0] ?? ''
 
-    // The awaited key is the one highlighted, and it is ringed in its finger's own ink.
+    // The awaited key is the one highlighted: B's wanted key, solid red and ringed in the same
+    // red, over the finger zones (the first run's scheme draws it the same way).
     const awaited = page.getByTestId('keyboard-guide').locator('[data-awaited="true"]')
     await expect(awaited).toHaveCount(1)
     await expect(awaited).toHaveText(first)
     const ring = await awaited.evaluate((node) => {
       const style = getComputedStyle(node)
-      return { style: style.outlineStyle, outline: style.outlineColor, ink: style.color }
+      return { style: style.outlineStyle, outline: style.outlineColor, fill: style.backgroundColor }
     })
     expect(ring.style).toBe('solid')
-    expect(ring.outline).toBe(ring.ink)
+    expect(ring.fill).toBe('rgb(194, 31, 19)')
+    expect(ring.outline).toBe(ring.fill)
 
     // The finger is named in words as well as colour (FR-061).
     await expect(page.getByTestId('next-key')).toContainText(/мізинець|палець/)

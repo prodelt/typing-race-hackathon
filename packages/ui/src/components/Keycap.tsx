@@ -38,6 +38,20 @@ const WIDTHS = {
   space: 'w-56',
 } as const
 
+/**
+ * Each finger draws its zone (tokens.css): white at the pinkies deepening to the index fingers,
+ * the same on both hands — the language of the first run's finger scheme. Whole class names so
+ * Tailwind sees them, and classes rather than an inline style so a screen can restyle a keycap
+ * from its stylesheet: the practice guide fills the awaited key red that way.
+ */
+const FINGER_ZONE: Record<Finger, string> = {
+  pinky: 'bg-finger-pinky-tint text-finger-pinky-ink border-finger-pinky-line',
+  ring: 'bg-finger-ring-tint text-finger-ring-ink border-finger-ring-line',
+  middle: 'bg-finger-middle-tint text-finger-middle-ink border-finger-middle-line',
+  index: 'bg-finger-index-tint text-finger-index-ink border-finger-index-line',
+  thumb: 'bg-finger-thumb-tint text-finger-thumb-ink border-finger-thumb-line',
+}
+
 export function Keycap({
   glyph,
   finger,
@@ -48,10 +62,6 @@ export function Keycap({
   className,
   ...rest
 }: KeycapProps) {
-  const ink = `var(--color-finger-${finger}-ink)`
-  const tint = `var(--color-finger-${finger}-tint)`
-  const line = `var(--color-finger-${finger}-line)`
-
   return (
     <span
       // Decorative by default: the guide repeats what the typing line already says, and a screen
@@ -70,22 +80,15 @@ export function Keycap({
         // The awaited key is the one place the keyboard uses the brand red, at full strength
         // whatever its guide tier, so the eye finds it without searching.
         awaited ? 'opacity-100 scale-105' : locked ? 'opacity-30' : TIERS[tier],
+        awaited
+          ? 'bg-accent text-on-accent border-accent-deep'
+          : locked
+            ? 'bg-paper text-muted border-hairline'
+            : FINGER_ZONE[finger],
         WIDTHS[width],
         className,
       )}
-      style={
-        awaited
-          ? {
-              color: 'var(--color-on-accent)',
-              backgroundColor: 'var(--color-accent)',
-              borderColor: 'var(--color-accent-deep)',
-            }
-          : {
-              color: locked ? 'var(--color-muted)' : ink,
-              backgroundColor: locked ? 'var(--color-paper)' : tint,
-              borderColor: locked ? 'var(--color-hairline)' : line,
-            }
-      }
+      data-finger={finger}
       {...rest}
     >
       {width === 'space' ? '' : glyph}

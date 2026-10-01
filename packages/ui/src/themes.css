@@ -47,27 +47,16 @@
 
   --color-nav-dimmed: #5d6872;
 
-  /* Finger inks lift and tints darken; the line stays the mid value so a keycap still reads as
-   * a keycap rather than as a filled block. */
-  --color-finger-pinky-ink: #b7a6e0;
-  --color-finger-pinky-tint: #242236;
-  --color-finger-pinky-line: #4b4266;
-
-  --color-finger-ring-ink: #8fc79e;
-  --color-finger-ring-tint: #1b2a24;
-  --color-finger-ring-line: #3d5a46;
-
-  --color-finger-middle-ink: #dcb567;
-  --color-finger-middle-tint: #2b2619;
-  --color-finger-middle-line: #5c4c26;
-
-  --color-finger-index-ink: #86bcd8;
-  --color-finger-index-tint: #182832;
-  --color-finger-index-line: #34505f;
-
-  --color-finger-thumb-ink: #a7b2ba;
-  --color-finger-thumb-tint: #1d252c;
-  --color-finger-thumb-line: #3b4650;
+  /* Finger zones on the dark: a ramp in *lightness*, slate to a dusty rose. A tint of the red
+   * alone stays near black at every step and the four zones melt together; lifting the
+   * lightness keeps each step 1.2:1 or more from the next. The rose stays desaturated so the
+   * awaited key's saturated red is still the loudest thing on the keyboard. */
+  --color-zone-0: #1d252d;
+  --color-zone-1: #3a2e35;
+  --color-zone-2: #5b3a3f;
+  --color-zone-3: #82494b;
+  --color-zone-ink: #e7ebee;
+  --color-zone-line: #3a4753;
 
   /* Shadow does almost nothing on a dark ground; the hairline carries the separation instead. */
   --shadow-paper: 0 1px 0 rgb(0 0 0 / 30%);
@@ -114,25 +103,13 @@
 
   --color-nav-dimmed: #3f4a53;
 
-  --color-finger-pinky-ink: #3d2f66;
-  --color-finger-pinky-tint: #ded6f0;
-  --color-finger-pinky-line: #3d2f66;
-
-  --color-finger-ring-ink: #1f5130;
-  --color-finger-ring-tint: #d3e6d8;
-  --color-finger-ring-line: #1f5130;
-
-  --color-finger-middle-ink: #5a3f00;
-  --color-finger-middle-tint: #f0e2c0;
-  --color-finger-middle-line: #5a3f00;
-
-  --color-finger-index-ink: #103c52;
-  --color-finger-index-tint: #cfe3ee;
-  --color-finger-index-line: #103c52;
-
-  --color-finger-thumb-ink: #2c3630;
-  --color-finger-thumb-tint: #e4e8e2;
-  --color-finger-thumb-line: #2c3630;
+  /* Finger zones deepen further, and every key gets the theme's hard black edge. */
+  --color-zone-0: #ffffff;
+  --color-zone-1: #f8dcd8;
+  --color-zone-2: #f0b4ac;
+  --color-zone-3: #e58a7e;
+  --color-zone-ink: #0b0f12;
+  --color-zone-line: #0b0f12;
 
   --text-typing: 40px;
   --leading-typing: 1.7;
@@ -160,3 +137,4 @@
 :root[data-theme="dark"] :where(:focus-visible) {
   outline-color: var(--color-terracotta);
 }
+
