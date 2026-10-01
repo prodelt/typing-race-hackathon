@@ -29,7 +29,7 @@
     "data": "node --import ./tools/data/register.mjs tools/data/cli.ts",
     "data:check": "node --import ./tools/data/register.mjs tools/data/cli.ts --check",
     "supabase:bundle": "node tools/bundle-functions.ts",
-    "supabase:functions": "node tools/bundle-functions.ts && npx supabase functions deploy submit-attempt finish-race --use-api"
+    "supabase:functions": "node tools/bundle-functions.ts && npx supabase functions deploy submit-attempt finish-race delete-account --use-api"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",

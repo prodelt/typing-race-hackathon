@@ -14,6 +14,7 @@ import type {
   LayoutId,
 } from '@typing-race/domain'
 import { json, preflight } from '../_shared/cors.ts'
+import { overQuota } from '../_shared/rate-limit.ts'
 
 // The three workspace packages are mapped in `../deno.json` and resolved with `sloppy-imports`,
 // because their own internal imports are extensionless — that is what `allowImportingTsExtensions:
@@ -142,6 +143,9 @@ Deno.serve(async (request) => {
     Deno.env.get('SUPABASE_URL') ?? '',
     Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
   )
+
+  const limited = await overQuota(service, userId, 'submit-attempt')
+  if (limited) return limited
 
   let body: { attempts?: Submission[] }
   try {

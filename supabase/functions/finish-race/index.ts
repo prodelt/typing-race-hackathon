@@ -3,6 +3,7 @@ import { layouts } from '@typing-race/curriculum'
 import type { KeystrokeEventLog, LayoutId } from '@typing-race/domain'
 import { computeMetrics } from '@typing-race/metrics'
 import { json, preflight } from '../_shared/cors.ts'
+import { overQuota } from '../_shared/rate-limit.ts'
 
 /**
  * `finish-race` — the only place a race finish becomes a Validated Result.
@@ -98,6 +99,9 @@ Deno.serve(async (request) => {
     Deno.env.get('SUPABASE_URL') ?? '',
     Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
   )
+
+  const limited = await overQuota(service, userId, 'finish-race')
+  if (limited) return limited
 
   let body: { roomId?: string; log?: KeystrokeEventLog; elapsedMs?: number }
   try {
