@@ -1,5 +1,6 @@
 import { createClient, type RealtimeChannel, type SupabaseClient } from '@supabase/supabase-js'
 import type { KeystrokeEventLog, Language } from '@typing-race/domain'
+import { startSync } from './index.js'
 
 /**
  * The race side of the `sync` seam: every Supabase call a race makes, and nothing else.
@@ -274,6 +275,8 @@ function createBackend(client: SupabaseClient): RaceBackend {
       })
       if (error || !data.user) fail(error, 'network')
       safeStorage('local')?.setItem(NAME_KEY, nickname)
+      // A session exists from here on, so training syncs too (ADR-0006: signed in means syncing).
+      void startSync()
       return readProfile(data.user.id)
     },
 

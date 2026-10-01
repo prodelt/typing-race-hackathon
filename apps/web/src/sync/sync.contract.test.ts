@@ -3,7 +3,15 @@ import { describe, expect, it, vi } from 'vitest'
 import type { ProgressStore } from '../seams/index.js'
 import { memoryOutbox } from '../seams/outbox.js'
 import { DEFAULT_SETTINGS, memoryStore } from '../seams/store.js'
-import { createSync, type Rejection, type Remote, type StampedSettings } from './index.js'
+import {
+  createSync,
+  NickError,
+  type Rejection,
+  type Remote,
+  RemoteError,
+  type StampedSettings,
+  UPLOAD_BATCH,
+} from './index.js'
 
 /**
  * The sync engine (ADR-0006), driven through its interface against an in-memory cloud.
@@ -264,6 +272,58 @@ describe('sync — the outbox', () => {
     expect(sync.status().phase).toBe('idle')
   })
 
+  it('uploads a long outbox in batches, and keeps what a failed batch did not send', async () => {
+    const cloud = fakeCloud()
+    const remote = cloud.remote()
+    let calls = 0
+    const flaky: Remote = {
+      ...remote,
+      async push(attempts) {
+        calls += 1
+        // The second request drops: the first batch is in the cloud, the rest still queued.
+        if (calls === 2) throw new Error('network down')
+        return remote.push(attempts)
+      },
+    }
+    const a = device()
+    const total = UPLOAD_BATCH * 2 + 3
+    for (let i = 0; i < total; i += 1) await a.outbox.put(attempt(`a${i}`, 1_000 + i))
+
+    await a.sync.connect(flaky)
+    expect(cloud.pushes.every((batch) => batch.length <= UPLOAD_BATCH)).toBe(true)
+    expect(cloud.attempts.size).toBe(UPLOAD_BATCH)
+    expect(a.sync.status().pending).toBe(total - UPLOAD_BATCH)
+
+    await a.sync.syncNow()
+    expect(cloud.attempts.size).toBe(total)
+    expect(a.sync.status().pending).toBe(0)
+  })
+
+  it('waits as long as a rate-limited server asks before retrying', async () => {
+    const cloud = fakeCloud()
+    const delays: number[] = []
+    const limited: Remote = {
+      ...cloud.remote(),
+      push: async () => {
+        throw new RemoteError('rate_limited', 600_000)
+      },
+    }
+    const sync = createSync({
+      store: memoryStore(),
+      outbox: memoryOutbox([attempt('a1')]),
+      isOnline: () => true,
+      onOnline: () => () => {},
+      schedule: (_fn, ms) => {
+        delays.push(ms)
+        return () => {}
+      },
+    })
+    await sync.connect(limited)
+    expect(sync.status().phase).toBe('error')
+    expect(delays).toEqual([600_000])
+    expect(sync.status().pending).toBe(1)
+  })
+
   it('survives a reload: a new engine over the same outbox still uploads it', async () => {
     const outbox = memoryOutbox()
     const cloud = fakeCloud()
@@ -380,6 +440,21 @@ describe('sync — nick', () => {
     expect(await a.sync.nick()).toBe('typist-1234')
     expect(await a.sync.setNick('Швидкий')).toBe('Швидкий')
     expect(cloud.nick).toBe('Швидкий')
+  })
+
+  it('trims a nick and refuses one outside 2 to 32 characters without asking the server', async () => {
+    const cloud = fakeCloud()
+    const a = device()
+    await a.sync.connect(cloud.remote())
+    expect(await a.sync.setNick('  Ліра  ')).toBe('Ліра')
+    await expect(a.sync.setNick(' x ')).rejects.toMatchObject({ code: 'invalid' })
+    await expect(a.sync.setNick('x'.repeat(33))).rejects.toBeInstanceOf(NickError)
+    expect(cloud.nick).toBe('Ліра')
+  })
+
+  it('says plainly when there is no account to write the nick to', async () => {
+    const a = device()
+    await expect(a.sync.setNick('Ліра')).rejects.toMatchObject({ code: 'signed-out' })
   })
 })
 

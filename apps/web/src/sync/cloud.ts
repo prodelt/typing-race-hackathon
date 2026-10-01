@@ -1,6 +1,14 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Attempt, Settings } from '@typing-race/domain'
-import { appSync, type Rejection, type Remote, type StampedSettings } from './index.js'
+import {
+  appSync,
+  NickError,
+  type Rejection,
+  type Remote,
+  RemoteError,
+  type StampedSettings,
+  type StartResult,
+} from './index.js'
 import { supabaseClient } from './race.js'
 
 /**
@@ -10,8 +18,6 @@ import { supabaseClient } from './race.js'
  * Supabase client. `startSync` only ever *uses* a session that already exists: it never signs
  * anyone in, so no anonymous user is created by sync (lazy identity, ADR-0006).
  */
-
-export type StartResult = 'syncing' | 'no-backend' | 'no-session'
 
 let unsubscribeAuth: (() => void) | null = null
 
@@ -76,7 +82,7 @@ export function supabaseRemote(client: SupabaseClient, userId: string): Remote {
           })),
         },
       })
-      if (error || !data) throw new Error(error?.message ?? 'submit-attempt returned nothing')
+      if (error || !data) throw remoteError(error)
       return { accepted: data.accepted, rejected: [...data.rejected, ...refused] }
     },
 
@@ -141,10 +147,30 @@ export function supabaseRemote(client: SupabaseClient, userId: string): Remote {
         .eq('id', userId)
         .select('nickname')
         .single()
-      if (error) throw new Error(error.message)
+      if (error) {
+        if (error.code === '23505' || /profiles_nickname_key/.test(error.message)) {
+          throw new NickError('taken')
+        }
+        if (error.code === '23514') throw new NickError('invalid')
+        throw new RemoteError(error.message)
+      }
       return data.nickname as string
     },
   }
+}
+
+/**
+ * Turns a failed `functions.invoke` into a `RemoteError`, keeping the wait a rate-limited
+ * `submit-attempt` asks for (429 with `Retry-After` in seconds).
+ */
+function remoteError(error: unknown): RemoteError {
+  const message = error instanceof Error ? error.message : 'submit-attempt returned nothing'
+  const response = (error as { context?: unknown } | null)?.context
+  if (response instanceof Response && response.status === 429) {
+    const seconds = Number(response.headers.get('Retry-After'))
+    return new RemoteError('rate_limited', Number.isFinite(seconds) ? seconds * 1000 : 0)
+  }
+  return new RemoteError(message)
 }
 
 function fromRow(row: AttemptRow): Attempt {

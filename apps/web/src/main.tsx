@@ -9,6 +9,7 @@ import { applyPresentation, readEnvironment, watchSystemPreferences } from './ap
 import { HomeScreen } from './features/home/HomeScreen.js'
 import { installLatencyProbe } from './instrument/latency.js'
 import { serviceWorkerCache } from './seams/index.js'
+import { startSync } from './sync/index.js'
 
 /**
  * The application entry point.
@@ -60,7 +61,7 @@ createRoot(rootElement).render(
 // Sync runs only for a learner who already has a session (ADR-0006). The check is a localStorage
 // read, so a learner without one never downloads the Supabase client and never meets the backend.
 if (hasStoredSession()) {
-  void import('./sync/cloud.js').then(({ startSync }) => startSync()).catch(() => undefined)
+  void startSync()
 }
 
 function hasStoredSession(): boolean {

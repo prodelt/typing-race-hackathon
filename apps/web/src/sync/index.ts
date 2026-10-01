@@ -1,5 +1,6 @@
 import type { Attempt, Settings } from '@typing-race/domain'
 import type { OutboxStore, ProgressStore } from '../seams/index.js'
+import { batches, missingFrom, resolveSettings, retryDelay, settleUpload } from './policy.js'
 
 /**
  * The sync engine — ADR-0006's "progress syncs as a union of attempts".
@@ -36,6 +37,45 @@ export interface Rejection {
   readonly reason: RejectionReason
 }
 
+/**
+ * A failure the remote can describe: a dropped request, or the server asking the device to back off
+ * (`submit-attempt` answers 429 with `Retry-After` past its per-user window). Any other error is
+ * treated the same way, just without a minimum wait.
+ */
+export class RemoteError extends Error {
+  constructor(
+    message: string,
+    /** The server asked for at least this long before the next attempt. */
+    readonly retryAfterMs = 0,
+  ) {
+    super(message)
+    this.name = 'RemoteError'
+  }
+}
+
+/**
+ * Why a nick was not saved. `taken`: another learner has it (nicks are unique, case-insensitive).
+ * `invalid`: outside 2–32 characters once trimmed — the profile's own check. `signed-out`: there
+ * is no account to write it to.
+ */
+export class NickError extends Error {
+  constructor(readonly code: 'taken' | 'invalid' | 'signed-out') {
+    super(`nick not saved: ${code}`)
+    this.name = 'NickError'
+  }
+}
+
+/** The profile's check (`char_length(nickname) between 2 and 32`), applied before the round trip. */
+export const NICK_MIN = 2
+export const NICK_MAX = 32
+
+/**
+ * Attempts per `submit-attempt` request. The function recomputes every attempt's metrics within one
+ * call, so a week offline goes up in several modest requests rather than one that outlives the
+ * function's time limit — and each batch leaves the outbox as soon as it is accepted.
+ */
+export const UPLOAD_BATCH = 50
+
 export interface StampedSettings {
   readonly settings: Settings
   /** Epoch ms of the write. The later stamp wins. */
@@ -54,6 +94,7 @@ export interface Remote {
   settings(): Promise<StampedSettings | null>
   saveSettings(stamped: StampedSettings): Promise<void>
   nick(): Promise<string>
+  /** Saves and returns the stored nick. Throws `NickError('taken')` when another learner has it. */
   setNick(nick: string): Promise<string>
 }
 
@@ -92,6 +133,7 @@ export interface Sync {
   flush(): Promise<FlushReport>
   /** The profile nick, or `null` when disconnected. */
   nick(): Promise<string | null>
+  /** Trims, checks and saves the nick; resolves to what was stored. Rejects with `NickError`. */
   setNick(nick: string): Promise<string>
   /**
    * For sign-out. Wipes the local copy only when the outbox is empty, and says `'pending'`
@@ -115,9 +157,6 @@ export interface SyncDeps {
   readonly onLocalChanged?: () => void
   readonly now?: () => number
 }
-
-const FIRST_RETRY_MS = 2_000
-const MAX_RETRY_MS = 5 * 60_000
 
 const defaultIsOnline = (): boolean => globalThis.navigator?.onLine ?? true
 
@@ -181,10 +220,10 @@ export function createSync(deps: SyncDeps): Sync {
     cancelRetry = null
   }
 
-  const failed = () => {
+  const failed = (error: unknown) => {
     phase = 'error'
     clearRetry()
-    const delay = Math.min(FIRST_RETRY_MS * 2 ** failures, MAX_RETRY_MS)
+    const delay = retryDelay(failures, error instanceof RemoteError ? error.retryAfterMs : 0)
     failures += 1
     cancelRetry = schedule(() => {
       cancelRetry = null
@@ -197,21 +236,25 @@ export function createSync(deps: SyncDeps): Sync {
   const upload = async (target: Remote): Promise<FlushReport> => {
     const queued = await deps.outbox.all()
     if (queued.length === 0) return { accepted: [], rejected: [], pending: 0 }
-    const result = await target.push(queued)
-    // A refused attempt leaves the outbox too: the server would refuse it again forever. The one
-    // exception is an exercise the server does not know yet — an older deploy — which is kept and
-    // re-sent, because dropping it would lose that attempt from the account for good.
-    const final = result.rejected.filter((r) => r.reason !== 'unknown_scale').map((r) => r.id)
-    await deps.outbox.remove([...result.accepted, ...final])
-    lastRejections = result.rejected
-    return { accepted: result.accepted, rejected: result.rejected, pending: await refreshPending() }
+    const accepted: string[] = []
+    const rejected: Rejection[] = []
+    // Oldest first, so an interrupted upload leaves the newest work queued, not a gap in the past.
+    const ordered = [...queued].sort((x, y) => x.completedAt - y.completedAt)
+    for (const batch of batches(ordered, UPLOAD_BATCH)) {
+      const result = await target.push(batch)
+      // Settled per batch: a failure further on keeps only what was not sent.
+      await deps.outbox.remove(settleUpload(result))
+      accepted.push(...result.accepted)
+      rejected.push(...result.rejected)
+    }
+    lastRejections = rejected
+    return { accepted, rejected, pending: await refreshPending() }
   }
 
   const pullAttempts = async (target: Remote): Promise<boolean> => {
     const cloud = await target.pull()
     const loaded = await deps.store.load()
-    const known = new Set(typeof loaded === 'string' ? [] : loaded.attempts.map((a) => a.id))
-    const missing = cloud.filter((a) => !known.has(a.id))
+    const missing = missingFrom(typeof loaded === 'string' ? [] : loaded.attempts, cloud)
     if (missing.length === 0) return false
     await deps.store.appendAttempts(missing)
     return true
@@ -220,16 +263,17 @@ export function createSync(deps: SyncDeps): Sync {
   const reconcileSettings = async (target: Remote): Promise<boolean> => {
     const loaded = await deps.store.load()
     if (loaded === 'unavailable' || loaded === 'unreadable-version') return false
-    const localStamp = loaded === 'empty' ? 0 : (loaded.settingsUpdatedAt ?? 0)
+    const local =
+      loaded === 'empty'
+        ? null
+        : { settings: loaded.settings, updatedAt: loaded.settingsUpdatedAt ?? 0 }
     const cloud = await target.settings()
-    const cloudStamp = cloud?.updatedAt ?? 0
-    if (cloud !== null && cloudStamp > localStamp) {
+    const decision = resolveSettings(local, cloud)
+    if (decision === 'take' && cloud !== null) {
       await deps.store.saveSettings(cloud.settings, cloud.updatedAt)
       return true
     }
-    if (loaded !== 'empty' && localStamp > cloudStamp) {
-      await target.saveSettings({ settings: loaded.settings, updatedAt: localStamp })
-    }
+    if (decision === 'push' && local !== null) await target.saveSettings(local)
     return false
   }
 
@@ -253,8 +297,10 @@ export function createSync(deps: SyncDeps): Sync {
         phase = 'idle'
         lastSyncAt = now()
         announce()
-      } catch {
-        if (remote === target) failed()
+      } catch (error) {
+        // A batch may have gone up before the failure; the count the learner sees must say so.
+        await refreshPending()
+        if (remote === target) failed(error)
       }
     })
 
@@ -272,8 +318,8 @@ export function createSync(deps: SyncDeps): Sync {
         lastSyncAt = now()
         announce()
         return report
-      } catch {
-        if (remote === target) failed()
+      } catch (error) {
+        if (remote === target) failed(error)
         return { accepted: [], rejected: [], pending: await refreshPending() }
       }
     })
@@ -328,8 +374,11 @@ export function createSync(deps: SyncDeps): Sync {
     },
 
     async setNick(nick) {
-      if (remote === null) throw new Error('not signed in')
-      return remote.setNick(nick)
+      if (remote === null) throw new NickError('signed-out')
+      const trimmed = nick.trim()
+      const length = [...trimmed].length
+      if (length < NICK_MIN || length > NICK_MAX) throw new NickError('invalid')
+      return remote.setNick(trimmed)
     },
 
     async wipeLocalIfSynced() {
@@ -360,8 +409,9 @@ export function createSync(deps: SyncDeps): Sync {
 }
 
 // -------------------------------------------------------------------------------------------
-// The application's one engine, and the small surface the account UI calls. `startSync` lives in
-// `cloud.ts` so the Supabase client loads only when a session is about to be used.
+// The application's one engine, and the small surface the sign-in UI and Profile's Account section
+// call. Everything below is safe to import eagerly: the Supabase client loads only inside
+// `startSync`, and only when a backend is configured.
 // -------------------------------------------------------------------------------------------
 
 let shared: Sync | null = null
@@ -377,11 +427,21 @@ export function appSync(): Sync {
   return shared
 }
 
-/** Observable sync status for the account UI. Subscribing calls back immediately. */
-export const syncStatus = {
-  get: (): SyncStatus => appSync().status(),
-  subscribe: (listener: (status: SyncStatus) => void): (() => void) =>
-    appSync().subscribe(listener),
+export type StartResult = 'syncing' | 'no-backend' | 'no-session'
+
+/**
+ * Connects the signed-in account and runs a first full sync: the outbox uploads, the cloud history
+ * unions in, settings reconcile. Call it after a sign-in (Google or the first race's guest) and at
+ * boot. It never signs anyone in: with no session it answers `'no-session'` and touches nothing,
+ * and with no backend configured `'no-backend'`. Never rejects.
+ */
+export async function startSync(): Promise<StartResult> {
+  try {
+    const cloud = await import('./cloud.js')
+    return await cloud.startSync()
+  } catch {
+    return 'no-backend'
+  }
 }
 
 /** Detaches the account. Local progress and the outbox stay. */
@@ -389,7 +449,34 @@ export function stopSync(): void {
   shared?.disconnect()
 }
 
-/** For sign-out: `'wiped'` only when nothing is left to upload, else `'pending'` and nothing is touched. */
+/** A sync right now — a "sync" button, or after the app regains focus. Never rejects. */
+export function syncNow(): Promise<void> {
+  return appSync().syncNow()
+}
+
+/** Observable sync status for the account UI. Subscribing calls back immediately. */
+export const syncStatus = {
+  get: (): SyncStatus => appSync().status(),
+  subscribe: (listener: (status: SyncStatus) => void): (() => void) =>
+    appSync().subscribe(listener),
+}
+
+/** The account's public nick, or `null` with no account connected. */
+export function accountNick(): Promise<string | null> {
+  return appSync().nick()
+}
+
+/** Saves the account's nick; resolves to what was stored, rejects with `NickError`. */
+export function setAccountNick(nick: string): Promise<string> {
+  return appSync().setNick(nick)
+}
+
+/**
+ * The first half of sign-out (ADR-0006): flushes the outbox, then wipes the local copy only if
+ * nothing is left to upload. `'pending'` means attempts are still unsynced and nothing was touched:
+ * the UI warns, and may retry or let the learner stay signed in. On `'wiped'` the caller signs out
+ * of Supabase, which disconnects sync.
+ */
 export function wipeLocalIfSynced(): Promise<'wiped' | 'pending'> {
   return appSync().wipeLocalIfSynced()
 }
