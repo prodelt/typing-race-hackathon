@@ -85,10 +85,14 @@ test.describe('weak-spot review', () => {
     test.setTimeout(90_000)
     await seed(page, history())
     await page.goto('/today')
-    // Повторення is a live destination in the navigation now.
+    // Weak-spot review lives on the Map: the destination, then its «Слабкі місця» tab.
     await page
       .getByRole('navigation', { name: 'Основна навігація' })
-      .getByRole('link', { name: 'Повторення' })
+      .getByRole('link', { name: 'Мапа' })
+      .click()
+    await page
+      .getByRole('navigation', { name: 'Розділи мапи' })
+      .getByRole('link', { name: 'Слабкі місця' })
       .click()
     await expect(page).toHaveURL(/\/review$/)
     await expect(page.getByRole('heading', { level: 1, name: /Повторення/ })).toBeVisible()

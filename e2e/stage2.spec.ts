@@ -77,7 +77,7 @@ async function seedHomeRow(page: Page, passesOnK = 0): Promise<void> {
 async function openPath(page: Page): Promise<void> {
   await page
     .getByRole('navigation', { name: 'Основна навігація' })
-    .getByRole('link', { name: 'Шлях' })
+    .getByRole('link', { name: 'Мапа' })
     .click()
   await expect(page).toHaveURL(/\/path$/)
 }

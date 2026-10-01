@@ -72,13 +72,13 @@ test.describe('US4 the public Formulas page', () => {
   })
 
   test('the other public pages open with no stored progress too', async ({ page }) => {
-    // The product page, formulas, licences, privacy and about are the only screens a visitor
-    // without a learner may reach (docs/adr/0003).
+    // The product page, formulas, licences, privacy and about open for a visitor without a
+    // learner (docs/adr/0003). The product page moved to /about when / became Home.
     for (const [path, heading] of [
-      ['/', 'Друкуй наосліп'],
+      ['/about', 'Друкуй наосліп'],
       ['/licences', 'Ліцензії'],
       ['/privacy', 'Приватність'],
-      ['/about', 'Про проєкт'],
+      ['/about/project', 'Про проєкт'],
     ] as const) {
       await page.goto(path)
       await expect(page.getByRole('heading', { level: 1, name: heading })).toBeVisible()

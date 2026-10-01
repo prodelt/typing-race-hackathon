@@ -51,7 +51,7 @@ test('races say calmly that they are unavailable when the backend cannot be reac
   await expect(page.getByTestId('race-unavailable')).toBeVisible({ timeout: 20_000 })
   // Training is one click away and does not depend on the backend at all.
   await page.getByRole('link', { name: 'До тренування' }).click()
-  await expect(page).toHaveURL(/\/today$/)
+  await expect(page).toHaveURL(/\/$/)
 })
 
 test.describe('@backend races', () => {

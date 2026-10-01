@@ -325,11 +325,11 @@ test.describe('US5 settings', () => {
     await expect(row).toContainText('Серія 1 з 3')
 
     // Typing language: English. The layout follows it, and Path is the English catalogue.
-    await primaryNavigation(page).getByRole('link', { name: 'Сьогодні' }).click()
+    await primaryNavigation(page).getByRole('link', { name: 'Головна' }).click()
     await page.goto('/settings')
     await radio(page, 'Мова набору', 'English').check()
     await expect(radio(page, 'Розкладка', 'QWERTY')).toBeChecked()
-    await primaryNavigation(page).getByRole('link', { name: 'Шлях' }).click()
+    await primaryNavigation(page).getByRole('link', { name: 'Мапа' }).click()
     await expect(page.getByTestId('keyboard').locator('[data-code="KeyQ"]')).toHaveText(/^q$/i)
     await expect(
       page.locator('li[data-state]').filter({ hasText: 'Ряд · f' }).first(),
@@ -339,7 +339,7 @@ test.describe('US5 settings', () => {
     await page.goto('/settings')
     await radio(page, 'Мова набору', 'Українська').check()
     await expect(radio(page, 'Розкладка', 'ЙЦУКЕН')).toBeChecked()
-    await primaryNavigation(page).getByRole('link', { name: 'Шлях' }).click()
+    await primaryNavigation(page).getByRole('link', { name: 'Мапа' }).click()
     await expect(page.getByTestId('keyboard').locator('[data-code="KeyQ"]')).toHaveText(/^й$/i)
     await expect(
       page.locator('li[data-state]').filter({ hasText: 'Ряд · п' }).first(),
@@ -352,7 +352,7 @@ test.describe('US5 settings', () => {
     await page.goto('/settings')
 
     await radio(page, 'Розкладка', 'QWERTY').check()
-    await primaryNavigation(page).getByRole('link', { name: 'Шлях' }).click()
+    await primaryNavigation(page).getByRole('link', { name: 'Мапа' }).click()
     await expect(page.getByTestId('keyboard').locator('[data-code="KeyQ"]')).toHaveText(/^q$/i)
   })
 
@@ -376,11 +376,12 @@ test.describe('US5 settings', () => {
     await radio(page, 'Мова інтерфейсу', 'English').click({ noWaitAfter: true })
     await expect(page.getByRole('heading', { level: 1, name: 'Settings' })).toBeVisible()
 
-    // The shell, the page and the footer have all switched.
+    // The rail, the status bar, the page and the «About the game» menu have all switched.
     await expect(html(page)).toHaveAttribute('lang', 'en')
     const navigation = page.getByRole('navigation', { name: 'Primary navigation' })
-    await expect(navigation.getByRole('link', { name: 'Today' })).toBeVisible()
-    await expect(navigation.getByRole('link', { name: 'Path' })).toBeVisible()
+    await expect(navigation.getByRole('link', { name: 'Home', exact: true })).toBeVisible()
+    await expect(navigation.getByRole('link', { name: 'Map' })).toBeVisible()
+    await page.getByRole('button', { name: 'About the game' }).click()
     await expect(page.getByRole('link', { name: 'Formulas' })).toBeVisible()
     await expect(page.getByRole('link', { name: 'Privacy' })).toBeVisible()
     await expect(page.getByText('Формули')).toHaveCount(0)

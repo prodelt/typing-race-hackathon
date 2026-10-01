@@ -111,7 +111,7 @@ function primaryNavigation(page: Page) {
 
 /** Back to the session through the application's own links, so nothing reloads. */
 async function toSession(page: Page): Promise<void> {
-  await primaryNavigation(page).getByRole('link', { name: 'Сьогодні' }).click()
+  await primaryNavigation(page).getByRole('link', { name: 'Головна' }).click()
   await page.getByRole('link', { name: 'Кероване заняття' }).click()
   await expect(page.getByRole('heading', { level: 1, name: 'Сесія' })).toBeVisible()
 }
@@ -347,7 +347,7 @@ test.describe('US6 a guided session', () => {
     await typeExerciseThroughToResult(page)
 
     // Leaving: straight to Today, mid-block, with no ceremony.
-    await primaryNavigation(page).getByRole('link', { name: 'Сьогодні' }).click()
+    await primaryNavigation(page).getByRole('link', { name: 'Головна' }).click()
 
     // Resumable: the session is still there, and it knows one attempt is done.
     await page.getByRole('link', { name: 'Кероване заняття' }).click()
@@ -361,7 +361,7 @@ test.describe('US6 a guided session', () => {
 
     // The attempt is kept "with everything it implies for progress": a Practice Attempt on the
     // exercise screen shows the last completed one, which it could not if it had been thrown away.
-    await primaryNavigation(page).getByRole('link', { name: 'Шлях' }).click()
+    await primaryNavigation(page).getByRole('link', { name: 'Мапа' }).click()
     await page.getByRole('button', { name: 'Почати вправу Ряд · а' }).click()
     await page.getByRole('button', { name: 'Почати', exact: true }).click()
     await expect(page.getByTestId('live-speed')).not.toHaveText('—')
@@ -426,9 +426,9 @@ test.describe('US6 a session interrupted by a restart (FR-078)', () => {
       await expect(after.getByText(/Блок \d з 4/)).toHaveCount(0)
 
       // Every other way out still works.
-      await primaryNavigation(after).getByRole('link', { name: 'Шлях' }).click()
+      await primaryNavigation(after).getByRole('link', { name: 'Мапа' }).click()
       await expect(after.getByRole('heading', { level: 1, name: 'Шлях' })).toBeVisible()
-      await primaryNavigation(after).getByRole('link', { name: 'Сьогодні' }).click()
+      await primaryNavigation(after).getByRole('link', { name: 'Головна' }).click()
       await expect(after.getByTestId('next-action')).toBeVisible()
 
       // The attempt recorded before the restart is still there, result and all.

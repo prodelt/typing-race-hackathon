@@ -125,5 +125,5 @@ test('groups and boards say calmly that they are unavailable when the backend is
   await page.goto('/leaderboards')
   await expect(page.getByTestId('community-unavailable')).toBeVisible({ timeout: 20_000 })
   await page.getByRole('link', { name: 'До тренування' }).click()
-  await expect(page).toHaveURL(/\/today$/)
+  await expect(page).toHaveURL(/\/$/)
 })

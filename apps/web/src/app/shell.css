@@ -25,9 +25,6 @@
   font-size: 15px;
   line-height: 1.4;
   overflow: hidden;
-  transition:
-    grid-template-columns var(--play-ms) var(--ease-enter),
-    grid-template-rows var(--play-ms) var(--ease-enter);
 }
 
 @media (max-width: 1200px), (max-height: 820px) {
@@ -55,16 +52,22 @@
   transform: none;
 }
 
-/* ---- Play Mode: the rail and the bar leave, the stage takes the whole screen ------------- */
+/* ---- Play Mode: the rail and the bar leave, the stage takes the whole screen -------------
+ *
+ * The grid collapses **at once**, on Start, so the run's layout is final before the first
+ * keystroke; the rail and the bar then leave as overlays, sliding out over the stage. Nothing
+ * that animates here changes the size of anything the learner types into. */
 
 .frame__rail {
   grid-row: 1 / 3;
   grid-column: 1;
   min-width: 0;
   overflow: hidden;
+  z-index: 6;
   transition:
     transform var(--play-ms) var(--ease-enter),
-    opacity var(--play-ms) var(--ease-enter);
+    opacity var(--play-ms) var(--ease-enter),
+    visibility 0s linear 0s;
 }
 
 .frame__bar {
@@ -76,7 +79,8 @@
   z-index: 5;
   transition:
     transform var(--play-ms) var(--ease-enter),
-    opacity var(--play-ms) var(--ease-enter);
+    opacity var(--play-ms) var(--ease-enter),
+    visibility 0s linear 0s;
 }
 
 .frame[data-play] {
@@ -84,14 +88,31 @@
   grid-template-rows: 0 minmax(0, 1fr);
 }
 
-.frame[data-play] .frame__rail {
-  transform: translateX(-100%);
+.frame[data-play] .frame__rail,
+.frame[data-play] .frame__bar {
+  position: absolute;
   opacity: 0;
+  visibility: hidden;
+  transition:
+    transform var(--play-ms) var(--ease-exit),
+    opacity var(--play-ms) var(--ease-exit),
+    visibility 0s linear var(--play-ms);
+}
+
+.frame[data-play] .frame__rail {
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: var(--rail-w);
+  transform: translateX(-100%);
 }
 
 .frame[data-play] .frame__bar {
+  top: 0;
+  left: var(--rail-w);
+  right: 0;
+  height: var(--bar-h);
   transform: translateY(-100%);
-  opacity: 0;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -244,7 +265,8 @@
   margin: 4px 0;
   font: 500 22px / 1 var(--font-display);
   letter-spacing: -0.04em;
-  color: var(--color-accent);
+  /* The red as *text*: it lifts to a readable coral in the dark theme. */
+  color: var(--color-terracotta);
 }
 
 .season small {
@@ -374,7 +396,7 @@
 }
 
 .lvl .num {
-  color: var(--color-accent);
+  color: var(--color-terracotta);
 }
 
 .xp {
@@ -607,7 +629,6 @@
   min-height: 0;
   padding: 0 var(--pad) var(--pad) 0;
   background: var(--frame-bg);
-  transition: padding var(--play-ms) var(--ease-enter);
 }
 
 .stage__in {
@@ -716,9 +737,10 @@
   }
 }
 
+/* `!important` because each blob's timing is an inline style. */
 :root[data-motion="off"] .gp-blob,
 :root[data-motion="reduced"] .gp-blob {
-  animation: none;
+  animation: none !important;
 }
 
 /* The pink gradient belongs to the light theme; dark and low-vision keep a flat canvas. */
@@ -842,7 +864,15 @@
   }
 
   .frame[data-play] .frame__rail {
+    top: auto;
+    right: 0;
+    width: auto;
+    height: var(--dock-h);
     transform: translateY(100%);
+  }
+
+  .frame[data-play] .frame__bar {
+    left: 0;
   }
 
   .stage {
