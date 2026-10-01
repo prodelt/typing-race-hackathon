@@ -114,7 +114,11 @@ export function Results({
           </dl>
         )}
 
-        <RatingLine roomId={snapshot.id} settled={finished && ratingRead} />
+        <RatingLine
+          roomId={snapshot.id}
+          settled={finished && ratingRead}
+          alone={startLine(snapshot) < 2}
+        />
 
         <div className="race-gather__actions rr-actions">
           <Button
@@ -196,7 +200,15 @@ export function Results({
 }
 
 /** What this race did to the Race Rating: the change, "once everyone finishes", or "none". */
-function RatingLine({ roomId, settled }: { readonly roomId: string; readonly settled: boolean }) {
+function RatingLine({
+  roomId,
+  settled,
+  alone,
+}: {
+  readonly roomId: string
+  readonly settled: boolean
+  readonly alone: boolean
+}) {
   const standing = useRaceStanding((state) => state.standing)
   if (!settled) {
     return <p className="rr-rating rr-rating--quiet">{m.race_results_rating_pending()}</p>
@@ -212,5 +224,19 @@ function RatingLine({ roomId, settled }: { readonly roomId: string; readonly set
     )
   }
   if (standing.kind === 'loading' || standing.kind === 'unavailable') return null
-  return <p className="rr-rating rr-rating--quiet">{m.race_results_rating_none()}</p>
+  // The lone-racer reason only when it is the reason; otherwise just say it did not change.
+  return (
+    <p className="rr-rating rr-rating--quiet">
+      {alone ? m.race_results_rating_none() : m.race_results_rating_unchanged()}
+    </p>
+  )
+}
+
+/** How many racers were on the start line: joined before the start, or holding a result. */
+function startLine(snapshot: RoomSnapshot): number {
+  const start = snapshot.startsAt === null ? Number.NaN : Date.parse(snapshot.startsAt)
+  const finished = new Set(snapshot.results.map((result) => result.userId))
+  return snapshot.participants.filter(
+    (person) => finished.has(person.userId) || Date.parse(person.joinedAt) <= start,
+  ).length
 }

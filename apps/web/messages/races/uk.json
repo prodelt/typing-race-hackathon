@@ -99,6 +99,7 @@
   "race_results_rating_delta": "{delta} за цей заїзд",
   "race_results_rating_pending": "Рейтинг оновиться, коли фінішують усі.",
   "race_results_rating_none": "Цей заїзд рейтинг не змінив: на старті був лише один учасник.",
+  "race_results_rating_unchanged": "Цей заїзд рейтинг не змінив.",
   "race_results_your_speed": "ваша швидкість",
   "race_results_your_accuracy": "ваша точність",
   "race_gather_seats": "Учасники · {n} з 5"

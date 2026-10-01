@@ -126,7 +126,10 @@
 
 .rl {
   grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-  grid-template-rows: minmax(0, 1fr) auto auto;
+  /* Panels take their content's height and the group sits centred on the stage: no panel is
+     stretched into an empty middle just to reach the bottom edge. */
+  grid-template-rows: auto auto auto;
+  align-content: center;
 }
 
 .rl-quick {
@@ -151,7 +154,7 @@
 }
 
 .rl-tiles {
-  flex: 1;
+  flex: none;
   min-height: 0;
   margin-top: clamp(12px, 2vh, 20px);
   display: grid;
@@ -161,7 +164,7 @@
 
 .rl-tile {
   position: relative;
-  min-height: 132px;
+  min-height: 150px;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
@@ -242,7 +245,7 @@
 }
 
 .rl-friend__row {
-  flex: 1;
+  flex: none;
   margin-top: 16px;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
@@ -370,8 +373,9 @@
 }
 
 .rl-how {
-  margin-top: auto;
+  margin-top: clamp(16px, 2.6vh, 28px);
   padding-top: clamp(16px, 2.6vh, 28px);
+  border-top: var(--border-hairline) solid var(--color-hairline);
 }
 
 .rl-how ul {
