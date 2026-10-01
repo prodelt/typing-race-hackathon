@@ -227,6 +227,20 @@ for (const adapter of adapters) {
       expect(loaded.settings).toEqual(settings)
     })
 
+    it('stamps settings with when they changed, or with the time it is given', async () => {
+      // Settings sync last-write-wins by this stamp; a write applied from the cloud keeps the
+      // cloud's time, or the next comparison would think this device had just changed them.
+      await store.saveSettings({ ...DEFAULT_SETTINGS, theme: 'dark' })
+      const local = await store.load()
+      if (typeof local === 'string') throw new Error('expected an envelope')
+      expect(local.settingsUpdatedAt).toBeGreaterThan(1_000)
+
+      await store.saveSettings({ ...DEFAULT_SETTINGS, theme: 'light' }, 42)
+      const fromCloud = await store.load()
+      if (typeof fromCloud === 'string') throw new Error('expected an envelope')
+      expect(fromCloud.settingsUpdatedAt).toBe(42)
+    })
+
     it('advances writtenAt on every write, so a stale snapshot is detectable', async () => {
       await store.appendAttempts([attempt('a1', 1_000)])
       const first = await store.load()

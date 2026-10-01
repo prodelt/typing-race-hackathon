@@ -1,16 +1,16 @@
-import type { Attempt, AttemptMetrics } from '@typing-race/domain'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { memoryStore } from '../seams/store.js'
-import { createSync, memorySync, type Rejection, type Sync } from './index.js'
+import type { Attempt, AttemptMetrics, Settings } from '@typing-race/domain'
+import { describe, expect, it, vi } from 'vitest'
+import type { ProgressStore } from '../seams/index.js'
+import { memoryOutbox } from '../seams/outbox.js'
+import { DEFAULT_SETTINGS, memoryStore } from '../seams/store.js'
+import { createSync, type Rejection, type Remote, type StampedSettings } from './index.js'
 
 /**
- * The `sync` contract. Like the `ProgressStore` suite it sits beside, this is written to be run
- * against **every** adapter, so it asserts on behaviour a server must also honour and never on
- * how anything is stored.
+ * The sync engine (ADR-0006), driven through its interface against an in-memory cloud.
  *
- * The behaviour that matters most here is the one the offline promise rests on: a submitted
- * attempt is durable before the network is consulted, and no call throws because the network is
- * gone (FR-074).
+ * The cloud below behaves as `submit-attempt` and the tables do: an upload is idempotent by attempt
+ * id, a pull returns every attempt of the account, and the attempt that comes back has lost its
+ * text (the server keeps none) — exactly what a real round trip does.
  */
 
 function metrics(): AttemptMetrics {
@@ -50,128 +50,354 @@ function attempt(id: string, completedAt = 1_000): Attempt {
   }
 }
 
-describe('sync — offline behaviour, the promise FR-074 rests on', () => {
-  let sync: Sync
+interface FakeCloud {
+  readonly attempts: Map<string, Attempt>
+  settings: StampedSettings | null
+  nick: string
+  /** Set to make the next requests fail as a dropped connection would. */
+  down: boolean
+  readonly pushes: Attempt[][]
+  remote(): Remote
+}
 
-  beforeEach(() => {
-    sync = memorySync(memoryStore())
+function fakeCloud(): FakeCloud {
+  const cloud: FakeCloud = {
+    attempts: new Map(),
+    settings: null,
+    nick: 'typist-1234',
+    down: false,
+    pushes: [],
+    remote() {
+      const reachable = () => {
+        if (cloud.down) throw new Error('network down')
+      }
+      return {
+        async push(attempts) {
+          reachable()
+          cloud.pushes.push([...attempts])
+          // `on conflict do nothing`: a second copy of an id is accepted and changes nothing.
+          for (const a of attempts) if (!cloud.attempts.has(a.id)) cloud.attempts.set(a.id, a)
+          return { accepted: attempts.map((a) => a.id), rejected: [] as Rejection[] }
+        },
+        async pull() {
+          reachable()
+          return [...cloud.attempts.values()].map((a) => ({ ...a, text: '' }))
+        },
+        async settings() {
+          reachable()
+          return cloud.settings
+        },
+        async saveSettings(stamped) {
+          reachable()
+          cloud.settings = stamped
+        },
+        async nick() {
+          reachable()
+          return cloud.nick
+        },
+        async setNick(nick) {
+          reachable()
+          cloud.nick = nick
+          return nick
+        },
+      }
+    },
+  }
+  return cloud
+}
+
+async function localIds(store: ProgressStore): Promise<string[]> {
+  const loaded = await store.load()
+  if (typeof loaded === 'string') return []
+  return loaded.attempts.map((a) => a.id)
+}
+
+async function localSettings(store: ProgressStore) {
+  const loaded = await store.load()
+  if (typeof loaded === 'string') throw new Error('expected an envelope')
+  return { settings: loaded.settings, updatedAt: loaded.settingsUpdatedAt }
+}
+
+function device(options: { store?: ProgressStore; online?: () => boolean } = {}) {
+  const store = options.store ?? memoryStore()
+  const outbox = memoryOutbox()
+  const onLocalChanged = vi.fn()
+  const sync = createSync({
+    store,
+    outbox,
+    isOnline: options.online ?? (() => true),
+    onOnline: () => () => {},
+    schedule: () => () => {},
+    onLocalChanged,
+  })
+  return { store, outbox, sync, onLocalChanged }
+}
+
+describe('sync — union of attempts', () => {
+  it('unions disjoint histories: each device ends with both', async () => {
+    const cloud = fakeCloud()
+    const a = device()
+    const b = device()
+    await a.sync.submitAttempt(attempt('a1', 1_000))
+    await b.sync.submitAttempt(attempt('b1', 2_000))
+
+    await a.sync.connect(cloud.remote())
+    await b.sync.connect(cloud.remote())
+    await a.sync.syncNow()
+
+    expect(await localIds(a.store)).toEqual(['a1', 'b1'])
+    expect(await localIds(b.store)).toEqual(['a1', 'b1'])
+    expect([...cloud.attempts.keys()].sort()).toEqual(['a1', 'b1'])
   })
 
-  it('makes an attempt durable locally before any network is consulted', async () => {
+  it('unions overlapping histories without counting the shared attempt twice', async () => {
+    const cloud = fakeCloud()
+    cloud.attempts.set('shared', attempt('shared', 1_000))
+    cloud.attempts.set('cloud-only', attempt('cloud-only', 3_000))
+    const a = device()
+    await a.sync.submitAttempt(attempt('shared', 1_000))
+    await a.sync.submitAttempt(attempt('local-only', 2_000))
+
+    await a.sync.connect(cloud.remote())
+
+    expect(await localIds(a.store)).toEqual(['shared', 'local-only', 'cloud-only'])
+    expect(cloud.attempts.size).toBe(3)
+  })
+
+  it('leaves identical histories exactly as they were', async () => {
+    const cloud = fakeCloud()
+    cloud.attempts.set('x', attempt('x', 1_000))
+    const a = device({ store: memoryStore() })
+    await a.store.appendAttempts([attempt('x', 1_000)])
+    const before = await a.store.load()
+
+    await a.sync.connect(cloud.remote())
+
+    const after = await a.store.load()
+    if (typeof before === 'string' || typeof after === 'string') throw new Error('envelope')
+    expect(after.attempts).toEqual(before.attempts)
+    expect(cloud.attempts.size).toBe(1)
+  })
+
+  it('tells the application that local data changed, so derived state recomputes', async () => {
+    const cloud = fakeCloud()
+    cloud.attempts.set('c1', attempt('c1'))
+    const a = device()
+    await a.sync.connect(cloud.remote())
+    expect(a.onLocalChanged).toHaveBeenCalled()
+  })
+})
+
+describe('sync — the outbox', () => {
+  it('re-uploading the same attempt is a no-op in the cloud', async () => {
+    const cloud = fakeCloud()
+    const a = device()
+    await a.sync.submitAttempt(attempt('a1'))
+    await a.sync.connect(cloud.remote())
+    // The same attempt queued again, as a retry after a dropped response would.
+    await a.outbox.put(attempt('a1'))
+    await a.sync.flush()
+
+    expect(cloud.pushes).toHaveLength(2)
+    expect(cloud.attempts.size).toBe(1)
+    expect(a.sync.status().pending).toBe(0)
+  })
+
+  it('queues while offline and flushes once online', async () => {
+    let online = false
+    const cloud = fakeCloud()
+    let wake: () => void = () => {}
     const store = memoryStore()
-    const offline = createSync({ store, isOnline: () => false })
-
-    await offline.submitAttempt(attempt('a1'))
-
-    const loaded = await store.load()
-    if (typeof loaded === 'string') throw new Error('expected an envelope')
-    expect(loaded.attempts.map((a) => a.id)).toEqual(['a1'])
-  })
-
-  it('does not throw when there is no network', async () => {
-    const offline = createSync({ store: memoryStore(), isOnline: () => false })
-    // The whole point. A call that threw in a tunnel would break practice at the worst moment.
-    await expect(offline.submitAttempt(attempt('a1'))).resolves.toBeUndefined()
-    await expect(offline.flush()).resolves.toMatchObject({ pending: 1 })
-  })
-
-  it('queues while offline and drains once online', async () => {
-    let online = false
-    const push = vi.fn(async (attempts: readonly Attempt[]) => ({
-      accepted: attempts.map((a) => a.id),
-      rejected: [] as Rejection[],
-      progress: null,
-    }))
-    const queued = createSync({ store: memoryStore(), isOnline: () => online, push })
-
-    await queued.submitAttempt(attempt('a1', 1_000))
-    await queued.submitAttempt(attempt('a2', 2_000))
-    expect(push).not.toHaveBeenCalled()
-    expect(queued.status().pending).toBe(2)
-
-    online = true
-    const report = await queued.flush()
-
-    // One batched call, not one per attempt: the outbox flushes everything at once.
-    expect(push).toHaveBeenCalledTimes(1)
-    expect(report.accepted).toEqual(['a1', 'a2'])
-    expect(queued.status().pending).toBe(0)
-  })
-
-  it('drops a rejected attempt from the outbox instead of retrying it forever', async () => {
-    // A log the server has judged malformed will be judged malformed again. Retrying it would
-    // queue it until the learner clears their storage, and would tell them about it every minute.
-    let online = false
-    const push = vi.fn(async (attempts: readonly Attempt[]) => ({
-      accepted: [] as string[],
-      rejected: attempts.map((a) => ({ id: a.id, reason: 'log_malformed' as const })),
-      progress: null,
-    }))
-    const rejecting = createSync({ store: memoryStore(), isOnline: () => online, push })
-
-    await rejecting.submitAttempt(attempt('bad'))
-    online = true
-    const report = await rejecting.flush()
-
-    expect(report.rejected).toEqual([{ id: 'bad', reason: 'log_malformed' }])
-    expect(rejecting.status().pending).toBe(0)
-  })
-
-  it('surfaces a rejection raised by the flush submitAttempt starts on its own', async () => {
-    // `submitAttempt` kicks off a flush nobody awaits, so a rejection raised there has no return
-    // value to travel in. It has to reach the learner through the status, or an attempt is
-    // silently thrown away.
-    const push = vi.fn(async (attempts: readonly Attempt[]) => ({
-      accepted: [] as string[],
-      rejected: attempts.map((a) => ({ id: a.id, reason: 'too_fast' as const })),
-      progress: null,
-    }))
-    const s = createSync({ store: memoryStore(), isOnline: () => true, push })
-
-    await s.submitAttempt(attempt('suspicious'))
-    await vi.waitFor(() => {
-      expect(s.status().lastRejections).toEqual([{ id: 'suspicious', reason: 'too_fast' }])
+    const outbox = memoryOutbox()
+    const sync = createSync({
+      store,
+      outbox,
+      isOnline: () => online,
+      onOnline: (listener) => {
+        wake = listener
+        return () => {}
+      },
+      schedule: () => () => {},
     })
+    await sync.connect(cloud.remote())
+    await sync.submitAttempt(attempt('a1', 1_000))
+    await sync.submitAttempt(attempt('a2', 2_000))
+    expect(cloud.pushes).toHaveLength(0)
+    expect(sync.status().pending).toBe(2)
+
+    online = true
+    wake()
+
+    await vi.waitFor(() => expect(sync.status().pending).toBe(0))
+    expect([...cloud.attempts.keys()].sort()).toEqual(['a1', 'a2'])
   })
 
-  it('flushing twice accepts nothing the second time', async () => {
-    const push = vi.fn(async (attempts: readonly Attempt[]) => ({
-      accepted: attempts.map((a) => a.id),
-      rejected: [] as Rejection[],
-      progress: null,
-    }))
-    const s = createSync({ store: memoryStore(), isOnline: () => true, push })
-
-    await s.submitAttempt(attempt('a1'))
-    await s.flush()
-    const second = await s.flush()
-
-    expect(second.accepted).toEqual([])
-    expect(push).toHaveBeenCalledTimes(1)
-  })
-
-  it('flushing an empty outbox is a no-op, not an error', async () => {
-    await expect(sync.flush()).resolves.toEqual({ accepted: [], rejected: [], pending: 0 })
-  })
-
-  it('tells a subscriber the current status immediately, not only on the next change', async () => {
-    const seen: number[] = []
-    sync.subscribe((status) => seen.push(status.pending))
+  it('keeps an attempt queued when the upload fails, and retries with backoff', async () => {
+    const cloud = fakeCloud()
+    cloud.down = true
+    const delays: number[] = []
+    let retry: () => void = () => {}
+    const sync = createSync({
+      store: memoryStore(),
+      outbox: memoryOutbox(),
+      isOnline: () => true,
+      onOnline: () => () => {},
+      schedule: (fn, ms) => {
+        delays.push(ms)
+        retry = fn
+        return () => {}
+      },
+    })
+    await sync.connect(cloud.remote())
     await sync.submitAttempt(attempt('a1'))
-    expect(seen[0]).toBe(0)
-    expect(seen.at(-1)).toBe(1)
+    await vi.waitFor(() => expect(sync.status().phase).toBe('error'))
+    expect(sync.status().pending).toBe(1)
+
+    retry()
+    await vi.waitFor(() => expect(delays.length).toBeGreaterThanOrEqual(2))
+    // Each failure waits longer than the last.
+    expect(delays[1]).toBeGreaterThan(delays[0] ?? 0)
+
+    cloud.down = false
+    retry()
+    await vi.waitFor(() => expect(sync.status().pending).toBe(0))
+    expect(sync.status().phase).toBe('idle')
   })
 
-  it('sign-out clears the local cache and the outbox', async () => {
-    // Ticket 21: this protects a learner on a shared machine. A reload is not a sign-out, so
-    // requirement §8.9 is unaffected — that is asserted in the ProgressStore suite.
-    const store = memoryStore()
-    const s = createSync({ store, isOnline: () => false })
+  it('survives a reload: a new engine over the same outbox still uploads it', async () => {
+    const outbox = memoryOutbox()
+    const cloud = fakeCloud()
+    const before = createSync({ store: memoryStore(), outbox, isOnline: () => false })
+    await before.submitAttempt(attempt('a1'))
 
-    await s.submitAttempt(attempt('a1'))
-    await s.signOut()
+    const after = createSync({ store: memoryStore(), outbox, isOnline: () => true })
+    await after.connect(cloud.remote())
 
-    expect(s.status().pending).toBe(0)
-    await expect(store.load()).resolves.toBe('empty')
+    expect([...cloud.attempts.keys()]).toEqual(['a1'])
+  })
+
+  it('drops an attempt the server refused instead of retrying it forever', async () => {
+    const cloud = fakeCloud()
+    const remote = cloud.remote()
+    const refusing: Remote = {
+      ...remote,
+      push: async (attempts) => ({
+        accepted: [],
+        rejected: attempts.map((a) => ({ id: a.id, reason: 'too_fast' as const })),
+      }),
+    }
+    const a = device()
+    await a.sync.submitAttempt(attempt('fast'))
+    await a.sync.connect(refusing)
+    expect(a.sync.status().pending).toBe(0)
+    expect(a.sync.status().lastRejections).toEqual([{ id: 'fast', reason: 'too_fast' }])
+  })
+
+  it('keeps an attempt whose exercise the server does not know yet, rather than losing it', async () => {
+    // An older server knows fewer exercise families. Its refusal says "not yet", not "never".
+    const cloud = fakeCloud()
+    const unaware: Remote = {
+      ...cloud.remote(),
+      push: async (attempts) => ({
+        accepted: [],
+        rejected: attempts.map((a) => ({ id: a.id, reason: 'unknown_scale' as const })),
+      }),
+    }
+    const a = device()
+    await a.sync.submitAttempt(attempt('words'))
+    await a.sync.connect(unaware)
+    expect(a.sync.status().pending).toBe(1)
+  })
+
+  it('still unions attempts when the settings half of a sync fails', async () => {
+    const cloud = fakeCloud()
+    cloud.attempts.set('c1', attempt('c1'))
+    const broken: Remote = {
+      ...cloud.remote(),
+      settings: async () => {
+        throw new Error('column profiles.settings does not exist')
+      },
+    }
+    const a = device()
+    await a.sync.connect(broken)
+    expect(await localIds(a.store)).toEqual(['c1'])
+    expect(a.onLocalChanged).toHaveBeenCalled()
+  })
+
+  it('never touches a remote while disconnected: training stays local', async () => {
+    const a = device()
+    await a.sync.submitAttempt(attempt('a1'))
+    expect(await localIds(a.store)).toEqual(['a1'])
+    expect(a.sync.status()).toMatchObject({ connected: false, pending: 1 })
+    await expect(a.sync.flush()).resolves.toMatchObject({ accepted: [], pending: 1 })
+  })
+})
+
+describe('sync — settings, last write wins', () => {
+  const dark: Settings = { ...DEFAULT_SETTINGS, theme: 'dark' }
+  const big: Settings = { ...DEFAULT_SETTINGS, textSizePx: 36 }
+
+  it('takes the cloud copy when it is newer', async () => {
+    const cloud = fakeCloud()
+    cloud.settings = { settings: dark, updatedAt: 5_000 }
+    const a = device()
+    await a.store.saveSettings(big, 1_000)
+
+    await a.sync.connect(cloud.remote())
+
+    expect(await localSettings(a.store)).toEqual({ settings: dark, updatedAt: 5_000 })
+    expect(a.onLocalChanged).toHaveBeenCalled()
+  })
+
+  it('pushes the local copy when it is newer', async () => {
+    const cloud = fakeCloud()
+    cloud.settings = { settings: dark, updatedAt: 1_000 }
+    const a = device()
+    await a.store.saveSettings(big, 5_000)
+
+    await a.sync.connect(cloud.remote())
+
+    expect(cloud.settings).toEqual({ settings: big, updatedAt: 5_000 })
+    expect(await localSettings(a.store)).toEqual({ settings: big, updatedAt: 5_000 })
+  })
+
+  it('pushes a change made while connected', async () => {
+    const cloud = fakeCloud()
+    const a = device()
+    await a.sync.connect(cloud.remote())
+    await a.store.saveSettings(dark, 9_000)
+    await a.sync.settingsChanged()
+    expect(cloud.settings).toEqual({ settings: dark, updatedAt: 9_000 })
+  })
+})
+
+describe('sync — nick', () => {
+  it('reads and writes the profile nick', async () => {
+    const cloud = fakeCloud()
+    const a = device()
+    expect(await a.sync.nick()).toBeNull()
+    await a.sync.connect(cloud.remote())
+    expect(await a.sync.nick()).toBe('typist-1234')
+    expect(await a.sync.setNick('Швидкий')).toBe('Швидкий')
+    expect(cloud.nick).toBe('Швидкий')
+  })
+})
+
+describe('sync — wipe on sign-out', () => {
+  it('refuses to wipe while attempts are unsynced', async () => {
+    const a = device({ online: () => false })
+    await a.sync.submitAttempt(attempt('a1'))
+    expect(await a.sync.wipeLocalIfSynced()).toBe('pending')
+    expect(await localIds(a.store)).toEqual(['a1'])
+  })
+
+  it('wipes the local copy once everything is in the cloud', async () => {
+    const cloud = fakeCloud()
+    const a = device()
+    await a.sync.submitAttempt(attempt('a1'))
+    await a.sync.connect(cloud.remote())
+    expect(await a.sync.wipeLocalIfSynced()).toBe('wiped')
+    await expect(a.store.load()).resolves.toBe('empty')
+    expect(a.onLocalChanged).toHaveBeenCalled()
   })
 })

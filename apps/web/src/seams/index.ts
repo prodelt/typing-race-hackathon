@@ -43,7 +43,11 @@ export interface ProgressStore {
   load(): Promise<StoredEnvelope | 'empty' | 'unreadable-version' | 'unavailable'>
   /** Idempotent on `attempt.id`, so a retry cannot double-count. */
   appendAttempts(attempts: readonly Attempt[]): Promise<void>
-  saveSettings(settings: Settings): Promise<void>
+  /**
+   * Stamps `settingsUpdatedAt` with now, or with `updatedAt` when given — sync passes the cloud's
+   * stamp when it applies the cloud's copy, so the two sides agree on which write was last.
+   */
+  saveSettings(settings: Settings, updatedAt?: number): Promise<void>
   /**
    * FR-048's answer, per typing language. Separate from `appendAttempts` because it is recorded
    * *before* the first attempt exists, and separate from `saveSettings` because it is progress
@@ -66,5 +70,6 @@ export interface AssetCache {
 export { noAssetCache, serviceWorkerCache } from './cache.js'
 export { manualClock, systemClock } from './clock.js'
 export { domInputSource, scriptedInput } from './input.js'
+export { indexedDbOutbox, memoryOutbox, type OutboxStore } from './outbox.js'
 export { seededRandom } from './random.js'
 export { indexedDbStore, memoryStore } from './store.js'
