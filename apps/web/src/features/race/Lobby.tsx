@@ -1,7 +1,7 @@
-import { useNavigate } from '@tanstack/react-router'
+import { useNavigate, useSearch } from '@tanstack/react-router'
 import type { Language } from '@typing-race/domain'
 import { Button, Field, Index } from '@typing-race/ui'
-import { type FormEvent, useEffect, useState } from 'react'
+import { type FormEvent, useEffect, useRef, useState } from 'react'
 import { useAppStore } from '../../app/state/index.js'
 import { m } from '../../paraglide/messages.js'
 import { type Identity, type RaceBackend, RaceError } from '../../sync/race.js'
@@ -14,7 +14,8 @@ import { validName } from './backend.js'
 export function Lobby({ backend }: { readonly backend: RaceBackend }) {
   const navigate = useNavigate()
   const typingLanguage = useAppStore((state) => state.settings.typingLanguage)
-  const [language, setLanguage] = useState<Language>(typingLanguage)
+  const asked = useSearch({ from: '/races' })
+  const [language, setLanguage] = useState<Language>(asked.lang ?? typingLanguage)
   const { identity, name, setName, ensure } = useIdentity(backend)
   const [code, setCode] = useState('')
   const [busy, setBusy] = useState<'quick' | 'create' | 'join' | null>(null)
@@ -36,6 +37,19 @@ export function Lobby({ backend }: { readonly backend: RaceBackend }) {
       setBusy(null)
     }
   }
+
+  // Home's tiles ask for a race outright. It starts once; without a valid name the usual message
+  // shows and the learner finishes the form here.
+  const launched = useRef(false)
+  // biome-ignore lint/correctness/useExhaustiveDependencies: runs once, for the request it arrived with
+  useEffect(() => {
+    if (launched.current || asked.go === undefined) return
+    launched.current = true
+    const go = asked.go
+    void navigate({ to: '/races', search: {}, replace: true })
+    if (go === 'quick') void run('quick', () => backend.quickMatch(language))
+    else void run('create', async () => (await backend.createPrivateRoom(language)).roomId)
+  }, [])
 
   const join = (event: FormEvent) => {
     event.preventDefault()

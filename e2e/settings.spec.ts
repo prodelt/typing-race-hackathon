@@ -66,7 +66,7 @@ async function startFromEmpty(page: Page, option = /Ще не друкую на�
   await page.goto('/today')
   await page.getByRole('radio', { name: option }).check()
   await page.getByRole('button', { name: 'Обрати й почати' }).click()
-  await expect(page.getByRole('heading', { name: 'Сьогодні' })).toBeVisible()
+  await expect(page.getByTestId('home-continue')).toBeVisible()
 }
 
 async function background(page: Page): Promise<string> {

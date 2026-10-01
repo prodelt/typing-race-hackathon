@@ -148,6 +148,13 @@ const profileRoute = createRoute({
 const racesRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/races',
+  // Home's race tiles land here with what to do: `go` starts it at once, `lang` picks the text.
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): { go?: 'quick' | 'friend'; lang?: 'uk' | 'en' } => ({
+    ...(search['go'] === 'quick' || search['go'] === 'friend' ? { go: search['go'] } : {}),
+    ...(search['lang'] === 'uk' || search['lang'] === 'en' ? { lang: search['lang'] } : {}),
+  }),
   component: lazyRouteComponent(() => import('../features/race/index.js'), 'RacesScreen'),
 })
 

@@ -19,7 +19,8 @@
       "./messages/academy/{locale}.json",
       "./messages/community/{locale}.json",
       "./messages/review/{locale}.json",
-      "./messages/shell/{locale}.json"
+      "./messages/shell/{locale}.json",
+      "./messages/home/{locale}.json"
     ]
   }
 }
