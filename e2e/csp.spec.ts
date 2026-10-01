@@ -13,6 +13,10 @@ import { typeText } from './harness/type.js'
  * narrows the policy needs to read.
  */
 
+// The worker's own registration and precache run under the policy too (worker-src, connect-src),
+// so this spec lets it register, unlike the rest of the suite.
+test.use({ serviceWorkers: 'allow' })
+
 declare global {
   interface Window {
     __cspViolations?: string[]

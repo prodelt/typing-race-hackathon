@@ -40,6 +40,13 @@ export default defineConfig({
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
     video: 'off',
+    // The production build registers its service worker on every load, and the worker precaches
+    // the whole build (about 3 MB, 76 files) the moment it installs. In a suite that opens a fresh
+    // context per test that is hundreds of full downloads, and a context closed mid-install waits
+    // for them: under full-suite load that is what pushed the long scenarios (progress across a
+    // restart, above all) past their timeouts in teardown. The specs about the worker opt back in
+    // with `test.use({ serviceWorkers: 'allow' })`; nothing else depends on it.
+    serviceWorkers: 'block',
   },
   projects: [
     {
