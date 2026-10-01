@@ -1,17 +1,19 @@
 import { useNavigate } from '@tanstack/react-router'
 import { Button, cx } from '@typing-race/ui'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useScreenKeys } from '../../app/screenKeys.js'
+import { refreshRaceStanding, signed, useRaceStanding } from '../../app/state/raceStanding.js'
 import { m } from '../../paraglide/messages.js'
 import type { RaceResult, RoomSnapshot } from '../../sync/race.js'
 import { raceBackend } from '../../sync/race.js'
 import type { Mine } from './backend.js'
+import { RATING_ACCURACY_FLOOR } from './rating.js'
 import { type Lane, Track } from './Track.js'
 
-/** The ranking floor, matching `finish-race`: below it a result is shown but not placed. */
-const RANK_FLOOR = 0.9
+const NUMBER = new Intl.NumberFormat('uk-UA')
 
 function ranked(result: RaceResult): boolean {
-  return result.validated && result.accuracy >= RANK_FLOOR
+  return result.validated && result.accuracy >= RATING_ACCURACY_FLOOR
 }
 
 function percent(accuracy: number): string {
@@ -19,9 +21,9 @@ function percent(accuracy: number): string {
 }
 
 /**
- * The results: validated results ranked by score, then the ones that did not rank and why, then
- * whoever is still typing. The copy says plainly that the live lanes were approximate and this
- * ranking is the server's.
+ * The results, as a reward: the learner's place in big type with their own numbers and what the
+ * race did to their Race Rating, beside the server's ranking. Validated results rank by score; the
+ * ones that did not rank say why; whoever is still typing is listed last, with the live track.
  */
 export function Results({
   snapshot,
@@ -34,6 +36,7 @@ export function Results({
 }) {
   const navigate = useNavigate()
   const [again, setAgain] = useState(false)
+  const [ratingRead, setRatingRead] = useState(false)
   const finished = snapshot.state === 'finished'
   const placed = snapshot.results.filter(ranked)
   const unplaced = snapshot.results.filter((result) => !ranked(result))
@@ -42,8 +45,15 @@ export function Results({
     (person) => person.role === 'racer' && !done.has(person.userId),
   )
   const myPlace = placed.findIndex((result) => result.userId === snapshot.me)
+  const myResult = snapshot.results.find((result) => result.userId === snapshot.me)
+
+  // The rating is computed by the server in the same transaction that finishes the room.
+  useEffect(() => {
+    if (finished) void refreshRaceStanding().then(() => setRatingRead(true))
+  }, [finished])
 
   const raceAgain = async () => {
+    if (again) return
     setAgain(true)
     const backend = await raceBackend()
     if (backend === null) return setAgain(false)
@@ -55,10 +65,26 @@ export function Results({
     }
   }
 
+  useScreenKeys({
+    Enter: () => void raceAgain(),
+    Escape: () => void navigate({ to: '/races' }),
+  })
+
   return (
-    <div className="race-room" data-phase="results">
-      <header className="race-results__head">
-        <h1 className="race-display race-results__title" data-testid="race-results-title">
+    <div className="rr" data-phase="results">
+      <section className="rl-panel rr-me" aria-labelledby="rr-title">
+        <div className="rl-head">
+          <span className="rl-idx">{snapshot.language === 'uk' ? 'ЙЦУКЕН' : 'QWERTY'}</span>
+          <span className="rl-title">
+            {snapshot.visibility === 'quick' ? m.race_quick_title() : m.race_private_title()}
+          </span>
+        </div>
+        <h1
+          id="rr-title"
+          className="race-display rr-title"
+          data-testid="race-results-title"
+          data-first={myPlace === 0 || undefined}
+        >
           {mine.kind === 'checking'
             ? m.race_results_checking()
             : myPlace >= 0
@@ -72,69 +98,119 @@ export function Results({
               ? m.race_results_final()
               : m.race_results_waiting()}
         </p>
-      </header>
 
-      <ol className="race-results" data-testid="race-ranking">
-        {placed.map((result, index) => (
-          <li
-            key={result.userId}
-            className={cx('race-result', result.userId === snapshot.me && 'race-result--me')}
-            data-testid="race-result"
+        {myResult === undefined ? null : (
+          <dl className="rr-cells">
+            <div>
+              <dt>{m.race_results_your_speed()}</dt>
+              <dd>
+                {Math.round(myResult.spm)} <small>{m.race_spm_unit()}</small>
+              </dd>
+            </div>
+            <div>
+              <dt>{m.race_results_your_accuracy()}</dt>
+              <dd>{percent(myResult.accuracy)}</dd>
+            </div>
+          </dl>
+        )}
+
+        <RatingLine roomId={snapshot.id} settled={finished && ratingRead} />
+
+        <div className="race-gather__actions rr-actions">
+          <Button
+            variant="primary"
+            size="lg"
+            hint="Enter"
+            disabled={again}
+            onClick={() => void raceAgain()}
           >
-            <span className="race-result__place">{index + 1}</span>
-            <span className="race-result__name">{result.nickname}</span>
-            <span className="race-result__figure">
-              <strong>{Math.round(result.spm)}</strong>
-              <span>{m.race_spm_unit()}</span>
-            </span>
-            <span className="race-result__figure">
-              <strong>{percent(result.accuracy)}</strong>
-              <span>{m.race_accuracy_unit()}</span>
-            </span>
-          </li>
-        ))}
-        {unplaced.map((result) => (
-          <li
-            key={result.userId}
-            className={cx(
-              'race-result race-result--out',
-              result.userId === snapshot.me && 'race-result--me',
-            )}
+            {m.race_again()}
+          </Button>
+          <Button
+            variant="secondary"
+            size="lg"
+            hint="Esc"
+            onClick={() => void navigate({ to: '/races' })}
           >
-            <span className="race-result__place">-</span>
-            <span className="race-result__name">{result.nickname}</span>
-            <span className="race-result__why">
-              {result.validated ? m.race_unranked_accuracy() : m.race_unranked_invalid()}
-            </span>
-            <span className="race-result__figure">
-              <strong>{percent(result.accuracy)}</strong>
-              <span>{m.race_accuracy_unit()}</span>
-            </span>
-          </li>
-        ))}
-        {outstanding.map((person) => (
-          <li key={person.userId} className="race-result race-result--out">
-            <span className="race-result__place">-</span>
-            <span className="race-result__name">{person.nickname}</span>
-            <span className="race-result__why">
-              {finished ? m.race_did_not_finish() : m.race_still_typing()}
-            </span>
-          </li>
-        ))}
-      </ol>
+            {m.race_back_to_lobby()}
+          </Button>
+        </div>
+      </section>
 
-      {finished ? null : <Track lanes={lanes} />}
+      <section className="rl-panel rr-board" aria-label={m.race_results_title()}>
+        <ol className="race-results" data-testid="race-ranking">
+          {placed.map((result, index) => (
+            <li
+              key={result.userId}
+              className={cx('race-result', result.userId === snapshot.me && 'race-result--me')}
+              data-testid="race-result"
+            >
+              <span className="race-result__place">{index + 1}</span>
+              <span className="race-result__name">{result.nickname}</span>
+              <span className="race-result__figure">
+                <strong>{Math.round(result.spm)}</strong>
+                <span>{m.race_spm_unit()}</span>
+              </span>
+              <span className="race-result__figure">
+                <strong>{percent(result.accuracy)}</strong>
+                <span>{m.race_accuracy_unit()}</span>
+              </span>
+            </li>
+          ))}
+          {unplaced.map((result) => (
+            <li
+              key={result.userId}
+              className={cx(
+                'race-result race-result--out',
+                result.userId === snapshot.me && 'race-result--me',
+              )}
+            >
+              <span className="race-result__place">–</span>
+              <span className="race-result__name">{result.nickname}</span>
+              <span className="race-result__why">
+                {result.validated ? m.race_unranked_accuracy() : m.race_unranked_invalid()}
+              </span>
+              <span className="race-result__figure">
+                <strong>{percent(result.accuracy)}</strong>
+                <span>{m.race_accuracy_unit()}</span>
+              </span>
+            </li>
+          ))}
+          {outstanding.map((person) => (
+            <li key={person.userId} className="race-result race-result--out">
+              <span className="race-result__place">–</span>
+              <span className="race-result__name">{person.nickname}</span>
+              <span className="race-result__why">
+                {finished ? m.race_did_not_finish() : m.race_still_typing()}
+              </span>
+            </li>
+          ))}
+        </ol>
 
-      <p className="race-honest">{m.race_results_honest()}</p>
+        {finished ? null : <Track lanes={lanes} />}
 
-      <div className="race-gather__actions">
-        <Button variant="primary" size="lg" disabled={again} onClick={() => void raceAgain()}>
-          {m.race_again()}
-        </Button>
-        <Button variant="secondary" size="lg" onClick={() => void navigate({ to: '/races' })}>
-          {m.race_back_to_lobby()}
-        </Button>
-      </div>
+        <p className="race-honest">{m.race_results_honest()}</p>
+      </section>
     </div>
   )
+}
+
+/** What this race did to the Race Rating: the change, "once everyone finishes", or "none". */
+function RatingLine({ roomId, settled }: { readonly roomId: string; readonly settled: boolean }) {
+  const standing = useRaceStanding((state) => state.standing)
+  if (!settled) {
+    return <p className="rr-rating rr-rating--quiet">{m.race_results_rating_pending()}</p>
+  }
+  if (standing.kind === 'rated' && standing.lastRoomId === roomId) {
+    return (
+      <p className="rr-rating" data-testid="race-rating-change">
+        <span>{m.race_results_rating({ rating: NUMBER.format(standing.rating) })}</span>
+        <b data-sign={Math.sign(standing.lastDelta)}>
+          {m.race_results_rating_delta({ delta: signed(standing.lastDelta) })}
+        </b>
+      </p>
+    )
+  }
+  if (standing.kind === 'loading' || standing.kind === 'unavailable') return null
+  return <p className="rr-rating rr-rating--quiet">{m.race_results_rating_none()}</p>
 }
