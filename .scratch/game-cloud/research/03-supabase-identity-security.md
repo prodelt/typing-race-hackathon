@@ -297,7 +297,38 @@ CSP entries (§7). Optional for us.
 
 ## 6. "Delete my data"
 
-_TBD_
+**API.** `supabase.auth.admin.deleteUser(id, shouldSoftDelete)` — "Requires a `service_role`
+key", "should only be called on a server. Never expose your `service_role` key in the browser."
+(https://supabase.com/docs/reference/javascript/auth-admin-deleteuser) A hard delete
+(`shouldSoftDelete: false`, the default) removes the `auth.users` row and invalidates sessions
+and refresh tokens; soft delete "only blocks sign-in … and does not revoke existing sessions".
+(https://supabase.com/docs/guides/auth/managing-user-data)
+
+**Cascade.** Tables referencing `auth.users` must use `on delete cascade`, "without this … deleting
+a user will fail"; users who own Storage objects cannot be deleted until those objects are removed
+or reassigned. (https://supabase.com/docs/guides/auth/managing-user-data)
+
+**Our schema is already shaped for it:** `auth.users` → `profiles` cascade (`core.sql:23`), and
+every user-owned table cascades from `profiles` (§0). Deleting the auth user therefore removes
+attempts, keystroke logs, progress, memberships, race participation/results, leaderboard rows and
+**groups the user owns** (`races.sql:26` — the group disappears for its other members; decide
+whether that is wanted or ownership should transfer first). Race rooms keep existing with
+`host_id` nulled (`race_flow.sql:48`). We use no Storage.
+
+**Button design.** New Edge Function `delete-account` (`verify_jwt = true`):
+
+1. Read the caller from the JWT with an anon-key client (`auth.getUser()`), never from the body.
+2. Optionally require a fresh confirmation (typed nickname) in the UI.
+3. With a service-role client: `auth.admin.deleteUser(user.id)`.
+4. Client then calls `supabase.auth.signOut({ scope: 'local' })` and clears its local caches /
+   IndexedDB, since already-issued access tokens are JWTs that stay valid until `exp`
+   (`jwt_expiry = 3600`, `config.toml:165`) — harmless once the rows are gone.
+
+Same function serves anonymous users (who have no other way to erase themselves) and the merge
+step of §2 (delete the anonymous user after moving its data). For periodic cleanup of abandoned
+anonymous users the docs give
+`delete from auth.users where is_anonymous is true and created_at < now() - interval '30 days';`
+(https://supabase.com/docs/guides/auth/auth-anonymous) — could run from `pg_cron`.
 
 ## 7. CSP and HSTS on Vercel
 
