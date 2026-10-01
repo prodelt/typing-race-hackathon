@@ -1,8 +1,9 @@
 import type { Attempt, Settings, StartingLevelChoice } from '@typing-race/domain'
 import { useMemo } from 'react'
 import { create } from 'zustand'
-import type { ProgressStore } from '../../seams/index.js'
-import { indexedDbStore } from '../../seams/index.js'
+import type { OutboxStore, ProgressStore } from '../../seams/index.js'
+import { indexedDbOutbox, indexedDbStore, memoryOutbox } from '../../seams/index.js'
+import { createSync, type Sync, setAppSync } from '../../sync/index.js'
 import { type DerivedState, derive } from './derive.js'
 import { type AppAction, type AppState, initialState, reduce } from './reduce.js'
 
@@ -18,6 +19,8 @@ export interface AppStore extends AppState {
   readonly dispatch: (action: AppAction) => void
   /** Reads local storage and resolves the four outcomes — FR-052, FR-083. */
   readonly boot: () => Promise<void>
+  /** Re-reads local storage after sync changed it; an emptied store resets the learner. */
+  readonly reload: () => Promise<void>
   readonly chooseStartingLevel: (choice: StartingLevelChoice) => Promise<void>
   readonly changeSettings: (patch: Partial<Settings>) => Promise<void>
   readonly beginAttempt: () => void
@@ -33,9 +36,29 @@ export interface AppStore extends AppState {
  * lives outside React (ADR-0003) and must reach it too.
  */
 let progressStore: ProgressStore = indexedDbStore()
+let sync: Sync = makeSync(progressStore, indexedDbOutbox())
 
-export function setProgressStore(store: ProgressStore): void {
+/**
+ * The sync engine over the same store. Every finished attempt goes through it, so it is queued in
+ * the outbox whether or not anyone is signed in (ADR-0006); it leaves the browser only once
+ * `startSync` connects an account.
+ */
+function makeSync(store: ProgressStore, outbox: OutboxStore): Sync {
+  const created = createSync({
+    store,
+    outbox,
+    // A pull, cloud settings or a wipe changed the store underneath us: re-read it, and derived
+    // state (progress, Level, XP, Streak) recomputes through the normal path.
+    onLocalChanged: () => void useAppStore.getState().reload(),
+  })
+  setAppSync(created)
+  return created
+}
+
+export function setProgressStore(store: ProgressStore, outbox: OutboxStore = memoryOutbox()): void {
+  sync.disconnect()
   progressStore = store
+  sync = makeSync(store, outbox)
 }
 
 export const useAppStore = create<AppStore>()((set, get) => ({
@@ -52,6 +75,12 @@ export const useAppStore = create<AppStore>()((set, get) => ({
     else if (loaded === 'unreadable-version') dispatch({ type: 'store/unreadableVersion' })
     else if (loaded === 'unavailable') dispatch({ type: 'store/unavailable' })
     else dispatch({ type: 'store/loaded', envelope: loaded })
+  },
+
+  async reload() {
+    const loaded = await progressStore.load()
+    if (loaded === 'empty') get().dispatch({ type: 'store/reset' })
+    else if (typeof loaded !== 'string') get().dispatch({ type: 'store/loaded', envelope: loaded })
   },
 
   async chooseStartingLevel(choice) {
@@ -73,6 +102,7 @@ export const useAppStore = create<AppStore>()((set, get) => ({
     // storage failure must not stop the learner changing the theme.
     get().dispatch({ type: 'settings/changed', patch })
     await progressStore.saveSettings(get().settings)
+    await sync.settingsChanged()
   },
 
   beginAttempt() {
@@ -81,7 +111,7 @@ export const useAppStore = create<AppStore>()((set, get) => ({
 
   async finishAttempt(attempt) {
     get().dispatch({ type: 'attempt/finished', attempt })
-    await progressStore.appendAttempts([attempt])
+    await sync.submitAttempt(attempt)
   },
 
   abandonAttempt() {

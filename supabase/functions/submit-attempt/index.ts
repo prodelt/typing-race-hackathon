@@ -1,5 +1,13 @@
 import { createClient } from 'jsr:@supabase/supabase-js@2'
-import { catalogue, deriveProgress, layouts } from '@typing-race/curriculum'
+import {
+  catalogue,
+  deriveProgress,
+  isAcademyExerciseId,
+  isRealTextId,
+  isReviewDrillId,
+  isWordDrillId,
+  layouts,
+} from '@typing-race/curriculum'
 import {
   computeAggregates,
   computeMetrics,
@@ -119,6 +127,24 @@ function checkPlausibility(
   return null
 }
 
+/**
+ * A Stage 1 scale from the catalogue, or one of the generated exercise families (Stage 2 word
+ * drills, review drills, real text, Academy). Sync uploads every attempt (ADR-0006), and refusing
+ * all but Stage 1 would leave most of a learner's history behind on the device it was typed on.
+ * The metrics are recomputed from the log and the text either way; the id only has to be one the
+ * app can produce.
+ */
+function knownExercise(layoutId: LayoutId, scaleId: string): boolean {
+  if (typeof scaleId !== 'string' || scaleId.length === 0 || scaleId.length > 120) return false
+  if (catalogue[layoutId]?.some((s) => s.id === scaleId)) return true
+  return (
+    isWordDrillId(scaleId) ||
+    isReviewDrillId(scaleId) ||
+    isRealTextId(scaleId) ||
+    isAcademyExerciseId(scaleId)
+  )
+}
+
 Deno.serve(async (request) => {
   const early = preflight(request)
   if (early) return early
@@ -161,8 +187,7 @@ Deno.serve(async (request) => {
   for (const submission of submissions) {
     const { attempt, log } = submission
     const layout = layouts[attempt.layoutId as LayoutId]
-    const scale = catalogue[attempt.layoutId as LayoutId]?.find((s) => s.id === attempt.scaleId)
-    if (!layout || !scale) {
+    if (!layout || !knownExercise(attempt.layoutId as LayoutId, attempt.scaleId)) {
       rejected.push({ id: attempt.id, reason: 'unknown_scale' })
       continue
     }

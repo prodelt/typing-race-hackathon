@@ -463,6 +463,11 @@ export interface StoredEnvelope {
   readonly attempts: readonly AttemptSummary[]
   /** Keyed by attempt id. Only the 20 most recent survive — FR-081. */
   readonly logs: Readonly<Record<string, KeystrokeEventLog>>
+  /**
+   * When `settings` last changed, in epoch ms. Settings sync last-write-wins by it (ADR-0006).
+   * Absent on an envelope that has never saved settings, which loses to any stamped copy.
+   */
+  readonly settingsUpdatedAt?: number
 }
 
 /** What the current build writes. A different value on disk is FR-083's deliberate fresh start. */

@@ -57,6 +57,20 @@ createRoot(rootElement).render(
   </StrictMode>,
 )
 
+// Sync runs only for a learner who already has a session (ADR-0006). The check is a localStorage
+// read, so a learner without one never downloads the Supabase client and never meets the backend.
+if (hasStoredSession()) {
+  void import('./sync/cloud.js').then(({ startSync }) => startSync()).catch(() => undefined)
+}
+
+function hasStoredSession(): boolean {
+  try {
+    return globalThis.localStorage.getItem('typing-race:race-auth') !== null
+  } catch {
+    return false
+  }
+}
+
 // The offline promise: after one successful load the app opens, runs an exercise and shows its
 // result with the network away. Only a production build emits `/sw.js`, so the dev server never
 // registers anything. Registration waits for `load` so installing the precache never competes
