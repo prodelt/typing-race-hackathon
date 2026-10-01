@@ -1,6 +1,5 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
-  "shell_rail_label": "Sections",
   "shell_dest_home": "Home",
   "shell_dest_map": "Map",
   "shell_dest_races": "Races",
@@ -22,7 +21,6 @@
   "shell_streak_hint": "Streak: {days} days in a row with at least one finished attempt. A freeze forgives one missed day.",
   "shell_freeze": "freeze {n}",
   "shell_rating": "race rating",
-  "shell_rating_hint": "Race rating: changes only in races, never in lessons.",
   "shell_layout": "Layout",
   "shell_layout_hint": "Layout for lessons and races",
   "shell_sound_on": "Sound: on",
@@ -42,14 +40,5 @@
   "shell_tab_leaderboards": "Leaderboards",
   "shell_keyboard_title": "A physical keyboard is needed",
   "shell_keyboard_body": "Touch typing is learned on a real keyboard, so lessons and races open on a computer. Here you can still view your profile, the leaderboards and the races.",
-  "profile_title": "Profile",
-  "profile_lead": "Guest, not signed in. Progress is kept in this browser only.",
-  "profile_level": "Level",
-  "profile_streak": "Streak",
-  "profile_streak_value": "{days} days",
-  "profile_rating": "Race rating",
-  "profile_rating_none": "none yet",
-  "profile_goal": "Daily goal",
-  "profile_goal_value": "{today} of {goal} min",
-  "profile_soon": "Google sign-in, history and achievements will appear here soon."
+  "profile_title": "Profile"
 }
