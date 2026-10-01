@@ -54,7 +54,7 @@ Comprehensive domain model and conceptual glossary for the Typing-Race touch-typ
   _Avoid_: exam, blind mode
 - **Practice Attempt (Тренувальна спроба)**: An attempt with the on-screen keyboard and next-key hint visible; it never counts toward mastery. The learner switches to a test attempt, which becomes the primary action once practice clears the accuracy floor.
 - **Key Unlock (Відкриття клавіші)**: The moment a key joins the learner's unlocked set after the Mastery Rule is met on an exercise focused on it; shown on the result screen together with its finger and first words.
-- **Next Action (Наступна дія)**: The one Actionable Recommendation shown on Today and on every result, with a button that starts it.
+- **Next Action (Наступна дія)**: The one Actionable Recommendation shown on Home and on every result, with a button that starts it.
 - **Mastery Rule (Правило засвоєння)**: Three consecutive test attempts at or above the level's accuracy floor; speed never gates progression.
 - **Session (Заняття)**: A 15–25 minute practice block of warm-up, one target skill, consolidation and real text.
 - **Diagnostic (Діагностика)**: A short, skippable placement run that sets a learner's starting point and initial confidence.
@@ -66,6 +66,20 @@ Comprehensive domain model and conceptual glossary for the Typing-Race touch-typ
 - **Word Bank (Банк слів)**: The filtered, normalised words of one language from which Stage 2 and Academy exercises draw. Proper nouns are kept apart in a separate capitalisation bank used for Shift drills.
 - **Difficulty Tier (Рівень складності слова)**: A 1–5 grade of a word from its frequency rank and length; same-finger transitions and row changes only order words within a tier.
 - **Scale Catalogue (Каталог гам)**: The authored list of Stage 1 scales — type, fingers, size, tempo — whose text is generated from the finger map of each layout.
+
+## Game Layer
+
+- **Home (Головна)**: The hub a returning learner lands on; its one primary action is Continue, which starts the Next Action.
+  _Avoid_: Today, dashboard, landing page
+- **Map (Мапа)**: The whole curriculum drawn as one route through three regions (Stage 1, Stage 2, Stage 3), with weak-spot review and free practice always open from it.
+  _Avoid_: Path, course list
+- **Play Mode (Режим гри)**: The state while an attempt or race runs: navigation and the status bar leave the screen and only the run remains.
+  _Avoid_: focus mode, fullscreen
+- **Level (Рівень)**: A learner's standing derived from mastery alone (keys unlocked, Academy modules completed); speed never raises it.
+- **Experience / XP (Досвід)**: Points earned only by Test Attempts that clear the level's accuracy floor; they fill the bar toward the next Level.
+  _Avoid_: score, coins
+- **Streak (Серія)**: Consecutive days with at least one completed attempt; one missed day is forgiven by a freeze.
+- **Race Rating (Рейтинг перегонів)**: A learner's competitive standing computed from Validated Race Results only; it exists in races and nowhere else.
 
 ## Curriculum Data Model
 
