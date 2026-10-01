@@ -1,5 +1,4 @@
 import type { AttemptSummary } from '@typing-race/domain'
-import { Card } from '@typing-race/ui'
 import { m } from '../../paraglide/messages.js'
 import { number, signed } from './format.js'
 
@@ -16,31 +15,33 @@ export function Comparison({
   readonly previous: AttemptSummary | null
 }) {
   return (
-    <Card aria-labelledby="result-comparison" role="region" className="p-5">
-      <h2 id="result-comparison" className="font-ui text-lg font-bold">
+    <section aria-labelledby="result-comparison" className="reward-cmp">
+      <h2 id="result-comparison" className="reward-cmp__title">
         {m.result_comparison_heading()}
       </h2>
       {previous === null ? (
-        <p className="mt-2 font-ui">{m.result_compare_none()}</p>
+        <p>{m.result_compare_none()}</p>
       ) : (
         <>
-          <p className="mt-2 font-ui">
+          <p>
             {m.result_compare_previous({
               spm: number(previous.metrics.spm, 1),
               accuracy: number(previous.metrics.accuracy * 100, 1),
             })}
           </p>
-          <p className="mt-1 font-ui">
-            {m.result_compare_delta({
-              spmDelta: signed(attempt.metrics.spm - previous.metrics.spm, 1),
-              accuracyDelta: signed(
-                (attempt.metrics.accuracy - previous.metrics.accuracy) * 100,
-                1,
-              ),
-            })}
+          <p>
+            <b>
+              {m.result_compare_delta({
+                spmDelta: signed(attempt.metrics.spm - previous.metrics.spm, 1),
+                accuracyDelta: signed(
+                  (attempt.metrics.accuracy - previous.metrics.accuracy) * 100,
+                  1,
+                ),
+              })}
+            </b>
           </p>
         </>
       )}
-    </Card>
+    </section>
   )
 }

@@ -51,7 +51,7 @@
   width: 2px;
   height: 1.3em;
   transform: translate(-1px, -50%);
-  background-color: var(--color-sage);
+  background-color: var(--color-accent);
   border-radius: 1px;
 }
 
@@ -76,7 +76,7 @@
 }
 
 .typing-line__char[data-state="typed"] {
-  color: var(--color-sage);
+  color: var(--color-ink);
 }
 
 .typing-line__char[data-state="upcoming"] {
@@ -84,15 +84,20 @@
 }
 
 .typing-line__char[data-state="awaited"] {
-  background-color: var(--color-sage-tint);
-  box-shadow: inset 0 -2px 0 var(--color-sage);
+  color: var(--color-ink);
+  background-color: color-mix(in srgb, var(--color-accent) 10%, transparent);
+  box-shadow: inset 0 -4px 0 var(--color-accent);
 }
 
 /* After the state rules so it wins: the awaited character, marked where it stands. */
 .typing-line__char[data-mark="wrong"] {
-  color: var(--color-terracotta);
+  color: var(--color-terracotta-ink);
   background-color: var(--color-terracotta-tint);
   box-shadow: inset 0 -3px 0 var(--color-terracotta);
+  /* More than colour: a wavy underline the eye catches even without telling red apart. */
+  text-decoration: underline wavy var(--color-terracotta);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.32em;
   transition-timing-function: var(--ease-exit);
 }
 
@@ -102,18 +107,27 @@
   right: 0;
   bottom: 0;
   left: 0;
-  height: 3px;
+  height: 4px;
   overflow: hidden;
-  background-color: var(--color-hairline);
+  background-color: var(--color-hairline-strong);
   border-radius: 2px;
 }
 
 .typing-line__rule-fill {
   width: 100%;
   height: 100%;
-  background-color: var(--color-sage);
+  background-color: var(--color-ink);
   transform: scaleX(0);
   transform-origin: left;
+}
+
+.typing-line__station {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  margin-left: -1.5px;
+  background-color: var(--color-paper);
 }
 
 .typing-line__hint {
@@ -129,7 +143,16 @@
   color: color-mix(in srgb, var(--color-ink) 68%, var(--color-paper));
 }
 
-.typing-line:not([data-state="idle"]) .typing-line__hint {
+.typing-line:not([data-state="idle"]) .typing-line__station {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  margin-left: -1.5px;
+  background-color: var(--color-paper);
+}
+
+.typing-line__hint {
   visibility: hidden;
 }
 
@@ -149,6 +172,7 @@
 
 .typing-line__readouts dd {
   margin: 0;
-  font-size: 1.25rem;
+  font: 500 clamp(20px, 1.8vw, 26px) / 1 var(--font-display);
+  letter-spacing: -0.04em;
   font-variant-numeric: tabular-nums;
 }

@@ -38,18 +38,12 @@
   "exercise_time": "Time",
   "exercise_errors": "Errors",
   "exercise_progress": "Progress",
-  "exercise_rail_label": "About this exercise",
-  "exercise_rail_last_title": "Last completed exercise",
   "exercise_rail_last_frozen": "These values change between exercises, never during an attempt.",
-  "exercise_rail_last_none": "No completed exercise yet. Your first result will appear here.",
   "exercise_metric_speed": "Speed",
   "exercise_metric_speed_unit": "cpm",
   "exercise_metric_accuracy": "Accuracy",
   "exercise_metric_errors": "Errors",
   "exercise_metric_time": "Time",
-  "exercise_rail_next_title": "Next action",
-  "exercise_rail_next_this": "This scale is your next action.",
-  "exercise_rail_next_later": "After the scale you will see exactly one next action.",
   "exercise_rail_zero_peek": "No guides: the keyboard, the key highlight, the fingers and live speed are not shown. Time, errors and progress stay.",
   "exercise_guide_label": "On-screen keyboard",
   "exercise_key_space": "Space",
@@ -69,5 +63,8 @@
   "exercise_pause_resume": "Resume",
   "exercise_pause_leave": "Leave the attempt",
   "exercise_pause_leave_note": "A left attempt is not recorded.",
-  "exercise_pace_label": "Pace {spm} SPM · step {step} of {steps}"
+  "exercise_pace_label": "Pace {spm} SPM · step {step} of {steps}",
+  "exercise_hud_label": "Attempt status",
+  "exercise_hud_pause": "Pause",
+  "exercise_hud_last": "Last time"
 }

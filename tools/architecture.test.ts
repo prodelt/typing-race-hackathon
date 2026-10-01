@@ -42,9 +42,9 @@ const EXEMPT = [
   // The shell's 1–5 destination keys: the same kind of accelerator, and switched off in Play
   // Mode and whenever focus is in a field or the typing surface, so it never meets an attempt.
   'apps/web/src/app/Shell.tsx',
-  // Home's Enter/Q/W/F/D: the same kind of accelerator, mounted only on Home, where no attempt
-  // ever runs, and silent while focus is in a field.
-  'apps/web/src/features/home/keys.ts',
+  // Single-key accelerators on Home and the result screen: the same kind, mounted only on
+  // screens where no attempt runs, and silent while focus is in a field.
+  'apps/web/src/app/screenKeys.ts',
 ]
 
 interface Rule {

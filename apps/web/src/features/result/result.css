@@ -57,3 +57,419 @@
   animation: result-fade var(--dur-slow) var(--ease-enter) both;
   animation-delay: calc(var(--dur-slow) * 0.43);
 }
+
+/* ---- The reward (direction B) -------------------------------------------------------------
+   The fold is the moment and fills the stage; the details follow below it and scroll. Every
+   colour is a theme token, so the dark and low-vision themes follow on their own. */
+
+.stage__scroll:has(.reward) {
+  container-type: size;
+}
+
+.stage__content:has(> .reward),
+.stage__content:has(> * > .reward) {
+  max-width: none;
+  padding: 8px;
+}
+
+.reward {
+  --r-gap: 8px;
+  --r-pad: clamp(16px, 1.7vw, 28px);
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.reward .num {
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.reward__fold {
+  min-height: calc(100cqh - 16px);
+  display: grid;
+  gap: var(--r-gap);
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  grid-template-rows: minmax(0, 1fr) auto;
+}
+
+.reward__side {
+  display: grid;
+  gap: var(--r-gap);
+  grid-template-rows: auto minmax(0, 1fr);
+  min-height: 0;
+}
+
+/* The score */
+
+.reward-score {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 480px;
+  padding: clamp(22px, 2.6vw, 40px);
+  border-radius: 0 96px 0 0;
+  background: var(--color-accent-deep);
+  color: var(--color-on-accent);
+  animation: result-rise var(--dur-slow) var(--ease-enter) both;
+}
+
+.reward-score__top {
+  padding-right: 120px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-accent-pale);
+}
+
+.reward-score__body {
+  margin-top: auto;
+  padding: clamp(16px, 3vh, 32px) 0 clamp(16px, 3vh, 28px);
+}
+
+.reward-score__h {
+  margin: 0;
+  font: 600 clamp(34px, 4.4vw, 68px) / 1.02 var(--font-display);
+  letter-spacing: -0.045em;
+}
+
+.reward-score__say {
+  margin: clamp(12px, 2vh, 18px) 0 0;
+  max-width: 32em;
+  font-size: clamp(16px, 1.45vw, 22px);
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.reward-score__note {
+  margin: 10px 0 0;
+  font-size: 13px;
+  color: var(--color-accent-pale);
+}
+
+.reward-xp {
+  position: absolute;
+  top: clamp(18px, 2.2vw, 30px);
+  right: clamp(56px, 6vw, 96px);
+  display: inline-flex;
+  align-items: center;
+  height: 40px;
+  padding: 0 16px;
+  border-radius: 999px;
+  background: var(--color-on-accent);
+  color: var(--color-accent-deep);
+  font: 600 17px / 1 var(--font-display);
+  letter-spacing: -0.04em;
+  white-space: nowrap;
+}
+
+.reward-xp--flying {
+  position: fixed;
+  z-index: 60;
+  right: auto;
+  pointer-events: none;
+}
+
+.reward-cmp {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 16px;
+  padding: 12px 0;
+  border-top: 1px solid rgb(255 255 255 / 28%);
+  font-size: 14px;
+  color: var(--color-accent-pale);
+}
+
+.reward-cmp__title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-on-accent);
+}
+
+.reward-cmp p {
+  margin: 0;
+}
+
+.reward-cmp b {
+  color: var(--color-on-accent);
+  font-weight: 600;
+}
+
+.reward-cells dl {
+  margin: 4px 0 0;
+  display: grid;
+  grid-template-columns: 1.35fr repeat(3, minmax(0, 1fr));
+  gap: var(--r-gap);
+}
+
+.reward-cell {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: clamp(12px, 1.3vw, 18px);
+  background: rgb(255 255 255 / 12%);
+  animation: result-rise var(--dur-base) var(--ease-enter) both;
+  animation-delay: calc(var(--dur-base) + var(--stagger-tile) * 2);
+}
+
+.reward-cell dt {
+  order: 2;
+  margin-top: 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.reward-cell__value {
+  order: 1;
+  margin: 0;
+  font-size: clamp(20px, 1.8vw, 30px);
+  white-space: nowrap;
+}
+
+.reward-cell--main .reward-cell__value {
+  font-size: clamp(34px, 3.4vw, 58px);
+}
+
+.reward-cell__hint {
+  order: 3;
+  margin: 2px 0 0;
+  font-size: 12.5px;
+  line-height: 1.35;
+  color: var(--color-accent-pale);
+}
+
+/* Panels on the side */
+
+.reward-panel {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  padding: var(--r-pad);
+  background: var(--color-paper-raised);
+  animation: result-rise var(--dur-slow) var(--ease-enter) both;
+  animation-delay: calc(var(--stagger-tile) * 2);
+}
+
+.reward-panel__title {
+  margin: 0;
+  font: 600 16px / 1.2 var(--font-ui);
+  letter-spacing: -0.015em;
+}
+
+.reward-say {
+  margin: 12px 0 0;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--color-ink-soft);
+}
+
+.reward-mastery__ex {
+  margin: 6px 0 0;
+  font-size: 12.5px;
+  color: var(--color-muted);
+}
+
+.reward-slots {
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--r-gap);
+  height: clamp(88px, 12vh, 112px);
+}
+
+.reward-slot {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: var(--color-paper);
+}
+
+.reward-slot__lab {
+  font-size: 12.5px;
+  color: var(--color-ink-soft);
+}
+
+.reward-slot__n {
+  font-size: clamp(22px, 2vw, 30px);
+}
+
+.reward-slot.is-ok {
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+.reward-slot.is-ok .reward-slot__lab {
+  color: var(--color-accent-pale);
+}
+
+.reward-slot.is-new {
+  box-shadow: inset 0 0 0 3px var(--color-ink);
+  animation: result-pop var(--dur-slow) var(--ease-enter) both;
+  animation-delay: var(--dur-reveal);
+}
+
+.reward-slot.is-empty .reward-slot__n {
+  color: var(--color-muted);
+}
+
+.reward-mastery__next {
+  margin: 12px 0 0;
+  font-size: 13px;
+  color: var(--color-ink-soft);
+}
+
+.reward-stagebar {
+  margin-top: 16px;
+}
+
+.reward-stagebar__h {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-ink-soft);
+}
+
+.reward-segs {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 2px;
+  margin-top: 8px;
+}
+
+.reward-segs i {
+  height: 8px;
+  background: var(--color-accent-tint);
+}
+
+.reward-segs i.on {
+  background: var(--color-accent);
+}
+
+.reward-segs i.cur {
+  background: repeating-linear-gradient(
+    135deg,
+    var(--color-accent) 0 3px,
+    var(--color-accent-tint) 3px 6px
+  );
+}
+
+.reward-gauge {
+  position: relative;
+  height: 8px;
+  margin-top: 14px;
+  background: var(--color-accent-tint);
+}
+
+.reward-gauge__fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: var(--color-accent);
+}
+
+.reward-gauge__goal {
+  position: absolute;
+  top: -5px;
+  bottom: -5px;
+  width: 3px;
+  background: var(--color-ink);
+}
+
+.reward-gauge__lab {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-muted);
+}
+
+.reward-weak > button {
+  align-self: flex-start;
+  margin-top: auto;
+}
+
+/* The actions bar */
+
+.reward-actions {
+  grid-column: 1 / 3;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+  padding: 12px 12px 12px var(--r-pad);
+  background: var(--color-paper-raised);
+}
+
+.reward-actions__more {
+  display: flex;
+  gap: 10px;
+}
+
+.reward-next {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px 16px;
+  min-width: 18rem;
+}
+
+.reward-next__title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-muted);
+  white-space: nowrap;
+}
+
+.reward-next__say {
+  flex: 1;
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-ink);
+}
+
+/* The details */
+
+.reward__details {
+  display: grid;
+  gap: 16px;
+  max-width: 72rem;
+  margin: 40px auto 24px;
+}
+
+.reward__details-title {
+  margin: 0;
+  font: 600 22px / 1.2 var(--font-display);
+  letter-spacing: -0.03em;
+}
+
+@media (max-width: 1240px) {
+  .reward-cells dl {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .reward-cell--main {
+    grid-column: 1 / 4;
+  }
+}
+
+@media (max-width: 1000px) {
+  .reward__fold {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .reward-actions {
+    grid-column: 1;
+  }
+}

@@ -40,7 +40,7 @@ export function RealTextExercise({ mode }: { readonly mode: AttemptMode }) {
 }
 
 function Run({ plan, mode }: { readonly plan: RealTextPlan; readonly mode: AttemptMode }) {
-  const { layout, progress, nextAction } = useDerived()
+  const { layout, progress } = useDerived()
   const attempts = useAppStore((state) => state.attempts)
   const id = realTextId(layout)
 
@@ -61,7 +61,6 @@ function Run({ plan, mode }: { readonly plan: RealTextPlan; readonly mode: Attem
       last: attempts.at(-1) ?? null,
       keyConfidence: progress?.keyConfidence ?? {},
       testIsPrimary: false,
-      thisScaleIsNext: nextAction === null ? null : nextAction.startsScaleId === id,
     }
   })
   if (frozen === null) return null

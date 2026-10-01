@@ -37,6 +37,9 @@ function TypingLineBase({ engine, text, sizePx }: TypingLineProps) {
   })
 
   const chars = Array.from(text)
+  const stations = chars.flatMap((char, i) =>
+    char === ' ' && i > 0 && i < chars.length - 1 ? [((i + 1) / chars.length) * 100] : [],
+  )
 
   const paint = useCallback((view: EngineView) => {
     const region = regionRef.current
@@ -160,6 +163,10 @@ function TypingLineBase({ engine, text, sizePx }: TypingLineProps) {
           className="typing-line__rule"
         >
           <div ref={fillRef} className="typing-line__rule-fill" />
+          {/* A station at every word boundary: drawn once, never repainted. */}
+          {stations.map((at) => (
+            <i key={at} className="typing-line__station" style={{ left: `${at}%` }} />
+          ))}
         </div>
         <p className="typing-line__hint">{m.exercise_type_to_begin()}</p>
       </div>

@@ -110,7 +110,7 @@ async function expectSingleNextAction(page: Page): Promise<void> {
   await expect(next).toBeVisible()
   await expect(page.locator('[data-rule]')).toHaveCount(1)
   await expect(next.getByRole('button')).toHaveCount(1)
-  await expect(next.getByRole('button', { name: 'Почати' })).toBeVisible()
+  await expect(next.getByRole('button', { name: 'Далі' })).toBeVisible()
 }
 
 /**
@@ -161,7 +161,7 @@ test.describe('US2 the result of an attempt', () => {
     ])
     await page.goto('/result/a1')
 
-    await expect(page.getByRole('heading', { name: 'Результат спроби' })).toBeVisible()
+    await expect(page.getByTestId('result-score')).toBeVisible()
 
     // The four headline tiles: SPM (CPM), accuracy, errors, time.
     const tiles = region(page, 'Головні показники')
@@ -321,7 +321,7 @@ test.describe('US2 the result of an attempt', () => {
       'Наступна клавіша: п (вказівний палець)',
     )
 
-    await region(page, 'Що робити далі').getByRole('button', { name: 'Почати' }).click()
+    await region(page, 'Що робити далі').getByRole('button', { name: 'Далі' }).click()
     await expect(page).toHaveURL(
       new RegExp(`/exercise/${FIRST_KEY.replace('.', '\\.')}\\?mode=practice`),
     )
@@ -468,5 +468,32 @@ test.describe('US2 the result of an attempt', () => {
     await page.goto('/result/fast')
     await expect(region(page, 'Ритм')).toBeVisible()
     await audit(page)
+  })
+})
+
+test.describe('the result as a reward', () => {
+  test('a counted test names the streak and its XP, and Esc, R and Enter lead on', async ({
+    page,
+  }) => {
+    await seedLearner(page, [{ id: 'pass', scaleId: ANCHORS, mode: 'test', accuracy: 0.98 }])
+    await page.goto('/result/pass')
+
+    const score = page.getByTestId('result-score')
+    await expect(score.getByRole('heading', { level: 1 })).toHaveText('Зараховано: 1 з 3')
+    await expect(score).toContainText('+10 XP')
+    await expect(region(page, 'Опанування вправи')).toContainText('спроба 1 · щойно')
+
+    await page.keyboard.press('KeyR')
+    await expect(page).toHaveURL(`/exercise/${ANCHORS}?mode=test`)
+
+    await page.goto('/result/pass')
+    await expect(score).toBeVisible()
+    await page.keyboard.press('Escape')
+    await expect(page).toHaveURL(/\/$/)
+
+    await page.goto('/result/pass')
+    await expect(score).toBeVisible()
+    await page.keyboard.press('Enter')
+    await expect(page).toHaveURL(/\/exercise\/.+\?mode=practice/)
   })
 })

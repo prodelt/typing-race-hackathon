@@ -90,8 +90,6 @@ function WordRun({ drill, bank, mode }: { drill: WordDrill; bank: WordBank; mode
           a.mode === 'practice' &&
           a.metrics.accuracy >= derived.accuracyFloor,
       ),
-      thisScaleIsNext:
-        derived.nextAction === null ? null : derived.nextAction.startsScaleId === drill.id,
     }
   })
 

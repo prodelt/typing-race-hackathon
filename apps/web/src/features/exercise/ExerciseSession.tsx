@@ -27,7 +27,6 @@ export interface RunProps {
   readonly last: Parameters<typeof TypingScreen>[0]['last']
   readonly keyConfidence: Parameters<typeof TypingScreen>[0]['keyConfidence']
   readonly testIsPrimary: boolean
-  readonly thisScaleIsNext: boolean | null
 }
 
 /**
@@ -60,8 +59,6 @@ export function ExerciseSession({ scale, mode }: ExerciseSessionProps) {
         attempt.mode === 'practice' &&
         attempt.metrics.accuracy >= derived.accuracyFloor,
     ),
-    thisScaleIsNext:
-      derived.nextAction === null ? null : derived.nextAction.startsScaleId === scale.id,
   }))
 
   if (plan === null) return <Locked />
@@ -105,7 +102,6 @@ export function ExerciseRun({
   last,
   keyConfidence,
   testIsPrimary,
-  thisScaleIsNext,
 }: RunProps) {
   const settings = useAppStore((state) => state.settings)
   const navigate = useNavigate()
@@ -201,7 +197,6 @@ export function ExerciseRun({
             unlocked={plan.unlocked}
             keyConfidence={keyConfidence}
             last={last}
-            thisScaleIsNext={thisScaleIsNext}
           />
           {paused ? (
             <PauseOverlay
