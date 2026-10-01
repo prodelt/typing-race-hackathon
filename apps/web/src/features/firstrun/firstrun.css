@@ -452,6 +452,12 @@
 
 /* ---- The check: one typed line --------------------------------------------------------- */
 
+/* The line sits in the middle of the stage, the way the play screen holds its line. */
+.fr-step--check {
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  align-content: stretch;
+}
+
 .fr-run {
   position: relative;
   align-self: center;
