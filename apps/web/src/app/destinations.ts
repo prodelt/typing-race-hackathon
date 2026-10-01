@@ -43,7 +43,16 @@ export function destinationOf(pathname: string): DestinationId | null {
  * Routes that need a physical keyboard. On a phone they show a calm notice instead; profile,
  * leaderboards, groups, the races lobby and the reference pages stay readable.
  */
-const TRAINING = ['/today', '/map', '/path', '/academy', '/review', '/exercise', '/session']
+const TRAINING = [
+  '/today',
+  '/map',
+  '/path',
+  '/academy',
+  '/review',
+  '/exercise',
+  '/session',
+  '/start',
+]
 
 export function needsKeyboard(pathname: string): boolean {
   if (pathname === '/') return true

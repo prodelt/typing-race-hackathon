@@ -4,6 +4,7 @@ import { Button, Card, cx } from '@typing-race/ui'
 import { useId, useState } from 'react'
 import { useAppStore, useDerived } from '../../app/state/index.js'
 import { m } from '../../paraglide/messages.js'
+import { STARTING_LEVELS } from './labels.js'
 
 /**
  * T113. The starting-level question — FR-048, and the forward-only rule — FR-073.
@@ -14,31 +15,6 @@ import { m } from '../../paraglide/messages.js'
  * whose boundary is below the recorded one. The count on each option is read from the same
  * `boundaryFor` the fold uses, so what a card promises is what the fold will deliver.
  */
-
-interface Option {
-  readonly choice: StartingLevelChoice
-  readonly title: () => string
-  readonly body: () => string
-}
-
-/** FR-048's order: the learner is offered them from least to most experienced. */
-const OPTIONS: readonly Option[] = [
-  {
-    choice: 'neverTouchTyped',
-    title: () => m.path_start_never_title(),
-    body: () => m.path_start_never_body(),
-  },
-  {
-    choice: 'knowsHomeRow',
-    title: () => m.path_start_home_title(),
-    body: () => m.path_start_home_body(),
-  },
-  {
-    choice: 'touchTypesWantsAccuracy',
-    title: () => m.path_start_accuracy_title(),
-    body: () => m.path_start_accuracy_body(),
-  },
-]
 
 export interface StartingLevelProps {
   /** `first` replaces the hub on a first run; `change` sits on Path for a returning learner. */
@@ -75,7 +51,7 @@ export function StartingLevel({ mode }: StartingLevelProps) {
 
       <fieldset className="mt-5 grid gap-3">
         <legend className="sr-only">{m.path_start_group()}</legend>
-        {OPTIONS.map((option) => {
+        {STARTING_LEVELS.map((option) => {
           const id = `${groupId}-${option.choice}`
           const active = selected === option.choice
           const lower = boundaryFor(layout, option.choice) < currentBoundary

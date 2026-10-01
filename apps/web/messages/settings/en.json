@@ -51,5 +51,8 @@
   "settings_data_confirm_body": "This cannot be undone. Every attempt, unlocked key and confidence value will be lost.",
   "settings_data_confirm_yes": "Yes, delete",
   "settings_data_cancel": "Cancel",
-  "settings_data_done": "Local data deleted."
+  "settings_data_done": "Local data deleted.",
+  "settings_group_start": "First run",
+  "settings_start_over_body": "Language, level and the finger scheme once more. Your attempts and progress stay.",
+  "settings_start_over": "Start over"
 }

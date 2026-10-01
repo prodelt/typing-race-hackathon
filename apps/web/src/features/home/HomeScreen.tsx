@@ -9,18 +9,18 @@ import {
 } from '@typing-race/curriculum'
 import type { Language, NextAction, Scale } from '@typing-race/domain'
 import { Button, IconFlame } from '@typing-race/ui'
-import { useMemo, useRef } from 'react'
+import { lazy, Suspense, useMemo, useRef } from 'react'
 import { LiveGradient } from '../../app/LiveGradient.js'
 import { useScreenKeys } from '../../app/screenKeys.js'
 import { useGameStats } from '../../app/state/gameStats.js'
 import { useAppStore, useDerived } from '../../app/state/index.js'
 import { m } from '../../paraglide/messages.js'
 import { getLocale } from '../../paraglide/runtime.js'
+import { useFirstRunHold } from '../firstrun/hold.js'
 import { routeGeometry } from '../map/model.js'
 import { RouteLine, useSize } from '../map/RouteLine.js'
 import { keyLabel, nextActionText } from '../path/labels.js'
 import { MASTERY_STREAK, streakFor, totalKeyCount, unlockedKeyCount } from '../path/model.js'
-import { StartingLevel } from '../path/StartingLevel.js'
 import { spotLabel } from '../review/format.js'
 import { composeSession, type SessionPlan } from '../session/compose.js'
 import { useSessionStore } from '../session/store.js'
@@ -32,15 +32,25 @@ import './home.css'
  * quiet panels around it, each with one way in and a key for it. The grid fills the stage; it
  * never scrolls as a page at desktop sizes.
  *
- * With no starting-level answer there is no progress to show, so the question replaces the hub.
+ * With no starting-level answer there is no progress to show, so the first run replaces the hub.
+ * It is lazy: a returning learner, who is most of the visits, never downloads it.
  */
 export function HomeScreen() {
   const derived = useDerived()
-  if (derived.progress === null || derived.nextAction === null) {
-    return <StartingLevel mode="first" />
+  const holding = useFirstRunHold((state) => state.holding)
+  if (holding || derived.progress === null || derived.nextAction === null) {
+    return (
+      <Suspense fallback={null}>
+        <FirstRun mode="first" />
+      </Suspense>
+    )
   }
   return <Hub nextAction={derived.nextAction} />
 }
+
+const FirstRun = lazy(() =>
+  import('../firstrun/FirstRun.js').then((module) => ({ default: module.FirstRun })),
+)
 
 const BLOCK_NAMES = [
   () => m.session_block_warmUp(),

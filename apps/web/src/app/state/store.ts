@@ -1,4 +1,4 @@
-import type { Attempt, Settings, StartingLevelChoice } from '@typing-race/domain'
+import type { Attempt, Language, Settings, StartingLevelChoice } from '@typing-race/domain'
 import { useMemo } from 'react'
 import { create } from 'zustand'
 import type { ProgressStore } from '../../seams/index.js'
@@ -19,6 +19,13 @@ export interface AppStore extends AppState {
   /** Reads local storage and resolves the four outcomes — FR-052, FR-083. */
   readonly boot: () => Promise<void>
   readonly chooseStartingLevel: (choice: StartingLevelChoice) => Promise<void>
+  /**
+   * The starting level recorded for each typing language. The state keeps only the current
+   * language's answer; start over needs both, so it may offer each language's forward-only floor.
+   */
+  readonly recordedStartingLevels: () => Promise<
+    Readonly<Partial<Record<Language, StartingLevelChoice>>>
+  >
   readonly changeSettings: (patch: Partial<Settings>) => Promise<void>
   readonly beginAttempt: () => void
   readonly finishAttempt: (attempt: Attempt) => Promise<void>
@@ -66,6 +73,19 @@ export const useAppStore = create<AppStore>()((set, get) => ({
     if (kept !== undefined && kept !== get().startingLevelChoice) {
       get().dispatch({ type: 'startingLevel/chosen', choice: kept })
     }
+  },
+
+  async recordedStartingLevels() {
+    const stored = await progressStore.load()
+    const recorded: Partial<Record<Language, StartingLevelChoice>> =
+      typeof stored === 'string' ? {} : { ...stored.startingLevelByLanguage }
+    // The in-memory answer counts too: it may not have reached storage (FR-052), or it may have
+    // come from the attempt-count fallback of an older envelope.
+    const { startingLevelChoice, settings } = get()
+    if (startingLevelChoice !== null && recorded[settings.typingLanguage] === undefined) {
+      recorded[settings.typingLanguage] = startingLevelChoice
+    }
+    return recorded
   },
 
   async changeSettings(patch) {

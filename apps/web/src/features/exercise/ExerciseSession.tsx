@@ -15,6 +15,8 @@ import { type ExerciseTarget, type ExerciseWording, scaleWording } from './wordi
 export interface ExerciseSessionProps {
   readonly scale: Scale
   readonly mode: AttemptMode
+  /** Start as soon as the keyboard checks out, skipping the pre-start screen (the first run). */
+  readonly autostart?: boolean
 }
 
 /** Everything one run needs, decided before it starts. Stage 2 word drills render this directly. */
@@ -27,6 +29,7 @@ export interface RunProps {
   readonly last: Parameters<typeof TypingScreen>[0]['last']
   readonly keyConfidence: Parameters<typeof TypingScreen>[0]['keyConfidence']
   readonly testIsPrimary: boolean
+  readonly autostart?: boolean
 }
 
 /**
@@ -37,7 +40,7 @@ export interface RunProps {
  * hand the engine a different exercise at the moment it completes, and a recomputed "last exercise"
  * would unfreeze the rail (FR-059).
  */
-export function ExerciseSession({ scale, mode }: ExerciseSessionProps) {
+export function ExerciseSession({ scale, mode, autostart = false }: ExerciseSessionProps) {
   const derived = useDerived()
   const attempts = useAppStore((state) => state.attempts)
 
@@ -70,6 +73,7 @@ export function ExerciseSession({ scale, mode }: ExerciseSessionProps) {
       mode={mode}
       plan={plan}
       layout={derived.layout}
+      autostart={autostart}
       {...frozen}
     />
   )
@@ -102,6 +106,7 @@ export function ExerciseRun({
   last,
   keyConfidence,
   testIsPrimary,
+  autostart = false,
 }: RunProps) {
   const settings = useAppStore((state) => state.settings)
   const navigate = useNavigate()
@@ -121,6 +126,22 @@ export function ExerciseRun({
     setInput(source)
     source.focus()
   }, [scale.layoutId])
+
+  // The first run lands here ready to type: once the layout probe agrees, the run starts and Play
+  // Mode takes the screen. A mismatch leaves the pre-start screen up, which says what to switch.
+  // The flag is dropped from the address so a reload shows the pre-start screen as usual.
+  useEffect(() => {
+    if (!autostart || input === null) return
+    let live = true
+    void input.probeLayout().then((probe) => {
+      if (!live || !probe.producible) return
+      setStarted(true)
+      void navigate({ to: '.', search: { mode }, replace: true, viewTransition: false })
+    })
+    return () => {
+      live = false
+    }
+  }, [autostart, input, mode, navigate])
 
   const engine = useAttempt({
     active: started,
