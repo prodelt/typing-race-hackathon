@@ -442,7 +442,8 @@ https://github.com/supabase/splinter).
 `supabase db advisors --help` on the installed CLI v2.116.0 (the docs page lists `--type`,
 `--linked`, `--local`; https://supabase.com/docs/guides/observability/advisors). CI gate example:
 `supabase db advisors --local --type all --fail-on error` after `supabase db reset`. (The older
-`supabase db lint` is a plpgsql_check linter, not the advisors.
+`supabase db lint` is a separate command that "lints local database for schema errors" — not the
+advisors.
 https://supabase.com/docs/reference/cli/supabase-db-lint)
 
 **Expected findings on our schema (not yet run):** 0003 on the five owner policies
