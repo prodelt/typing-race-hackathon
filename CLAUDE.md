@@ -9,6 +9,8 @@ Browser touch-typing trainer for Ukrainian (ЙЦУКЕН) and English (QWERTY). 
 
 **Design: top quality, taken wholesale from `E:\Ametrin projects\Ametrin_website5\variants\v4\b-red` (the 2026-09-25 version, not the older `variants\b-red`)** —
 its fonts (Unbounded + Onest), palette, tokens, spacing and motion. Adapt it to an app, don't dilute it.
+The app is a **game client**, not a website: the reference for every screen is
+`git show prototype/05-game-shell:prototypes/game-shell/b-red.html` (`?screen=home|play|result`).
 A screen is done when it has been looked at running, not when its tests pass.
 
 ## Run it
