@@ -6,15 +6,15 @@
 <title>Typing-Race · b-red</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=Unbounded:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=Unbounded:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* ==========================================================================
    Typing-Race · game shell · direction b-red (Ametrin website5 v4 «Бренд-червоний»)
-   Unbounded: short big titles and numbers only. Onest: everything else.
-   Shapes: blocks and fields square, buttons and pills fully round,
-   one 0 96px 0 0 corner (Manuport hero frame) on the primary block.
-   Fills instead of 1px borders, 8px gaps between blocks. Live CSS gradient
-   (bright / ember palettes) with static grain. Index numbers [01].
+   Round 3: clarity and comfort. One loud thing per screen, text ≥ 12 px,
+   AA contrast, every term explained once, calm motion.
+   Unbounded: short titles and numbers. Onest: everything else.
+   Blocks square, buttons fully round, the 0 96px 0 0 corner on primary blocks.
+   Buttons: red pill = primary, ink-outline pill = secondary, text link = tertiary.
    ========================================================================== */
 :root {
   --red: #c21f13;
@@ -23,23 +23,21 @@
   --red-tint: #f2dcd9;
   --red-soft: #f7d0cb;
   --red-pale: #fbe3e0;
-  --bg: #ffffff;
   --paper: #fcf1ef;
   --paper-2: #f9e6e3;
   --ink: #141414;
   --ink-2: #2e2e2e;
-  --mute: #666666;
-  --grey: #8a8a8a;
-  --locked: #efe7e6;
+  --mute: #5f5f5f;          /* ≥ 4.9:1 on every pink fill used here */
 
   --display: "Unbounded", "Onest", system-ui, sans-serif;
   --text: "Onest", system-ui, sans-serif;
 
   --ease: cubic-bezier(.16, 1, .3, 1);
   --ease-soft: cubic-bezier(.5, 1, .89, 1);
+  --ease-io: cubic-bezier(.87, 0, .13, 1);
   --t1: 100ms; --t2: 200ms; --t3: 320ms;
 
-  --rail-w: 104px;
+  --rail-w: 108px;
   --bar-h: 72px;
   --pad: 20px;
   --gap: 8px;
@@ -47,53 +45,66 @@
   color-scheme: light;
 }
 @media (max-width: 1200px), (max-height: 820px) {
-  :root { --rail-w: 88px; --bar-h: 64px; --pad: 14px; }
+  :root { --rail-w: 92px; --bar-h: 64px; --pad: 14px; }
 }
 
 *, *::before, *::after { box-sizing: border-box; }
 html, body { height: 100%; margin: 0; overflow: hidden; }
-body {
-  background: var(--paper);
-  color: var(--ink);
-  font-family: var(--text);
-  font-size: 15px; line-height: 1.4;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-}
+body { background: #fff; color: var(--ink); font-family: var(--text); font-size: 15px; line-height: 1.4; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
 button { font: inherit; color: inherit; border: 0; background: none; padding: 0; cursor: pointer; }
 h1, h2, h3, p, ol, ul { margin: 0; padding: 0; }
 ol, ul { list-style: none; }
 svg { display: block; }
 :focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
 .on-red :focus-visible { outline-color: #fff; }
-.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-.num { font-family: var(--display); font-weight: 500; letter-spacing: -.05em; font-variant-numeric: tabular-nums; line-height: .95; }
-.idx { font-size: 13px; font-weight: 500; font-variant-numeric: tabular-nums; color: var(--red); letter-spacing: 0; }
+.num { font-family: var(--display); font-weight: 500; letter-spacing: -.04em; font-variant-numeric: tabular-nums; line-height: 1; }
+.idx { font-size: 12.5px; font-weight: 500; font-variant-numeric: tabular-nums; color: var(--mute); }
+.on-red .idx { color: var(--red-pale); }
+.lab { font-size: 12.5px; color: var(--mute); font-weight: 500; }
 .ico { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
 
-/* key cap: a small block, square, filled, pressed edge */
-.kbd {
-  display: inline-grid; place-items: center;
-  min-width: 26px; height: 24px; padding: 0 7px;
-  font: 600 12px/1 var(--text); letter-spacing: 0; white-space: nowrap;
-  background: var(--paper-2); color: var(--ink-2);
-  box-shadow: inset 0 -2px 0 rgba(20, 20, 20, .14);
-}
-.on-red .kbd { background: rgba(255, 255, 255, .16); color: #fff; box-shadow: inset 0 -2px 0 rgba(0, 0, 0, .22); }
+/* key hint: one style everywhere */
+.kbd { display: inline-grid; place-items: center; white-space: nowrap; min-width: 26px; height: 24px; padding: 0 7px;
+  font: 600 12.5px/1 var(--text); background: var(--paper-2); color: var(--ink-2); box-shadow: inset 0 -2px 0 rgba(20,20,20,.14); }
 
-/* ---------- live gradient (port of grad.js / grad.css, CSS only) ---------- */
+/* tooltips: title for mouse, visible bubble on hover and keyboard focus */
+.tip { position: relative; }
+.tip[data-tip]:hover::after, .tip[data-tip]:focus-visible::after {
+  content: attr(data-tip); position: absolute; z-index: 40; left: 50%; top: calc(100% + 10px); transform: translateX(-50%);
+  width: max-content; max-width: 240px; padding: 8px 11px; border-radius: 0 10px 0 0;
+  background: var(--ink); color: #fff; font: 500 12.5px/1.4 var(--text); letter-spacing: 0; text-align: left; white-space: normal; pointer-events: none;
+}
+.tip.tip--up[data-tip]:hover::after, .tip.tip--up[data-tip]:focus-visible::after { top: auto; bottom: calc(100% + 10px); }
+.dotted { text-decoration: underline dotted 1.5px; text-underline-offset: 3px; cursor: help; }
+
+/* buttons */
+.btn { display: inline-flex; align-items: center; gap: 12px; height: 48px; padding: 0 8px 0 22px; border-radius: 999px; font-size: 15px; font-weight: 600; letter-spacing: -.01em; white-space: nowrap; flex: none;
+  transition: background-color var(--t2) var(--ease), color var(--t1) linear, box-shadow var(--t2) var(--ease); }
+.btn .kbd { border-radius: 999px; height: 32px; padding: 0 11px; }
+.btn--primary { background: var(--red); color: #fff; }
+.btn--primary .kbd { background: rgba(255,255,255,.18); color: #fff; box-shadow: none; }
+.btn--primary:hover { background: var(--red-deep); }
+.btn--secondary { box-shadow: inset 0 0 0 2px var(--ink); color: var(--ink); }
+.btn--secondary:hover { background: var(--ink); color: #fff; }
+.btn--secondary:hover .kbd { background: rgba(255,255,255,.18); color: #fff; box-shadow: none; }
+.btn--inverse { background: #fff; color: var(--red); }
+.btn--inverse .kbd { background: var(--red-pale); color: var(--red); box-shadow: none; }
+.btn--lg { height: 60px; padding: 0 10px 0 30px; font-size: 18px; }
+.btn--lg .kbd { height: 40px; padding: 0 14px; }
+.btn--sm { height: 36px; padding: 0 5px 0 14px; font-size: 13px; gap: 8px; }
+.btn--sm .kbd { height: 26px; padding: 0 8px; }
+.link { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--ink); text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1.5px; white-space: nowrap; }
+.link .kbd { text-decoration: none; }
+.link:hover { color: var(--red); }
+
+/* ---------- live gradient (port of grad.js), slowed and softened ---------- */
 .gp-host { position: relative; isolation: isolate; }
 .gp-layer { position: absolute; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; contain: strict; }
-.gp-blob {
-  position: absolute; display: block; border-radius: 50%;
-  transform: translate(-50%, -50%);
-  animation: var(--anim) var(--dur) ease-in-out var(--delay) infinite alternate both;
-}
-.gp-grain {
-  position: absolute; inset: 0;
+.gp-blob { position: absolute; display: block; border-radius: 50%; transform: translate(-50%, -50%); animation: var(--anim) var(--dur) ease-in-out var(--delay) infinite alternate both; }
+.gp-static .gp-blob { animation-play-state: paused; }
+.gp-grain { position: absolute; inset: 0;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-size: 180px 180px;
-}
+  background-size: 180px 180px; }
 @keyframes gp-drift-0 { 0% { transform: translate(-50%,-50%) rotate(0) scale(1); } 50% { transform: translate(-37%,-60%) rotate(34deg) scale(1.12); } 100% { transform: translate(-58%,-42%) rotate(68deg) scale(.94); } }
 @keyframes gp-drift-1 { 0% { transform: translate(-50%,-50%) rotate(0) scale(1.05); } 50% { transform: translate(-63%,-41%) rotate(-30deg) scale(.92); } 100% { transform: translate(-44%,-57%) rotate(-58deg) scale(1.1); } }
 @keyframes gp-drift-2 { 0% { transform: translate(-50%,-50%) rotate(18deg) scale(.95); } 50% { transform: translate(-42%,-38%) rotate(-12deg) scale(1.14); } 100% { transform: translate(-60%,-58%) rotate(40deg) scale(1); } }
@@ -104,433 +115,323 @@ svg { display: block; }
    ========================================================================== */
 .screen { position: fixed; inset: 0; display: none; }
 .screen.is-on { display: grid; }
+#home { grid-template-columns: var(--rail-w) minmax(0, 1fr); grid-template-rows: var(--bar-h) minmax(0, 1fr); background: #fff; }
+#result { grid-template-columns: minmax(0, 1fr); grid-template-rows: var(--bar-h) minmax(0, 1fr); background: #fff; }
 
-/* ---------- Home shell ---------- */
-#home {
-  grid-template-columns: var(--rail-w) minmax(0, 1fr);
-  grid-template-rows: var(--bar-h) minmax(0, 1fr);
-  background: #fff;
-}
+/* ---------- rail ---------- */
+.rail { grid-row: 1 / 3; display: flex; flex-direction: column; background: #fff; padding: 0 10px 12px; }
+.brand { height: var(--bar-h); display: grid; place-items: center; flex: none; }
+.brand__mark { width: 44px; height: 44px; display: grid; place-items: center; background: var(--red); color: #fff; border-radius: 0 16px 0 0; font: 700 18px/1 var(--display); letter-spacing: -.06em; }
+.rail__nav { display: flex; flex-direction: column; gap: 4px; padding-top: 6px; }
+.rail__item { position: relative; display: grid; justify-items: center; gap: 5px; padding: 10px 4px; color: var(--ink-2); font-size: 12.5px; font-weight: 600; letter-spacing: -.01em;
+  transition: background-color var(--t2) var(--ease), color var(--t1) linear; }
+.rail__item .rn { justify-self: start; margin-left: 4px; font: 500 12px/1 var(--display); letter-spacing: -.03em; color: var(--mute); }
+.rail__item .ico { width: 24px; height: 24px; margin-top: -4px; }
+.rail__item:hover { background: var(--paper); }
+.rail__item[aria-current="page"] { background: var(--red); color: #fff; border-radius: 0 16px 0 0; }
+.rail__item[aria-current="page"] .rn { color: var(--red-pale); }
+.rail__item[aria-current="page"]::before { content: ""; position: absolute; left: -10px; top: 0; bottom: 0; width: 5px; background: var(--red); }
+.rail__badge { position: absolute; top: 7px; right: 8px; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 999px; background: var(--red); color: #fff; font: 600 12px/20px var(--text); text-align: center; }
+.rail__foot { margin-top: auto; display: flex; flex-direction: column; gap: 6px; }
+.season { background: var(--paper); padding: 10px 10px 9px; border-radius: 0 16px 0 0; }
+.season .lab { display: block; font-size: 12px; }
+.season .num { display: block; font-size: 22px; color: var(--red); margin: 4px 0; }
+.season small { display: block; font-size: 12px; color: var(--ink-2); font-weight: 500; }
+.season i { display: block; height: 4px; background: var(--red-tint); margin-top: 7px; position: relative; }
+.season i::after { content: ""; position: absolute; inset: 0 auto 0 0; width: 70%; background: var(--red); }
+.online { display: flex; align-items: center; gap: 7px; padding: 4px 6px; font-size: 12px; color: var(--mute); white-space: nowrap; }
+.online b { color: var(--ink); font-weight: 600; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--red); flex: none; }
 
-/* rail */
-.rail {
-  grid-row: 1 / 3;
-  display: flex; flex-direction: column; align-items: stretch;
-  background: #fff;
-  padding: 0 0 16px;
-}
-.brand {
-  height: var(--bar-h); display: grid; place-items: center; flex: none;
-}
-.brand__mark {
-  width: 44px; height: 44px; display: grid; place-items: center;
-  background: var(--red); color: #fff;
-  border-radius: 0 16px 0 0;
-  font: 900 19px/1 var(--display); letter-spacing: -.06em;
-}
-.rail__nav { display: flex; flex-direction: column; gap: 4px; padding: 8px 10px 0; }
-.rail__item {
-  position: relative;
-  display: flex; flex-direction: column; align-items: center; gap: 6px;
-  padding: 14px 4px 11px;
-  color: var(--mute);
-  font-size: 12.5px; font-weight: 500; letter-spacing: -.01em;
-  transition: background-color var(--t2) var(--ease), color var(--t1) linear;
-}
-.rail__item .ico { width: 24px; height: 24px; }
-.rail__item:hover { background: var(--paper); color: var(--ink); }
-.rail__item .hk {
-  position: absolute; top: 5px; right: 6px;
-  font-size: 10.5px; font-weight: 500; font-variant-numeric: tabular-nums; color: var(--grey);
-}
-.rail__item[aria-current="page"] { background: var(--red-pale); color: var(--red); font-weight: 600; }
-.rail__item[aria-current="page"]::before {
-  content: ""; position: absolute; left: -10px; top: 10px; bottom: 10px; width: 4px; background: var(--red);
-}
-.rail__item[aria-current="page"] .hk { color: var(--red); }
-.rail__badge {
-  position: absolute; top: 9px; left: calc(50% + 6px);
-  min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px;
-  background: var(--red); color: #fff; font: 600 10.5px/18px var(--text); text-align: center;
-}
-.rail__foot { margin-top: auto; text-align: center; font-size: 11px; color: var(--grey); line-height: 1.3; }
-.rail__foot b { display: block; color: var(--ink-2); font-weight: 600; }
-
-/* status bar */
-.bar {
-  display: flex; align-items: center; gap: clamp(14px, 2vw, 30px);
-  padding: 0 calc(var(--pad) + 4px) 0 var(--pad);
-  background: #fff; min-width: 0;
-}
+/* ---------- status bar ---------- */
+.bar { display: flex; align-items: center; gap: clamp(14px, 2vw, 30px); padding: 0 calc(var(--pad) + 4px) 0 var(--pad); background: #fff; min-width: 0; position: relative; z-index: 5; }
+#result .bar { padding-left: 24px; }
+.bar .brand { width: 52px; height: auto; }
 .who { display: flex; align-items: center; gap: 10px; min-width: 0; }
-.avatar {
-  width: 40px; height: 40px; border-radius: 999px; flex: none;
-  display: grid; place-items: center;
-  background: var(--red-pale); color: var(--red);
-  font: 600 14px/1 var(--display); letter-spacing: -.04em;
-}
+.avatar { width: 40px; height: 40px; border-radius: 999px; flex: none; display: grid; place-items: center; background: var(--red-pale); color: var(--red); font: 600 14px/1 var(--display); letter-spacing: -.04em; }
 .who__name { font-weight: 600; font-size: 15px; letter-spacing: -.01em; white-space: nowrap; }
-.who__sub { font-size: 12px; color: var(--mute); white-space: nowrap; }
-
-.lvl { display: flex; align-items: center; gap: 10px; }
-.lvl__n { display: flex; align-items: baseline; gap: 6px; }
-.lvl__n .num { font-size: 26px; color: var(--red); }
-.lab { font-size: 12px; color: var(--mute); font-weight: 500; white-space: nowrap; }
-.xp { width: clamp(90px, 9vw, 150px); }
-.xp__track { height: 8px; background: var(--red-tint); position: relative; overflow: hidden; }
-.xp__fill { position: absolute; inset: 0 auto 0 0; width: 67%; background: var(--red); }
-.xp__fill::after { /* edge juice: a slow sheen on the bar */
-  content: ""; position: absolute; inset: 0; width: 40%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,.45), transparent);
-  animation: sheen 3.6s var(--ease-soft) infinite;
-}
-@keyframes sheen { 0% { transform: translateX(-120%); } 60%, 100% { transform: translateX(320%); } }
-.xp__txt { margin-top: 4px; font-size: 11.5px; color: var(--mute); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.who__sub { font-size: 12.5px; color: var(--mute); white-space: nowrap; }
+.sb { display: flex; align-items: center; gap: 9px; white-space: nowrap; outline-offset: 6px; }
+.sb .num { font-size: 20px; }
+.sb__col { display: flex; flex-direction: column; gap: 4px; }
+.sb__top { display: flex; align-items: baseline; gap: 6px; }
+.sb__top .lab { color: var(--ink-2); }
+.lvl .num { color: var(--red); }
+.xp { width: clamp(84px, 8vw, 130px); }
+.xp__track { height: 6px; background: var(--red-tint); position: relative; overflow: hidden; }
+.xp__gain { position: absolute; inset: 0 auto 0 0; width: 67%; background: var(--ink); transition: width 900ms var(--ease); }
+.xp__fill { position: absolute; inset: 0 auto 0 0; width: 67%; background: var(--red); transition: width 900ms var(--ease); }
+.xp__txt { font-size: 12px; color: var(--mute); font-variant-numeric: tabular-nums; }
 .xp__txt b { color: var(--ink); font-weight: 600; }
-
-.stat { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
-.stat .num { font-size: 22px; }
-.stat__col { display: flex; flex-direction: column; gap: 3px; }
-.flame { width: 26px; height: 26px; fill: var(--red); stroke: none; }
-.freeze {
-  display: inline-flex; align-items: center; gap: 4px;
-  height: 20px; padding: 0 8px 0 6px; border-radius: 999px;
-  background: var(--paper-2); color: var(--ink-2); font-size: 11px; font-weight: 500;
-}
+.xp__plus { position: absolute; left: 100%; top: -4px; margin-left: 10px; font: 600 14px/1 var(--display); letter-spacing: -.04em; color: var(--red); opacity: 0; white-space: nowrap; }
+.xp__plus.on { animation: plus 1.6s var(--ease) forwards; }
+@keyframes plus { 0% { opacity: 0; transform: translateY(8px); } 20% { opacity: 1; transform: none; } 75% { opacity: 1; } 100% { opacity: 0; transform: translateY(-8px); } }
+.flame { width: 24px; height: 24px; fill: var(--red); stroke: none; }
+.freeze { display: inline-flex; align-items: center; gap: 4px; height: 20px; padding: 0 8px 0 6px; border-radius: 999px; background: var(--paper-2); color: var(--ink-2); font-size: 12px; font-weight: 500; }
 .freeze svg { width: 12px; height: 12px; stroke-width: 2; }
-.swords { width: 24px; height: 24px; color: var(--ink); }
-
+.swords { width: 22px; height: 22px; }
 .bar__right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
 .seg { display: flex; padding: 3px; border-radius: 999px; background: var(--paper); }
-.seg button {
-  height: 34px; padding: 0 13px; border-radius: 999px;
-  font-size: 13px; font-weight: 600; color: var(--mute);
-  transition: background-color var(--t2) var(--ease), color var(--t1) linear;
-}
+.seg button { height: 34px; padding: 0 13px; border-radius: 999px; font-size: 13px; font-weight: 600; color: var(--mute); transition: background-color var(--t2) var(--ease), color var(--t1) linear; }
 .seg button[aria-pressed="true"] { background: var(--ink); color: #fff; }
-.iconbtn {
-  width: 40px; height: 40px; border-radius: 999px; display: grid; place-items: center;
-  background: var(--paper); color: var(--ink-2);
-  transition: background-color var(--t2) var(--ease);
-}
+.iconbtn { width: 40px; height: 40px; border-radius: 999px; display: grid; place-items: center; background: var(--paper); color: var(--ink-2); transition: background-color var(--t2) var(--ease); }
 .iconbtn:hover { background: var(--red-pale); color: var(--red); }
 .iconbtn .ico { width: 20px; height: 20px; }
-.gchip {
-  display: inline-flex; align-items: center; gap: 8px;
-  height: 40px; padding: 0 16px 0 12px; border-radius: 999px;
-  background: transparent; color: var(--mute);
-  font-size: 13px; font-weight: 500; white-space: nowrap;
-  box-shadow: inset 0 0 0 1.5px var(--red-tint);
-  transition: background-color var(--t2) var(--ease), color var(--t1) linear;
-}
-.gchip:hover { background: var(--paper); color: var(--ink); }
+.gchip { display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 16px 0 12px; border-radius: 999px; color: var(--ink-2); font-size: 13px; font-weight: 500; white-space: nowrap; box-shadow: inset 0 0 0 1.5px var(--red-tint); transition: background-color var(--t2) var(--ease); }
+.gchip:hover { background: var(--paper); }
 .gchip svg { width: 16px; height: 16px; }
+.bar.enter { animation: barIn var(--t3) var(--ease) both; }
+@keyframes barIn { from { transform: translateY(-100%); } to { transform: none; } }
 
-/* stage */
-.stage {
-  min-height: 0; min-width: 0;
-  padding: 0 var(--pad) var(--pad) 0;
-  background: #fff;
-}
-.stage__in {
-  height: 100%;
-  display: grid;
-  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-  grid-template-rows: minmax(0, 1.08fr) minmax(0, 1fr);
-  gap: var(--gap);
-  padding: var(--gap);
-}
-.panel {
-  position: relative; min-height: 0; min-width: 0;
-  background: rgba(255, 255, 255, .92);
-  padding: var(--cpad);
-  display: flex; flex-direction: column;
-}
+/* ---------- stage ---------- */
+.stage { min-height: 0; min-width: 0; padding: 0 var(--pad) var(--pad) 0; background: #fff; }
+#result .stage { padding-left: var(--pad); }
+.stage__in { height: 100%; display: grid; gap: var(--gap); padding: var(--gap); }
+#home .stage__in { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); grid-template-rows: minmax(0, 1.08fr) minmax(0, 1fr); }
+.panel { position: relative; min-height: 0; min-width: 0; background: #fff; padding: var(--cpad); display: flex; flex-direction: column; }
 .panel__head { display: flex; align-items: baseline; gap: 10px; }
 .panel__title { font: 600 16px/1.2 var(--text); letter-spacing: -.015em; }
-.panel__meta { margin-left: auto; font-size: 13px; color: var(--mute); white-space: nowrap; }
+.panel__meta { margin-left: auto; font-size: 13px; color: var(--mute); white-space: nowrap; display: inline-flex; align-items: center; gap: 7px; }
+.panel__meta b { color: var(--ink); font-weight: 600; }
 
-/* ---------- primary: Continue ---------- */
-.go {
-  grid-column: 1; grid-row: 1;
-  position: relative; isolation: isolate; overflow: hidden;
-  border-radius: 0 96px 0 0;
-  color: #fff;
-  padding: clamp(20px, 2.4vw, 36px) clamp(22px, 2.6vw, 40px);
-  display: grid;
-  grid-template-rows: auto 1fr auto;
-  text-align: left; cursor: pointer;
-  transition: transform var(--t2) var(--ease);
-}
-.go:active { transform: scale(.995); }
-.go__top { display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 500; color: var(--red-pale); }
-.go__top .idx { color: #fff; }
-.go__top .tag {
-  margin-left: 4px;
-  height: 28px; padding: 0 12px; border-radius: 999px; display: inline-flex; align-items: center; gap: 6px;
-  background: rgba(255,255,255,.14); color: #fff; font-size: 12.5px; font-weight: 600;
-}
-.go__mid { align-self: end; padding-bottom: clamp(10px, 1.6vh, 20px); }
-.go__title {
-  font: 700 clamp(46px, 5.4vw, 88px)/.92 var(--display);
-  letter-spacing: -.045em;
-}
-.go__what { margin-top: clamp(10px, 1.6vh, 18px); font-size: clamp(15px, 1.25vw, 19px); font-weight: 500; letter-spacing: -.01em; color: var(--red-pale); max-width: 34em; }
-.go__what b { color: #fff; font-weight: 600; }
-.go__bot { display: flex; align-items: center; gap: clamp(12px, 1.6vw, 24px); }
-.go__btn {
-  display: inline-flex; align-items: center; gap: 14px;
-  height: 56px; padding: 0 10px 0 28px; border-radius: 999px;
-  background: #fff; color: var(--red);
-  font-size: 17px; font-weight: 600; letter-spacing: -.01em;
-  transition: background-color var(--t2) var(--ease), color var(--t1) linear;
-}
-.go__btn .kbd { background: var(--red-pale); color: var(--red); box-shadow: inset 0 -2px 0 rgba(194,31,19,.25); height: 36px; padding: 0 12px; font-size: 13px; border-radius: 999px; }
-.go:hover .go__btn { background: var(--ink); color: #fff; }
-.go:hover .go__btn .kbd { background: rgba(255,255,255,.16); color: #fff; box-shadow: none; }
-.plan { display: flex; gap: 4px; flex: 1 1 0; min-width: 0; max-width: 360px; }
-.plan__seg { flex: var(--w) 1 0; min-width: 0; }
-.plan__bar { height: 6px; background: rgba(255,255,255,.22); }
-.plan__seg:first-child .plan__bar { background: #fff; }
-.plan__lab { margin-top: 6px; font-size: 11.5px; color: var(--red-pale); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.reward { margin-left: auto; text-align: right; }
-.reward .num { font-size: clamp(22px, 2vw, 30px); }
-.reward .lab { color: var(--red-pale); }
-/* the outlined giant key (Manuport contour word: stroke 2px, fill flows) */
-.go__glyph {
-  position: absolute; z-index: -1; right: clamp(56px, 6vw, 104px); top: clamp(-34px, -2vw, -14px);
-  font: 600 clamp(170px, 17vw, 280px)/1 var(--display); letter-spacing: -.06em;
-  color: transparent;
-  background: linear-gradient(90deg, rgba(255,255,255,.5) 0 50%, rgba(255,255,255,.14) 50% 100%);
-  background-size: 200% 100%; background-position: 100% 0;
-  -webkit-background-clip: text; background-clip: text;
-  animation: flow 1.2s cubic-bezier(.87,0,.13,1) .25s both;
-  pointer-events: none; user-select: none;
-}
-@keyframes flow { from { background-position: 0 0; } to { background-position: 100% 0; } }
+/* ---------- primary: today's lesson ---------- */
+.go { grid-column: 1; grid-row: 1; overflow: hidden; border-radius: 0 96px 0 0; color: #fff; padding: clamp(20px, 2.4vw, 36px) clamp(22px, 2.6vw, 40px); display: flex; flex-direction: column; min-height: 0; }
+.go__top { font-size: 14px; font-weight: 500; color: var(--red-pale); display: flex; gap: 10px; align-items: baseline; }
+.go__title { margin-top: auto; font: 700 clamp(34px, 3.6vw, 56px)/1 var(--display); letter-spacing: -.045em; }
+.go__what { margin-top: 12px; font-size: clamp(15px, 1.2vw, 18px); font-weight: 500; color: var(--red-pale); max-width: 40em; }
+.steps { margin-top: clamp(14px, 2.2vh, 22px); display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--gap); }
+.step { background: rgba(255,255,255,.12); padding: 10px 12px 11px; display: grid; grid-template-columns: auto 1fr; column-gap: 10px; align-items: baseline; }
+.step .num { font-size: 15px; grid-row: 1 / 3; }
+.step b { font-size: 14px; font-weight: 600; }
+.step span { font-size: 12.5px; color: var(--red-pale); }
+.step:first-child { background: rgba(255,255,255,.2); }
+.go__bot { margin-top: clamp(14px, 2.2vh, 22px); display: flex; align-items: center; gap: 14px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 12px; border-radius: 999px; font-size: 13px; font-weight: 600; white-space: nowrap; }
+.chip--veil { background: rgba(255,255,255,.16); color: #fff; }
+.chip--white { background: #fff; color: var(--red); }
 
 /* ---------- race ---------- */
 .race { grid-column: 2; grid-row: 1; }
-.live { display: inline-flex; align-items: center; gap: 7px; }
-.live i { width: 8px; height: 8px; border-radius: 50%; background: var(--red); position: relative; }
-.live i::after { content: ""; position: absolute; inset: -4px; border-radius: 50%; background: var(--red); opacity: .3; animation: ping 1.8s var(--ease) infinite; }
-@keyframes ping { from { transform: scale(.4); opacity: .5; } to { transform: scale(1.6); opacity: 0; } }
-.live b { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
-.tiles {
-  flex: 1; min-height: 0;
-  margin-top: clamp(12px, 1.6vh, 20px);
-  display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: var(--gap);
-}
-.tile {
-  position: relative; min-height: 0;
-  display: flex; flex-direction: column; justify-content: space-between; align-items: flex-start;
-  padding: clamp(12px, 1.3vw, 18px);
-  background: var(--paper); text-align: left;
-  transition: background-color var(--t2) var(--ease), color var(--t1) linear;
-}
-.tile:hover, .tile.is-hot { background: var(--red); color: #fff; }
-.tile:hover .tile__sub, .tile.is-hot .tile__sub { color: var(--red-pale); }
-.tile:hover .kbd, .tile.is-hot .kbd { background: rgba(255,255,255,.16); color: #fff; box-shadow: none; }
-.tile__lang { font: 600 clamp(22px, 2vw, 30px)/1 var(--display); letter-spacing: -.04em; }
-.tile__len { font-size: 15px; font-weight: 600; letter-spacing: -.01em; margin-top: 4px; }
+.race__lead { margin-top: 6px; font-size: 13px; color: var(--mute); }
+.tiles { flex: 1; min-height: 0; margin-top: clamp(10px, 1.6vh, 16px); display: grid; grid-template-columns: 1fr 1fr; grid-auto-rows: 1fr; gap: var(--gap); }
+.tile { position: relative; min-height: 0; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 4px; padding: 10px 46px 10px 14px; background: var(--paper); text-align: left;
+  transition: background-color var(--t2) var(--ease), color var(--t1) linear; }
+.tile:hover, .tile.is-hot { background: var(--ink); color: #fff; }
+.tile:hover .tile__sub, .tile.is-hot .tile__sub { color: #e8e8e8; }
+.tile:hover .kbd, .tile.is-hot .kbd { background: rgba(255,255,255,.18); color: #fff; box-shadow: none; }
+.tile__name { font-size: 15px; font-weight: 600; letter-spacing: -.01em; }
+.tile__name em { font-style: normal; font-weight: 700; }
 .tile__sub { font-size: 12.5px; color: var(--mute); }
-.tile__foot { display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 6px; }
-.tile .kbd { position: absolute; top: clamp(10px, 1.1vw, 14px); right: clamp(10px, 1.1vw, 14px); }
-.friend {
-  margin-top: var(--gap);
-  display: flex; align-items: center; gap: 10px; justify-content: center;
-  height: 48px; border-radius: 999px;
-  background: var(--red-pale); color: var(--red);
-  font-size: 15px; font-weight: 600;
-  transition: background-color var(--t2) var(--ease);
-}
-.friend:hover { background: var(--red-soft); }
-.friend .kbd { background: rgba(194,31,19,.12); color: var(--red); box-shadow: none; border-radius: 999px; }
+.tile .kbd { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); }
+.race__foot { margin-top: var(--gap); display: flex; }
+.race__foot .btn { flex: 1; justify-content: center; padding-left: 16px; }
 
 /* ---------- map ---------- */
 .map { grid-column: 1; grid-row: 2; }
-.map__svg { flex: 1; min-height: 0; margin-top: 10px; width: 100%; }
-.map__foot { display: flex; align-items: center; gap: 18px; font-size: 12px; color: var(--mute); margin-top: 8px; flex-wrap: nowrap; white-space: nowrap; }
-.lg { display: inline-flex; align-items: center; gap: 6px; }
-.lg i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
-.keys { display: flex; align-items: baseline; gap: 6px; }
-.keys .num { font-size: 22px; color: var(--red); }
-.map__svg .rlab { font: 500 11px var(--text); fill: var(--mute); }
-.map__svg .rname { font: 600 17px var(--display); letter-spacing: -.04em; fill: var(--ink); }
-.map__svg .nlab { font: 600 11px var(--text); fill: var(--ink-2); }
-.pulse { transform-box: fill-box; transform-origin: center; animation: ring 2.4s var(--ease) infinite; }
-@keyframes ring { from { transform: scale(.75); opacity: .55; } to { transform: scale(1.5); opacity: 0; } }
-.route-done { stroke-dasharray: 1200; stroke-dashoffset: 1200; animation: draw 1.1s var(--ease) .2s forwards; }
-@keyframes draw { to { stroke-dashoffset: 0; } }
+.map__svg { flex: 1; min-height: 0; margin-top: 10px; width: 100%; overflow: visible; }
+.m-band { fill: #f9e6e3; } .m-band--cur { fill: #f2dcd9; } .m-band--lock { fill: #f6f1f0; }
+.m-n { font: 500 17px var(--display); letter-spacing: -.04em; fill: var(--red); }
+.m-name { font: 600 17px var(--display); letter-spacing: -.04em; fill: var(--ink); }
+.m-route { fill: none; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
+.m-route--todo { stroke: #c4aeab; stroke-dasharray: 1 10; }
+.m-route--done { stroke: var(--red); }
+.m-route--done.draw { animation: draw 1.1s var(--ease) .2s both; }
+@keyframes draw { from { stroke-dashoffset: var(--len); } to { stroke-dashoffset: 0; } }
+.mnode text { font: 600 16px var(--display); letter-spacing: -.04em; text-anchor: middle; dominant-baseline: central; }
+.mnode--done circle { fill: var(--red); } .mnode--done text { fill: #fff; }
+.mnode--lock circle { fill: #ece3e1; } .mnode--lock text { fill: #6b5a57; }
+.mnode--cur .halo { fill: var(--red); opacity: .2; }
+.mnode--cur .core { fill: var(--red); }
+.mnode--cur text { fill: #fff; font-size: 20px; font-weight: 700; }
+.mnode--rev rect, .mnode--goal rect { fill: var(--ink); }
+.mnode--rev path { fill: none; stroke: #fff; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.m-tip { font: 600 16px var(--text); fill: #fff; text-anchor: middle; dominant-baseline: central; letter-spacing: 0; }
+.legend { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; margin-top: 10px; font-size: 12.5px; color: var(--ink-2); }
+.legend span { display: inline-flex; align-items: center; gap: 7px; }
+.lg { width: 12px; height: 12px; flex: none; display: inline-block; }
+.lg--done { background: var(--red); border-radius: 50%; }
+.lg--cur { background: var(--red); border-radius: 0 5px 0 0; }
+.lg--rev { background: var(--ink); transform: rotate(45deg) scale(.85); }
+.lg--goal { background: var(--ink); }
+.lg--lock { background: #ece3e1; border-radius: 50%; }
+.legend .link { margin-left: auto; }
 
-/* ---------- side pair ---------- */
+/* ---------- weak spot + daily goal ---------- */
 .pair { grid-column: 2; grid-row: 2; display: grid; grid-template-columns: 1fr 1fr; gap: var(--gap); min-height: 0; }
-.weak__key { font: 600 clamp(52px, 5.4vw, 84px)/.9 var(--display); letter-spacing: -.06em; margin-top: clamp(14px, 2.4vh, 28px); }
-.weak__ms { margin-top: auto !important; }
-.weak__key span { color: var(--red); }
-.weak__ms { margin-top: 10px; font-size: 13px; color: var(--mute); }
-.weak__ms b { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
-.gauge { position: relative; height: 8px; background: var(--red-tint); margin-top: 8px; }
-.gauge__fill { position: absolute; inset: 0 auto 0 0; width: 100%; background: linear-gradient(90deg, var(--red-soft), var(--red)); }
-.gauge__goal { position: absolute; top: -5px; bottom: -5px; width: 3px; background: var(--ink); left: 60.7%; }
-.gauge__lab { display: flex; justify-content: space-between; font-size: 11px; color: var(--mute); margin-top: 6px; font-variant-numeric: tabular-nums; }
-.pill {
-  margin-top: clamp(10px, 1.6vh, 16px);
-  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-  height: 44px; padding: 0 18px; border-radius: 999px;
-  background: var(--red); color: #fff; font-size: 14px; font-weight: 600;
-  transition: background-color var(--t2) var(--ease);
-}
-.pill:hover { background: var(--red-deep); }
-.pill .kbd { background: rgba(255,255,255,.16); color: #fff; box-shadow: none; border-radius: 999px; min-width: 22px; height: 22px; padding: 0 6px; }
-
-.goal__n { margin-top: clamp(14px, 2.4vh, 28px); display: flex; align-items: baseline; gap: 6px; }
-.goal__n .num { font-size: clamp(44px, 4.4vw, 68px); }
-.goal__n .of { font: 500 clamp(18px, 1.6vw, 24px)/1 var(--display); letter-spacing: -.04em; color: var(--grey); }
-.goal__bar { height: 8px; background: var(--red-tint); margin-top: auto; position: relative; }
-.goal__bar i { position: absolute; inset: 0 auto 0 0; width: 60%; background: var(--red); }
-.goal__left { font-size: 12px; color: var(--mute); margin-top: 6px; }
-.week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: clamp(10px, 1.6vh, 16px); }
-.day { display: flex; flex-direction: column; align-items: center; gap: 5px; font-size: 10.5px; color: var(--mute); }
-.day i { width: 100%; aspect-ratio: 1; max-height: 30px; display: grid; place-items: center; background: var(--paper-2); }
-.day.done i { background: var(--red); }
-.day.done i svg { width: 12px; height: 12px; stroke: #fff; stroke-width: 3; fill: none; }
-.day.today i { background: linear-gradient(0deg, var(--red) 60%, var(--red-tint) 60%); box-shadow: inset 0 0 0 2px var(--ink); }
-.day.today { color: var(--ink); font-weight: 600; }
+.say { margin-top: 12px; font-size: 14px; line-height: 1.45; color: var(--ink-2); }
+.say b { color: var(--ink); font-weight: 600; white-space: nowrap; }
+.say .red { color: var(--red); }
+.spark { flex: 1; min-height: 44px; max-height: 120px; margin-top: 12px; width: 100%; }
+.spark__lab { display: flex; justify-content: space-between; gap: 8px; margin-top: 6px; font-size: 12.5px; color: var(--mute); }
+.weak .btn { margin-top: 12px; align-self: flex-start; }
+.chart { flex: 1; min-height: 70px; margin-top: 16px; position: relative; display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; align-items: end; padding-bottom: 20px; }
+.chart__goal { position: absolute; left: 0; right: 0; bottom: calc(20px + (100% - 20px) * .571); border-top: 2px dashed var(--ink); opacity: .6; }
+.chart__goal span { position: absolute; right: 0; top: -19px; font-size: 12px; color: var(--ink-2); font-weight: 600; background: #fff; padding: 0 0 0 4px; }
+.bar7 { position: relative; height: var(--h); background: var(--red-soft); }
+.bar7 em { position: absolute; left: -3px; right: -3px; bottom: -20px; text-align: center; font-style: normal; font-size: 12px; color: var(--mute); }
+.bar7.today { background: var(--red); }
+.bar7.today::before { content: ""; position: absolute; left: 0; right: 0; bottom: 100%; height: var(--rest); background: repeating-linear-gradient(135deg, var(--red-tint) 0 4px, transparent 4px 8px); }
+.bar7.today em { color: var(--ink); font-weight: 700; }
+.streak { margin-top: 10px; font-size: 12.5px; color: var(--ink-2); display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; }
+.streak svg { width: 14px; height: 14px; fill: var(--red); }
+.streak b { font-weight: 600; }
 
 /* ==========================================================================
-   Play mode
+   Play — the line is the only loud thing
    ========================================================================== */
-#play {
-  grid-template-rows: auto minmax(0, 1fr) auto;
-  background: #fbe8e5;
-}
-.prog { position: absolute; inset: 0 0 auto 0; height: 6px; background: rgba(194,31,19,.14); z-index: 2; }
-.prog i { position: absolute; inset: 0 auto 0 0; width: 49%; background: var(--red); transition: width var(--t2) var(--ease); }
-.prog i::after { content: ""; position: absolute; right: -2px; top: -3px; width: 4px; height: 12px; background: var(--red-dark); }
-.hud {
-  display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 24px;
-  padding: clamp(22px, 3.4vh, 36px) clamp(24px, 4vw, 64px) 0;
-}
-.hud__left { display: flex; align-items: center; gap: 14px; font-size: 14px; color: var(--ink-2); font-weight: 500; }
-.esc {
-  display: inline-flex; align-items: center; gap: 10px;
-  height: 40px; padding: 0 16px 0 6px; border-radius: 999px;
-  background: rgba(255,255,255,.75); color: var(--ink-2); font-size: 13px; font-weight: 500;
-  transition: background-color var(--t2) var(--ease);
-}
-.esc:hover { background: #fff; }
-.esc .kbd { border-radius: 999px; height: 28px; min-width: 40px; background: var(--ink); color: #fff; box-shadow: none; }
-.hud__mid { display: flex; align-items: baseline; gap: 8px; }
-.hud__mid .num { font-size: 22px; color: var(--red); }
-.hud__right { display: flex; justify-content: flex-end; gap: clamp(20px, 3vw, 44px); }
+#play { background: #fcf0ee; place-items: center; }
+.pb { --k: clamp(40px, min(4.9vw, 7.4vh), 66px); width: min(1240px, 100% - clamp(32px, 6vw, 96px)); display: flex; flex-direction: column; gap: clamp(18px, 4.8vh, 48px); }
+.hud { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 20px; }
+.hud__left { display: flex; align-items: center; gap: 16px; }
+.hud__mid { font-size: 13px; color: var(--ink-2); font-weight: 500; white-space: nowrap; }
+.hud__right { display: flex; justify-content: flex-end; gap: clamp(18px, 2.4vw, 36px); }
 .hstat { text-align: right; }
-.hstat .num { font-size: clamp(26px, 2.4vw, 36px); }
-.hstat .lab { display: block; margin-top: 4px; }
-.hstat.red .num { color: var(--red); }
+.hstat .num { font-size: clamp(20px, 1.8vw, 26px); color: var(--ink); }
+.hstat .lab { display: block; margin-top: 5px; color: var(--ink-2); font-weight: 500; }
+.proute { position: relative; height: 22px; margin-top: 6px; }
+.proute__line { position: absolute; left: 0; right: 0; top: 9px; height: 0; border-top: 4px dotted #cdb2ad; }
+.proute__done { position: absolute; left: 0; top: 9px; height: 4px; background: var(--ink); border-radius: 4px; }
+.st { position: absolute; top: 5px; width: 12px; height: 12px; margin-left: -6px; border-radius: 50%; background: #fff; box-shadow: inset 0 0 0 3px #cdb2ad; }
+.st.done { background: var(--ink); box-shadow: none; }
+.proute__me { position: absolute; top: 0; width: 22px; height: 22px; margin-left: -11px; background: var(--red); border-radius: 0 8px 0 0; }
+.proute__pct { position: absolute; top: -22px; transform: translateX(-50%); font: 500 14px/1 var(--display); letter-spacing: -.04em; color: var(--ink); }
+.proute__end { position: absolute; right: 0; top: 3px; width: 16px; height: 16px; background: var(--ink); }
 
-.run { display: flex; flex-direction: column; justify-content: center; gap: clamp(36px, 8vh, 84px); min-height: 0; padding: 0 clamp(24px, 4vw, 64px) clamp(24px, 5vh, 56px); }
-.line-wrap { align-self: center; justify-self: center; width: min(100%, 1240px); }
-.line-meta { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: clamp(14px, 2.4vh, 26px); font-size: 13px; color: var(--mute); }
-.line-meta .idx { margin-right: 8px; }
-.line {
-  font: 500 clamp(28px, 2.95vw, 44px)/1.5 var(--text);
-  letter-spacing: .015em;
-  color: #b3a3a0;
-  word-spacing: .08em;
-  user-select: none;
-}
+.line-meta { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: clamp(10px, 2vh, 18px); font-size: 13px; color: var(--ink-2); }
+.line { font: 500 clamp(34px, min(5vw, 7.4vh), 68px)/1.4 var(--text); letter-spacing: .01em; word-spacing: .06em; color: #6e5956; user-select: none; }
+.line .w { white-space: nowrap; }
 .line .c { position: relative; display: inline-block; white-space: pre; }
 .line .done { color: var(--ink); }
-.line .err {
-  color: var(--red-deep);
-  background: rgba(194,31,19,.14);
-  text-decoration: underline wavy var(--red);
-  text-decoration-thickness: 2px; text-underline-offset: 7px;
-}
-.line .err::after { /* what was actually typed */
-  content: attr(data-typed);
-  position: absolute; left: 50%; top: -.55em; transform: translateX(-50%);
-  font: 600 .32em/1 var(--text); color: #fff; background: var(--red);
-  padding: 2px 4px; letter-spacing: 0;
-}
-.line .cur { color: var(--red); background: rgba(194,31,19,.12); }
-.line .cur::before {
-  content: ""; position: absolute; left: -2px; top: .2em; bottom: .2em; width: 3px; background: var(--red);
-  animation: blink 1.06s steps(1) infinite;
-}
-.line .cur::after { content: ""; position: absolute; left: 0; right: 0; bottom: .12em; height: 4px; background: var(--red); }
+.line .err { color: var(--red-deep); background: rgba(194,31,19,.1); text-decoration: underline wavy var(--red); text-decoration-thickness: 2px; text-underline-offset: 8px; }
+.line .err::after { content: attr(data-typed); position: absolute; right: -.1em; top: .05em; font: 600 13px/1 var(--text); color: var(--red-deep); background: #fff; padding: 2px 4px; box-shadow: 0 0 0 1px rgba(194,31,19,.25); }
+.line .cur { color: var(--red); background: rgba(194,31,19,.1); }
+.line .cur::before { content: ""; position: absolute; left: -2px; top: .2em; bottom: .2em; width: 3px; background: var(--red); animation: blink 1.06s steps(1) infinite; }
+.line .cur::after { content: ""; position: absolute; left: 0; right: 0; bottom: .1em; height: 4px; background: var(--red); }
 @keyframes blink { 50% { opacity: 0; } }
 .line .sp.cur { min-width: .32em; }
 
-.guide { display: grid; grid-template-columns: auto auto; gap: clamp(20px, 3vw, 48px); align-items: end; justify-content: center; align-self: center; }
+.guide { display: grid; grid-template-columns: auto auto; grid-template-rows: auto auto; justify-content: center; column-gap: clamp(16px, 2.2vw, 32px); row-gap: 12px; align-items: stretch; }
 .kb { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
 .kb__row { display: flex; gap: 6px; }
 .kb__row:nth-child(2) { margin-left: calc(var(--k) * .35); }
 .kb__row:nth-child(3) { margin-left: calc(var(--k) * .85); }
-.kb { --k: clamp(44px, 4.1vw, 60px); }
-.key {
-  width: var(--k); height: calc(var(--k) * .9);
-  display: grid; place-items: center; position: relative;
-  font: 500 calc(var(--k) * .33)/1 var(--text);
-  color: var(--ink-2);
-  background: var(--fz, #fff);
-  box-shadow: inset 0 -3px 0 rgba(20,20,20,.08);
-}
-.key.home::after { content: ""; position: absolute; bottom: 8px; width: 12px; height: 2px; background: currentColor; opacity: .5; }
-.key.f0 { --fz: #fff; }
-.key.f1 { --fz: #fdf3f1; }
-.key.f2 { --fz: #f9e3df; }
-.key.f3 { --fz: #f4d0ca; }
-.key.space { width: calc(var(--k) * 6.4 + 30px); margin-left: calc(var(--k) * 1.9); --fz: rgba(255,255,255,.7); font-size: 12px; color: var(--mute); }
+.key { width: var(--k); height: calc(var(--k) * .88); display: grid; place-items: center; position: relative; font: 500 calc(var(--k) * .34)/1 var(--text); color: var(--ink-2); background: var(--fz, #fff); box-shadow: inset 0 -3px 0 rgba(20,20,20,.1); }
+.key.home::after { content: ""; position: absolute; bottom: 7px; width: 12px; height: 2px; background: currentColor; opacity: .55; }
+.f0 { --fz: #ffffff; } .f1 { --fz: #fdf3f1; } .f2 { --fz: #f9e3df; } .f3 { --fz: #f4d0ca; }
+.key.space { width: calc(var(--k) * 6.4 + 30px); margin-left: calc(var(--k) * 1.9); font-size: 12.5px; color: var(--mute); }
 .key.want { background: var(--red); color: #fff; box-shadow: inset 0 -3px 0 var(--red-dark); }
-.key.want::before { content: ""; position: absolute; inset: -6px; box-shadow: 0 0 0 2px var(--red); opacity: .5; animation: ring2 1.8s var(--ease) infinite; }
-@keyframes ring2 { from { transform: scale(.92); opacity: .7; } to { transform: scale(1.12); opacity: 0; } }
-.kb__legend { display: flex; gap: 14px; margin-top: 6px; font-size: 11.5px; color: var(--mute); }
-.kb__legend span { display: inline-flex; align-items: center; gap: 6px; }
-.kb__legend i { width: 14px; height: 14px; display: inline-block; box-shadow: inset 0 -2px 0 rgba(20,20,20,.12); }
+.kb__legend { display: flex; align-items: center; gap: 16px; font-size: 12.5px; color: var(--ink-2); }
+.kb__legend span { display: inline-flex; align-items: center; gap: 7px; }
+.kb__legend i { width: 14px; height: 14px; background: var(--fz); box-shadow: inset 0 -2px 0 rgba(20,20,20,.14); }
 
-.next {
-  width: clamp(220px, 20vw, 290px);
-  position: relative; isolation: isolate; overflow: hidden; color: #fff;
-  padding: 20px 22px; border-radius: 0 48px 0 0;
-  display: grid; grid-template-columns: auto 1fr; gap: 6px 16px; align-items: end;
-}
-.next__lab { grid-column: 1 / 3; font-size: 13px; color: var(--red-pale); font-weight: 500; }
-.next__key { font: 600 clamp(64px, 6vw, 92px)/.85 var(--display); color: #fff; letter-spacing: -.06em; }
-.next__finger { font-size: 15px; font-weight: 600; letter-spacing: -.01em; padding-bottom: 6px; }
-.hand { grid-column: 1 / 3; display: flex; gap: 5px; align-items: flex-end; height: 44px; margin-top: 10px; }
-.hand i { width: 18%; background: rgba(255,255,255,.2); border-radius: 999px 999px 4px 4px; }
-.hand i.on { background: #fff; }
+.next { width: clamp(230px, 21vw, 290px); min-height: 0; background: #fff; padding: clamp(12px, 1.8vh, 16px) 18px; border-radius: 0 40px 0 0; display: flex; flex-direction: column; overflow: hidden; }
+.next__lab { font-size: 12.5px; color: var(--mute); font-weight: 500; }
+.next__row { display: flex; align-items: flex-end; gap: 14px; margin-top: 6px; }
+.next__key { font: 600 calc(var(--k) * 1.15)/.85 var(--display); letter-spacing: -.06em; color: var(--ink); padding-bottom: 6px; box-shadow: inset 0 -4px 0 var(--red); }
+.next__finger { font-size: 15px; font-weight: 600; padding-bottom: 6px; }
+.next svg { flex: 1 1 0; min-height: 0; width: 100%; max-height: calc(var(--k) * 1.6); margin-top: 8px; overflow: visible; }
+.next .hl { font: 600 13px var(--text); fill: var(--red-deep); text-anchor: middle; }
+.next .hn { font: 600 12.5px var(--text); fill: var(--ink-2); text-anchor: middle; }
+.hands__cap { display: flex; justify-content: space-around; margin-top: 6px; font-size: 12.5px; color: var(--ink-2); }
+.next__then { display: flex; align-items: center; gap: 4px; padding-left: 18px; font-size: 12.5px; color: var(--ink-2); }
+.next__then span:first-child { margin-right: 6px; }
+.next__then .kbd { min-width: 26px; height: 26px; font-size: 14px; font-weight: 500; }
 
-/* ---------- run boundary wipe (the only big motion) ---------- */
+/* ==========================================================================
+   Result
+   ========================================================================== */
+#result .stage__in { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); grid-template-rows: auto minmax(0, 1fr) auto; }
+.score { grid-column: 1; grid-row: 1 / 3; color: #fff; border-radius: 0 96px 0 0; overflow: hidden; padding: clamp(22px, 2.6vw, 40px); display: flex; flex-direction: column; min-height: 0; }
+.score__top { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 14px; font-weight: 500; color: var(--red-pale); padding-right: 70px; }
+.score__body { margin-top: auto; padding: clamp(16px, 3vh, 32px) 0 clamp(18px, 3.2vh, 30px); }
+.score__h { font: 600 clamp(34px, 4.8vw, 72px)/1.02 var(--display); letter-spacing: -.045em; }
+.score__say { margin-top: clamp(12px, 2vh, 20px); font-size: clamp(17px, 1.6vw, 24px); line-height: 1.4; font-weight: 500; color: #fff; max-width: 30em; }
+.score__note { margin-top: 10px; font-size: 13px; color: var(--red-pale); }
+.cmp { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 22px; padding: 12px 0; border-top: 1px solid rgba(255,255,255,.28); font-size: 14px; color: var(--red-pale); }
+.cmp b { color: #fff; font-weight: 600; font-variant-numeric: tabular-nums; }
+.cells { margin-top: 4px; display: grid; grid-template-columns: 1.35fr repeat(3, minmax(0, 1fr)); gap: var(--gap); }
+.cell { background: rgba(255,255,255,.12); padding: clamp(12px, 1.3vw, 18px); display: flex; flex-direction: column; min-width: 0; }
+.cell .num { font-size: clamp(28px, 2.6vw, 40px); }
+.cell--main .num { font-size: clamp(44px, 4.6vw, 72px); }
+.cell b { margin-top: 8px; font-size: 14px; font-weight: 600; }
+.cell span.ex { margin-top: 2px; font-size: 12.5px; color: var(--red-pale); line-height: 1.35; }
+.cell i { display: block; height: 4px; background: rgba(255,255,255,.22); margin-top: auto; position: relative; }
+.cell span.ex { margin-bottom: 12px; }
+.cell i::after { content: ""; position: absolute; inset: 0 auto 0 0; width: var(--v); background: #fff; transition: width 900ms var(--ease); }
+.xpchip { position: absolute; top: clamp(18px, 2.2vw, 30px); right: clamp(56px, 6vw, 96px); height: 40px; padding: 0 16px; border-radius: 999px; background: #fff; color: var(--red); display: inline-flex; align-items: center; font: 600 17px/1 var(--display); letter-spacing: -.04em; white-space: nowrap; }
+.flyer { position: fixed; z-index: 60; pointer-events: none; transition: transform 760ms var(--ease-io), opacity 760ms ease-in; }
+
+.mastery { grid-column: 2; grid-row: 1; }
+.mastery__ex { margin-top: 6px; font-size: 12.5px; color: var(--mute); }
+.slots { margin-top: 14px; display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gap); height: clamp(96px, 13vh, 118px); }
+.slot { background: var(--paper); padding: 10px 12px; display: flex; flex-direction: column; justify-content: space-between; }
+.slot .lab { font-size: 12.5px; color: var(--ink-2); }
+.slot .num { font-size: clamp(22px, 2vw, 30px); }
+.slot.ok { background: var(--red); color: #fff; } .slot.ok .lab { color: var(--red-pale); }
+.slot.new { box-shadow: inset 0 0 0 3px var(--ink); }
+.slot.new.pop { animation: pop 520ms var(--ease) 900ms both; }
+@keyframes pop { from { transform: scale(.85); opacity: 0; } to { transform: none; opacity: 1; } }
+.slot.empty .num { color: var(--mute); }
+.stagebar { margin-top: 16px; }
+.mastery__next { margin-top: 12px; font-size: 13px; color: var(--ink-2); }
+.mastery__next b { font-weight: 600; }
+.stagebar__h { display: flex; justify-content: space-between; align-items: baseline; font-size: 13px; color: var(--ink-2); font-weight: 500; }
+.stagebar__h .num { font-size: 16px; }
+.segs { display: grid; grid-template-columns: repeat(12, 1fr); gap: 3px; margin-top: 8px; }
+.segs i { height: 8px; background: var(--red-tint); }
+.segs i.on { background: var(--red); }
+.segs i.cur { background: repeating-linear-gradient(135deg, var(--red) 0 3px, var(--red-tint) 3px 6px); }
+
+.rweak { grid-column: 2; grid-row: 2; }
+.gauge { position: relative; height: 8px; background: var(--red-tint); margin-top: 12px; }
+.gauge__fill { position: absolute; inset: 0 auto 0 0; background: var(--red); }
+.gauge__goal { position: absolute; top: -5px; bottom: -5px; width: 3px; background: var(--ink); left: 50%; }
+.gauge__lab { display: flex; justify-content: space-between; font-size: 12.5px; color: var(--mute); margin-top: 6px; font-variant-numeric: tabular-nums; }
+.rweak__row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 12px; flex-wrap: wrap; }
+.rweak .spark { max-height: 150px; min-height: 40px; margin-top: 16px; }
+.rweak .spark__lab { margin-top: 6px; }
+.rweak__row .lab { color: var(--ink-2); }
+
+.actions { grid-column: 1 / 3; grid-row: 3; display: flex; align-items: center; gap: 10px; background: #fff; padding: 12px 12px 12px var(--cpad); }
+.actions__next { font-size: 14px; color: var(--ink-2); }
+.actions__next b { color: var(--ink); font-weight: 600; }
+.actions__btns { margin-left: auto; display: flex; gap: 10px; align-items: center; }
+.rin { animation: rin 560ms var(--ease) both; animation-delay: var(--d, 0ms); }
+@keyframes rin { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+/* ---------- run boundary wipe ---------- */
 .wipe { position: fixed; inset: 0; z-index: 50; pointer-events: none; transform: translateY(101%); background: var(--red); border-radius: 0 96px 0 0; }
-.wipe.in { transition: transform var(--t3) cubic-bezier(.87,0,.13,1); transform: translateY(0); }
-.wipe.out { transition: transform var(--t3) cubic-bezier(.87,0,.13,1); transform: translateY(-101%); border-radius: 0 0 96px 0; }
+.wipe.in { transition: transform var(--t3) var(--ease-io); transform: translateY(0); }
+.wipe.out { transition: transform var(--t3) var(--ease-io); transform: translateY(-101%); border-radius: 0 0 96px 0; }
 
 /* ---------- compact (1024×768) ---------- */
 @media (max-width: 1200px), (max-height: 820px) {
+  #home .stage__in { grid-template-columns: minmax(0, 1.22fr) minmax(0, 1fr); }
   .who__sub, .gchip .full { display: none; }
   .gchip { padding: 0 14px 0 12px; }
-  .xp { width: 92px; }
-  .rail__item { padding: 12px 2px 9px; font-size: 11.5px; }
-  .rail__foot { display: none; }
-  .tile__sub { display: none; }
-  .map__foot .lg:nth-of-type(n+3) { display: none; }
-  .plan { max-width: 220px; } .plan__lab { display: none; }
-  .go__top .tag { display: none; }
   .bar { gap: 16px; }
-  .lab.hide-c { display: none; }
-  .day i { max-height: 22px; }
-  .friend { height: 42px; }
+  .rail__item { padding: 8px 2px; }
+  .go__what { font-size: 14px; }
+  .step { padding: 8px 10px; }
+  .race__lead { display: none; }
+  .btn--lg { height: 54px; font-size: 17px; padding-left: 24px; }
+  .cells { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .cell--main { grid-column: 1 / 4; flex-direction: row; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+  .cell--main i { display: none; }
+  .cell--main .num { font-size: 52px; }
+  .score__body { padding: 12px 0 16px; }
+  .score__h { font-size: 40px; }
+  .next__key { font-size: calc(var(--k) * .95); }
+  .cmp { gap: 4px 16px; font-size: 13px; }
+  .cmp .hide-c { display: none; }
+  .cell--main b { margin-top: 0; padding-top: 0; }
+  .actions__next { display: none; }
+  .hud__mid { display: none; }
+  .hud { grid-template-columns: 1fr auto; }
 }
-@media (max-width: 1100px) {
-  .who__name { display: none; }
-  .hide-n { display: none; }
-}
-
+@media (max-width: 1100px) { .who__name { display: none; } .hide-n { display: none; } }
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration: 1ms !important; animation-iteration-count: 1 !important; transition-duration: 1ms !important; }
+  *, *::before, *::after { animation-duration: 1ms !important; animation-delay: 0ms !important; animation-iteration-count: 1 !important; transition-duration: 1ms !important; }
   .gp-blob { animation-play-state: paused !important; }
   .line .cur::before { animation: none !important; }
 }
@@ -548,179 +449,145 @@ svg { display: block; }
   <symbol id="i-swords" viewBox="0 0 24 24"><path d="M4 4l11 11M13 17l4-4M16.5 16.5 20 20M20 4 9 15M11 17l-4-4M7.5 16.5 4 20"/></symbol>
   <symbol id="i-vol" viewBox="0 0 24 24"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></symbol>
   <symbol id="i-cog" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68 1.65 1.65 0 0 0 10 3.17V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.32 9 1.65 1.65 0 0 0 20.83 10H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></symbol>
-  <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 22.5c4.1 0 7.2-2.9 7.2-6.9 0-3.3-2-5.8-3.7-7.6-.3 2-1.3 3.3-2.5 3.7.4-3.7-1.2-7-4.1-9.7.2 3.5-1.6 5.8-3.3 7.8C4.3 11.4 4.8 13 4.8 15.6c0 4 3.1 6.9 7.2 6.9z"/><path d="M12 21c1.8 0 3.1-1.3 3.1-3.1 0-1.6-1-2.7-1.9-3.6-.3 1-.9 1.5-1.5 1.7.1-1.6-.6-3-1.9-4.1 0 1.6-.8 2.6-1.5 3.5-.6.8-.5 1.5-.5 2.5C7.8 19.7 10.1 21 12 21z" fill="#fff" opacity=".9"/></symbol>
+  <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 22.5c4.1 0 7.2-2.9 7.2-6.9 0-3.3-2-5.8-3.7-7.6-.3 2-1.3 3.3-2.5 3.7.4-3.7-1.2-7-4.1-9.7.2 3.5-1.6 5.8-3.3 7.8C4.3 11.4 4.8 13 4.8 15.6c0 4 3.1 6.9 7.2 6.9z"/></symbol>
   <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
   <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
-  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="1"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></symbol>
-  <symbol id="i-redo" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.4-5.7M20 4v4.5h-4.5"/></symbol>
-  <symbol id="i-gift" viewBox="0 0 24 24"><path d="M4 11h16v10H4zM3 7h18v4H3zM12 7v14M12 7S10.5 3 8 3.6 8.5 7 12 7zm0 0s1.5-4 4-3.4S15.5 7 12 7z"/></symbol>
 </svg>
+
+<template id="tpl-bar">
+  <div class="who">
+    <span class="avatar" aria-hidden="true">ОК</span>
+    <div><div class="who__name">Олеся_К</div><div class="who__sub">гість, без входу</div></div>
+  </div>
+  <div class="sb lvl tip" tabindex="0" title="Рівень росте від XP за заняття й перегони" data-tip="Рівень росте від XP за заняття й перегони. До рівня 8 — 660 XP.">
+    <div class="sb__col">
+      <div class="sb__top"><span class="lab">Рівень</span><span class="num">7</span></div>
+      <div class="xp"><div class="xp__track"><span class="xp__gain"></span><span class="xp__fill"></span></div></div>
+      <div class="xp__txt"><b class="xp__val">1 340</b> / 2 000 XP</div>
+    </div>
+    <span class="xp__plus">+140 XP</span>
+  </div>
+  <div class="sb tip" tabindex="0" title="Серія: 12 днів поспіль з виконаною метою дня" data-tip="Серія: 12 днів поспіль з виконаною метою дня. Заморозка: один пропущений день не обнуляє серію.">
+    <svg class="flame"><use href="#i-flame"/></svg>
+    <div class="sb__col">
+      <div class="sb__top"><span class="num">12</span><span class="lab">днів серія</span></div>
+      <span class="freeze"><svg class="ico"><use href="#i-snow"/></svg>заморозка 1</span>
+    </div>
+  </div>
+  <div class="sb tip" tabindex="0" title="Рейтинг перегонів: змінюється тільки в перегонах" data-tip="Рейтинг перегонів: змінюється тільки в перегонах, не в заняттях.">
+    <svg class="ico swords"><use href="#i-swords"/></svg>
+    <div class="sb__col"><span class="num">1 240</span><span class="lab">рейтинг перегонів</span></div>
+  </div>
+  <div class="bar__right">
+    <div class="seg tip" role="group" aria-label="Розкладка" data-tip="Розкладка для занять і перегонів"><button aria-pressed="true">УКР</button><button aria-pressed="false">ENG</button></div>
+    <button class="iconbtn tip" aria-label="Звук" title="Звук: увімкнено" data-tip="Звук: увімкнено"><svg class="ico"><use href="#i-vol"/></svg></button>
+    <button class="iconbtn tip" aria-label="Налаштування" title="Налаштування" data-tip="Налаштування"><svg class="ico"><use href="#i-cog"/></svg></button>
+    <button class="gchip tip" data-tip="Збереже прогрес між пристроями">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.4h6.5a5.6 5.6 0 0 1-2.4 3.6v3h3.9c2.2-2.1 3.5-5.1 3.5-8.7z"/><path fill="#34A853" d="M12 24c3.2 0 6-1.1 7.9-2.9l-3.9-3c-1.1.7-2.4 1.2-4 1.2-3.1 0-5.7-2.1-6.6-4.9h-4v3.1A12 12 0 0 0 12 24z"/><path fill="#FBBC05" d="M5.4 14.4a7.2 7.2 0 0 1 0-4.7V6.6h-4a12 12 0 0 0 0 10.8z"/><path fill="#EA4335" d="M12 4.8c1.8 0 3.3.6 4.6 1.8l3.4-3.4A12 12 0 0 0 1.4 6.6l4 3.1C6.3 6.9 8.9 4.8 12 4.8z"/></svg>
+      <span>Увійти<span class="full"> через Google</span></span>
+    </button>
+  </div>
+</template>
 
 <!-- ======================================================= HOME -->
 <main id="home" class="screen" aria-label="Головна">
   <nav class="rail" aria-label="Розділи">
     <div class="brand"><span class="brand__mark" aria-label="Typing-Race">ТР</span></div>
     <div class="rail__nav">
-      <button class="rail__item" aria-current="page" data-k="1"><span class="hk">1</span><svg class="ico"><use href="#i-home"/></svg>Головна</button>
-      <button class="rail__item" data-k="2"><span class="hk">2</span><svg class="ico"><use href="#i-map"/></svg>Мапа</button>
-      <button class="rail__item" data-k="3"><span class="hk">3</span><svg class="ico"><use href="#i-race"/></svg>Перегони</button>
-      <button class="rail__item" data-k="4"><span class="hk">4</span><span class="rail__badge">2</span><svg class="ico"><use href="#i-people"/></svg>Спільнота</button>
-      <button class="rail__item" data-k="5"><span class="hk">5</span><svg class="ico"><use href="#i-user"/></svg>Профіль</button>
+      <button class="rail__item" aria-current="page" data-k="1" aria-keyshortcuts="1" title="Головна · клавіша 1"><span class="rn">01</span><svg class="ico"><use href="#i-home"/></svg>Головна</button>
+      <button class="rail__item" data-k="2" aria-keyshortcuts="2" title="Мапа · клавіша 2"><span class="rn">02</span><svg class="ico"><use href="#i-map"/></svg>Мапа</button>
+      <button class="rail__item" data-k="3" aria-keyshortcuts="3" title="Перегони · клавіша 3"><span class="rn">03</span><svg class="ico"><use href="#i-race"/></svg>Перегони</button>
+      <button class="rail__item" data-k="4" aria-keyshortcuts="4" title="Спільнота · клавіша 4 · 2 нові"><span class="rn">04</span><span class="rail__badge">2</span><svg class="ico"><use href="#i-people"/></svg>Спільнота</button>
+      <button class="rail__item" data-k="5" aria-keyshortcuts="5" title="Профіль · клавіша 5"><span class="rn">05</span><svg class="ico"><use href="#i-user"/></svg>Профіль</button>
     </div>
-    <div class="rail__foot"><b>Сезон 3</b>ще 9 днів</div>
+    <div class="rail__foot">
+      <div class="season"><span class="lab">Сезон</span><span class="num">03</span><small>ще 9 днів</small><i></i></div>
+      <div class="online"><span class="dot"></span>онлайн <b>37</b></div>
+    </div>
   </nav>
 
-  <header class="bar" aria-label="Стан гравця">
-    <div class="who">
-      <span class="avatar" aria-hidden="true">ОК</span>
-      <div><div class="who__name">Олеся_К</div><div class="who__sub">анонімний профіль</div></div>
-    </div>
-    <div class="lvl" title="Рівень 7">
-      <div class="lvl__n"><span class="lab">Рівень</span><span class="num">7</span></div>
-      <div class="xp">
-        <div class="xp__track"><span class="xp__fill"></span></div>
-        <div class="xp__txt"><b>1 340</b> / 2 000 XP</div>
-      </div>
-    </div>
-    <div class="stat" title="Серія: 12 днів">
-      <svg class="flame"><use href="#i-flame"/></svg>
-      <div class="stat__col">
-        <div style="display:flex;align-items:baseline;gap:5px"><span class="num">12</span><span class="lab">днів</span></div>
-        <span class="freeze"><svg class="ico"><use href="#i-snow"/></svg>заморозка 1</span>
-      </div>
-    </div>
-    <div class="stat" title="Рейтинг перегонів">
-      <svg class="ico swords"><use href="#i-swords"/></svg>
-      <div class="stat__col"><span class="num">1 240</span><span class="lab hide-c">рейтинг перегонів</span></div>
-    </div>
-    <div class="bar__right">
-      <div class="seg" role="group" aria-label="Розкладка">
-        <button aria-pressed="true">УКР</button><button aria-pressed="false">ENG</button>
-      </div>
-      <button class="iconbtn" aria-label="Вимкнути звук"><svg class="ico"><use href="#i-vol"/></svg></button>
-      <button class="iconbtn" aria-label="Налаштування"><svg class="ico"><use href="#i-cog"/></svg></button>
-      <button class="gchip">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.4h6.5a5.6 5.6 0 0 1-2.4 3.6v3h3.9c2.2-2.1 3.5-5.1 3.5-8.7z"/><path fill="#34A853" d="M12 24c3.2 0 6-1.1 7.9-2.9l-3.9-3c-1.1.7-2.4 1.2-4 1.2-3.1 0-5.7-2.1-6.6-4.9h-4v3.1A12 12 0 0 0 12 24z"/><path fill="#FBBC05" d="M5.4 14.4a7.2 7.2 0 0 1 0-4.7V6.6h-4a12 12 0 0 0 0 10.8z"/><path fill="#EA4335" d="M12 4.8c1.8 0 3.3.6 4.6 1.8l3.4-3.4A12 12 0 0 0 1.4 6.6l4 3.1C6.3 6.9 8.9 4.8 12 4.8z"/></svg>
-        <span>Увійти<span class="full"> через Google</span></span>
-      </button>
-    </div>
-  </header>
+  <header class="bar" aria-label="Стан гравця"></header>
 
   <section class="stage">
-    <div class="stage__in gp-host" data-gp="bright">
+    <div class="stage__in" data-gp="bright">
 
-      <!-- primary -->
-      <button class="go on-red" data-gp="ember" id="continue" aria-describedby="go-what">
-        <div class="go__top"><span class="idx">[01]</span>Заняття на сьогодні<span class="tag"><svg class="ico" style="width:14px;height:14px"><use href="#i-map"/></svg>Етап 2 · Слова</span></div>
-        <div class="go__mid">
-          <div class="go__title">Продовжити</div>
-          <p class="go__what" id="go-what"><b>Заняття на сьогодні · 18 хв</b> · розминка на перехід «ол»</p>
-        </div>
+      <section class="go on-red" data-gp="ember" aria-labelledby="go-h">
+        <div class="go__top"><span class="idx">01</span>Продовжити навчання · Етап 2 · Слова</div>
+        <h1 class="go__title" id="go-h">Нова клавіша «п»</h1>
+        <p class="go__what">18 хвилин: розігріємо перехід «ол», вивчимо клавішу «п» і закріпимо її в словах.</p>
+        <ol class="steps">
+          <li class="step"><span class="num">1</span><b>Розминка «ол»</b><span>4 хв</span></li>
+          <li class="step"><span class="num">2</span><b>Нова клавіша «п»</b><span>8 хв</span></li>
+          <li class="step"><span class="num">3</span><b>Слова з «п»</b><span>6 хв</span></li>
+        </ol>
         <div class="go__bot">
-          <span class="go__btn">Почати <span class="kbd">Enter ↵</span></span>
-          <div class="plan" aria-hidden="true">
-            <div class="plan__seg" style="--w:3"><div class="plan__bar"></div><div class="plan__lab">розминка «ол»</div></div>
-            <div class="plan__seg" style="--w:8"><div class="plan__bar"></div><div class="plan__lab">нова клавіша «п»</div></div>
-            <div class="plan__seg" style="--w:7"><div class="plan__bar"></div><div class="plan__lab">текст</div></div>
-          </div>
-          <div class="reward"><div class="num">+140</div><div class="lab">XP</div></div>
+          <button class="btn btn--inverse btn--lg" id="continue" aria-keyshortcuts="Enter">Почати <span class="kbd">Enter</span></button>
+          <span class="chip chip--veil">+140 XP за заняття</span>
         </div>
-        <span class="go__glyph" aria-hidden="true">п</span>
-      </button>
+      </section>
 
-      <!-- race -->
       <section class="panel race" aria-labelledby="race-h">
-        <div class="panel__head">
-          <span class="idx">[02]</span><h2 class="panel__title" id="race-h">Перегін</h2>
-          <span class="panel__meta live"><i></i>онлайн зараз: <b>37</b></span>
-        </div>
+        <div class="panel__head"><span class="idx">02</span><h2 class="panel__title" id="race-h">Перегони</h2><span class="panel__meta"><span class="dot"></span>онлайн зараз: <b>37</b></span></div>
+        <p class="race__lead">Швидкий перегін з гравцями онлайн. Впливає на рейтинг перегонів.</p>
         <div class="tiles">
-          <button class="tile" data-hk="q"><span class="kbd">Q</span><div><div class="tile__lang">УКР</div><div class="tile__len">коротко</div></div><div class="tile__foot"><span class="tile__sub">~ 30 с · 4 гравці</span></div></button>
-          <button class="tile" data-hk="w"><span class="kbd">W</span><div><div class="tile__lang">УКР</div><div class="tile__len">середньо</div></div><div class="tile__foot"><span class="tile__sub">~ 75 с · 5 гравців</span></div></button>
-          <button class="tile" data-hk="e"><span class="kbd">E</span><div><div class="tile__lang">ENG</div><div class="tile__len">коротко</div></div><div class="tile__foot"><span class="tile__sub">~ 30 с · 3 гравці</span></div></button>
-          <button class="tile" data-hk="r"><span class="kbd">R</span><div><div class="tile__lang">ENG</div><div class="tile__len">середньо</div></div><div class="tile__foot"><span class="tile__sub">~ 75 с · 2 гравці</span></div></button>
+          <button class="tile" data-hk="q" aria-keyshortcuts="Q"><span class="kbd">Q</span><span class="tile__name"><em>УКР</em> · коротко</span><span class="tile__sub">≈30 с · 4 гравці онлайн</span></button>
+          <button class="tile" data-hk="w" aria-keyshortcuts="W"><span class="kbd">W</span><span class="tile__name"><em>УКР</em> · середньо</span><span class="tile__sub">≈75 с · 5 гравців онлайн</span></button>
+          <button class="tile" data-hk="e" aria-keyshortcuts="E"><span class="kbd">E</span><span class="tile__name"><em>ENG</em> · коротко</span><span class="tile__sub">≈30 с · 3 гравці онлайн</span></button>
+          <button class="tile" data-hk="r" aria-keyshortcuts="R"><span class="kbd">R</span><span class="tile__name"><em>ENG</em> · середньо</span><span class="tile__sub">≈75 с · 2 гравці онлайн</span></button>
         </div>
-        <button class="friend" data-hk="f"><svg class="ico" style="width:18px;height:18px"><use href="#i-plus"/></svg>Кімната з другом <span class="kbd">F</span></button>
+        <div class="race__foot"><button class="btn btn--secondary" data-hk="f" aria-keyshortcuts="F"><svg class="ico" style="width:18px;height:18px"><use href="#i-plus"/></svg>Кімната з другом <span class="kbd">F</span></button></div>
       </section>
 
-      <!-- map -->
       <section class="panel map" aria-labelledby="map-h">
-        <div class="panel__head">
-          <span class="idx">[03]</span><h2 class="panel__title" id="map-h">Маршрут навчання</h2>
-          <span class="panel__meta keys"><span class="num">14</span><span>/ 33 клавіш відкрито</span></span>
-        </div>
-        <svg class="map__svg" viewBox="0 0 780 250" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Етап 2 зі 3, поточна клавіша п">
-          <!-- regions: square fills, 8px-like gaps -->
-          <rect x="0" y="0" width="250" height="250" fill="#f9e6e3"/>
-          <rect x="262" y="0" width="256" height="250" fill="#f2dcd9"/>
-          <rect x="530" y="0" width="250" height="250" fill="#f6f1f0"/>
-          <text class="rlab" x="14" y="24">Етап 1 · пройдено</text><text class="rname" x="14" y="48">Гами</text>
-          <text class="rlab" x="276" y="24" style="fill:#9c170d">Етап 2 · зараз</text><text class="rname" x="276" y="48">Слова</text>
-          <text class="rlab" x="544" y="24">Етап 3 · закрито</text><text class="rname" x="544" y="48" style="fill:#8a8a8a">Академія</text>
-          <g transform="translate(0 30)">
-          <!-- route -->
-          <path d="M28 168 C 50 168, 58 118, 80 118 S 112 166, 130 166 S 160 116, 178 116 S 208 162, 222 162 S 268 112, 292 112 S 320 168, 338 168 S 360 112, 376 112 S 404 160, 422 160" fill="none" stroke="#c21f13" stroke-width="5" stroke-linecap="round" class="route-done"/>
-          <path d="M422 160 C 440 160, 448 108, 464 108 S 490 160, 502 160 S 540 112, 558 112 S 586 166, 602 166 S 630 112, 648 112 S 678 166, 694 166 S 728 120, 742 120" fill="none" stroke="#c9b9b7" stroke-width="3" stroke-dasharray="2 9" stroke-linecap="round"/>
-          <!-- done nodes -->
-          <g fill="#c21f13">
-            <circle cx="28" cy="168" r="13"/><circle cx="80" cy="118" r="13"/><circle cx="130" cy="166" r="13"/><circle cx="178" cy="116" r="13"/><circle cx="222" cy="162" r="13"/>
-            <circle cx="292" cy="112" r="13"/><circle cx="338" cy="168" r="13"/>
-          </g>
-          <g fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M22 168l4 4 7-8"/><path d="M74 118l4 4 7-8"/><path d="M124 166l4 4 7-8"/><path d="M172 116l4 4 7-8"/><path d="M216 162l4 4 7-8"/><path d="M286 112l4 4 7-8"/><path d="M332 168l4 4 7-8"/>
-          </g>
-          <!-- review node -->
-          <circle cx="376" cy="112" r="15" fill="#fff" stroke="#141414" stroke-width="2.5"/>
-          <g transform="translate(368 104) scale(.68)" fill="none" stroke="#141414" stroke-width="2.6" stroke-linecap="round"><path d="M20 12a8 8 0 1 1-2.4-5.7M20 4v4.5h-4.5"/></g>
-          <text class="nlab" x="376" y="146" text-anchor="middle">повтор</text>
-          <!-- current -->
-          <circle class="pulse" cx="422" cy="160" r="26" fill="#c21f13"/>
-          <circle cx="422" cy="160" r="22" fill="#c21f13"/>
-          <text x="422" y="167" text-anchor="middle" style="font:700 21px Unbounded, sans-serif; fill:#fff; letter-spacing:-.04em">п</text>
-          <rect x="390" y="88" width="64" height="24" rx="12" fill="#141414"/>
-          <text x="422" y="104" text-anchor="middle" style="font:600 11px Onest, sans-serif; fill:#fff">ти тут</text>
-          <!-- locked -->
-          <g fill="#e8dcda"><circle cx="464" cy="108" r="11"/><circle cx="502" cy="160" r="11"/></g>
-          <g fill="#ebe5e4"><circle cx="558" cy="112" r="11"/><circle cx="602" cy="166" r="11"/><circle cx="648" cy="112" r="11"/><circle cx="694" cy="166" r="11"/></g>
-          <g fill="none" stroke="#a89896" stroke-width="1.6"><rect x="459.5" y="106" width="9" height="7" rx="1"/><path d="M461.5 106v-2.5a2.5 2.5 0 0 1 5 0V106"/><rect x="497.5" y="158" width="9" height="7" rx="1"/><path d="M499.5 158v-2.5a2.5 2.5 0 0 1 5 0V158"/></g>
-          <!-- academy goal -->
-          <rect x="726" y="104" width="32" height="32" fill="#fff"/>
-          <path d="M736 128v-17h12l-2.5 4 2.5 4h-12" fill="none" stroke="#8a8a8a" stroke-width="2" stroke-linejoin="round"/>
-          </g>
+        <div class="panel__head"><span class="idx">03</span><h2 class="panel__title" id="map-h">Маршрут навчання</h2><span class="panel__meta"><b>14 з 33</b> клавіш відкрито</span></div>
+        <p class="say" style="margin-top:8px"><b class="red">Ти тут:</b> клавіша «п», вправа 3 з 5 · далі «р»</p>
+        <svg class="map__svg" id="mapSvg" viewBox="0 0 600 214" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Етап 2 зі 3. Ти тут: клавіша п, вправа 3 з 5">
+          <rect class="m-band" x="0" y="0" width="192" height="214"/>
+          <rect class="m-band m-band--cur" x="204" y="0" width="192" height="214"/>
+          <rect class="m-band m-band--lock" x="408" y="0" width="192" height="214"/>
+          <text class="m-n" x="12" y="28">01</text><text class="m-name" x="46" y="28">Гами</text>
+          <text class="m-n" x="216" y="28">02</text><text class="m-name" x="250" y="28">Слова</text>
+          <text class="m-n" x="420" y="28" style="fill:#6b5a57">03</text><text class="m-name" x="454" y="28" style="fill:#5f5f5f">Академія</text>
+          <path id="routeTodo" class="m-route m-route--todo" d="M24 184 H 120 A 40 40 0 0 0 160 144 V 114 A 40 40 0 0 1 200 74 H 340 A 40 40 0 0 1 380 114 V 144 A 40 40 0 0 0 420 184 H 460 A 40 40 0 0 0 500 144 V 114 A 40 40 0 0 1 540 74 H 580"/>
+          <path id="routeDone" class="m-route m-route--done draw" d="M24 184 H 120 A 40 40 0 0 0 160 144 V 114 A 40 40 0 0 1 200 74 H 340 A 40 40 0 0 1 380 114 V 144 A 40 40 0 0 0 420 184 H 460 A 40 40 0 0 0 500 144 V 114 A 40 40 0 0 1 540 74 H 580"/>
+          <g id="mapNodes"></g>
         </svg>
-        <div class="map__foot">
-          <span class="lg"><i style="background:#c21f13"></i>пройдено</span>
-          <span class="lg"><i style="background:#c21f13;box-shadow:0 0 0 3px #f7d0cb"></i>поточна</span>
-          <span class="lg"><i style="background:#e8dcda"></i>закрито</span>
-          <span class="lg"><i style="background:#fff;box-shadow:inset 0 0 0 2px #141414"></i>повторення</span>
-          <span style="margin-left:auto" class="hide-n">далі: «р», «о» · ще 3 заняття до Етапу 3</span>
+        <div class="legend">
+          <span><i class="lg lg--done"></i>пройдено</span>
+          <span><i class="lg lg--cur"></i>ти тут</span>
+          <span><i class="lg lg--rev"></i>повторення</span>
+          <span><i class="lg lg--goal"></i>іспит етапу</span>
+          <span><i class="lg lg--lock"></i>закрито</span>
+          <button class="link" data-k="2" title="Уся мапа · клавіша 2">Уся мапа <span class="kbd">2</span></button>
         </div>
       </section>
 
-      <!-- weak spot + daily goal -->
       <div class="pair">
         <section class="panel weak" aria-labelledby="weak-h">
-          <div class="panel__head"><span class="idx">[04]</span><h2 class="panel__title" id="weak-h">Слабке місце</h2></div>
-          <div class="weak__key">«<span>ол</span>»</div>
-          <div class="weak__ms">перехід «ол»<br><b>412 мс</b> → ціль <b>250 мс</b></div>
-          <div class="gauge" aria-hidden="true"><span class="gauge__fill"></span><span class="gauge__goal"></span></div>
-          <div class="gauge__lab"><span>0</span><span>ціль 250</span><span>412 мс</span></div>
-          <button class="pill" data-hk="d">Розібрати <span class="kbd">D</span></button>
+          <div class="panel__head"><span class="idx">04</span><h2 class="panel__title" id="weak-h">Слабке місце</h2></div>
+          <p class="say">Перехід <b class="red">о→л</b> повільний: <b>412 мс</b>, ціль 250 мс.</p>
+          <svg class="spark" viewBox="0 0 200 70" preserveAspectRatio="none" aria-label="Останні 5 спроб: 520, 488, 455, 430, 412 мс; ціль 250">
+            <rect x="0" y="0" width="200" height="70" fill="#fcf1ef"/>
+            <line x1="0" y1="62" x2="200" y2="62" stroke="#141414" stroke-width="1.5" stroke-dasharray="4 4" opacity=".6" vector-effect="non-scaling-stroke"/>
+            <polyline points="12,10 56,17 100,25 144,31 188,35" fill="none" stroke="#c21f13" stroke-width="3" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+          </svg>
+          <div class="spark__lab"><span>останні 5 спроб: 520 → 412, краще</span></div>
+          <button class="btn btn--secondary btn--sm" data-hk="d" aria-keyshortcuts="D">Розібрати <span class="kbd">D</span></button>
         </section>
         <section class="panel goal" aria-labelledby="goal-h">
-          <div class="panel__head"><span class="idx">[05]</span><h2 class="panel__title" id="goal-h">Мета дня</h2></div>
-          <div class="goal__n"><span class="num">12</span><span class="of">/ 20 хв</span></div>
-          <div class="goal__bar"><i></i></div>
-          <div class="goal__left">ще 8 хв — і серія стане 13</div>
-          <div class="week" aria-label="Останні 7 днів">
-            <div class="day done"><i><svg viewBox="0 0 24 24"><use href="#i-check"/></svg></i>Чт</div>
-            <div class="day done"><i><svg viewBox="0 0 24 24"><use href="#i-check"/></svg></i>Пт</div>
-            <div class="day done"><i><svg viewBox="0 0 24 24"><use href="#i-check"/></svg></i>Сб</div>
-            <div class="day done"><i><svg viewBox="0 0 24 24"><use href="#i-check"/></svg></i>Нд</div>
-            <div class="day done"><i><svg viewBox="0 0 24 24"><use href="#i-check"/></svg></i>Пн</div>
-            <div class="day done"><i><svg viewBox="0 0 24 24"><use href="#i-check"/></svg></i>Вт</div>
-            <div class="day today"><i></i>Ср</div>
+          <div class="panel__head"><span class="idx">05</span><h2 class="panel__title" id="goal-h">Мета дня</h2></div>
+          <p class="say">Сьогодні <b>12 з 20 хв</b> · <span style="color:var(--red-deep);font-weight:600;white-space:nowrap">ще 8 хв</span></p>
+          <div class="chart" aria-label="Хвилини за останні 7 днів">
+            <div class="chart__goal"><span>ціль 20</span></div>
+            <div class="bar7" style="--h:62%"><em>Чт</em></div>
+            <div class="bar7" style="--h:57%"><em>Пт</em></div>
+            <div class="bar7" style="--h:71%"><em>Сб</em></div>
+            <div class="bar7" style="--h:57%"><em>Нд</em></div>
+            <div class="bar7" style="--h:88%"><em>Пн</em></div>
+            <div class="bar7" style="--h:60%"><em>Вт</em></div>
+            <div class="bar7 today" style="--h:34%;--rest:23%"><em>Ср</em></div>
           </div>
+          <div class="streak"><svg viewBox="0 0 24 24"><use href="#i-flame"/></svg>серія <b>12 днів</b> · <span class="dotted tip tip--up" tabindex="0" title="Один пропущений день не обнуляє серію" data-tip="Заморозка: один пропущений день не обнуляє серію.">заморозка 1</span></div>
         </section>
       </div>
 
@@ -729,43 +596,111 @@ svg { display: block; }
 </main>
 
 <!-- ======================================================= PLAY -->
-<main id="play" class="screen gp-host" data-gp="bright" aria-label="Заняття">
-  <div class="prog" aria-hidden="true"><i id="prog"></i></div>
-  <header class="hud">
-    <div class="hud__left">
-      <button class="esc" id="esc"><span class="kbd">Esc</span>пауза</button>
-      <span class="hide-n"><span class="idx">[02]</span> Етап 2 · Слова · нова клавіша «п»</span>
-    </div>
-    <div class="hud__mid"><span class="num" id="pct">49%</span><span class="lab">тексту</span></div>
-    <div class="hud__right">
-      <div class="hstat"><span class="num" id="timer">00:38</span><span class="lab">час</span></div>
-      <div class="hstat red"><span class="num">312</span><span class="lab">зн/хв</span></div>
-      <div class="hstat"><span class="num">97%</span><span class="lab">точність · тренування</span></div>
-    </div>
-  </header>
+<main id="play" class="screen" data-gp="soft" aria-label="Заняття">
+  <div class="pb">
+    <header class="hud">
+      <div class="hud__left">
+        <button class="btn btn--secondary btn--sm" id="esc" aria-keyshortcuts="Escape" style="padding:0 14px 0 5px"><span class="kbd">Esc</span>пауза</button>
+        <button class="link" id="finish" aria-keyshortcuts="Tab">завершити (демо) <span class="kbd">Tab</span></button>
+      </div>
+      <div class="hud__mid">Етап 2 · Слова · вправа 3 з 5</div>
+      <div class="hud__right">
+        <div class="hstat"><span class="num" id="timer">00:38</span><span class="lab">час</span></div>
+        <div class="hstat tip" tabindex="0" data-tip="знаків за хвилину, рахуються лише правильні"><span class="num">312</span><span class="lab">зн/хв · знаків за хвилину</span></div>
+        <div class="hstat"><span class="num">97%</span><span class="lab">точність</span></div>
+      </div>
+    </header>
 
-  <section class="run">
-    <div class="line-wrap">
-      <div class="line-meta"><span><span class="idx">[3/5]</span>Вправа: слова з «п»</span><span>помилку видно, доки не виправиш</span></div>
+    <div class="proute" aria-hidden="true">
+      <span class="proute__line"></span><span class="proute__done" id="pdone"></span>
+      <span id="stations"></span><span class="proute__end"></span>
+      <span class="proute__me" id="pme"></span><span class="proute__pct" id="pct">49%</span>
+    </div>
+
+    <div>
+      <div class="line-meta"><span>Слова з «п» · тренування</span><span>помилка лишається позначеною, доки її не виправиш</span></div>
       <p class="line" id="line" aria-label="Текст вправи"></p>
     </div>
 
     <div class="guide">
-      <div>
-        <div class="kb" id="kb" aria-hidden="true"></div>
-        <div class="kb__legend">
-          <span><i style="background:#fff"></i>мізинці</span>
-          <span><i style="background:#fdf3f1"></i>безіменні</span>
-          <span><i style="background:#f9e3df"></i>середні</span>
-          <span><i style="background:#f4d0ca"></i>вказівні</span>
+      <div class="kb" id="kb" aria-hidden="true"></div>
+      <aside class="next" aria-live="polite">
+        <div class="next__lab">наступна клавіша</div>
+        <div class="next__row"><div class="next__key" id="nk">п</div><div class="next__finger" id="nf">лівий вказівний</div></div>
+        <svg id="handsSvg" viewBox="0 0 200 100" aria-hidden="true"></svg>
+        <div class="hands__cap"><span>ліва рука</span><span>права рука</span></div>
+      </aside>
+      <div class="kb__legend" aria-hidden="true">
+        <span><i class="f0"></i>мізинці</span><span><i class="f1"></i>безіменні</span><span><i class="f2"></i>середні</span><span><i class="f3"></i>вказівні</span>
+      </div>
+      <div class="next__then" id="nthen"></div>
+    </div>
+  </div>
+</main>
+
+<!-- ======================================================= RESULT -->
+<main id="result" class="screen" aria-label="Результат">
+  <header class="bar" aria-label="Стан гравця"><div class="brand"><span class="brand__mark" aria-label="Typing-Race">ТР</span></div></header>
+  <section class="stage">
+    <div class="stage__in" data-gp="bright">
+
+      <section class="score on-red rin" data-gp="ember" aria-labelledby="score-h">
+        <div class="score__top"><span class="idx">03 з 05</span>Вправа пройдена · Етап 2 · клавіша «п»
+          <span class="chip chip--white"><svg class="ico" style="width:14px;height:14px;stroke-width:2.6"><use href="#i-check"/></svg>залікова спроба</span></div>
+        <div class="score__body">
+          <h1 class="score__h" id="score-h">Зараховано: 2 з 3</h1>
+          <p class="score__say">Ще одна залікова спроба ≥ 96% — і клавіша «п» опанована, відкриється «р».</p>
+          <p class="score__note">Залікова спроба — без підказок; рахується для відкриття клавіші.</p>
+        </div>
+        <p class="cmp"><span>Порівняно з минулою<span class="hide-c"> спробою</span>:</span><span><b>+6</b> зн/хв</span><span>точність <b>=</b></span><span>ритм <b>+3%</b></span><span>час <b>−4 с</b></span></p>
+        <div class="cells">
+          <div class="cell cell--main"><span class="num" data-to="318">318</span><b>зн/хв</b><span class="ex">знаків за хвилину, лише правильних</span><i style="--v:80%"></i></div>
+          <div class="cell"><span class="num" data-to="96" data-suf="%">96%</span><b>точність</b><span class="ex">правильних натискань</span><i style="--v:96%"></i></div>
+          <div class="cell"><span class="num" data-to="82" data-suf="%">82%</span><b>ритм</b><span class="ex">рівність темпу між клавішами</span><i style="--v:82%"></i></div>
+          <div class="cell"><span class="num" data-to="47" data-time="1">00:47</span><b>час</b><span class="ex">уся вправа</span><i style="--v:100%"></i></div>
+        </div>
+        <span class="xpchip" id="xpchip">+140 XP</span>
+      </section>
+
+      <section class="panel mastery rin" style="--d:120ms" aria-labelledby="mast-h">
+        <div class="panel__head"><span class="idx">04</span><h2 class="panel__title" id="mast-h">Опанування клавіші «п»</h2></div>
+        <p class="mastery__ex">Потрібно 3 залікові спроби з точністю від 96%.</p>
+        <div class="slots">
+          <div class="slot ok"><span class="lab">спроба 1 · вчора</span><span class="num">97%</span></div>
+          <div class="slot ok new pop"><span class="lab">спроба 2 · щойно</span><span class="num">96%</span></div>
+          <div class="slot empty"><span class="lab">спроба 3</span><span class="num">—</span></div>
+        </div>
+        <p class="mastery__next">Після опанування «п» відкриється <b>«р»</b>; в Етапі 2 лишиться 3 клавіші до іспиту.</p>
+        <div class="stagebar"><div class="stagebar__h"><span>Етап 2 · Слова</span><span><b class="num">8 з 12</b> клавіш</span></div>
+          <div class="segs"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="cur"></i><i></i><i></i><i></i></div></div>
+      </section>
+
+      <section class="panel rweak rin" style="--d:220ms" aria-labelledby="rweak-h">
+        <div class="panel__head"><span class="idx">05</span><h2 class="panel__title" id="rweak-h">Найслабший перехід</h2></div>
+        <p class="say">Перехід <b class="red">о→л</b> найповільніший: <b>398 мс</b>, ціль 250 мс.</p>
+        <div class="gauge" aria-hidden="true"><span class="gauge__fill" style="width:79.6%"></span><span class="gauge__goal"></span></div>
+        <div class="gauge__lab"><span>0</span><span>ціль 250</span><span>500 мс</span></div>
+        <svg class="spark" viewBox="0 0 200 70" preserveAspectRatio="none" aria-label="Останні 5 спроб: 488, 455, 430, 412, 398 мс; ціль 250">
+          <rect x="0" y="0" width="200" height="70" fill="#fcf1ef"/>
+          <line x1="0" y1="62" x2="200" y2="62" stroke="#141414" stroke-width="1.5" stroke-dasharray="4 4" opacity=".6" vector-effect="non-scaling-stroke"/>
+          <polyline points="12,10 56,18 100,24 144,28 188,32" fill="none" stroke="#c21f13" stroke-width="3" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+        </svg>
+        <div class="spark__lab"><span>останні 5 спроб: 488 → 398 мс, краще</span><span>пунктир — ціль</span></div>
+        <div class="rweak__row">
+          <span class="lab">2 хвилини вправ саме на «ол»</span>
+          <button class="btn btn--secondary btn--sm" data-hk="d" aria-keyshortcuts="D">Тренувати «ол» <span class="kbd">D</span></button>
+        </div>
+      </section>
+
+      <div class="actions rin" style="--d:320ms">
+        <span class="actions__next">Далі: <b>вправа 4 з 5 · слова з «п»</b></span>
+        <div class="actions__btns">
+          <button class="btn btn--secondary" id="r-home" aria-keyshortcuts="Escape">На головну <span class="kbd">Esc</span></button>
+          <button class="btn btn--secondary" id="r-again" aria-keyshortcuts="Tab">Ще раз <span class="kbd">Tab</span></button>
+          <button class="btn btn--primary btn--lg" id="r-next" aria-keyshortcuts="Enter">Далі <span class="kbd">Enter</span></button>
         </div>
       </div>
-      <aside class="next on-red" data-gp="ember" aria-live="polite">
-        <div class="next__lab">наступна</div>
-        <div class="next__key" id="nk">п</div>
-        <div class="next__finger" id="nf">лівий вказівний</div>
-        <div class="hand" id="hand" aria-hidden="true"><i style="height:52%"></i><i style="height:80%"></i><i style="height:94%"></i><i style="height:86%" class="on"></i><i style="height:40%;margin-left:6px"></i></div>
-      </aside>
+
     </div>
   </section>
 </main>
@@ -776,84 +711,137 @@ svg { display: block; }
 (function () {
   'use strict';
   var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var NS = 'http://www.w3.org/2000/svg';
+  function $(s, r) { return (r || document).querySelector(s); }
+  function $$(s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); }
+  function el(n, a, p) { var e = document.createElementNS(NS, n); for (var k in a) e.setAttribute(k, a[k]); p.appendChild(e); return e; }
 
-  /* ---------- live gradient (palettes copied from grad.js) ---------- */
+  $$('.bar').forEach(function (b) { b.appendChild($('#tpl-bar').content.cloneNode(true)); });
+
+  /* ---------- live gradient (grad.js palettes), slowed ×2.5 and softened ---------- */
   var PAL = {
-    bright: { base: '#fbe8e5', grain: .05, speed: .7, blobs: [['#f0aca4',1,1.05],['#f9dcd8',1,1.15],['#c21f13',.22,.85],['#ea948a',.8,.9],['#fff4f2',.9,.75],['#f4c2bc',1,1]] },
-    ember:  { base: '#8f150c', grain: .07, speed: 1, blobs: [['#c21f13',1,1.15],['#6e0f08',.9,.95],['#b41c11',1,1],['#c21f13',.9,.85],['#7d1109',.8,.8]] }
+    bright: { base: '#fbebe8', grain: .04, speed: .28, alpha: .55, blobs: [['#f0aca4',1,1.05],['#f9dcd8',1,1.15],['#c21f13',.22,.85],['#ea948a',.8,.9],['#fff4f2',.9,.75],['#f4c2bc',1,1]] },
+    ember:  { base: '#8f150c', grain: .06, speed: .4, alpha: .8, blobs: [['#c21f13',1,1.15],['#6e0f08',.9,.95],['#b41c11',1,1],['#c21f13',.9,.85],['#7d1109',.8,.8]] },
+    soft:   { base: '#fcf0ee', grain: .03, speed: .2, alpha: .35, still: true, blobs: [['#f4c2bc',1,1.1],['#fff6f4',1,1],['#f9dcd8',1,1.2]] }
   };
   var POS = [[18,22],[78,30],[30,78],[86,82],[55,48],[62,12]];
   function rgba(h, a) { var n = parseInt(h.slice(1), 16); return 'rgba(' + (n >> 16 & 255) + ',' + (n >> 8 & 255) + ',' + (n & 255) + ',' + a + ')'; }
-  document.querySelectorAll('[data-gp]').forEach(function (host, hi) {
+  $$('[data-gp]').forEach(function (host, hi) {
     var p = PAL[host.getAttribute('data-gp')];
-    host.classList.add('gp-host');
+    host.classList.add('gp-host'); if (p.still) host.classList.add('gp-static');
     host.style.backgroundColor = p.base;
     var layer = document.createElement('span'); layer.className = 'gp-layer'; layer.setAttribute('aria-hidden', 'true');
     p.blobs.forEach(function (b, i) {
       var s = document.createElement('span'); s.className = 'gp-blob';
-      var size = Math.round(78 * b[2]);
-      var pos = POS[(i + hi) % POS.length];
+      var size = Math.round(78 * b[2]), pos = POS[(i + hi) % POS.length];
       s.style.cssText = 'left:' + pos[0] + '%;top:' + pos[1] + '%;width:' + size + 'vmax;height:' + size + 'vmax;' +
-        'background:radial-gradient(closest-side,' + rgba(b[0], b[1]) + ',' + rgba(b[0], 0) + ');' +
-        '--anim:gp-drift-' + (i % 4) + ';--dur:' + Math.round((16 + i * 4) / p.speed) + 's;--delay:-' + (i * 3 + hi * 2) + 's';
+        'background:radial-gradient(closest-side,' + rgba(b[0], b[1] * p.alpha) + ',' + rgba(b[0], 0) + ');' +
+        '--anim:gp-drift-' + (i % 4) + ';--dur:' + Math.round((16 + i * 4) / p.speed) + 's;--delay:-' + (i * 7 + hi * 5) + 's';
       layer.appendChild(s);
     });
     var g = document.createElement('span'); g.className = 'gp-grain'; g.style.opacity = p.grain; layer.appendChild(g);
     host.insertBefore(layer, host.firstChild);
   });
 
+  /* ---------- map: nodes placed along the route by length ---------- */
+  var route = $('#routeDone'), total = route.getTotalLength();
+  var NODES = [
+    { L: 8, t: 'done', k: 'а' }, { L: 40, t: 'done', k: 'о' }, { L: 72, t: 'done', k: 'в' }, { L: 106, t: 'done', k: 'л' },
+    { L: 174, t: 'done', k: 'і' },
+    { L: 268, t: 'rev' },
+    { L: 302, t: 'done', k: 'е' }, { L: 334, t: 'done', k: 'н' },
+    { L: 372, t: 'cur', k: 'п' },
+    { L: 470, t: 'lock', k: 'р' },
+    { L: 556, t: 'lock', k: 'г' }, { L: 667, t: 'lock', k: 'щ' }, { L: 770, t: 'goal' }
+  ];
+  var CUR = 372;
+  route.style.strokeDasharray = CUR + ' ' + (total + 10);
+  route.style.setProperty('--len', CUR);
+  var mg = $('#mapNodes');
+  NODES.forEach(function (n) {
+    var pt = route.getPointAtLength(n.L);
+    var grp = el('g', { 'class': 'mnode mnode--' + n.t, transform: 'translate(' + pt.x.toFixed(1) + ' ' + pt.y.toFixed(1) + ')' }, mg);
+    if (n.t === 'done' || n.t === 'lock') { el('circle', { r: 14 }, grp); el('text', { y: 1 }, grp).textContent = n.k; }
+    else if (n.t === 'cur') {
+      el('rect', { 'class': 'halo', x: -27, y: -27, width: 54, height: 54 }, grp);
+      el('path', { 'class': 'core', d: 'M-20 -20 H 10 A 10 10 0 0 1 20 -10 V 20 H -20 Z' }, grp);
+      el('text', { y: 1 }, grp).textContent = n.k;
+    } else if (n.t === 'rev') {
+      el('rect', { x: -12, y: -12, width: 24, height: 24, transform: 'rotate(45)' }, grp);
+      el('path', { d: 'M5 -2 A 5.5 5.5 0 1 0 4 4 M5 -6 V -2 H 1' }, grp);
+    } else if (n.t === 'goal') {
+      el('rect', { x: -16, y: -16, width: 32, height: 32 }, grp);
+      el('path', { d: 'M-5 -7 V 8 M-5 -7 H 7 L 4 -3 L 7 1 H -5', fill: 'none', stroke: '#fff', 'stroke-width': 2.2, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, grp);
+    }
+  });
+
   /* ---------- typing line ---------- */
   var TEXT = 'пала пора пан поле лапа плато полон опал пора пап';
-  var ERR = { 15: 'и' };          // one unerased error: «поле» typed as «пиле»
-  var pos = 24;                   // caret on the «п» of «плато»
-  var line = document.getElementById('line');
+  var ERR = { 15: 'и' };
+  var START = 24, pos = START;
+  var line = $('#line');
+  var st = '', acc = 0, words = TEXT.split(' ');
+  words.forEach(function (w, i) { acc += w.length + 1; if (i < words.length - 1) st += '<i class="st" data-at="' + (acc - 1) + '" style="left:' + ((acc - 1) / TEXT.length * 100).toFixed(2) + '%"></i>'; });
+  $('#stations').innerHTML = st;
   function renderLine() {
-    var html = '';
+    var html = '<span class="w">';
     for (var i = 0; i < TEXT.length; i++) {
       var ch = TEXT[i], cls = 'c' + (ch === ' ' ? ' sp' : '');
       if (i < pos) cls += ERR[i] ? ' err' : ' done';
       if (i === pos) cls += ' cur';
-      html += '<span class="' + cls + '"' + (ERR[i] && i < pos ? ' data-typed="' + ERR[i] + '"' : '') + '>' + (ch === ' ' ? ' ' : ch) + '</span>';
+      var span = '<span class="' + cls + '"' + (ERR[i] && i < pos ? ' data-typed="' + ERR[i] + '" title="тут натиснуто «' + ERR[i] + '»"' : '') + '>' + ch + '</span>';
+      html += ch === ' ' ? '</span>' + span + '<span class="w">' : span;
     }
-    line.innerHTML = html;
+    line.innerHTML = html + '</span>';
     var pct = Math.round(pos / TEXT.length * 100);
-    document.getElementById('pct').textContent = pct + '%';
-    document.getElementById('prog').style.width = pct + '%';
+    $('#pct').textContent = pct + '%'; $('#pct').style.left = pct + '%';
+    $('#pdone').style.width = pct + '%'; $('#pme').style.left = pct + '%';
+    $$('.st').forEach(function (s) { s.classList.toggle('done', +s.dataset.at < pos); });
     renderNext();
   }
 
-  /* ---------- ЙЦУКЕН keyboard with finger zones ---------- */
+  /* ---------- keyboard, finger zones, hands ---------- */
   var ROWS = ['йцукенгшщзхї', 'фівапролджє', 'ячсмитьбю'];
-  var FINGER = {};   // key -> [zone 0..3, name, hand index for the hand diagram]
-  var map = [
-    ['йфя', 0, 'лівий мізинець', 0], ['ціч', 1, 'лівий безіменний', 1], ['увс', 2, 'лівий середній', 2], ['кеапми', 3, 'лівий вказівний', 3],
-    ['нгрот ь', 3, 'правий вказівний', 3], ['шлб', 2, 'правий середній', 2], ['щдю', 1, 'правий безіменний', 1], ['зхїжє', 0, 'правий мізинець', 0]
-  ];
-  map.forEach(function (m) { m[0].replace(/ /g, '').split('').forEach(function (k) { FINGER[k] = [m[1], m[2], m[3], m[2].indexOf('правий') === 0]; }); });
-  FINGER[' '] = [0, 'великий палець', 4, false];
-  var kb = document.getElementById('kb');
+  var FINGER = {};   // key -> [zone 0..3, name, finger 0..4 (pinky..thumb), right?]
+  [['йфя',0,'лівий мізинець',0,0],['ціч',1,'лівий безіменний',1,0],['увс',2,'лівий середній',2,0],['кеапми',3,'лівий вказівний',3,0],
+   ['нгроть',3,'правий вказівний',3,1],['шлб',2,'правий середній',2,1],['щдю',1,'правий безіменний',1,1],['зхїжє',0,'правий мізинець',0,1]]
+    .forEach(function (m) { m[0].split('').forEach(function (k) { FINGER[k] = [m[1], m[2], m[3], m[4]]; }); });
+  FINGER[' '] = [0, 'великий палець', 4, 0];
+  var kb = $('#kb');
   ROWS.forEach(function (r) {
     var row = document.createElement('div'); row.className = 'kb__row';
-    r.split('').forEach(function (k) {
-      var el = document.createElement('span'); el.className = 'key f' + FINGER[k][0] + (k === 'а' || k === 'о' ? ' home' : '');
-      el.textContent = k; el.dataset.k = k; row.appendChild(el);
-    });
+    r.split('').forEach(function (k) { var e = document.createElement('span'); e.className = 'key f' + FINGER[k][0] + (k === 'а' || k === 'о' ? ' home' : ''); e.textContent = k; e.dataset.k = k; row.appendChild(e); });
     kb.appendChild(row);
   });
-  var sp = document.createElement('div'); sp.className = 'kb__row';
-  sp.innerHTML = '<span class="key space" data-k=" ">пробіл</span>'; kb.appendChild(sp);
+  var sp = document.createElement('div'); sp.className = 'kb__row'; sp.innerHTML = '<span class="key space f0" data-k=" ">пробіл</span>'; kb.appendChild(sp);
+
+  var HS = $('#handsSvg'), ZONE = ['#ffffff', '#fdf3f1', '#f9e3df', '#f4d0ca'];
+  var FL = [[0, 40], [1, 54], [2, 60], [3, 54]];
+  var fingerEls = { 0: [], 1: [] };
+  [0, 1].forEach(function (right) {
+    var ox = right ? 119 : 4, g = el('g', {}, HS);
+    for (var i = 0; i < 4; i++) {
+      var idx = right ? 3 - i : i, len = FL[idx][1];
+      fingerEls[right][idx] = el('rect', { x: ox + i * 20, y: 66 - len, width: 17, height: len + 4, rx: 8.5, fill: ZONE[FL[idx][0]], stroke: 'rgba(20,20,20,.18)', 'stroke-width': 1 }, g);
+    }
+    var tx = right ? ox - 17 : ox + 80;
+    fingerEls[right][4] = el('rect', { x: tx, y: 50, width: 16, height: 32, rx: 8, fill: '#ffffff', stroke: 'rgba(20,20,20,.18)', 'stroke-width': 1, transform: 'rotate(' + (right ? 30 : -30) + ' ' + (tx + 8) + ' 82)' }, g);
+    el('rect', { x: ox, y: 66, width: 77, height: 34, fill: '#f9e6e3' }, g);
+  });
 
   function renderNext() {
     var ch = TEXT[pos] || ' ';
-    kb.querySelectorAll('.want').forEach(function (e) { e.classList.remove('want'); });
+    $$('.want', kb).forEach(function (e) { e.classList.remove('want'); });
     var k = kb.querySelector('[data-k="' + ch + '"]'); if (k) k.classList.add('want');
     var f = FINGER[ch] || FINGER[' '];
-    document.getElementById('nk').textContent = ch === ' ' ? '␣' : ch;
-    document.getElementById('nf').textContent = f[1];
-    var fingers = document.querySelectorAll('#hand i');
-    var hand = document.getElementById('hand');
-    hand.style.flexDirection = f[3] ? 'row-reverse' : 'row';
-    fingers.forEach(function (e, i) { e.classList.toggle('on', i === f[2]); });
+    $('#nk').textContent = ch === ' ' ? '␣' : ch;
+    $('#nf').textContent = f[1];
+    $('#nthen').innerHTML = '<span>далі</span>' + TEXT.slice(pos + 1, pos + 5).split('').map(function (c) { return '<span class="kbd">' + (c === ' ' ? '␣' : c) + '</span>'; }).join('');
+    [0, 1].forEach(function (r) { fingerEls[r].forEach(function (e, i) {
+      var on = ch === ' ' ? i === 4 : (r === f[3] && i === f[2]);
+      e.setAttribute('fill', on ? '#c21f13' : (i === 4 ? '#ffffff' : ZONE[FL[i][0]]));
+      e.setAttribute('stroke', on ? '#c21f13' : 'rgba(20,20,20,.18)');
+    }); });
   }
   renderLine();
 
@@ -861,58 +849,111 @@ svg { display: block; }
   var secs = 38, tick = null;
   function fmt(s) { return ('0' + Math.floor(s / 60)).slice(-2) + ':' + ('0' + s % 60).slice(-2); }
 
+  /* ---------- result: count-up, XP flight, bar fill ---------- */
+  function countUp(e) {
+    var to = +e.dataset.to, suf = e.dataset.suf || '', time = e.dataset.time;
+    var show = function (v) { e.textContent = time ? fmt(Math.round(v)) : Math.round(v) + suf; };
+    if (reduce) { show(to); return; }
+    var t0 = performance.now(), dur = 1000;
+    (function step(t) { var p = Math.min(1, (t - t0) / dur); show(to * (1 - Math.pow(1 - p, 4))); if (p < 1) requestAnimationFrame(step); })(t0);
+  }
+  function playReward() {
+    var bar = $('#result .bar');
+    var fill = $('.xp__fill', bar), gain = $('.xp__gain', bar), val = $('.xp__val', bar), plus = $('.xp__plus', bar), chip = $('#xpchip');
+    var V = [80, 96, 82, 100];
+    fill.style.width = '67%'; gain.style.width = '67%'; val.textContent = '1 340'; plus.classList.remove('on');
+    chip.textContent = '+140 XP'; chip.style.visibility = '';
+    var bars = $$('#result .cell i');
+    bars.forEach(function (i) { i.style.setProperty('--v', '0%'); });
+    var finish = function () {
+      gain.style.width = '74%';
+      setTimeout(function () { fill.style.width = '74%'; }, reduce ? 0 : 450);
+      val.textContent = '1 480'; plus.classList.add('on');
+      chip.textContent = '+140 XP ✓';
+    };
+    var go = function () {
+      $$('#result [data-to]').forEach(countUp);
+      bars.forEach(function (i, n) { i.style.setProperty('--v', V[n] + '%'); });
+      if (reduce) { finish(); return; }
+      bar.classList.remove('enter'); void bar.offsetWidth; bar.classList.add('enter');
+      setTimeout(function () {
+        var a = chip.getBoundingClientRect(), b = $('.xp__track', bar).getBoundingClientRect();
+        var fl = chip.cloneNode(true); fl.removeAttribute('id'); fl.className = 'xpchip flyer';
+        fl.style.cssText = 'left:' + a.left + 'px;top:' + a.top + 'px;right:auto;width:' + a.width + 'px;height:' + a.height + 'px';
+        document.body.appendChild(fl); chip.style.visibility = 'hidden';
+        requestAnimationFrame(function () { requestAnimationFrame(function () {
+          var dx = (b.left + b.width * .7) - (a.left + a.width / 2), dy = (b.top + 3) - (a.top + a.height / 2);
+          fl.style.transform = 'translate(' + dx + 'px,' + dy + 'px) scale(.3)'; fl.style.opacity = '0.2';
+        }); });
+        setTimeout(function () { fl.remove(); finish(); }, 780);
+        setTimeout(function () { chip.style.visibility = ''; }, 1400);
+      }, 1050);
+    };
+    if (reduce) go(); else {
+      $$('#result [data-to]').forEach(function (e) { e.textContent = e.dataset.time ? '00:00' : '0' + (e.dataset.suf || ''); });
+      setTimeout(go, 120);
+    }
+  }
+
   /* ---------- screens ---------- */
   var cur = null;
   function show(name, animate) {
-    if (name !== 'play') name = 'home';
+    if (name !== 'play' && name !== 'result') name = 'home';
     if (name === cur) return;
     var swap = function () {
-      document.querySelectorAll('.screen').forEach(function (s) { s.classList.toggle('is-on', s.id === name); });
       var first = cur === null; cur = name;
+      $$('.screen').forEach(function (s) { s.classList.toggle('is-on', s.id === name); });
       clearInterval(tick);
       if (name === 'play') {
-        tick = setInterval(function () { secs++; document.getElementById('timer').textContent = fmt(secs); }, 1000);
-        if (!first) document.getElementById('esc').focus({ preventScroll: true });
-      } else {
-        if (!first) document.getElementById('continue').focus({ preventScroll: true });
-      }
+        pos = START; secs = 38; renderLine(); $('#timer').textContent = fmt(secs);
+        tick = setInterval(function () { secs++; $('#timer').textContent = fmt(secs); }, 1000);
+        if (!first) $('#esc').focus({ preventScroll: true });
+      } else if (name === 'result') {
+        $$('#result .rin').forEach(function (e) { e.style.animation = 'none'; void e.offsetWidth; e.style.animation = ''; });
+        playReward();
+        if (!first) $('#r-next').focus({ preventScroll: true });
+      } else if (!first) $('#continue').focus({ preventScroll: true });
     };
-    var w = document.getElementById('wipe');
+    var w = $('#wipe');
     if (!animate || reduce || cur === null) { swap(); return; }
     w.className = 'wipe in';
-    setTimeout(function () {
-      swap();
-      w.className = 'wipe out';
-      setTimeout(function () { w.className = 'wipe'; }, 340);
-    }, 330);
+    setTimeout(function () { swap(); w.className = 'wipe out'; setTimeout(function () { w.className = 'wipe'; }, 340); }, 330);
   }
-  var q = new URLSearchParams(location.search).get('screen');
-  show(q === 'play' ? 'play' : 'home', false);
+  show(new URLSearchParams(location.search).get('screen'), false);
   window.addEventListener('message', function (e) { if (e.data && e.data.screen) show(e.data.screen, true); });
 
-  document.getElementById('continue').addEventListener('click', function () { show('play', true); });
-  document.getElementById('esc').addEventListener('click', function () { show('home', true); });
-  document.querySelectorAll('.rail__item').forEach(function (b) {
-    b.addEventListener('click', function () {
-      document.querySelectorAll('.rail__item').forEach(function (x) { x.removeAttribute('aria-current'); });
-      b.setAttribute('aria-current', 'page');
-    });
+  $('#continue').addEventListener('click', function () { show('play', true); });
+  $('#esc').addEventListener('click', function () { show('home', true); });
+  $('#finish').addEventListener('click', function () { show('result', true); });
+  $('#r-home').addEventListener('click', function () { show('home', true); });
+  $('#r-again').addEventListener('click', function () { show('play', true); });
+  $('#r-next').addEventListener('click', function () { show('play', true); });
+  $$('.rail__item').forEach(function (b) {
+    b.addEventListener('click', function () { $$('.rail__item').forEach(function (x) { x.removeAttribute('aria-current'); }); b.setAttribute('aria-current', 'page'); });
   });
 
-  var LAT = { 'й':'q','ц':'w','у':'e','к':'r','а':'f','в':'d' };
+  var LAT = { 'й': 'q', 'ц': 'w', 'у': 'e', 'к': 'r', 'а': 'f', 'в': 'd' };
+  function flash(t) { if (!t) return; t.classList.add('is-hot'); t.focus({ preventScroll: true }); setTimeout(function () { t.classList.remove('is-hot'); }, 200); }
   document.addEventListener('keydown', function (e) {
     if (e.ctrlKey || e.metaKey || e.altKey) return;
+    var a = document.activeElement, k = LAT[e.key.toLowerCase()] || e.key.toLowerCase();
     if (cur === 'home') {
-      if (e.key === 'Enter' && (document.activeElement === document.body || document.activeElement.id === 'continue' || !document.activeElement)) { e.preventDefault(); show('play', true); return; }
-      if (/^[1-5]$/.test(e.key)) { document.querySelector('.rail__item[data-k="' + e.key + '"]').click(); return; }
-      var k = (LAT[e.key.toLowerCase()] || e.key.toLowerCase());
-      var t = document.querySelector('[data-hk="' + k + '"]');
-      if (t) { t.classList.add('is-hot'); t.focus({ preventScroll: true }); setTimeout(function () { t.classList.remove('is-hot'); }, 200); }
+      if (e.key === 'Enter' && (!a || a === document.body || a.id === 'continue')) { e.preventDefault(); show('play', true); return; }
+      if (/^[1-5]$/.test(e.key)) { $('.rail__item[data-k="' + e.key + '"]').click(); return; }
+      flash($('#home [data-hk="' + k + '"]'));
     } else if (cur === 'play') {
       if (e.key === 'Escape') { e.preventDefault(); show('home', true); return; }
+      if (e.key === 'Tab' || e.key === 'Enter') { e.preventDefault(); show('result', true); return; }
       if (e.key.length === 1 && e.key.toLowerCase() === TEXT[pos]) {
-        e.preventDefault(); pos = Math.min(pos + 1, TEXT.length - 1); renderLine();
+        e.preventDefault(); pos++;
+        if (pos >= TEXT.length) { show('result', true); return; }
+        renderLine();
       }
+    } else if (cur === 'result') {
+      if (e.key === 'Escape') { e.preventDefault(); show('home', true); return; }
+      if (e.key === 'Tab') { e.preventDefault(); show('play', true); return; }
+      if (e.key === 'Enter' && (!a || a === document.body || a.id === 'r-next')) { e.preventDefault(); show('play', true); return; }
+      if (k === 'd') flash($('#result [data-hk="d"]'));
     }
   });
 })();

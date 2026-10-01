@@ -31,6 +31,7 @@
   <span class="sep"></span>
   <button id="home">Головна</button>
   <button id="play">Гра</button>
+  <button id="result">Результат</button>
 </div>
 <script>
   const VARIANTS = [
@@ -40,13 +41,12 @@
   const f = document.getElementById('f');
   const params = new URLSearchParams(location.search);
   let i = Math.max(0, VARIANTS.findIndex(([k]) => k === params.get('variant')));
-  let screen = params.get('screen') === 'play' ? 'play' : 'home';
+  let screen = ['play', 'result'].includes(params.get('screen')) ? params.get('screen') : 'home';
 
   function render(reload) {
     const [key, name] = VARIANTS[i];
     document.getElementById('label').textContent = name;
-    document.getElementById('home').classList.toggle('on', screen === 'home');
-    document.getElementById('play').classList.toggle('on', screen === 'play');
+    for (const s of ['home', 'play', 'result']) document.getElementById(s).classList.toggle('on', screen === s);
     history.replaceState(null, '', `?variant=${key}&screen=${screen}`);
     if (reload) f.src = `${key}.html?screen=${screen}`;
     else f.contentWindow?.postMessage({ screen }, '*');
@@ -57,6 +57,7 @@
   document.getElementById('next').onclick = () => go(1);
   document.getElementById('home').onclick = () => show('home');
   document.getElementById('play').onclick = () => show('play');
+  document.getElementById('result').onclick = () => show('result');
   const keys = (e) => {
     if (e.key === 'ArrowLeft' && e.altKey) go(-1);
     if (e.key === 'ArrowRight' && e.altKey) go(1);
