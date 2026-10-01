@@ -80,7 +80,7 @@ test.describe('@backend races', () => {
     await guest.goto('/races')
     await guest.getByLabel('Ваше ім’я в заїзді').fill(`Guest ${suffix}`)
     await guest.getByLabel('Код кімнати').fill(code.toLowerCase())
-    await guest.getByRole('button', { name: 'Увійти', exact: true }).click()
+    await guest.locator('#main').getByRole('button', { name: 'Увійти', exact: true }).click()
     await expect(guest.getByTestId('race-code')).toHaveText(code)
 
     // Both are in the room before the host starts it.

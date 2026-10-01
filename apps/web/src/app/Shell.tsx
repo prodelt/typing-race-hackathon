@@ -141,7 +141,8 @@ export function Shell() {
       <main id="main" className="stage">
         <div className="stage__in">
           <LiveGradient tone={play ? 'soft' : 'bright'} />
-          <div className="stage__scroll" data-stage-scroll="">
+          {/* biome-ignore lint/a11y/noNoninteractiveTabindex: a scrollable region must be reachable by keyboard */}
+          <div className="stage__scroll" data-stage-scroll="" tabIndex={0}>
             <div className="stage__content">
               <StageTabs active={active} pathname={pathname} />
               <BootGate>

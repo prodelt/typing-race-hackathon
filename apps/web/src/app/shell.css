@@ -192,15 +192,6 @@
   color: var(--color-muted);
 }
 
-.rail__kbd {
-  position: absolute;
-  top: 6px;
-  right: 6px;
-  min-width: 20px;
-  height: 20px;
-  padding: 0 5px;
-}
-
 .rail__icon {
   margin-top: -4px;
   stroke-width: 1.8;
@@ -218,12 +209,6 @@
 
 .rail__item[aria-current="page"] .rail__n {
   color: var(--color-accent-pale);
-}
-
-.rail__item[aria-current="page"] .rail__kbd {
-  color: inherit;
-  background: rgb(255 255 255 / 18%);
-  box-shadow: none;
 }
 
 .rail__item[aria-current="page"]::before {
@@ -684,7 +669,7 @@
   font-size: 13px;
   font-weight: 600;
   color: var(--color-ink-soft);
-  background: rgb(255 255 255 / 60%);
+  background: color-mix(in srgb, var(--color-paper-raised) 60%, transparent);
   text-decoration: none;
   transition: background-color 200ms var(--ease-enter);
 }
@@ -886,8 +871,7 @@
 
   .rail__brand,
   .rail__foot,
-  .rail__n,
-  .rail__kbd {
+  .rail__n {
     display: none;
   }
 

@@ -69,9 +69,6 @@ export function Rail({
               <span className="rail__n" aria-hidden="true">
                 {String(key).padStart(2, '0')}
               </span>
-              <span className="kbd rail__kbd" aria-hidden="true">
-                {key}
-              </span>
               <Icon size={24} className="rail__icon" />
               <span className="rail__label">{label}</span>
             </Link>

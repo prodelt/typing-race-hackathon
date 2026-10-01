@@ -80,7 +80,7 @@ test.describe('@backend groups', () => {
     await b.goto('/races')
     await expect(b.getByLabel('Ваше ім’я в заїзді')).toHaveValue(nameB)
     await b.getByLabel('Код кімнати').fill(room)
-    await b.getByRole('button', { name: 'Увійти', exact: true }).click()
+    await b.locator('#main').getByRole('button', { name: 'Увійти', exact: true }).click()
     await expect(a.getByTestId('race-roster-row')).toHaveCount(2)
     await a.getByRole('button', { name: 'Старт', exact: true }).click()
     await Promise.all([race(a), race(b)])
