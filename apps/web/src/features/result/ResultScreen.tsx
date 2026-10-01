@@ -99,7 +99,7 @@ export function ResultScreen() {
           variant="primary"
           className="mt-5"
           onClick={() => {
-            void navigate({ to: '/today' })
+            void navigate({ to: '/' })
           }}
         >
           {m.result_go_today()}

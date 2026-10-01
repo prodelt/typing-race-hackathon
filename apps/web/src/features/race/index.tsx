@@ -36,7 +36,7 @@ function Unavailable() {
     <div className="race-calm" data-testid="race-unavailable">
       <h1 className="race-display race-calm__title">{m.race_title()}</h1>
       <p className="race-lede">{m.race_unavailable()}</p>
-      <Link to="/today" className={buttonClass('primary', 'md')}>
+      <Link to="/" className={buttonClass('primary', 'md')}>
         {m.race_unavailable_action()}
       </Link>
     </div>

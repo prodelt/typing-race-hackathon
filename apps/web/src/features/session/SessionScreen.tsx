@@ -89,7 +89,7 @@ export function SessionScreen() {
               variant="primary"
               onClick={() => {
                 dispatch({ type: 'reset' })
-                void navigate({ to: '/today' })
+                void navigate({ to: '/' })
               }}
             >
               {m.session_finished_today()}

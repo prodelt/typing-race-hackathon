@@ -386,7 +386,7 @@
 
 .review-map__value {
   font-family: var(--font-ui);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500;
   font-variant-numeric: tabular-nums;
 }
@@ -431,7 +431,7 @@
 
 .review-rhythm__tick {
   font-family: var(--font-ui);
-  font-size: 11px;
+  font-size: 12px;
   fill: var(--color-muted);
   font-variant-numeric: tabular-nums;
 }

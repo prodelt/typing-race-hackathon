@@ -3,6 +3,7 @@ import {
   createRoute,
   createRouter,
   lazyRouteComponent,
+  redirect,
 } from '@tanstack/react-router'
 import type { FunctionComponent } from 'react'
 import { Shell } from './Shell.js'
@@ -29,10 +30,13 @@ import { Shell } from './Shell.js'
 
 const rootRoute = createRootRoute({ component: Shell })
 
+/** Today became Home at `/`; the old address still works. */
 const todayRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/today',
-  component: lazyRouteComponent(() => import('../features/path/index.js'), 'TodayScreen'),
+  beforeLoad: () => {
+    throw redirect({ to: '/', replace: true })
+  },
 })
 
 const pathRoute = createRoute({
@@ -119,10 +123,25 @@ const privacyRoute = createRoute({
   component: lazyRouteComponent(() => import('../features/public/index.js'), 'PrivacyPage'),
 })
 
+/** The product page: a long landing page, drawn outside the game frame. */
 const aboutRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/about',
+  component: lazyRouteComponent(() => import('../features/product/index.js'), 'ProductPage'),
+})
+
+/** The short "about the project" page, reached from the «Про гру» menu. */
+const aboutProjectRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/about/project',
   component: lazyRouteComponent(() => import('../features/public/index.js'), 'AboutPage'),
+})
+
+/** Profile, destination 05. */
+const profileRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/profile',
+  component: lazyRouteComponent(() => import('../features/profile/index.js'), 'ProfileScreen'),
 })
 
 /** Live races. Lazy like every screen, which keeps `@supabase/supabase-js` out of the entry. */
@@ -182,26 +201,30 @@ const leaderboardsRoute = createRoute({
   ),
 })
 
-/**
- * The public pages are reachable without a learner. Everything else is behind sign-in from F2
- * onward; in F1 there is no sign-in, and `plan.md`'s waiver records why.
- */
-export const PUBLIC_PATHS = ['/', '/formulas', '/licences', '/privacy', '/about'] as const
+/** Pages a visitor reaches from the «Про гру» menu, with or without a learner. */
+export const PUBLIC_PATHS = [
+  '/about',
+  '/formulas',
+  '/licences',
+  '/privacy',
+  '/about/project',
+] as const
 
 /**
- * The product page is the one eagerly loaded route: it is what `/` renders, so deferring it would
- * add a round trip to the first paint and buy nothing. It is injected rather than imported so a
- * test can mount the tree with a stub entry screen and no module mock.
+ * Home is the one eagerly loaded route: it is what `/` renders, so deferring it would add a round
+ * trip to the first paint and buy nothing. It is injected rather than imported so a test can mount
+ * the tree with a stub entry screen and no module mock. For a fresh profile it starts the
+ * first-run starting-level flow itself.
  */
-export function buildRouteTree(pages: { readonly product: FunctionComponent }) {
-  const productRoute = createRoute({
+export function buildRouteTree(pages: { readonly home: FunctionComponent }) {
+  const homeRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/',
-    component: pages.product,
+    component: pages.home,
   })
 
   return rootRoute.addChildren([
-    productRoute,
+    homeRoute,
     todayRoute,
     pathRoute,
     exerciseRoute,
@@ -215,6 +238,8 @@ export function buildRouteTree(pages: { readonly product: FunctionComponent }) {
     licencesRoute,
     privacyRoute,
     aboutRoute,
+    aboutProjectRoute,
+    profileRoute,
     racesRoute,
     raceRoomRoute,
     raceJoinRoute,

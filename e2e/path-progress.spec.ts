@@ -298,7 +298,7 @@ test.describe('US3 the path and mastery', () => {
     await expect(scaleRow(page, 'Ряд · р')).toHaveAttribute('data-state', 'locked')
 
     await completeAttempt(page, FIRST_KEY, 'test')
-    await primaryNavigation(page).getByRole('link', { name: 'Шлях' }).click()
+    await primaryNavigation(page).getByRole('link', { name: 'Мапа' }).click()
 
     // Scenario 2: complete, and the Mastery Rule is what did it.
     await expect(scaleRow(page, 'Ряд · п')).toHaveAttribute('data-state', 'complete')
@@ -329,9 +329,9 @@ test.describe('US3 the path and mastery', () => {
     await completeAttempt(page, FIRST_KEY, 'test', 4)
     await expect(region(page, 'Головні показники')).toContainText(/Помилки\s*4/)
 
-    await primaryNavigation(page).getByRole('link', { name: 'Сьогодні' }).click()
+    await primaryNavigation(page).getByRole('link', { name: 'Головна' }).click()
     await expect(region(page, 'Де ви зараз')).toContainText(/Серія цієї вправи\s*0 з 3/)
-    await primaryNavigation(page).getByRole('link', { name: 'Шлях' }).click()
+    await primaryNavigation(page).getByRole('link', { name: 'Мапа' }).click()
     await expect(scaleRow(page, 'Ряд · п')).not.toHaveAttribute('data-state', 'complete')
     await expect(scaleRow(page, 'Ряд · п')).not.toContainText('Серія')
     await expect(page.getByTestId('keyboard-summary')).toContainText('Наступна до відкриття: п')
@@ -387,7 +387,7 @@ test.describe('US3 the path and mastery', () => {
     expect(await filled('Почати')).not.toBe(primary)
 
     // And the streak did not move: still two, and the key is still locked.
-    await primaryNavigation(page).getByRole('link', { name: 'Шлях' }).click()
+    await primaryNavigation(page).getByRole('link', { name: 'Мапа' }).click()
     await expect(scaleRow(page, 'Ряд · п')).toContainText('Серія 2 з 3')
     await expect(page.getByTestId('keyboard-summary')).toContainText('Наступна до відкриття: п')
   })
@@ -463,7 +463,7 @@ test.describe('US3 the path and mastery', () => {
     // Choosing the first opens exactly its count...
     await page.getByRole('radio', { name: /Ще не друкую наосліп/ }).check()
     await page.getByRole('button', { name: 'Обрати й почати' }).click()
-    await primaryNavigation(page).getByRole('link', { name: 'Шлях' }).click()
+    await primaryNavigation(page).getByRole('link', { name: 'Мапа' }).click()
     expect(await unlockedKeyCount(page)).toBe(never)
 
     // ...and choosing the third later opens more, never fewer.

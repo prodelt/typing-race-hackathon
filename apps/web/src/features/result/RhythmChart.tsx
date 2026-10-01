@@ -78,7 +78,7 @@ export function RhythmChart({ attempt }: { readonly attempt: AttemptSummary }) {
               x={WIDTH - 2}
               y={y(SLOW_INTERVAL_MS) - 4}
               textAnchor="end"
-              fontSize="11"
+              fontSize="12"
               fill="var(--color-ink)"
               className="font-mono"
             >

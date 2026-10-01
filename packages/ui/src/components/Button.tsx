@@ -7,19 +7,28 @@ export type ButtonSize = 'sm' | 'md' | 'lg'
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   readonly variant?: ButtonVariant
   readonly size?: ButtonSize
+  /** A key hint drawn inside the button, in the one `.kbd` style (e.g. `Enter`). */
+  readonly hint?: string
   readonly children: ReactNode
 }
 
 /**
- * Primary is the red pill: the one thing a screen most wants pressed, so a screen should have at
- * most one. Secondary is a light pill with a visible edge, because it often sits on a near-white
- * surface where a borderless light pill would disappear.
+ * One button vocabulary for the whole game client:
+ *
+ * - **primary** — the red pill. The one thing a screen most wants pressed; at most one per screen.
+ *   Red is otherwise reserved for the caret, errors and the awaited key.
+ * - **secondary** — a 2 px ink-outline pill that fills with ink on hover.
+ * - **quiet** — the tertiary action: a text link, underlined, no fill.
+ *
+ * All three carry key hints in the same `.kbd` style.
  */
 const VARIANTS: Record<ButtonVariant, string> = {
-  primary: 'bg-accent text-on-accent border-accent hover:bg-accent-deep hover:border-accent-deep',
+  primary:
+    'btn-primary bg-accent text-on-accent border-accent hover:bg-accent-deep hover:border-accent-deep',
   secondary:
-    'bg-paper-raised text-ink border-hairline-strong hover:border-ink hover:bg-paper-raised',
-  quiet: 'bg-transparent text-ink border-transparent hover:bg-paper-deep',
+    'btn-secondary bg-transparent text-ink border-ink hover:bg-ink hover:text-paper-raised',
+  quiet:
+    'btn-quiet bg-transparent text-ink border-transparent underline underline-offset-4 decoration-[1.5px] hover:text-accent-deep',
   danger: 'bg-transparent text-terracotta-ink border-terracotta hover:bg-terracotta-tint',
 }
 
@@ -32,9 +41,12 @@ const SIZES: Record<ButtonSize, string> = {
 /** The same look for an element that is not a `<button>`: a router link styled as a button. */
 export function buttonClass(variant: ButtonVariant = 'secondary', size: ButtonSize = 'md'): string {
   return cx(
-    'inline-flex items-center justify-center gap-2 font-ui font-semibold tracking-[-0.01em]',
-    'whitespace-nowrap no-underline select-none cursor-pointer',
-    'rounded-[var(--radius-pill)] border-[length:var(--border-hairline)]',
+    'inline-flex items-center justify-center gap-2.5 font-ui font-semibold tracking-[-0.01em]',
+    'whitespace-nowrap select-none cursor-pointer',
+    variant === 'quiet' ? '' : 'no-underline',
+    'rounded-[var(--radius-pill)]',
+    // The outline pill is 2 px of ink in every theme; the others follow the theme's hairline.
+    variant === 'secondary' ? 'border-2' : 'border-[length:var(--border-hairline)]',
     'transition-[background-color,border-color,color,transform] ease-[var(--ease-enter)]',
     'duration-[var(--dur-base)] active:scale-[0.98]',
     'disabled:opacity-50 disabled:pointer-events-none aria-disabled:opacity-50 aria-disabled:pointer-events-none',
@@ -55,15 +67,20 @@ export function buttonClass(variant: ButtonVariant = 'secondary', size: ButtonSi
 export function Button({
   variant = 'secondary',
   size = 'md',
+  hint,
   className,
   type,
+  children,
   ...rest
 }: ButtonProps) {
   return (
-    <button
-      type={type ?? 'button'}
-      className={cx(buttonClass(variant, size), className)}
-      {...rest}
-    />
+    <button type={type ?? 'button'} className={cx(buttonClass(variant, size), className)} {...rest}>
+      {children}
+      {hint === undefined ? null : (
+        <span className="kbd" aria-hidden="true">
+          {hint}
+        </span>
+      )}
+    </button>
   )
 }

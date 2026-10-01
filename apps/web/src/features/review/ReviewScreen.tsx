@@ -187,7 +187,7 @@ function Empty({ fresh }: { readonly fresh: boolean }) {
       <p className="review-empty__body">
         {fresh ? m.review_empty_fresh() : m.review_empty_clean()}
       </p>
-      <Link to={fresh ? '/path' : '/today'} className={buttonClass('primary', 'md')}>
+      <Link to={fresh ? '/path' : '/'} className={buttonClass('primary', 'md')}>
         {fresh ? m.review_empty_path() : m.review_empty_today()}
       </Link>
     </section>

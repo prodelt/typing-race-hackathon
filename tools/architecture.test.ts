@@ -39,6 +39,9 @@ const EXEMPT = [
   // only while no attempt is in progress. Routing it through InputSource would mean giving the
   // typing seam a second job, which is the opposite of what Constitution III asks for.
   'apps/web/src/app/CommandPalette.tsx',
+  // The shell's 1–5 destination keys: the same kind of accelerator, and switched off in Play
+  // Mode and whenever focus is in a field or the typing surface, so it never meets an attempt.
+  'apps/web/src/app/Shell.tsx',
 ]
 
 interface Rule {

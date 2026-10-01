@@ -18,7 +18,8 @@
       "./messages/races/{locale}.json",
       "./messages/academy/{locale}.json",
       "./messages/community/{locale}.json",
-      "./messages/review/{locale}.json"
+      "./messages/review/{locale}.json",
+      "./messages/shell/{locale}.json"
     ]
   }
 }

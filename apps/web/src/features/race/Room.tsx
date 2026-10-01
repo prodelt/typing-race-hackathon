@@ -2,6 +2,7 @@ import { Link, useNavigate } from '@tanstack/react-router'
 import type { KeystrokeEventLog } from '@typing-race/domain'
 import { Button, buttonClass, Index } from '@typing-race/ui'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { useHoldPlayMode } from '../../app/playMode.js'
 import { useAppStore } from '../../app/state/index.js'
 import { m } from '../../paraglide/messages.js'
 import type { ProgressMessage, RaceBackend, RoomConnection, RoomSnapshot } from '../../sync/race.js'
@@ -65,6 +66,8 @@ export function Room({
   const finishedRoom = snapshot?.state === 'finished'
   const now = useServerNow(offset, snapshot !== null && !finishedRoom)
   const phase = phaseOf(snapshot, now, mine, stepBack)
+  // The countdown and the race itself are Play Mode: only the run stays on screen.
+  useHoldPlayMode(phase === 'countdown' || phase === 'racing')
 
   // Broadcast is the fast path; this poll is what makes a missed message harmless.
   const loaded = snapshot !== null

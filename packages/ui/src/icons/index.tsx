@@ -123,6 +123,137 @@ export const IconNextAction = (p: IconProps) => (
   </Icon>
 )
 
+/* ---- The game shell's glyphs (prototype b-red) ------------------------------------------- */
+
+/** Home, rail destination 01. */
+export const IconHome = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M3.5 10.5 12 3.5l8.5 7V20.5h-5.5v-6h-6v6H3.5z" />
+  </Icon>
+)
+
+/** Map, rail destination 02. */
+export const IconMap = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M9 4 3.5 6v14L9 18l6 2 5.5-2V4L15 6 9 4zM9 4v14M15 6v14" />
+  </Icon>
+)
+
+/** Races, rail destination 03: a flag with a dash forward. */
+export const IconFlag = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M5 21V4M5 4h11l-2 4 2 4H5" />
+    <path d="M19 15l2 2-2 2M15 17h6" />
+  </Icon>
+)
+
+/** Community, rail destination 04. */
+export const IconPeople = (p: IconProps) => (
+  <Icon {...p}>
+    <circle cx="9" cy="8" r="3.5" />
+    <path d="M2.5 20c.8-3.5 3.4-5.5 6.5-5.5s5.7 2 6.5 5.5" />
+    <circle cx="17" cy="9" r="2.5" />
+    <path d="M16.5 14.5c2.4.2 4.2 1.8 5 4.5" />
+  </Icon>
+)
+
+/** Profile, rail destination 05. */
+export const IconUser = (p: IconProps) => (
+  <Icon {...p}>
+    <circle cx="12" cy="8" r="4" />
+    <path d="M4 21c1.2-4 4.4-6 8-6s6.8 2 8 6" />
+  </Icon>
+)
+
+/** A streak freeze. */
+export const IconSnow = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M12 2v20M4.5 6.5l15 11M19.5 6.5l-15 11M9 3.5l3 2.5 3-2.5M9 20.5l3-2.5 3 2.5" />
+  </Icon>
+)
+
+/** The race rating. */
+export const IconSwords = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M4 4l11 11M13 17l4-4M16.5 16.5 20 20M20 4 9 15M11 17l-4-4M7.5 16.5 4 20" />
+  </Icon>
+)
+
+/** Sound on. */
+export const IconVolume = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" />
+    <path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11" />
+  </Icon>
+)
+
+/** Sound off. */
+export const IconVolumeOff = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" />
+    <path d="M16 9.5l5 5M21 9.5l-5 5" />
+  </Icon>
+)
+
+/** The settings cog. */
+export const IconCog = (p: IconProps) => (
+  <Icon {...p}>
+    <circle cx="12" cy="12" r="3" />
+    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68 1.65 1.65 0 0 0 10 3.17V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.32 9 1.65 1.65 0 0 0 20.83 10H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+  </Icon>
+)
+
+/** «Про гру»: an i in a circle. */
+export const IconInfo = (p: IconProps) => (
+  <Icon {...p}>
+    <circle cx="12" cy="12" r="9" />
+    <path d="M12 11v6M12 7.5v.5" />
+  </Icon>
+)
+
+/** The streak flame — filled, the one solid glyph. */
+export const IconFlame = ({ size = 24, ...rest }: IconProps) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    aria-hidden="true"
+    focusable="false"
+    {...rest}
+  >
+    <path d="M12 22.5c4.1 0 7.2-2.9 7.2-6.9 0-3.3-2-5.8-3.7-7.6-.3 2-1.3 3.3-2.5 3.7.4-3.7-1.2-7-4.1-9.7.2 3.5-1.6 5.8-3.3 7.8C4.3 11.4 4.8 13 4.8 15.6c0 4 3.1 6.9 7.2 6.9z" />
+  </svg>
+)
+
+/** The Google "G", in its own colours. */
+export const IconGoogle = ({ size = 16, ...rest }: IconProps) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    aria-hidden="true"
+    focusable="false"
+    {...rest}
+  >
+    <path
+      fill="#4285F4"
+      d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.4h6.5a5.6 5.6 0 0 1-2.4 3.6v3h3.9c2.2-2.1 3.5-5.1 3.5-8.7z"
+    />
+    <path
+      fill="#34A853"
+      d="M12 24c3.2 0 6-1.1 7.9-2.9l-3.9-3c-1.1.7-2.4 1.2-4 1.2-3.1 0-5.7-2.1-6.6-4.9h-4v3.1A12 12 0 0 0 12 24z"
+    />
+    <path fill="#FBBC05" d="M5.4 14.4a7.2 7.2 0 0 1 0-4.7V6.6h-4a12 12 0 0 0 0 10.8z" />
+    <path
+      fill="#EA4335"
+      d="M12 4.8c1.8 0 3.3.6 4.6 1.8l3.4-3.4A12 12 0 0 0 1.4 6.6l4 3.1C6.3 6.9 8.9 4.8 12 4.8z"
+    />
+  </svg>
+)
+
 /**
  * The product mark: a caret resting on a baseline. It reads at 16px and at 96px, which is the
  * only real requirement — it appears in the browser tab and on the product page and nowhere else.

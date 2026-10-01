@@ -1,278 +1,983 @@
 /*
- * The shell: header, main column, footer.
+ * The game shell (prototype b-red): a fixed full-height grid of rail, status bar and stage.
  *
- * The header follows the brand site's: 72 px tall on the canvas colour, wordmark left, a quiet
- * text nav pushed right, then the language switch and one red pill. No boxes around links: the
- * current destination is marked by weight and a small red square, the way the brand site marks
- * the current section.
+ * Blocks are square, buttons fully round, and the active rail item carries the signature corner
+ * (`0 16px 0 0` at rail scale, `0 96px 0 0` on the big primary blocks). Red is reserved for the
+ * caret, errors, the awaited key and the primary action — here, only the active destination and
+ * the brand mark wear it.
  */
 
-.shell {
+.frame {
+  --rail-w: 108px;
+  --bar-h: 72px;
+  --pad: 20px;
+  --gap: 8px;
+  --frame-bg: var(--color-paper-raised);
+  --play-ms: 280ms;
+
+  position: fixed;
+  inset: 0;
+  display: grid;
+  grid-template-columns: var(--rail-w) minmax(0, 1fr);
+  grid-template-rows: var(--bar-h) minmax(0, 1fr);
+  background: var(--frame-bg);
+  color: var(--color-ink);
+  font-size: 15px;
+  line-height: 1.4;
+  overflow: hidden;
+}
+
+@media (max-width: 1200px), (max-height: 820px) {
+  .frame {
+    --rail-w: 92px;
+    --bar-h: 64px;
+    --pad: 14px;
+  }
+}
+
+.skip {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  z-index: 80;
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: var(--color-ink);
+  color: var(--color-paper-raised);
+  font-weight: 600;
+  transform: translateY(-200%);
+}
+
+.skip:focus-visible {
+  transform: none;
+}
+
+/* ---- Play Mode: the rail and the bar leave, the stage takes the whole screen -------------
+ *
+ * The grid collapses **at once**, on Start, so the run's layout is final before the first
+ * keystroke; the rail and the bar then leave as overlays, sliding out over the stage. Nothing
+ * that animates here changes the size of anything the learner types into. */
+
+.frame__rail {
+  grid-row: 1 / 3;
+  grid-column: 1;
+  min-width: 0;
+  overflow: hidden;
+  z-index: 6;
+  transition:
+    transform var(--play-ms) var(--ease-enter),
+    opacity var(--play-ms) var(--ease-enter),
+    visibility 0s linear 0s;
+}
+
+.frame__bar {
+  grid-row: 1;
+  grid-column: 2;
+  min-width: 0;
+  min-height: 0;
+  position: relative;
+  z-index: 5;
+  transition:
+    transform var(--play-ms) var(--ease-enter),
+    opacity var(--play-ms) var(--ease-enter),
+    visibility 0s linear 0s;
+}
+
+.frame[data-play] {
+  grid-template-columns: 0 minmax(0, 1fr);
+  grid-template-rows: 0 minmax(0, 1fr);
+}
+
+.frame[data-play] .frame__rail,
+.frame[data-play] .frame__bar {
+  position: absolute;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    transform var(--play-ms) var(--ease-exit),
+    opacity var(--play-ms) var(--ease-exit),
+    visibility 0s linear var(--play-ms);
+}
+
+.frame[data-play] .frame__rail {
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: var(--rail-w);
+  transform: translateX(-100%);
+}
+
+.frame[data-play] .frame__bar {
+  top: 0;
+  left: var(--rail-w);
+  right: 0;
+  height: var(--bar-h);
+  transform: translateY(-100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .frame {
+    --play-ms: 0.01ms;
+  }
+}
+
+:root[data-motion="off"] .frame,
+:root[data-motion="reduced"] .frame {
+  --play-ms: 0.01ms;
+}
+
+/* ---- Rail -------------------------------------------------------------------------------- */
+
+.rail {
   display: flex;
   flex-direction: column;
-  min-height: 100dvh;
-  background: var(--color-paper);
-  color: var(--color-ink);
-  overflow-x: clip;
+  height: 100%;
+  padding: 0 10px 12px;
+  background: var(--frame-bg);
 }
 
-/* One column width for every app screen, header included, so the wordmark lines up with the
-   content below it. The landing page is wider, as the brand site is. */
-.shell-container {
-  width: 100%;
-  max-width: calc(72rem + 2 * var(--gutter));
-  margin-inline: auto;
-  padding-inline: var(--gutter);
-}
-
-.shell[data-landing] .shell-container {
-  max-width: none;
-}
-
-/* ---- Header ------------------------------------------------------------------------------ */
-
-.shell-head {
-  position: relative;
-  z-index: 30;
-  background: var(--color-paper);
-}
-
-.shell-head__inner {
-  display: flex;
-  align-items: center;
-  gap: 32px;
-  height: var(--head-h);
-}
-
-.shell-head__logo {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  color: var(--color-ink);
-  text-decoration: none;
-  border-radius: 6px;
-}
-
-.shell-head__logo [data-wordmark-caret] {
-  transition: transform var(--dur-base) var(--ease-enter);
-}
-
-.shell-head__logo:hover [data-wordmark-caret] {
-  transform: translate(0.12em, 0.04em);
-}
-
-.shell-nav {
-  display: flex;
-  align-items: center;
-  gap: clamp(16px, 1.9vw, 28px);
-  margin-left: auto;
-}
-
-.shell-nav__link,
-.shell-head__settings {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  min-height: 40px;
-  font-size: 15px;
-  font-weight: 500;
-  letter-spacing: -0.01em;
-  color: var(--color-ink);
-  text-decoration: none;
-  white-space: nowrap;
-  transition: color var(--dur-base) var(--ease-enter);
-}
-
-a.shell-nav__link:hover,
-a.shell-head__settings:hover {
-  color: var(--color-terracotta-ink);
-}
-
-/* The current destination: heavier, and a small red square underneath. */
-.shell-nav__link[data-active],
-.shell-head__settings[data-active] {
-  font-weight: 600;
-}
-
-.shell-nav__link[data-active]::after,
-.shell-head__settings[data-active]::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  bottom: 2px;
-  width: 5px;
-  height: 5px;
-  margin-left: -2.5px;
-  background: var(--color-accent);
-}
-
-.shell-head__settings {
-  gap: 8px;
-}
-
-.shell-head__settings svg {
+.rail__brand {
+  height: var(--bar-h);
+  display: grid;
+  place-items: center;
   flex: none;
 }
 
-.shell-nav__link--later {
-  color: var(--color-nav-dimmed);
-  cursor: default;
+.rail__mark {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  border-radius: 0 16px 0 0;
+  font: 700 18px / 1 var(--font-display);
+  letter-spacing: -0.06em;
+  text-decoration: none;
 }
 
-.shell-head__right {
+.rail__mark:focus-visible {
+  outline-color: var(--color-ink);
+}
+
+.rail__nav {
   display: flex;
-  align-items: center;
-  gap: 20px;
-  margin-left: 12px;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 6px;
 }
 
-.shell-lang {
+.rail__item {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 5px;
+  padding: 10px 4px;
+  color: var(--color-ink-soft);
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  border-radius: 0;
+  transition:
+    background-color 200ms var(--ease-enter),
+    color 100ms linear;
+}
+
+.rail__n {
+  justify-self: start;
+  margin-left: 4px;
+  font: 500 12px / 1 var(--font-display);
+  letter-spacing: -0.03em;
+  color: var(--color-muted);
+}
+
+.rail__icon {
+  margin-top: -4px;
+  stroke-width: 1.8;
+}
+
+.rail__item:hover {
+  background: var(--color-paper);
+}
+
+.rail__item[aria-current="page"] {
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  border-radius: 0 16px 0 0;
+}
+
+.rail__item[aria-current="page"] .rail__n {
+  color: var(--color-accent-pale);
+}
+
+.rail__item[aria-current="page"]::before {
+  content: "";
+  position: absolute;
+  left: -10px;
+  top: 0;
+  bottom: 0;
+  width: 5px;
+  background: var(--color-accent);
+}
+
+.rail__item[aria-current="page"]:focus-visible {
+  outline-color: var(--color-ink);
+}
+
+.rail__foot {
+  margin-top: auto;
   display: flex;
-  gap: 2px;
+  flex-direction: column;
+  gap: 6px;
 }
 
-.shell-lang__option {
-  min-width: 32px;
-  min-height: 32px;
-  padding: 0 4px;
-  border: 0;
-  border-radius: 6px;
-  background: none;
-  font: inherit;
-  font-size: 14px;
+.season {
+  background: var(--color-paper);
+  padding: 10px 10px 9px;
+  border-radius: 0 16px 0 0;
+}
+
+.season__lab {
+  display: block;
+  font-size: 12px;
   font-weight: 500;
   color: var(--color-muted);
-  cursor: pointer;
-  transition: color var(--dur-base) var(--ease-enter);
 }
 
-.shell-lang__option:hover {
-  color: var(--color-ink);
+.season__n {
+  display: block;
+  margin: 4px 0;
+  font: 500 22px / 1 var(--font-display);
+  letter-spacing: -0.04em;
+  /* The red as *text*: it lifts to a readable coral in the dark theme. */
+  color: var(--color-terracotta);
 }
 
-.shell-lang__option[aria-pressed="true"] {
+.season small {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-ink-soft);
+}
+
+.season__bar {
+  display: block;
+  position: relative;
+  height: 4px;
+  margin-top: 7px;
+  background: var(--color-accent-tint);
+}
+
+.season__bar b {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: var(--color-ink);
+}
+
+.online {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0;
+  padding: 4px 6px;
+  font-size: 12px;
+  color: var(--color-muted);
+  white-space: nowrap;
+}
+
+.online b {
   color: var(--color-ink);
   font-weight: 600;
+}
+
+.online__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  flex: none;
+}
+
+/* ---- Status bar -------------------------------------------------------------------------- */
+
+.bar {
+  display: flex;
+  align-items: center;
+  gap: clamp(14px, 2vw, 30px);
+  height: 100%;
+  padding: 0 calc(var(--pad) + 4px) 0 var(--pad);
+  background: var(--frame-bg);
+  min-width: 0;
+}
+
+.bar .num {
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  font-size: 20px;
+}
+
+.who {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  background: var(--color-accent-pale);
+  color: var(--color-accent-deep);
+  font: 600 15px / 1 var(--font-display);
+  letter-spacing: -0.04em;
+}
+
+.who__name {
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.who__sub {
+  font-size: 12.5px;
+  color: var(--color-muted);
+  white-space: nowrap;
+}
+
+.sb {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  white-space: nowrap;
+  outline-offset: 6px;
+  border-radius: 2px;
+}
+
+.sb__col {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sb__top {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.sb__lab {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--color-ink-soft);
+}
+
+.lvl .num {
+  color: var(--color-terracotta);
+}
+
+.xp {
+  position: relative;
+  width: clamp(84px, 8vw, 130px);
+  height: 6px;
+  background: var(--color-accent-tint);
+  overflow: hidden;
+}
+
+.xp__fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: var(--color-accent);
+  transition: width 900ms var(--ease-enter);
+}
+
+.xp__txt {
+  font-size: 12px;
+  color: var(--color-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.flame {
+  color: var(--color-accent);
+  flex: none;
+}
+
+.freeze {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 20px;
+  padding: 0 8px 0 6px;
+  border-radius: 999px;
+  background: var(--color-paper-deep);
+  color: var(--color-ink-soft);
+  font-size: 12px;
+  font-weight: 500;
+  align-self: flex-start;
+}
+
+.freeze svg {
+  stroke-width: 2;
+}
+
+.swords {
+  flex: none;
+}
+
+.bar__right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.seg {
+  display: flex;
+  padding: 3px;
+  border-radius: 999px;
+  background: var(--color-paper);
+}
+
+.seg button {
+  height: 34px;
+  padding: 0 13px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-muted);
+  cursor: pointer;
+  transition:
+    background-color 200ms var(--ease-enter),
+    color 100ms linear;
+}
+
+.seg button[aria-pressed="true"] {
+  background: var(--color-ink);
+  color: var(--color-paper-raised);
   cursor: default;
 }
 
-/* During an attempt the header stays where it is and steps back. The wordmark is left alone:
-   dimming the one link that still works would make it look broken. */
-.shell-head[data-dimmed] .shell-nav,
-.shell-head[data-dimmed] .shell-head__right {
-  opacity: 0.45;
-  transition: opacity var(--dur-base) var(--ease-standard);
+.iconbtn {
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: var(--color-paper);
+  color: var(--color-ink-soft);
+  cursor: pointer;
+  transition: background-color 200ms var(--ease-enter);
 }
 
-.shell-head[data-dimmed] .shell-nav__link,
-.shell-head[data-dimmed] .shell-head__settings {
-  color: var(--color-nav-dimmed);
+.iconbtn:hover,
+.iconbtn[aria-current="page"] {
+  background: var(--color-paper-deep);
+  color: var(--color-ink);
 }
 
-.shell-head__note {
-  margin: 0;
-  padding: 6px var(--gutter);
-  border-top: var(--border-hairline) solid var(--color-hairline);
-  text-align: center;
+.gchip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 16px 0 12px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--color-ink-soft);
+  font: inherit;
   font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  box-shadow: inset 0 0 0 1.5px var(--color-hairline);
+  cursor: default;
+}
+
+.gchip__short {
+  display: none;
+}
+
+/* ---- Tooltips: a visible bubble on hover and on keyboard focus --------------------------- */
+
+.tip {
+  position: relative;
+}
+
+.tip__bubble {
+  position: absolute;
+  z-index: 40;
+  left: 50%;
+  top: calc(100% + 10px);
+  width: max-content;
+  max-width: 260px;
+  padding: 8px 11px;
+  border-radius: 0 10px 0 0;
+  background: var(--color-ink);
+  color: var(--color-paper-raised);
+  font: 500 12.5px / 1.4 var(--font-ui);
+  letter-spacing: 0;
+  text-align: left;
+  white-space: normal;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transform: translate(-50%, -4px);
+  transition:
+    opacity 140ms var(--ease-enter),
+    transform 140ms var(--ease-enter),
+    visibility 0s linear 140ms;
+}
+
+.tip__bubble--end {
+  left: auto;
+  right: 0;
+  transform: translateY(-4px);
+}
+
+.tip:hover > .tip__bubble,
+.tip:focus-visible > .tip__bubble,
+.tip:focus-within > .tip__bubble {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, 0);
+  transition-delay: 0s;
+}
+
+.tip:hover > .tip__bubble--end,
+.tip:focus-visible > .tip__bubble--end {
+  transform: none;
+}
+
+/* ---- The «Про гру» menu: a native popover under the bar ----------------------------------- */
+
+.menu {
+  position: fixed;
+  inset: auto;
+  top: calc(var(--bar-h, 72px) + 4px);
+  right: 20px;
+  margin: 0;
+  min-width: 240px;
+  padding: 14px 8px 8px;
+  border: 0;
+  border-radius: 0 24px 0 0;
+  background: var(--color-paper-raised);
+  color: var(--color-ink);
+  box-shadow:
+    0 24px 48px -20px rgb(20 20 20 / 30%),
+    0 0 0 1px var(--color-hairline);
+}
+
+.menu__title {
+  margin: 0 12px 6px;
+  font-size: 12.5px;
+  font-weight: 500;
   color: var(--color-muted);
 }
 
-/* Narrow windows get the notice, not the app; the header keeps only the wordmark. */
-@media (max-width: 1023px) {
-  .shell-nav,
-  .shell-head__right {
+.menu ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.menu a {
+  display: block;
+  padding: 10px 12px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-ink);
+  text-decoration: none;
+}
+
+.menu a:hover {
+  background: var(--color-paper);
+}
+
+/* ---- Stage ------------------------------------------------------------------------------- */
+
+.stage {
+  grid-row: 2;
+  grid-column: 2;
+  min-width: 0;
+  min-height: 0;
+  padding: 0 var(--pad) var(--pad) 0;
+  background: var(--frame-bg);
+}
+
+.stage__in {
+  position: relative;
+  isolation: isolate;
+  height: 100%;
+  overflow: hidden;
+  background: var(--color-paper);
+  view-transition-name: main;
+}
+
+.stage__scroll {
+  position: absolute;
+  inset: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+
+.stage__content {
+  width: 100%;
+  max-width: calc(72rem + 2 * clamp(16px, 2.6vw, 40px));
+  margin-inline: auto;
+  padding: clamp(20px, 3vh, 32px) clamp(16px, 2.6vw, 40px) 48px;
+}
+
+.frame[data-play] .stage {
+  padding: 0;
+}
+
+.frame[data-play] .stage__in {
+  view-transition-name: none;
+}
+
+.frame[data-play] .stage__content {
+  max-width: calc(1240px + 2 * clamp(16px, 2.6vw, 40px));
+  padding-top: clamp(24px, 5vh, 56px);
+}
+
+/* The tab strip of Map and Community. */
+.tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 20px;
+}
+
+.tabs__item {
+  display: inline-flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-ink-soft);
+  background: color-mix(in srgb, var(--color-paper-raised) 60%, transparent);
+  text-decoration: none;
+  transition: background-color 200ms var(--ease-enter);
+}
+
+.tabs__item:hover {
+  background: var(--color-paper-raised);
+}
+
+.tabs__item[aria-current="page"] {
+  background: var(--color-ink);
+  color: var(--color-paper-raised);
+}
+
+/* ---- The live gradient: slow, soft, and still in Play ------------------------------------ */
+
+.gp-layer {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  contain: strict;
+}
+
+.gp-blob {
+  position: absolute;
+  display: block;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+  animation-fill-mode: both;
+}
+
+.gp-grain {
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+}
+
+.frame[data-play] .gp-blob {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gp-blob {
+    animation-play-state: paused;
+  }
+}
+
+/* `!important` because each blob's timing is an inline style. */
+:root[data-motion="off"] .gp-blob,
+:root[data-motion="reduced"] .gp-blob {
+  animation: none !important;
+}
+
+/* The pink gradient belongs to the light theme; dark and low-vision keep a flat canvas. */
+:root[data-theme="dark"] .gp-layer,
+:root[data-theme="low-vision"] .gp-layer {
+  display: none;
+}
+
+:root[data-theme="dark"] .frame,
+:root[data-theme="low-vision"] .frame {
+  --frame-bg: var(--color-paper-deep);
+}
+
+@keyframes gp-drift-0 {
+  0% {
+    transform: translate(-50%, -50%) rotate(0) scale(1);
+  }
+  50% {
+    transform: translate(-37%, -60%) rotate(34deg) scale(1.12);
+  }
+  100% {
+    transform: translate(-58%, -42%) rotate(68deg) scale(0.94);
+  }
+}
+
+@keyframes gp-drift-1 {
+  0% {
+    transform: translate(-50%, -50%) rotate(0) scale(1.05);
+  }
+  50% {
+    transform: translate(-63%, -41%) rotate(-30deg) scale(0.92);
+  }
+  100% {
+    transform: translate(-44%, -57%) rotate(-58deg) scale(1.1);
+  }
+}
+
+@keyframes gp-drift-2 {
+  0% {
+    transform: translate(-50%, -50%) rotate(18deg) scale(0.95);
+  }
+  50% {
+    transform: translate(-42%, -38%) rotate(-12deg) scale(1.14);
+  }
+  100% {
+    transform: translate(-60%, -58%) rotate(40deg) scale(1);
+  }
+}
+
+@keyframes gp-drift-3 {
+  0% {
+    transform: translate(-50%, -50%) rotate(-14deg) scale(1.1);
+  }
+  50% {
+    transform: translate(-56%, -63%) rotate(24deg) scale(0.9);
+  }
+  100% {
+    transform: translate(-40%, -47%) rotate(-40deg) scale(1.04);
+  }
+}
+
+/* ---- The keyboard notice (phones, training routes only) ----------------------------------- */
+
+.keyboard-needed {
+  display: none;
+}
+
+/* ---- Compact (1024×768) ------------------------------------------------------------------- */
+
+@media (max-width: 1200px), (max-height: 820px) {
+  .who__sub {
+    display: none;
+  }
+  .bar {
+    gap: 16px;
+  }
+  .rail__item {
+    padding: 8px 2px;
+  }
+  .gchip {
+    padding: 0 14px 0 12px;
+  }
+  .gchip__short {
+    display: inline;
+  }
+  .gchip__full {
     display: none;
   }
 }
 
-/* Between 1024 and 1240 px the six destinations, the switch and the pill share one row. */
-@media (max-width: 1240px) {
-  .shell-head__inner {
-    gap: 20px;
+@media (max-width: 1100px) {
+  .who__text {
+    display: none;
   }
-  .shell-nav__link,
-  .shell-head__settings {
-    font-size: 14px;
+}
+
+/* ---- Phone: the rail becomes a bottom dock ------------------------------------------------ */
+
+@media (max-width: 767px) {
+  .frame {
+    --bar-h: 56px;
+    --dock-h: 64px;
+    --pad: 0px;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: var(--bar-h) minmax(0, 1fr) var(--dock-h);
   }
-  .shell-nav {
+
+  .frame[data-play] {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: 0 minmax(0, 1fr) 0;
+  }
+
+  .frame__rail {
+    grid-row: 3;
+    grid-column: 1;
+    border-top: 1px solid var(--color-hairline);
+  }
+
+  .frame__bar {
+    grid-column: 1;
+  }
+
+  .frame[data-play] .frame__rail {
+    top: auto;
+    right: 0;
+    width: auto;
+    height: var(--dock-h);
+    transform: translateY(100%);
+  }
+
+  .frame[data-play] .frame__bar {
+    left: 0;
+  }
+
+  .stage {
+    grid-column: 1;
+  }
+
+  .rail {
+    flex-direction: row;
+    padding: 0;
+  }
+
+  .rail__brand,
+  .rail__foot,
+  .rail__n {
+    display: none;
+  }
+
+  .rail__nav {
+    flex-direction: row;
+    flex: 1;
+    gap: 0;
+    padding: 0;
+  }
+
+  .rail__item {
+    flex: 1;
+    align-content: center;
+    gap: 3px;
+    padding: 6px 2px;
+    font-size: 12px;
+  }
+
+  .rail__icon {
+    margin-top: 0;
+  }
+
+  .rail__item[aria-current="page"]::before {
+    display: none;
+  }
+
+  .bar {
     gap: 12px;
+    padding: 0 12px;
   }
-  .shell-head__right {
-    gap: 10px;
-    margin-left: 0;
+
+  .who,
+  .bar .sb:not(.lvl),
+  .seg,
+  .gchip,
+  .xp__txt {
+    display: none;
   }
-  .shell-head__logo > span {
-    font-size: 17px;
+
+  .stage__content {
+    padding: 20px 16px 40px;
   }
-  /* The settings link keeps its name for assistive tech and shows only its icon. */
-  .shell-head__settings {
-    justify-content: center;
-    min-width: 36px;
+
+  .frame[data-needs-keyboard] .stage__scroll {
+    display: none;
   }
-  .shell-head__settings-label {
+
+  .frame[data-needs-keyboard] .keyboard-needed {
     position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 16px;
+    padding: 32px 24px;
+  }
+
+  .keyboard-needed__mark {
+    width: 52px;
+    height: 52px;
+    display: grid;
+    place-items: center;
+    background: var(--color-accent);
+    color: var(--color-on-accent);
+    border-radius: 0 18px 0 0;
+    font: 700 20px / 1 var(--font-display);
+    letter-spacing: -0.06em;
+  }
+
+  .keyboard-needed h1 {
+    margin: 0;
+    font: 600 26px / 1.15 var(--font-display);
+    letter-spacing: -0.04em;
+  }
+
+  .keyboard-needed p {
+    margin: 0;
+    max-width: 30em;
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--color-ink-soft);
+  }
+
+  .keyboard-needed__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  .keyboard-needed__links a {
+    display: inline-flex;
+    align-items: center;
+    height: 44px;
+    padding: 0 18px;
+    border-radius: 999px;
+    box-shadow: inset 0 0 0 2px var(--color-ink);
+    color: var(--color-ink);
+    font-weight: 600;
+    text-decoration: none;
   }
 }
 
-/* ---- Main -------------------------------------------------------------------------------- */
+/* ---- The product page, outside the frame ------------------------------------------------- */
 
-.shell-main {
-  flex: 1;
-  padding-top: 32px;
-  padding-bottom: 72px;
-}
-
-.shell[data-landing] .shell-main {
-  padding: 0;
-}
-
-/* ---- Footer ------------------------------------------------------------------------------ */
-
-.shell-foot {
-  border-top: var(--border-hairline) solid var(--color-hairline);
-}
-
-.shell-foot__inner {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px 28px;
-  padding-block: 22px 26px;
-  font-size: 14px;
-}
-
-.shell-foot__links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px 24px;
-}
-
-.shell-foot__links a {
-  display: inline-flex;
-  align-items: center;
-  min-height: 32px;
-  font-weight: 500;
-  color: var(--color-ink);
-  text-decoration: none;
-  text-underline-offset: 4px;
-  transition:
-    color var(--dur-base) var(--ease-enter),
-    text-underline-offset var(--dur-base) var(--ease-enter);
-}
-
-.shell-foot__links a:hover {
-  color: var(--color-terracotta-ink);
-  text-decoration: underline;
-  text-underline-offset: 6px;
-}
-
-.shell-foot__note {
-  margin-left: auto;
-  color: var(--color-muted);
+.landing {
+  min-height: 100dvh;
+  background: var(--color-paper);
 }
