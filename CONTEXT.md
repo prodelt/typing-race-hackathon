@@ -8,6 +8,8 @@ Comprehensive domain model and conceptual glossary for the Typing-Race touch-typ
   _Avoid_: Guest, anonymous user, visitor
 - **Account (Акаунт)**: An optional Google sign-in attached to a Learner, so their attempts, settings and profile follow them to any device. Signing in never discards progress made before it.
   _Avoid_: user, login, profile (the profile is what an Account shows, not the Account itself)
+- **Nick (Нік)**: The only name of a Learner that other people ever see (races, groups, leaderboards); generated for a learner without an Account, editable, never taken from Google.
+  _Avoid_: username, display name
 
 ## Pedagogical Core Concepts
 
