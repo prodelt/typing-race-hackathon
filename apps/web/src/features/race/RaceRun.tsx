@@ -58,7 +58,6 @@ export function RaceRun({
   const liveRef = useRef(live)
   const sourceRef = useRef<InputSource | null>(null)
   const [engine, setEngine] = useState<Engine | null>(null)
-  const spmRef = useRef<HTMLSpanElement>(null)
   const callbacks = useRef({ onProgress, onFinish, onIdle })
   callbacks.current = { onProgress, onFinish, onIdle }
 
@@ -111,7 +110,6 @@ export function RaceRun({
       const view = engine.view
       if (view.state !== 'running') return
       const spm = speedOf(view.cursor, view.elapsedMs)
-      if (spmRef.current !== null) spmRef.current.textContent = String(Math.round(spm))
       // A wrong key is still a racer at the keyboard; only silence counts as idle.
       const activity = view.cursor + view.errorCount
       if (activity !== lastActivity) {
@@ -133,7 +131,7 @@ export function RaceRun({
 
   return (
     // biome-ignore lint/a11y/useKeyWithClickEvents lint/a11y/noStaticElementInteractions: a click anywhere on the race only returns focus to the hidden textarea, which is itself the keyboard path
-    <div className="race-run" onClick={refocus}>
+    <div className="race-run play__line" onClick={refocus}>
       <textarea
         ref={textareaRef}
         data-testid="typing-input"
@@ -149,12 +147,6 @@ export function RaceRun({
           if (liveRef.current && document.hasFocus()) textareaRef.current?.focus()
         }}
       />
-      <div className="race-run__meter" aria-live="off">
-        <span ref={spmRef} className="race-run__spm" data-testid="race-live-spm">
-          0
-        </span>
-        <span className="race-run__spm-unit">{m.race_live_spm()}</span>
-      </div>
       <div className="race-run__line" data-live={live || undefined}>
         {engine === null ? null : <TypingLine engine={engine} text={text} sizePx={sizePx} />}
       </div>

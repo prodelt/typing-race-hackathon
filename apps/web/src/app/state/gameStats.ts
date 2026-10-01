@@ -17,6 +17,7 @@ import {
 import type { AttemptSummary, LayoutId, StartingLevelChoice } from '@typing-race/domain'
 import { useMemo } from 'react'
 import { useAcademyCourse } from '../../features/academy/data.js'
+import { useRaceStanding } from './raceStanding.js'
 import { useAppStore } from './store.js'
 
 /**
@@ -36,7 +37,8 @@ export interface GameStats {
     readonly goalMinutes: number
     readonly last7: readonly { readonly date: string; readonly minutes: number }[] // oldest first, ISO yyyy-mm-dd, today last
   }
-  readonly raceRating: number | null // null until races compute a rating
+  /** The server-computed Race Rating, or `null` while there is none to show (`raceStanding.ts`). */
+  readonly raceRating: number | null
 }
 
 /** The learner's local calendar day of an instant, honouring the zone's offset at that instant. */
@@ -55,6 +57,8 @@ export interface GameStatsInput {
   /** Today's local day key, `yyyy-mm-dd`. */
   readonly today: string
   readonly dayOf?: (ms: number) => string
+  /** The Race Rating the server last reported, if any. */
+  readonly raceRating?: number | null
   /** Settings carry no goal yet, so this defaults to the constant. */
   readonly goalMinutes?: number
 }
@@ -103,7 +107,7 @@ export function deriveGameStats(input: GameStatsInput): GameStats {
       dayOf,
       goalMinutes: input.goalMinutes ?? DEFAULT_GOAL_MINUTES,
     }),
-    raceRating: null,
+    raceRating: input.raceRating ?? null,
   }
 }
 
@@ -119,9 +123,20 @@ export function useGameStats(): GameStats {
   const courseState = useAcademyCourse(language)
   const academyCourse = courseState.status === 'ready' ? courseState.course : null
   const today = localDay(Date.now())
+  const raceRating = useRaceStanding((state) =>
+    state.standing.kind === 'rated' ? state.standing.rating : null,
+  )
 
   return useMemo(
-    () => deriveGameStats({ attempts, layoutId, startingLevelChoice, academyCourse, today }),
-    [attempts, layoutId, startingLevelChoice, academyCourse, today],
+    () =>
+      deriveGameStats({
+        attempts,
+        layoutId,
+        startingLevelChoice,
+        academyCourse,
+        today,
+        raceRating,
+      }),
+    [attempts, layoutId, startingLevelChoice, academyCourse, today, raceRating],
   )
 }

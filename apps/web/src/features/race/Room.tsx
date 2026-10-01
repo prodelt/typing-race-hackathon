@@ -1,22 +1,24 @@
 import { Link, useNavigate } from '@tanstack/react-router'
 import type { KeystrokeEventLog } from '@typing-race/domain'
-import { Button, buttonClass, Index } from '@typing-race/ui'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { Button, buttonClass } from '@typing-race/ui'
+import { type KeyboardEvent, useCallback, useEffect, useRef, useState } from 'react'
 import { useHoldPlayMode } from '../../app/playMode.js'
 import { useAppStore } from '../../app/state/index.js'
 import { m } from '../../paraglide/messages.js'
 import type { ProgressMessage, RaceBackend, RoomConnection, RoomSnapshot } from '../../sync/race.js'
+import '../exercise/play.css'
 import { type Mine, useServerNow } from './backend.js'
 import { describe } from './Lobby.js'
 import { RaceRun } from './RaceRun.js'
 import { Results } from './Results.js'
-import { lanesOf, Track } from './Track.js'
+import { lanesOf, placeOf, Track } from './Track.js'
 
 /** How long a quick-match room gathers once a second racer is in, and how long a lone racer waits. */
 const GATHER_MS = 3_000
 const ALONE_MS = 20_000
 /** A safety net under Broadcast: a missed message costs at most this long. */
 const POLL_MS = 2_500
+const CAPACITY = 5
 
 type Phase = 'loading' | 'gathering' | 'countdown' | 'racing' | 'watching' | 'results'
 
@@ -27,6 +29,7 @@ export function Room({
   readonly backend: RaceBackend
   readonly roomId: string
 }) {
+  const navigate = useNavigate()
   const [snapshot, setSnapshot] = useState<RoomSnapshot | null>(null)
   const [loadError, setLoadError] = useState<string | null>(null)
   const [progress, setProgress] = useState<Record<string, ProgressMessage>>({})
@@ -66,8 +69,8 @@ export function Room({
   const finishedRoom = snapshot?.state === 'finished'
   const now = useServerNow(offset, snapshot !== null && !finishedRoom)
   const phase = phaseOf(snapshot, now, mine, stepBack)
-  // The countdown and the race itself are Play Mode: only the run stays on screen.
-  useHoldPlayMode(phase === 'countdown' || phase === 'racing')
+  // The countdown, the race and watching it are Play Mode: only the run stays on screen.
+  useHoldPlayMode(phase === 'countdown' || phase === 'racing' || phase === 'watching')
 
   // Broadcast is the fast path; this poll is what makes a missed message harmless.
   const loaded = snapshot !== null
@@ -123,6 +126,12 @@ export function Room({
     void backend.becomeSpectator(roomId).then(() => refresh())
   }, [backend, roomId, refresh])
 
+  /** Esc: leave the race. The seat steps back to watching first, so the room need not wait. */
+  const leave = useCallback(() => {
+    void backend.becomeSpectator(roomId).catch(() => undefined)
+    void navigate({ to: '/races' })
+  }, [backend, roomId, navigate])
+
   if (loadError !== null && snapshot === null) {
     return (
       <div className="race-calm">
@@ -147,39 +156,80 @@ export function Room({
 
   const startsAt = Date.parse(snapshot.startsAt ?? '')
   const remaining = Math.ceil((startsAt - now) / 1000)
+  const length = snapshot.text === null ? undefined : Array.from(snapshot.text).length
+  const place = placeOf(lanes)
+  const racing = lanes.length
+
+  const onKeyDown = (event: KeyboardEvent) => {
+    if (event.key !== 'Escape') return
+    event.preventDefault()
+    leave()
+  }
 
   return (
-    <div className="race-room" data-phase={phase}>
-      <RoomHead snapshot={snapshot} />
-      {phase === 'countdown' ? (
-        <div
-          className="race-countdown"
-          role="timer"
-          aria-live="assertive"
-          data-testid="race-countdown"
-        >
-          <span key={remaining} className="race-countdown__n">
-            {Math.max(1, remaining)}
-          </span>
+    // biome-ignore lint/a11y/noStaticElementInteractions: Escape reaches the leave from the hidden textarea through this wrapper; the same action is a real button in the HUD
+    <div className="play race-play" data-phase={phase} onKeyDown={onKeyDown}>
+      <section className="play-hud" aria-label={m.race_hud_label()}>
+        <div className="play-hud__left">
+          <Button
+            variant="secondary"
+            size="sm"
+            hint="Esc"
+            aria-keyshortcuts="Escape"
+            onClick={leave}
+          >
+            {m.race_leave()}
+          </Button>
         </div>
-      ) : null}
-      {phase === 'watching' ? (
-        <p className="race-note" role="status">
-          {stepBack ? m.race_watching_idle() : m.race_watching()}
-        </p>
-      ) : null}
-      {snapshot.text !== null && phase !== 'watching' ? (
-        <RaceRun
-          text={snapshot.text}
-          language={snapshot.language}
-          live={phase === 'racing'}
-          sizePx={sizePx}
-          onProgress={onProgress}
-          onFinish={onFinish}
-          onIdle={onIdle}
-        />
-      ) : null}
-      <Track lanes={lanes} caption={m.race_track_caption()} />
+        <div className="play-hud__mid">
+          <p>
+            <b>{snapshot.visibility === 'quick' ? m.race_quick_title() : m.race_private_title()}</b>
+            {' · '}
+            {snapshot.language === 'uk' ? 'ЙЦУКЕН' : 'QWERTY'}
+          </p>
+          {phase === 'racing' && place !== null && racing > 1 ? (
+            <p className="race-play__place" data-testid="race-place">
+              {m.race_hud_place()} <b>{place}</b> / {racing}
+            </p>
+          ) : null}
+        </div>
+        <div className="play-hud__right" />
+      </section>
+
+      <Track lanes={lanes} length={length} />
+
+      <div className="race-play__stage">
+        {phase === 'watching' ? (
+          <p className="race-note race-play__watching" role="status">
+            {stepBack ? m.race_watching_idle() : m.race_watching()}
+          </p>
+        ) : snapshot.text !== null ? (
+          <RaceRun
+            text={snapshot.text}
+            language={snapshot.language}
+            live={phase === 'racing'}
+            sizePx={sizePx}
+            onProgress={onProgress}
+            onFinish={onFinish}
+            onIdle={onIdle}
+          />
+        ) : null}
+        {phase === 'countdown' ? (
+          <div
+            className="race-countdown"
+            role="timer"
+            aria-live="assertive"
+            data-testid="race-countdown"
+          >
+            <span className="race-countdown__label">{m.race_countdown_label()}</span>
+            <span key={remaining} className="race-countdown__n">
+              {Math.max(1, remaining)}
+            </span>
+          </div>
+        ) : null}
+      </div>
+
+      <p className="rt-caption race-play__caption">{m.race_track_caption()}</p>
     </div>
   )
 }
@@ -194,17 +244,6 @@ function phaseOf(snapshot: RoomSnapshot | null, now: number, mine: Mine, stepBac
   if (snapshot.deadline !== null && now > Date.parse(snapshot.deadline)) return 'results'
   if (stepBack || me?.role !== 'racer') return 'watching'
   return 'racing'
-}
-
-function RoomHead({ snapshot }: { readonly snapshot: RoomSnapshot }) {
-  return (
-    <header className="race-room__head">
-      <Index n={snapshot.visibility === 'quick' ? 1 : 2}>
-        {snapshot.visibility === 'quick' ? m.race_quick_title() : m.race_private_title()}
-      </Index>
-      <span className="race-room__lang">{snapshot.language === 'uk' ? 'ЙЦУКЕН' : 'QWERTY'}</span>
-    </header>
-  )
 }
 
 function Gathering({
@@ -226,28 +265,48 @@ function Gathering({
   const second = racers[1]
   const gatherLeft =
     second === undefined ? null : Math.max(0, Date.parse(second.joinedAt) + GATHER_MS - now)
+  const aloneLeft = Math.max(0, Date.parse(snapshot.createdAt) + ALONE_MS - now)
   const invite =
     snapshot.joinCode === null ? null : `${location.origin}/races/join/${snapshot.joinCode}`
+  const quick = snapshot.visibility === 'quick'
 
-  const status =
-    snapshot.visibility === 'private'
-      ? host
-        ? m.race_gather_host()
-        : m.race_gather_guest()
-      : gatherLeft === null
-        ? m.race_gather_waiting()
-        : m.race_gather_soon()
+  const status = !quick
+    ? host
+      ? m.race_gather_host()
+      : m.race_gather_guest()
+    : gatherLeft === null
+      ? m.race_gather_waiting()
+      : m.race_gather_soon()
+
+  // While a quick room gathers, the bar fills toward the start: over three seconds once a rival is
+  // in, otherwise over the twenty a lone racer waits.
+  const share = !quick
+    ? 0
+    : gatherLeft !== null
+      ? 1 - gatherLeft / GATHER_MS
+      : 1 - aloneLeft / ALONE_MS
 
   return (
-    <div className="race-room" data-phase="gathering">
-      <RoomHead snapshot={snapshot} />
-      <div className="race-gather">
-        <div className="race-gather__main">
+    <div className="rg" data-phase="gathering">
+      <section className="rl-panel rg-main" aria-labelledby="rg-title">
+        <div className="rl-head">
+          <span className="rl-idx">{quick ? '01' : '02'}</span>
+          <h2 className="rl-title">
+            {quick ? m.race_quick_title() : m.race_private_title()}
+            {' · '}
+            {snapshot.language === 'uk' ? 'ЙЦУКЕН' : 'QWERTY'}
+          </h2>
+        </div>
+        <div className="rg-body">
           {snapshot.joinCode === null ? (
-            <h1 className="race-display race-gather__title">{m.race_gather_title()}</h1>
+            <h1 id="rg-title" className="race-display rg-title">
+              {m.race_gather_title()}
+            </h1>
           ) : (
             <>
-              <p className="race-gather__label">{m.race_code_label()}</p>
+              <p className="rl-label" id="rg-title">
+                {m.race_code_label()}
+              </p>
               <p className="race-code" data-testid="race-code">
                 {snapshot.joinCode}
               </p>
@@ -256,50 +315,61 @@ function Gathering({
           <p className="race-lede" role="status">
             {status}
           </p>
-          {snapshot.visibility === 'quick' ? (
-            <div
-              className="race-gather__bar"
-              data-on={gatherLeft !== null || undefined}
-              style={{
-                transform: `scaleX(${gatherLeft === null ? 0 : 1 - gatherLeft / GATHER_MS})`,
-              }}
-              aria-hidden="true"
-            />
+          {quick ? (
+            <div className="rg-bar" aria-hidden="true">
+              <span style={{ transform: `scaleX(${Math.min(1, Math.max(0, share))})` }} />
+            </div>
           ) : null}
-          <div className="race-gather__actions">
-            {host ? (
-              <Button
-                variant="primary"
-                size="lg"
-                disabled={starting}
-                onClick={() => {
-                  setStarting(true)
-                  void backend.requestStart(snapshot.id).then(() => onStarted())
-                }}
-              >
-                {m.race_start_action()}
-              </Button>
-            ) : null}
-            {invite === null ? null : (
-              <Button
-                variant="secondary"
-                size="lg"
-                onClick={() => {
-                  void navigator.clipboard?.writeText(invite).then(() => setCopied(true))
-                }}
-              >
-                {copied ? m.race_invite_copied() : m.race_invite_copy()}
-              </Button>
-            )}
-            <Button variant="quiet" size="lg" onClick={() => void navigate({ to: '/races' })}>
-              {m.race_leave()}
+        </div>
+        <div className="race-gather__actions">
+          {host ? (
+            <Button
+              variant="primary"
+              size="lg"
+              disabled={starting}
+              onClick={() => {
+                setStarting(true)
+                void backend.requestStart(snapshot.id).then(() => onStarted())
+              }}
+            >
+              {m.race_start_action()}
             </Button>
-          </div>
+          ) : null}
+          {invite === null ? null : (
+            <Button
+              variant="secondary"
+              size="lg"
+              onClick={() => {
+                void navigator.clipboard?.writeText(invite).then(() => setCopied(true))
+              }}
+            >
+              {copied ? m.race_invite_copied() : m.race_invite_copy()}
+            </Button>
+          )}
+          <Button variant="quiet" size="lg" onClick={() => void navigate({ to: '/races' })}>
+            {m.race_leave()}
+          </Button>
+        </div>
+      </section>
+
+      <section className="rl-panel rg-roster" aria-labelledby="rg-roster-title">
+        <div className="rl-head">
+          <h2 className="rl-title" id="rg-roster-title">
+            {m.race_gather_seats({ n: String(racers.length) })}
+          </h2>
         </div>
         <ol className="race-roster" aria-label={m.race_roster_label()}>
           {snapshot.participants.map((person, index) => (
-            <li key={person.userId} className="race-roster__row" data-testid="race-roster-row">
-              <span className="race-lane__n">[{String(index + 1).padStart(2, '0')}]</span>
+            <li
+              key={person.userId}
+              className="race-roster__row"
+              data-me={person.userId === snapshot.me || undefined}
+              data-testid="race-roster-row"
+            >
+              <span className="rt-n">{String(index + 1).padStart(2, '0')}</span>
+              <span className="race-roster__mark" aria-hidden="true">
+                {Array.from(person.nickname)[0]?.toUpperCase() ?? ''}
+              </span>
               <span className="race-roster__name">{person.nickname}</span>
               <span className="race-roster__tag">
                 {person.userId === snapshot.me
@@ -312,31 +382,39 @@ function Gathering({
               </span>
             </li>
           ))}
-          {Array.from({ length: Math.max(0, 5 - snapshot.participants.length) }, (_, index) => (
-            <li
-              // biome-ignore lint/suspicious/noArrayIndexKey: empty seats have no identity but their position
-              key={`seat-${index}`}
-              className="race-roster__row race-roster__row--empty"
-              aria-hidden="true"
-            >
-              <span className="race-lane__n">
-                [{String(snapshot.participants.length + index + 1).padStart(2, '0')}]
-              </span>
-              <span className="race-roster__name">{m.race_seat_free()}</span>
-            </li>
-          ))}
+          {Array.from(
+            { length: Math.max(0, CAPACITY - snapshot.participants.length) },
+            (_, index) => (
+              <li
+                // biome-ignore lint/suspicious/noArrayIndexKey: empty seats have no identity but their position
+                key={`seat-${index}`}
+                className="race-roster__row race-roster__row--empty"
+                aria-hidden="true"
+              >
+                <span className="rt-n">
+                  {String(snapshot.participants.length + index + 1).padStart(2, '0')}
+                </span>
+                <span className="race-roster__mark" />
+                <span className="race-roster__name">{m.race_seat_free()}</span>
+              </li>
+            ),
+          )}
         </ol>
-      </div>
+      </section>
     </div>
   )
 }
 
 function RoomSkeleton() {
   return (
-    <div className="race-room" aria-busy="true">
-      <div className="race-skeleton race-skeleton--title" />
-      <div className="race-skeleton race-skeleton--lane" />
-      <div className="race-skeleton race-skeleton--lane" />
+    <div className="rg" aria-busy="true">
+      <div className="rl-panel">
+        <div className="race-skeleton race-skeleton--title" />
+      </div>
+      <div className="rl-panel">
+        <div className="race-skeleton race-skeleton--lane" />
+        <div className="race-skeleton race-skeleton--lane" />
+      </div>
       <span className="sr-only">{m.race_loading()}</span>
     </div>
   )

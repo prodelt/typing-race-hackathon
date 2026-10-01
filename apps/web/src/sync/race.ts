@@ -80,8 +80,28 @@ export interface Identity {
   readonly nickname: string
 }
 
+/**
+ * The learner's Race Rating as the server computed it (`rate_race`, migration `race_rating`).
+ * `guest`: no race identity in this browser yet. `unrated`: an identity, but no rated race yet.
+ * `unavailable`: the server could not say (offline, or the rating is not deployed there).
+ */
+export type RaceStanding =
+  | { readonly kind: 'guest' }
+  | { readonly kind: 'unrated' }
+  | { readonly kind: 'unavailable' }
+  | {
+      readonly kind: 'rated'
+      readonly rating: number
+      readonly races: number
+      /** The change from the last rated race, and which room it was. */
+      readonly lastDelta: number
+      readonly lastRoomId: string | null
+    }
+
 export interface RaceBackend {
   identity(): Promise<Identity | null>
+  /** This learner's Race Rating, read under RLS (own row only). Never throws. */
+  standing(): Promise<RaceStanding>
   signIn(nickname: string): Promise<Identity>
   rename(nickname: string): Promise<Identity>
   rememberedName(): string
@@ -222,6 +242,30 @@ function createBackend(client: SupabaseClient): RaceBackend {
       const { data } = await client.auth.getSession()
       const user = data.session?.user
       return user ? readProfile(user.id) : null
+    },
+
+    async standing() {
+      try {
+        const { data: session } = await client.auth.getSession()
+        const user = session.session?.user
+        if (!user) return { kind: 'guest' }
+        const { data, error } = await client
+          .from('race_ratings')
+          .select('rating, races, last_delta, last_room')
+          .eq('user_id', user.id)
+          .maybeSingle()
+        if (error) return { kind: 'unavailable' }
+        if (data === null || Number(data.races) === 0) return { kind: 'unrated' }
+        return {
+          kind: 'rated',
+          rating: Number(data.rating),
+          races: Number(data.races),
+          lastDelta: Number(data.last_delta),
+          lastRoomId: (data.last_room as string | null) ?? null,
+        }
+      } catch {
+        return { kind: 'unavailable' }
+      }
     },
 
     async signIn(nickname) {

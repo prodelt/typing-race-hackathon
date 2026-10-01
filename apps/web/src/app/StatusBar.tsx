@@ -10,10 +10,11 @@ import {
   IconVolume,
   IconVolumeOff,
 } from '@typing-race/ui'
-import { type ReactNode, useId } from 'react'
+import { type ReactNode, useEffect, useId } from 'react'
 import { m } from '../paraglide/messages.js'
 import { useGameStats } from './state/gameStats.js'
 import { useAppStore } from './state/index.js'
+import { refreshRaceStanding, signed, useRaceStanding } from './state/raceStanding.js'
 
 /**
  * The status bar: who is playing, their Level and XP, the Streak with its freeze, the Race Rating
@@ -171,6 +172,39 @@ function GoogleChip() {
   )
 }
 
+/**
+ * The Race Rating: the server's number once there is one, otherwise a calm "—" whose tooltip says
+ * why. Never a placeholder number.
+ */
+function RatingStat() {
+  const standing = useRaceStanding((state) => state.standing)
+  useEffect(() => {
+    void refreshRaceStanding()
+  }, [])
+  const rated = standing.kind === 'rated'
+  const tip = rated
+    ? m.race_rating_tip({
+        races: String(standing.races),
+        delta: signed(standing.lastDelta),
+      })
+    : standing.kind === 'unrated'
+      ? m.race_rating_tip_unrated()
+      : standing.kind === 'unavailable'
+        ? m.race_rating_tip_unavailable()
+        : m.race_rating_tip_guest()
+  return (
+    <Stat tip={tip} className={rated ? '' : 'sb--absent'}>
+      <IconSwords size={22} className="swords" />
+      <div className="sb__col">
+        <span className="num" data-testid="status-rating">
+          {rated ? NUMBER.format(standing.rating) : '—'}
+        </span>
+        <span className="sb__lab">{m.shell_rating()}</span>
+      </div>
+    </Stat>
+  )
+}
+
 export function StatusBar({ settingsActive }: { readonly settingsActive: boolean }) {
   const stats = useGameStats()
   const xpShare = stats.xpForNextLevel > 0 ? Math.min(1, stats.xpInLevel / stats.xpForNextLevel) : 0
@@ -227,15 +261,7 @@ export function StatusBar({ settingsActive }: { readonly settingsActive: boolean
         </div>
       </Stat>
 
-      {stats.raceRating === null ? null : (
-        <Stat tip={m.shell_rating_hint()}>
-          <IconSwords size={22} className="swords" />
-          <div className="sb__col">
-            <span className="num">{NUMBER.format(stats.raceRating)}</span>
-            <span className="sb__lab">{m.shell_rating()}</span>
-          </div>
-        </Stat>
-      )}
+      <RatingStat />
 
       <div className="bar__right">
         <LayoutSwitch />

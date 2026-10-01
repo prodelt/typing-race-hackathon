@@ -54,6 +54,16 @@ test('races say calmly that they are unavailable when the backend cannot be reac
   await expect(page).toHaveURL(/\/$/)
 })
 
+test('a learner who never raced has no race rating, shown as absent rather than a number', async ({
+  page,
+}) => {
+  await page.goto('/races')
+  // No race identity in this browser: the status bar makes no request and shows a calm dash.
+  await expect(page.getByTestId('status-rating')).toHaveText('—')
+  await page.getByTestId('status-rating').locator('..').locator('..').focus()
+  await expect(page.getByRole('tooltip').filter({ hasText: 'Рейтингу ще немає' })).toBeAttached()
+})
+
 test.describe('@backend races', () => {
   test.skip(!backendConfigured(), 'Supabase is not configured for this build')
 

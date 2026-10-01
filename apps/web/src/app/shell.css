@@ -432,6 +432,12 @@
   flex: none;
 }
 
+/* No rating yet: the stat keeps its place, quieter, and its tooltip says why. */
+.sb--absent .num,
+.sb--absent .swords {
+  color: var(--color-muted);
+}
+
 .bar__right {
   margin-left: auto;
   display: flex;
