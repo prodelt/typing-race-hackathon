@@ -3,7 +3,6 @@ import type { Language } from '@typing-race/domain'
 import {
   IconCog,
   IconFlame,
-  IconGoogle,
   IconInfo,
   IconSnow,
   IconSwords,
@@ -11,6 +10,9 @@ import {
   IconVolumeOff,
 } from '@typing-race/ui'
 import { type ReactNode, useEffect, useId } from 'react'
+import { initialOf } from '../features/account/model.js'
+import { useAccount } from '../features/account/state.js'
+import { AccountChip } from '../features/account/ui.js'
 import { m } from '../paraglide/messages.js'
 import { useGameStats } from './state/gameStats.js'
 import { useAppStore } from './state/index.js'
@@ -18,8 +20,8 @@ import { refreshRaceStanding, signed, useRaceStanding } from './state/raceStandi
 
 /**
  * The status bar: who is playing, their Level and XP, the Streak with its freeze, the Race Rating
- * (only once there is one), and the controls — layout, sound, settings, the «Про гру» menu and a
- * quiet sign-in chip that waits for the cloud tickets.
+ * (only once there is one), and the controls — layout, sound, settings, the «Про гру» menu and the
+ * account chip: «Увійти через Google» for a guest, the sync state once signed in.
  */
 
 const NUMBER = new Intl.NumberFormat('uk-UA')
@@ -150,28 +152,6 @@ function AboutMenu() {
   )
 }
 
-function GoogleChip() {
-  const id = useId()
-  return (
-    <button
-      type="button"
-      className="gchip tip"
-      aria-disabled="true"
-      aria-describedby={id}
-      onClick={(event) => event.preventDefault()}
-    >
-      <IconGoogle size={16} />
-      <span>
-        <span className="gchip__short">{m.shell_google_short()}</span>
-        <span className="gchip__full">{m.shell_google()}</span>
-      </span>
-      <span role="tooltip" id={id} className="tip__bubble tip__bubble--end">
-        {m.shell_google_soon()}
-      </span>
-    </button>
-  )
-}
-
 /**
  * The Race Rating: the server's number once there is one, otherwise a calm "—" whose tooltip says
  * why. Never a placeholder number.
@@ -205,21 +185,33 @@ function RatingStat() {
   )
 }
 
+/** Who is playing: the public nick once there is one, never a name or photo from Google. */
+function Who() {
+  const kind = useAccount((state) => state.kind)
+  const nick = useAccount((state) => state.nick)
+  const name = nick ?? m.shell_guest()
+  return (
+    <div className="who" data-testid="status-who">
+      <span className="avatar" aria-hidden="true">
+        {initialOf(name)}
+      </span>
+      <div className="who__text">
+        <div className="who__name">{name}</div>
+        <div className="who__sub">
+          {kind === 'google' ? m.acct_sub_google() : m.shell_guest_sub()}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export function StatusBar({ settingsActive }: { readonly settingsActive: boolean }) {
   const stats = useGameStats()
   const xpShare = stats.xpForNextLevel > 0 ? Math.min(1, stats.xpInLevel / stats.xpForNextLevel) : 0
 
   return (
     <section className="bar" aria-label={m.shell_status_label()}>
-      <div className="who">
-        <span className="avatar" aria-hidden="true">
-          {m.shell_guest().slice(0, 1).toUpperCase()}
-        </span>
-        <div className="who__text">
-          <div className="who__name">{m.shell_guest()}</div>
-          <div className="who__sub">{m.shell_guest_sub()}</div>
-        </div>
-      </div>
+      <Who />
 
       <Stat
         className="lvl"
@@ -276,7 +268,7 @@ export function StatusBar({ settingsActive }: { readonly settingsActive: boolean
           <IconCog size={20} />
         </Link>
         <AboutMenu />
-        <GoogleChip />
+        <AccountChip />
       </div>
     </section>
   )

@@ -23,7 +23,8 @@
       "./messages/home/{locale}.json",
       "./messages/map/{locale}.json",
       "./messages/profile/{locale}.json",
-      "./messages/firstrun/{locale}.json"
+      "./messages/firstrun/{locale}.json",
+      "./messages/account/{locale}.json"
     ]
   }
 }

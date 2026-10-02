@@ -17,6 +17,9 @@ import { useAppStore, useDerived } from '../../app/state/index.js'
 import { m } from '../../paraglide/messages.js'
 import { getLocale } from '../../paraglide/runtime.js'
 import { type CourseState, useAcademyCourse } from '../academy/data.js'
+import { AccountPanel } from '../account/AccountPanel.js'
+import { initialOf } from '../account/model.js'
+import { useAccount } from '../account/state.js'
 import { keyLabel, scaleName } from '../path/labels.js'
 import { totalKeyCount, unlockedKeyCount } from '../path/model.js'
 import { drillName } from '../words/labels.js'
@@ -26,7 +29,8 @@ import './profile.css'
 /**
  * Profile, destination 05: who is playing, the game numbers, how far along the route they are, and
  * the history of attempts — readable on a phone too. The red block is the Level; everything else
- * is quiet. The Account panel says plainly that sign-in has not arrived yet.
+ * is quiet. The Account panel signs in with Google, and once signed in edits the nick, shows the
+ * sync state, signs out and deletes the learner's data.
  */
 
 const HISTORY_ROWS = 8
@@ -45,15 +49,7 @@ export function ProfileScreen() {
   return (
     <Screen className="prof">
       <ScreenHead title={m.profile_title()} titleId="profile-title">
-        <div className="prof-who">
-          <span className="prof-who__avatar" aria-hidden="true">
-            {m.prof_guest().slice(0, 1)}
-          </span>
-          <span className="prof-who__text">
-            <b>{m.prof_guest()}</b>
-            <span>{m.prof_guest_sub()}</span>
-          </span>
-        </div>
+        <ProfileWho />
         <Link to="/settings" className="scr-seg__btn prof-settings" aria-keyshortcuts="S">
           {m.prof_settings()}
           <span className="kbd" aria-hidden="true">
@@ -72,9 +68,27 @@ export function ProfileScreen() {
         <Numbers stats={stats} totals={totals} />
         <Mastery course={course} />
         <History attempts={attempts} course={course} />
-        <Account />
+        <AccountPanel />
       </div>
     </Screen>
+  )
+}
+
+/** The public nick once there is one; a guest is «Гість». Never a name or photo from Google. */
+function ProfileWho() {
+  const kind = useAccount((state) => state.kind)
+  const nick = useAccount((state) => state.nick)
+  const name = nick ?? m.prof_guest()
+  return (
+    <div className="prof-who">
+      <span className="prof-who__avatar" aria-hidden="true">
+        {initialOf(name)}
+      </span>
+      <span className="prof-who__text">
+        <b>{name}</b>
+        <span>{kind === 'google' ? m.acct_sub_google() : m.prof_guest_sub()}</span>
+      </span>
+    </div>
   )
 }
 
@@ -402,54 +416,5 @@ function Trend({ points }: { readonly points: readonly number[] }) {
         })}
       </figcaption>
     </figure>
-  )
-}
-
-/* ---- 05 Account: an honest placeholder -------------------------------------------------- */
-
-function Account() {
-  return (
-    <Panel
-      id="prof-account-title"
-      n={5}
-      title={m.prof_account_title()}
-      meta={
-        <span className="prof-account__row">
-          <button
-            type="button"
-            className="prof-google"
-            disabled
-            aria-describedby="prof-account-soon"
-          >
-            <svg width="16" height="16" viewBox="0 0 48 48" aria-hidden="true">
-              <path
-                fill="#EA4335"
-                d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.6 5.4 2.7 13.3l7.9 6.1C12.5 13.6 17.8 9.5 24 9.5z"
-              />
-              <path
-                fill="#4285F4"
-                d="M46.1 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.4c-.5 2.9-2.2 5.3-4.6 6.9l7.4 5.7c4.3-4 6.9-9.9 6.9-17.1z"
-              />
-              <path
-                fill="#FBBC05"
-                d="M10.6 28.6c-.5-1.4-.8-3-.8-4.6s.3-3.2.8-4.6l-7.9-6.1C1 16.6 0 20.2 0 24s1 7.4 2.7 10.7l7.9-6.1z"
-              />
-              <path
-                fill="#34A853"
-                d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.4-5.7c-2.1 1.4-4.8 2.3-8.5 2.3-6.2 0-11.5-4.1-13.4-9.9l-7.9 6.1C6.6 42.6 14.6 48 24 48z"
-              />
-            </svg>
-            {m.prof_account_action()}
-          </button>
-          <span className="scr-tag" id="prof-account-soon">
-            {m.prof_account_action_soon()}
-          </span>
-        </span>
-      }
-      className="prof-account"
-      testId="profile-account"
-    >
-      <p className="scr-say">{m.prof_account_body()}</p>
-    </Panel>
   )
 }

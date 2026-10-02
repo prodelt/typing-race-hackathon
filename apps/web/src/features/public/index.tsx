@@ -90,6 +90,12 @@ export function PrivacyPage() {
         </h2>
         <p className="ref-p">{m.page_privacy_server()}</p>
       </section>
+      <section className="ref-section" aria-labelledby="privacy-account">
+        <h2 className="ref-h2" id="privacy-account">
+          {m.page_privacy_account_title()}
+        </h2>
+        <p className="ref-p">{m.page_privacy_account()}</p>
+      </section>
     </RefPage>
   )
 }
