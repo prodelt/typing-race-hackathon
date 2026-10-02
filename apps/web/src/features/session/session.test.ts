@@ -1,4 +1,4 @@
-import { catalogue, layouts } from '@typing-race/curriculum'
+import { catalogue, layouts, stage2Gate, wordCatalogue } from '@typing-race/curriculum'
 import type { NextAction, Progress } from '@typing-race/domain'
 import { transitionKey } from '@typing-race/domain'
 import fc from 'fast-check'
@@ -28,6 +28,7 @@ describe('sizeSession', () => {
 })
 
 const layout = layouts.yq
+const stage2Open = new Set([...stage2Gate(layout), ' '])
 const scales = catalogue.yq
 const anchors = layout.homeAnchors
 
@@ -81,7 +82,7 @@ describe('composeSession', () => {
       attempts: [],
     })
     expect(plan?.blocks[0].fallback).toBe(false)
-    expect(plan?.blocks[0].focus.value).toBe(first)
+    expect(plan?.blocks[0].focus?.value).toBe(first)
     expect(plan?.blocks[1].scaleId).toBe(target.id)
   })
 
@@ -94,5 +95,36 @@ describe('composeSession', () => {
       attempts: [],
     })
     expect(plan?.blocks.map((block) => block.mode)).toEqual(['practice', 'practice', 'test'])
+  })
+})
+
+describe('composeSession for a Stage 2 learner', () => {
+  const drills = wordCatalogue.yq
+  const open = drills.find((drill) => drill.requires.every((char) => stage2Open.has(char)))
+  const locked = drills.find((drill) => !drill.requires.every((char) => stage2Open.has(char)))
+  if (open === undefined || locked === undefined) throw new Error('word catalogue has no drills')
+
+  const stage2Progress: Progress = {
+    ...progressWith({}),
+    unlockedSet: [...stage2Open],
+  }
+  const plan = (startsScaleId: string) =>
+    composeSession({
+      layout,
+      catalogue: scales,
+      progress: stage2Progress,
+      nextAction: { ...action, startsScaleId },
+      attempts: [],
+    })
+
+  it('trains the word drill the Next Action names, as practice and then as a test', () => {
+    const composed = plan(open.id)
+    expect(composed?.blocks[1].scaleId).toBe(open.id)
+    expect(composed?.blocks[2]).toMatchObject({ scaleId: open.id, mode: 'test' })
+  })
+
+  it('falls back to a Scale when the named drill is still locked', () => {
+    const composed = plan(locked.id)
+    expect(composed?.blocks[1].scaleId).toBe(target.id)
   })
 })

@@ -1,6 +1,7 @@
 import {
   catalogue as catalogues,
   deriveProgress,
+  fingerOf,
   focusDrillFor,
   layouts,
   nextAction,
@@ -9,7 +10,7 @@ import {
 } from '@typing-race/curriculum'
 import {
   type AttemptSummary,
-  type Finger,
+  type FingerAssignment,
   type Layout,
   LOG_RETENTION_COUNT,
   type NextAction,
@@ -19,6 +20,7 @@ import {
 } from '@typing-race/domain'
 import { confidenceOf, foldConfidence } from '@typing-race/metrics'
 import { m } from '../../paraglide/messages.js'
+import { fingerLabel } from '../exercise/labels.js'
 import { type Reward, rewardFor } from './reward.js'
 
 /**
@@ -36,7 +38,8 @@ const confidencePort = { fold: foldConfidence, of: confidenceOf }
 export interface Unlock {
   /** The one character that joined the unlocked set on this attempt — FR-041. */
   readonly key: string
-  readonly finger: Finger | undefined
+  /** The hand and finger that type the key, or `undefined` when the layout has no such key. */
+  readonly finger: FingerAssignment | undefined
   /** Scales that this key made startable, in catalogue order. */
   readonly opens: readonly Scale[]
   /** What the card's button starts. */
@@ -168,8 +171,8 @@ function unlockOn(
   return { key, finger: fingerOfChar(layout, key), opens, firstDrill, unlockedAfter: after }
 }
 
-export function fingerOfChar(layout: Layout, char: string): Finger | undefined {
-  return layout.keys.find((key) => key.plain === char || key.shifted === char)?.finger
+export function fingerOfChar(layout: Layout, char: string): FingerAssignment | undefined {
+  return fingerOf(layout, char)
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -186,16 +189,9 @@ export function displayChar(char: string): string {
   return char
 }
 
-export function fingerName(finger: Finger | undefined): string {
-  if (finger === undefined) return m.result_finger_unknown()
-  const names: Record<Finger, () => string> = {
-    pinky: m.result_finger_pinky,
-    ring: m.result_finger_ring,
-    middle: m.result_finger_middle,
-    index: m.result_finger_index,
-    thumb: m.result_finger_thumb,
-  }
-  return names[finger]()
+/** "лівий мізинець": the hand is part of the name, so two fingers of one name are not confusable. */
+export function fingerName(finger: FingerAssignment | undefined): string {
+  return finger === undefined ? m.result_finger_unknown() : fingerLabel(finger)
 }
 
 export function transitionLabel(key: string): string {
@@ -248,13 +244,13 @@ export function coachSentence(model: ResultModel): string {
     case templateKeys.weakTransition: {
       const from = text('from')
       const to = text('to')
-      return m.result_coach_weakTransition({
-        from: displayChar(from),
-        to: displayChar(to),
-        confidence: text('confidence'),
-        fromFinger: fingerName(fingerOfChar(layout, from)),
-        toFinger: fingerName(fingerOfChar(layout, to)),
-      })
+      const fromFinger = fingerName(fingerOfChar(layout, from))
+      const toFinger = fingerName(fingerOfChar(layout, to))
+      const shown = { from: displayChar(from), to: displayChar(to), confidence: text('confidence') }
+      // One finger on both keys would read "left index and left index".
+      if (fromFinger === toFinger)
+        return m.result_coach_weakTransitionOneFinger({ ...shown, finger: fromFinger })
+      return m.result_coach_weakTransition({ ...shown, fromFinger, toFinger })
     }
     case templateKeys.evenRhythm:
       return m.result_coach_evenRhythm({ rhythm: text('rhythm') })
