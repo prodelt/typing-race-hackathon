@@ -1,0 +1,369 @@
+/* The Account in the frame (direction B): the status bar chip, the dialog, the toast. Calm by
+   default — red only on the one primary action and on a failure. */
+
+/* ---- The chip ------------------------------------------------------------------------------ */
+
+.gchip--signin,
+.gchip--account {
+  cursor: pointer;
+  text-decoration: none;
+  box-shadow: inset 0 0 0 1.5px var(--color-accent-tint);
+  transition:
+    background-color var(--dur-base) var(--ease-enter),
+    box-shadow var(--dur-base) var(--ease-enter);
+}
+
+.gchip--signin:hover,
+.gchip--account:hover {
+  background: var(--color-paper);
+}
+
+.gchip--signin:disabled {
+  cursor: progress;
+  opacity: 0.75;
+}
+
+.gchip--account {
+  color: var(--color-ink-soft);
+  box-shadow: inset 0 0 0 1.5px var(--color-hairline);
+}
+
+.gchip__dot {
+  width: 8px;
+  height: 8px;
+  flex: none;
+  border-radius: 999px;
+  background: var(--color-muted);
+}
+
+.gchip__dot[data-tone="ok"] {
+  background: var(--color-sage);
+}
+
+.gchip__dot[data-tone="busy"] {
+  background: var(--color-steel);
+  animation: acct-pulse 1.4s var(--ease-in-out) infinite;
+}
+
+.gchip__dot[data-tone="alert"] {
+  background: var(--color-accent);
+}
+
+@keyframes acct-pulse {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gchip__dot[data-tone="busy"] {
+    animation: none;
+  }
+}
+
+:root:is([data-motion="off"], [data-motion="reduced"]) .gchip__dot[data-tone="busy"] {
+  animation: none;
+}
+
+/* ---- The dialog ---------------------------------------------------------------------------- */
+
+.acct-dialog {
+  width: min(480px, calc(100vw - 32px));
+  margin: auto;
+  padding: 28px 28px 24px;
+  border: 0;
+  border-radius: var(--radius-panel);
+  background: var(--color-paper-raised);
+  color: var(--color-ink);
+  box-shadow: var(--shadow-raised);
+}
+
+.acct-dialog::backdrop {
+  background: rgb(12 10 10 / 0.45);
+  backdrop-filter: blur(2px);
+}
+
+.acct-dialog[open] {
+  animation: acct-rise var(--dur-base) var(--ease-enter);
+}
+
+@keyframes acct-rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .acct-dialog[open] {
+    animation: none;
+  }
+}
+
+:root:is([data-motion="off"], [data-motion="reduced"]) .acct-dialog[open] {
+  animation: none;
+}
+
+.acct-dialog__title {
+  margin: 0;
+  font: 600 20px / 1.25 var(--font-display);
+  letter-spacing: -0.03em;
+}
+
+.acct-dialog[data-tone="danger"] .acct-dialog__title {
+  color: var(--color-accent-deep);
+}
+
+.acct-dialog__body {
+  margin-top: 12px;
+  display: grid;
+  gap: 10px;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--color-ink-soft);
+}
+
+.acct-dialog__body p {
+  margin: 0;
+}
+
+.acct-dialog__note {
+  font-size: 13.5px;
+  color: var(--color-muted);
+}
+
+.acct-dialog__error {
+  color: var(--color-accent-deep);
+  font-weight: 500;
+}
+
+.acct-dialog__actions {
+  margin-top: 22px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ---- The toast ----------------------------------------------------------------------------- */
+
+.acct-toast {
+  position: fixed;
+  z-index: 60;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  max-width: calc(100vw - 32px);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 12px 12px 20px;
+  border-radius: var(--radius-pill);
+  background: var(--color-ink);
+  color: var(--color-paper-raised);
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: var(--shadow-raised);
+}
+
+.acct-toast__close {
+  width: 28px;
+  height: 28px;
+  flex: none;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: inherit;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+.acct-toast__close:hover {
+  opacity: 1;
+}
+
+@media (max-width: 767px) {
+  .acct-toast {
+    bottom: 88px;
+  }
+}
+
+/* ---- Profile, panel 05 --------------------------------------------------------------------- */
+
+.acct {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  min-width: 0;
+  scroll-margin-top: 24px;
+}
+
+.acct .scr-say,
+.acct .scr-note {
+  margin: 0;
+}
+
+.acct-id {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.acct-id:has(.acct-nickform) {
+  align-items: flex-start;
+}
+
+.acct-id__avatar {
+  width: 44px;
+  height: 44px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--color-accent-pale);
+  color: var(--color-accent-deep);
+  font: 600 17px / 1 var(--font-display);
+  letter-spacing: -0.04em;
+}
+
+.acct-id__text {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.acct-nick {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 10px;
+  min-width: 0;
+}
+
+.acct-nick b {
+  font: 600 18px / 1.2 var(--font-display);
+  letter-spacing: -0.03em;
+  overflow-wrap: anywhere;
+}
+
+.acct-nick__hint {
+  font-size: 12.5px;
+  color: var(--color-muted);
+}
+
+.acct-sync {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  font-size: 13px;
+  color: var(--color-ink-soft);
+}
+
+.acct-email {
+  font-size: 13px;
+  color: var(--color-muted);
+  overflow-wrap: anywhere;
+}
+
+/* A quiet action inside a row: text-sized, never taller than the row. */
+.acct-inline {
+  min-height: 32px;
+  padding: 0 4px;
+  font-size: 13px;
+}
+
+.acct-ok {
+  font-size: 13px;
+  color: var(--color-sage-ink);
+}
+
+.acct-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+}
+
+.prof-google.acct-google {
+  cursor: pointer;
+  background: var(--color-paper-raised);
+  color: var(--color-ink);
+  transition: background-color var(--dur-base) var(--ease-enter);
+}
+
+.prof-google.acct-google:hover {
+  background: var(--color-paper);
+}
+
+.prof-google.acct-google:disabled {
+  cursor: progress;
+  opacity: 0.75;
+}
+
+.acct-privacy {
+  max-width: 52ch;
+}
+
+.acct-delete {
+  color: var(--color-muted);
+}
+
+.acct-delete:hover {
+  color: var(--color-accent-deep);
+}
+
+.acct-nickform {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.acct-input {
+  width: min(180px, 100%);
+  height: 40px;
+  padding: 0 14px;
+  border: 1.5px solid var(--color-hairline-strong);
+  border-radius: var(--radius-field);
+  background: var(--color-paper-raised);
+  color: var(--color-ink);
+  font: 500 15px / 1 var(--font-ui);
+}
+
+.acct-input:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+  border-color: transparent;
+}
+
+.acct-input[aria-invalid="true"] {
+  border-color: var(--color-accent);
+}
+
+.acct-error {
+  flex-basis: 100%;
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-accent-deep);
+}
+
+@media (max-width: 1200px), (max-height: 820px) {
+  .acct {
+    gap: 10px;
+  }
+
+  .acct-nick__hint {
+    display: none;
+  }
+
+  .acct-id__avatar {
+    width: 36px;
+    height: 36px;
+    font-size: 14px;
+  }
+}

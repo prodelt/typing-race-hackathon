@@ -16,7 +16,7 @@ export function useScreenKeys(handlers: Readonly<Record<string, () => void>>): v
       const target = event.target
       if (target instanceof HTMLElement) {
         if (target.isContentEditable) return
-        if (target.closest('input, textarea, select, [role="dialog"]') !== null) return
+        if (target.closest('input, textarea, select, dialog, [role="dialog"]') !== null) return
         if (event.code === 'Enter' && target.closest('a, button, summary') !== null) return
       }
       const handler = current.current[event.code]

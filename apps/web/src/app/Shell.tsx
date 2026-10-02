@@ -1,5 +1,6 @@
 import { Link, Outlet, useNavigate, useRouterState } from '@tanstack/react-router'
 import { useEffect } from 'react'
+import { AccountNotices } from '../features/account/ui.js'
 import { m } from '../paraglide/messages.js'
 import { BootGate } from './BootGate.js'
 import { CommandPalette } from './CommandPalette.js'
@@ -26,7 +27,10 @@ import './shell.css'
 function isEditable(target: EventTarget | null): boolean {
   if (!(target instanceof HTMLElement)) return false
   if (target.isContentEditable) return true
-  return target.closest('input, textarea, select, [contenteditable=""], [role="dialog"]') !== null
+  return (
+    target.closest('input, textarea, select, [contenteditable=""], dialog, [role="dialog"]') !==
+    null
+  )
 }
 
 /** Keys 1–5 open the five destinations. */
@@ -63,6 +67,7 @@ export function Shell() {
             <Outlet />
           </BootGate>
         </main>
+        <AccountNotices />
       </div>
     )
   }
@@ -112,6 +117,7 @@ export function Shell() {
       </main>
 
       <CommandPalette />
+      <AccountNotices />
     </div>
   )
 }

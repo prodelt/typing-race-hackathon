@@ -7,6 +7,8 @@ import { isOutsideFrame } from './app/destinations.js'
 import { buildRouteTree } from './app/router.js'
 import { DEFAULT_SETTINGS, useAppStore } from './app/state/index.js'
 import { applyPresentation, readEnvironment, watchSystemPreferences } from './app/theme.js'
+import { cleanAuthUrl, parseAuthReturn, RETURN_TO_KEY } from './features/account/model.js'
+import { completeAuthReturn, hasStoredSession, refreshAccount } from './features/account/state.js'
 import { HomeScreen } from './features/home/HomeScreen.js'
 import { installLatencyProbe } from './instrument/latency.js'
 import { serviceWorkerCache } from './seams/index.js'
@@ -34,6 +36,25 @@ watchSystemPreferences((next) => {
 // Dead in production: the body is behind `import.meta.env.DEV`, which the build constant-folds
 // away (research R8, and the note in instrument/latency.ts about why dot access matters).
 installLatencyProbe()
+
+// A return from Google carries a code (or an error) in the address. It is read and the address
+// cleaned *before* the router starts, so no code or token is ever routed, rendered or left in the
+// history; the exchange itself happens after the first paint, in the lazily loaded Account code.
+const authReturn = parseAuthReturn(window.location.href)
+if (authReturn.kind !== 'none') {
+  let returnTo: string | null = null
+  try {
+    returnTo = sessionStorage.getItem(RETURN_TO_KEY)
+    sessionStorage.removeItem(RETURN_TO_KEY)
+  } catch {
+    // Without it the learner lands where Google sent them, cleaned.
+  }
+  window.history.replaceState(
+    window.history.state,
+    '',
+    cleanAuthUrl(window.location.href, returnTo),
+  )
+}
 
 const router = createRouter({
   routeTree: buildRouteTree({ home: HomeScreen }),
@@ -76,15 +97,15 @@ createRoot(rootElement).render(
 
 // Sync runs only for a learner who already has a session (ADR-0006). The check is a localStorage
 // read, so a learner without one never downloads the Supabase client and never meets the backend.
-if (hasStoredSession()) {
-  void startSync()
-}
-
-function hasStoredSession(): boolean {
-  try {
-    return globalThis.localStorage.getItem('typing-race:race-auth') !== null
-  } catch {
-    return false
+// An OAuth return starts sync itself once the code is exchanged.
+if (authReturn.kind === 'code') {
+  void completeAuthReturn(authReturn)
+} else {
+  // A refused or cancelled return explains itself and leaves any session (a guest's) in place.
+  if (authReturn.kind === 'error') void completeAuthReturn(authReturn)
+  if (hasStoredSession()) {
+    void startSync()
+    void refreshAccount()
   }
 }
 
