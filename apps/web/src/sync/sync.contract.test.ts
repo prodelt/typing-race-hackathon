@@ -476,3 +476,18 @@ describe('sync — wipe on sign-out', () => {
     expect(a.onLocalChanged).toHaveBeenCalled()
   })
 })
+
+describe('sync — forget after delete', () => {
+  it('drops the outbox and the local copy unconditionally, and detaches', async () => {
+    const cloud = fakeCloud()
+    const a = device({ online: () => false })
+    await a.sync.connect(cloud.remote())
+    await a.sync.submitAttempt(attempt('a1'))
+    expect(a.sync.status().pending).toBe(1)
+    await a.sync.forgetLocal()
+    await expect(a.store.load()).resolves.toBe('empty')
+    expect(await a.outbox.all()).toEqual([])
+    expect(a.sync.status()).toMatchObject({ connected: false, phase: 'off', pending: 0 })
+    expect(a.onLocalChanged).toHaveBeenCalled()
+  })
+})

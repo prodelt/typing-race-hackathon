@@ -96,15 +96,15 @@ test.describe('Profile', () => {
     await expect(page).toHaveURL(/\/result\/t1$/)
   })
 
-  test('the Account section is an honest placeholder: sign-in is announced, not offered', async ({
+  test('the Account section offers Google sign-in to a guest and says what stays private', async ({
     page,
   }) => {
     await seedLearner(page)
     await page.goto('/profile')
     const account = page.getByTestId('profile-account')
     await expect(account).toContainText('гість')
-    await expect(account.getByRole('button', { name: 'Увійти через Google' })).toBeDisabled()
-    await expect(account).toContainText('скоро')
+    await expect(account.getByRole('button', { name: 'Увійти через Google' })).toBeEnabled()
+    await expect(account).toContainText('Публічним буде лише нік')
   })
 
   test('a fresh visitor sees an empty history that points to training', async ({

@@ -51,8 +51,5 @@
   "prof_kind_words": "Words",
   "prof_kind_academy": "Academy",
   "prof_kind_review": "Weak-spot review",
-  "prof_account_title": "Account",
-  "prof_account_body": "You are playing as a guest: progress is kept in this browser only, and another device will not have it. Sign-in with Google arrives in the next update — then your progress, level and rating are kept in the cloud.",
-  "prof_account_action": "Sign in with Google",
-  "prof_account_action_soon": "soon"
+  "prof_account_title": "Account"
 }
