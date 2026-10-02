@@ -51,6 +51,11 @@ jobs:
       - name: chromium — every scenario, including the @axe audits
         run: pnpm test:e2e
 
+      - name: chromium with real key events (CDP)
+        # `Input.dispatchKeyEvent` into a focused page: the physical-keyboard path the synthetic
+        # `beforeinput` driver cannot see.
+        run: pnpm test:e2e:cdp
+
       - name: firefox and webkit — the input path only
         # Firefox ignores preventDefault() on beforeinput and delivers non-US characters as IME
         # compositions, so the keystroke path is the one place the engines genuinely disagree.
@@ -104,8 +109,8 @@ jobs:
           docker ps --format '{{.Names}}'
           curl -s -o /dev/null -w '%{http_code}' -X OPTIONS "$VITE_SUPABASE_URL/functions/v1/submit-attempt" || true
 
-      - name: chromium — the @backend scenarios
-        run: pnpm exec playwright test --project=chromium --grep @backend
+      - name: chromium — the @backend scenarios, with synthetic and with real key events
+        run: pnpm exec playwright test --project=chromium --project=cdp --grep @backend
 
       - name: stack logs on failure
         if: ${{ failure() }}
