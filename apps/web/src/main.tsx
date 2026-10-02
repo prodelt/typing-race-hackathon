@@ -3,12 +3,14 @@ import '@typing-race/ui/tokens.css'
 import '@typing-race/ui/themes.css'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import { isOutsideFrame } from './app/destinations.js'
 import { buildRouteTree } from './app/router.js'
 import { DEFAULT_SETTINGS, useAppStore } from './app/state/index.js'
 import { applyPresentation, readEnvironment, watchSystemPreferences } from './app/theme.js'
 import { HomeScreen } from './features/home/HomeScreen.js'
 import { installLatencyProbe } from './instrument/latency.js'
 import { serviceWorkerCache } from './seams/index.js'
+import { startSync } from './sync/index.js'
 
 /**
  * The application entry point.
@@ -42,6 +44,21 @@ const router = createRouter({
   defaultViewTransition: true,
 })
 
+// The crossfade is the frame's: it moves the stage between two screens *of the frame*. The first
+// render has no screen to fade from, and the product page (/about) has no frame at all, so neither
+// takes one. WebKit's renderer crashes outright on a transition into /about (the stage named
+// `main` vanishes mid-transition), which is how this rule was found.
+const crossfade = router.startViewTransition.bind(router)
+router.startViewTransition = (update) => {
+  const from = router.state.resolvedLocation?.pathname
+  const to = router.latestLocation.pathname
+  if (from === undefined || isOutsideFrame(from) || isOutsideFrame(to)) {
+    delete router.shouldViewTransition
+    return update()
+  }
+  return crossfade(update)
+}
+
 declare module '@tanstack/react-router' {
   interface Register {
     router: typeof router
@@ -56,6 +73,20 @@ createRoot(rootElement).render(
     <RouterProvider router={router} />
   </StrictMode>,
 )
+
+// Sync runs only for a learner who already has a session (ADR-0006). The check is a localStorage
+// read, so a learner without one never downloads the Supabase client and never meets the backend.
+if (hasStoredSession()) {
+  void startSync()
+}
+
+function hasStoredSession(): boolean {
+  try {
+    return globalThis.localStorage.getItem('typing-race:race-auth') !== null
+  } catch {
+    return false
+  }
+}
 
 // The offline promise: after one successful load the app opens, runs an exercise and shows its
 // result with the network away. Only a production build emits `/sw.js`, so the dev server never

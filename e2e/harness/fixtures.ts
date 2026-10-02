@@ -76,6 +76,26 @@ export async function seedStore(page: Page, seed: SeedEnvelope): Promise<void> {
   )
 }
 
+/** The attempt ids in the page's stored envelope, read from IndexedDB itself. */
+export async function localAttemptIds(page: Page): Promise<string[]> {
+  return page.evaluate(
+    ({ dbName, dbVersion, storeName, key }) =>
+      new Promise<string[]>((resolve) => {
+        const request = indexedDB.open(dbName, dbVersion)
+        request.onsuccess = () => {
+          const read = request.result.transaction(storeName).objectStore(storeName).get(key)
+          read.onsuccess = () => {
+            const envelope = read.result as { attempts?: { id: string }[] } | undefined
+            resolve((envelope?.attempts ?? []).map((attempt) => attempt.id))
+          }
+          read.onerror = () => resolve([])
+        }
+        request.onerror = () => resolve([])
+      }),
+    { dbName: DB_NAME, dbVersion: DB_VERSION, storeName: STORE_NAME, key: ENVELOPE_KEY },
+  )
+}
+
 /**
  * The fixture every visual and accessibility scenario uses.
  *

@@ -167,6 +167,16 @@ async function outsideTypingLine(page: Page): Promise<string[]> {
  * not about a frame.
  */
 async function audit(page: Page): Promise<void> {
+  await settled(page)
+  await expectNoAxeViolations(page)
+}
+
+/**
+ * Waits for every finite animation and transition to land. Colour read straight after a state
+ * change can be mid-transition: "motion off" is a hundredth of a millisecond, but WebKit finishes
+ * a transition only on its next rendering update, which under load can be a while away.
+ */
+async function settled(page: Page): Promise<void> {
   await page.evaluate(() =>
     Promise.all(
       document
@@ -186,7 +196,6 @@ async function audit(page: Page): Promise<void> {
         ),
     ),
   )
-  await expectNoAxeViolations(page)
 }
 
 test.describe('US1 typing an exercise', { tag: '@input' }, () => {
@@ -231,6 +240,7 @@ test.describe('US1 typing an exercise', { tag: '@input' }, () => {
     await expect(page.getByTestId('error-count')).toHaveText('1')
 
     // "Colour, a tint and an underline" (FR-016): three cues, so that none is colour alone.
+    await settled(page)
     const marked = await awaited.evaluate((node) => {
       const style = getComputedStyle(node)
       return { color: style.color, background: style.backgroundColor, shadow: style.boxShadow }
@@ -246,6 +256,7 @@ test.describe('US1 typing an exercise', { tag: '@input' }, () => {
     // The marked character does not look like the unmarked awaited one.
     await pressBackspace(page)
     await expect(awaited).not.toHaveAttribute('data-mark', 'wrong')
+    await settled(page)
     const unmarked = await awaited.evaluate((node) => {
       const style = getComputedStyle(node)
       return { color: style.color, background: style.backgroundColor }
@@ -332,16 +343,18 @@ test.describe('US1 typing an exercise', { tag: '@input' }, () => {
     const text = [...(await exerciseText(page))]
     const first = text[0] ?? ''
 
-    // The awaited key is the one highlighted, and it is ringed in its finger's own ink.
+    // The awaited key is the one highlighted: B's wanted key, solid red and ringed in the same
+    // red, over the finger zones (the first run's scheme draws it the same way).
     const awaited = page.getByTestId('keyboard-guide').locator('[data-awaited="true"]')
     await expect(awaited).toHaveCount(1)
     await expect(awaited).toHaveText(first)
     const ring = await awaited.evaluate((node) => {
       const style = getComputedStyle(node)
-      return { style: style.outlineStyle, outline: style.outlineColor, ink: style.color }
+      return { style: style.outlineStyle, outline: style.outlineColor, fill: style.backgroundColor }
     })
     expect(ring.style).toBe('solid')
-    expect(ring.outline).toBe(ring.ink)
+    expect(ring.fill).toBe('rgb(194, 31, 19)')
+    expect(ring.outline).toBe(ring.fill)
 
     // The finger is named in words as well as colour (FR-061).
     await expect(page.getByTestId('next-key')).toContainText(/мізинець|палець/)

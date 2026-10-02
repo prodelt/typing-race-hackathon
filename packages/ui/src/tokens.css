@@ -73,29 +73,41 @@
 
   --color-nav-dimmed: #857370;
 
-  /* ---- Finger colours: ink / tint / line, one triple per finger -------------------------
-   * A keycap glyph takes its finger's *ink*, so the colour never carries meaning alone: the
-   * letter is still the letter, which is what keeps the guide usable without colour vision.
-   * Kept cool and muted so the keyboard never out-shouts the red of the awaited key. */
-  --color-finger-pinky-ink: #5b4f8f;
-  --color-finger-pinky-tint: #ebe8f5;
-  --color-finger-pinky-line: #cbc4e2;
+  /* ---- Finger zones: B's one language for "which finger" ---------------------------------
+   * Four steps of the paper deepening towards the red, white at the pinkies to the deepest at
+   * the index fingers, the same on both hands; the thumbs share the pinkies' white. The first
+   * run's scheme, the practice keyboard, the finger bars and the Map's keyboard all draw these.
+   * Each step is at least 1.2:1 from its neighbour in every theme (so they read apart side by
+   * side), the glyph ink is at least 5.8:1 on every step, and the deepest step stays clearly
+   * lighter and quieter than the awaited key's solid red. Colour never carries the finger alone:
+   * the next-key card names it in words. Themes redefine only the six zone values. */
+  --color-zone-0: #ffffff;
+  --color-zone-1: #fbe6e3;
+  --color-zone-2: #f6cdc8;
+  --color-zone-3: #efaea6;
+  --color-zone-ink: #2e2e2e;
+  --color-zone-line: #e9cfca;
 
-  --color-finger-ring-ink: #2e5e45;
-  --color-finger-ring-tint: #e3eee7;
-  --color-finger-ring-line: #bcd3c4;
+  /* Per-finger names, kept because the keycap and the finger bars address a finger, not a zone. */
+  --color-finger-pinky-ink: var(--color-zone-ink);
+  --color-finger-pinky-tint: var(--color-zone-0);
+  --color-finger-pinky-line: var(--color-zone-line);
 
-  --color-finger-middle-ink: #7d5a12;
-  --color-finger-middle-tint: #f4ecdc;
-  --color-finger-middle-line: #decaa0;
+  --color-finger-ring-ink: var(--color-zone-ink);
+  --color-finger-ring-tint: var(--color-zone-1);
+  --color-finger-ring-line: var(--color-zone-line);
 
-  --color-finger-index-ink: #1f5471;
-  --color-finger-index-tint: #e1ecf3;
-  --color-finger-index-line: #b3cfe0;
+  --color-finger-middle-ink: var(--color-zone-ink);
+  --color-finger-middle-tint: var(--color-zone-2);
+  --color-finger-middle-line: var(--color-zone-line);
 
-  --color-finger-thumb-ink: #4f5b64;
-  --color-finger-thumb-tint: #eef1f3;
-  --color-finger-thumb-line: #d3d9de;
+  --color-finger-index-ink: var(--color-zone-ink);
+  --color-finger-index-tint: var(--color-zone-3);
+  --color-finger-index-line: var(--color-zone-line);
+
+  --color-finger-thumb-ink: var(--color-zone-ink);
+  --color-finger-thumb-tint: var(--color-zone-0);
+  --color-finger-thumb-line: var(--color-zone-line);
 
   /* ---- Typography ---------------------------------------------------------------------- */
   --font-display: "Unbounded", "Onest", system-ui, sans-serif;

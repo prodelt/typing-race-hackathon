@@ -40,6 +40,13 @@ export default defineConfig({
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
     video: 'off',
+    // The production build registers its service worker on every load, and the worker precaches
+    // the whole build (about 3 MB, 76 files) the moment it installs. In a suite that opens a fresh
+    // context per test that is hundreds of full downloads, and a context closed mid-install waits
+    // for them: under full-suite load that is what pushed the long scenarios (progress across a
+    // restart, above all) past their timeouts in teardown. The specs about the worker opt back in
+    // with `test.use({ serviceWorkers: 'allow' })`; nothing else depends on it.
+    serviceWorkers: 'block',
   },
   projects: [
     {
@@ -57,6 +64,14 @@ export default defineConfig({
     {
       name: 'webkit',
       use: { ...devices['Desktop Safari'] },
+      // Playwright's WebKit renders in software on Windows and Linux hosts and is by far the
+      // slowest engine here: an in-app navigation takes about half a second on an idle machine,
+      // a click that changes screens 1.3–2.5 s, and both grow several-fold when four WebKit pages
+      // share the CPU. The long scenarios that sit well inside 30 s on Chromium then end in
+      // timeouts that pass on their own and in repeats. So the lane runs two pages at a time and
+      // gives each test twice the time — the engine's pace, not a retry that would hide a failure.
+      workers: 2,
+      timeout: 60_000,
       testIgnore: ['latency.spec.ts'],
       grepInvert: CDP_ONLY,
     },

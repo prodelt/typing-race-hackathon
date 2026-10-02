@@ -1,6 +1,6 @@
 import { type Browser, expect, type Page, test } from '@playwright/test'
 import { backendConfigured, learner } from './harness/backend.js'
-import { typeChar } from './harness/type.js'
+import { typeText } from './harness/type.js'
 
 /**
  * Live races against the real Supabase project: two learners in two isolated browser contexts
@@ -13,7 +13,9 @@ import { typeChar } from './harness/type.js'
 
 /**
  * About 1000 characters a minute: comfortably fast, and well under the server's plausibility
- * ceiling, which rejects a log typed faster than a human can.
+ * ceiling, which rejects a log typed faster than a human can. The keystrokes are paced inside the
+ * page (`typeText`), not one Playwright round trip each: on WebKit a round trip costs far more than
+ * the 60 ms gap, which slowed a 250-character room to a crawl and ran the test out of time.
  */
 const KEY_DELAY_MS = 60
 
@@ -28,14 +30,9 @@ async function race(page: Page, wrongAt: number | null): Promise<void> {
   await expect(page.locator('.race-run__line[data-live]')).toBeVisible({ timeout: 20_000 })
   const text = await page.locator('[data-testid="typing-line"] .sr-only').textContent()
   if (text === null || text.length === 0) throw new Error('no race text on the page')
-  for (const [index, char] of [...text].entries()) {
-    if (index === wrongAt) {
-      await typeChar(page, '#')
-      await page.waitForTimeout(KEY_DELAY_MS)
-    }
-    await typeChar(page, char)
-    await page.waitForTimeout(KEY_DELAY_MS)
-  }
+  const chars = [...text]
+  if (wrongAt !== null) chars.splice(wrongAt, 0, '#')
+  await typeText(page, chars.join(''), KEY_DELAY_MS)
 }
 
 async function ranking(page: Page): Promise<string[]> {

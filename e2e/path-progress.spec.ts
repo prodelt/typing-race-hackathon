@@ -657,10 +657,24 @@ async function registerWorker(page: Page): Promise<void> {
 }
 
 test.describe('US3 practice with the network away (§8.10)', () => {
+  // The worker is what these scenarios are about; the rest of the suite blocks it (see the note on
+  // `serviceWorkers` in playwright.config.ts).
+  test.use({ serviceWorkers: 'allow' })
+
   test('after one successful load, an unlocked exercise starts, completes and shows its result offline (scenario 11)', async ({
     page,
     context,
+    browserName,
   }) => {
+    // Playwright's offline emulation in WebKit refuses every navigation while offline — including
+    // one the controlling service worker would answer, so the harness cannot express this scenario
+    // there ("WebKit encountered an internal error" on the goto; the same navigation is served by
+    // the worker in Chromium and Firefox). The worker's registration is still proven on WebKit by
+    // the next test; the offline run itself is proven on the other two engines.
+    test.skip(
+      browserName === 'webkit',
+      'WebKit offline emulation blocks service-worker navigations',
+    )
     await seedLearner(page)
     await page.goto('/map')
     await expect(page.getByTestId('keyboard-summary')).toBeVisible()
