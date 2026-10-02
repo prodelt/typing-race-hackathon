@@ -144,7 +144,8 @@ test.describe('server attack suite', { tag: ['@backend', '@security'] }, () => {
 
   test.describe('Edge Functions refuse a caller who is nobody', () => {
     for (const name of FUNCTIONS) {
-      test(`${name}: no Authorization, the anon key, garbage and a tampered JWT all get 401`, async ({}, info) => {
+      test(`${name}: no Authorization, the anon key, garbage and a tampered JWT all get 401`, async () => {
+        const info = test.info()
         const tampered = (() => {
           const [head, payload, signature] = s.token.split('.')
           const body = JSON.parse(Buffer.from(payload ?? '', 'base64url').toString('utf8'))
@@ -169,7 +170,8 @@ test.describe('server attack suite', { tag: ['@backend', '@security'] }, () => {
   // ---- submit-attempt ------------------------------------------------------------------------
 
   test.describe('submit-attempt', () => {
-    test('accepts an honest attempt, once: a replay stores nothing new', async ({}, info) => {
+    test('accepts an honest attempt, once: a replay stores nothing new', async () => {
+      const info = test.info()
       const id = uuid()
       const first = await asS.fn('submit-attempt', { attempts: [submission(id)] })
       await mark(info, 'honest attempt', 'one plausible log', 'accepted', first)
@@ -183,7 +185,8 @@ test.describe('server attack suite', { tag: ['@backend', '@security'] }, () => {
       expect(rows(stored)).toHaveLength(1)
     })
 
-    test('another user cannot overwrite an attempt by sending its id', async ({}, info) => {
+    test('another user cannot overwrite an attempt by sending its id', async () => {
+      const info = test.info()
       const id = uuid()
       await asS.fn('submit-attempt', { attempts: [submission(id)] })
       const before = rows(await asS.select(`attempts?id=eq.${id}&select=metrics,mode`))[0]
@@ -201,7 +204,8 @@ test.describe('server attack suite', { tag: ['@backend', '@security'] }, () => {
       expect(rows(await asB.select(`attempts?id=eq.${id}&select=id`))).toHaveLength(0)
     })
 
-    test('every number is recomputed: claimed metrics are ignored', async ({}, info) => {
+    test('every number is recomputed: claimed metrics are ignored', async () => {
+      const info = test.info()
       const id = uuid()
       const forged = submission(id)
       Object.assign(forged.attempt, { metrics: { spm: 99_999, accuracy: 1, wpm: 99_999 } })
@@ -234,7 +238,8 @@ test.describe('server attack suite', { tag: ['@backend', '@security'] }, () => {
       ['a 100 KB exercise id', { attempt: { scaleId: 'x'.repeat(100_000) } }, 'unknown_scale'],
     ]
     for (const [label, over, reason] of rejections) {
-      test(`rejects ${label}`, async ({}, info) => {
+      test(`rejects ${label}`, async () => {
+        const info = test.info()
         const id = uuid()
         const reply = await asS.fn('submit-attempt', { attempts: [submission(id, over)] })
         await mark(info, `rejects ${label}`, 'one forged attempt', reason, reply)
@@ -248,7 +253,8 @@ test.describe('server attack suite', { tag: ['@backend', '@security'] }, () => {
       })
     }
 
-    test('malformed bodies are refused or rejected, never a server error', async ({}, info) => {
+    test('malformed bodies are refused or rejected, never a server error', async () => {
+      const info = test.info()
       const good = submission(uuid())
       const shapes: [string, unknown, string?][] = [
         ['attempts is a string', { attempts: 'x' }],
@@ -289,7 +295,8 @@ test.describe('server attack suite', { tag: ['@backend', '@security'] }, () => {
       expect(notJson.status).toBe(400)
     })
 
-    test('an oversized batch and an oversized log are refused', async ({}, info) => {
+    test('an oversized batch and an oversized log are refused', async () => {
+      const info = test.info()
       const many = Array.from({ length: 1500 }, () => submission(uuid()))
       const batch = await asS.fn('submit-attempt', { attempts: many })
       await mark(info, 'batch of 1500 attempts', 'one request', '413 (the client sends 50)', batch)
@@ -313,7 +320,8 @@ test.describe('server attack suite', { tag: ['@backend', '@security'] }, () => {
       }
     })
 
-    test('the rate limit holds: 60 requests in ten minutes, then 429 with Retry-After', async ({}, info) => {
+    test('the rate limit holds: 60 requests in ten minutes, then 429 with Retry-After', async () => {
+      const info = test.info()
       const asX = caller(api, x)
       const replies: Reply[] = []
       for (let i = 0; i < 70; i++) replies.push(await asX.fn('submit-attempt', { attempts: [] }))
@@ -356,7 +364,8 @@ test.describe('server attack suite', { tag: ['@backend', '@security'] }, () => {
       if (wait > 0) await new Promise((resolve) => setTimeout(resolve, wait))
     })
 
-    test('a log typed in a millisecond a key is rejected as a script, and the verdict is final', async ({}, info) => {
+    test('a log typed in a millisecond a key is rejected as a script, and the verdict is final', async () => {
+      const info = test.info()
       const log = raceLog(room1.text, 1)
       const forged = await asA.fn('finish-race', {
         roomId: room1.roomId,
@@ -384,7 +393,8 @@ test.describe('server attack suite', { tag: ['@backend', '@security'] }, () => {
       expect((second.body as { validated: boolean }).validated).toBe(false)
     })
 
-    test('an honest log is validated, and the server judges it from the text, not from the flags', async ({}, info) => {
+    test('an honest log is validated, and the server judges it from the text, not from the flags', async () => {
+      const info = test.info()
       const log = raceLog(room1.text, 55)
       const reply = await asB.fn('finish-race', {
         roomId: room1.roomId,
@@ -396,7 +406,8 @@ test.describe('server attack suite', { tag: ['@backend', '@security'] }, () => {
       expect((reply.body as { validated: boolean }).validated).toBe(true)
     })
 
-    test('a racer who pressed Backspace after a correct letter and retyped it is still validated', async ({}, info) => {
+    test('a racer who pressed Backspace after a correct letter and retyped it is still validated', async () => {
+      const info = test.info()
       const log = raceLog(room2.text, 55, ['BS'])
       const reply = await asC.fn('finish-race', {
         roomId: room2.roomId,
@@ -408,7 +419,8 @@ test.describe('server attack suite', { tag: ['@backend', '@security'] }, () => {
       expect((reply.body as { validated: boolean; reason?: string }).validated).toBe(true)
     })
 
-    test('someone who is not in the room cannot finish it, and a race that has not started cannot be finished', async ({}, info) => {
+    test('someone who is not in the room cannot finish it, and a race that has not started cannot be finished', async () => {
+      const info = test.info()
       const log = raceLog(room1.text, 55)
       const outsider = await asD.fn('finish-race', {
         roomId: room1.roomId,
@@ -471,7 +483,8 @@ test.describe('server attack suite', { tag: ['@backend', '@security'] }, () => {
       'race_rating_changes',
     ]
 
-    test('a visitor with only the anon key reads no table', async ({}, info) => {
+    test('a visitor with only the anon key reads no table', async () => {
+      const info = test.info()
       for (const table of TABLES) {
         const reply = await visit.select(`${table}?select=*&limit=5`)
         await mark(info, `visitor reads ${table}`, 'GET with the anon key', 'nothing', reply)
@@ -479,7 +492,8 @@ test.describe('server attack suite', { tag: ['@backend', '@security'] }, () => {
       }
     })
 
-    test('another user cannot read, change or delete my rows', async ({}, info) => {
+    test('another user cannot read, change or delete my rows', async () => {
+      const info = test.info()
       // B looks for A's profile, attempts and rooms by id.
       for (const [table, column] of [
         ['profiles', 'id'],
@@ -503,7 +517,8 @@ test.describe('server attack suite', { tag: ['@backend', '@security'] }, () => {
       expect(rows(await asS.select('attempts?select=id')).length).toBeGreaterThan(0)
     })
 
-    test('a user cannot take another nick, flip the test flag or move a profile', async ({}, info) => {
+    test('a user cannot take another nick, flip the test flag or move a profile', async () => {
+      const info = test.info()
       const takeover = await asB.patch(`profiles?id=eq.${b.id}`, { nickname: nickA.toUpperCase() })
       await mark(info, 'nick takeover', "PATCH my nick to A's nick", '409', takeover)
       expect(takeover.status).toBe(409)
@@ -521,7 +536,8 @@ test.describe('server attack suite', { tag: ['@backend', '@security'] }, () => {
       }
     })
 
-    test('nobody writes attempts, results, ratings or boards through the data API', async ({}, info) => {
+    test('nobody writes attempts, results, ratings or boards through the data API', async () => {
+      const info = test.info()
       const writes: [string, Record<string, unknown>][] = [
         [
           'attempts',
@@ -569,7 +585,8 @@ test.describe('server attack suite', { tag: ['@backend', '@security'] }, () => {
       expect(rows(result)).toHaveLength(0)
     })
 
-    test('internal functions are not callable, as a user or as a visitor', async ({}, info) => {
+    test('internal functions are not callable, as a user or as a visitor', async () => {
+      const info = test.info()
       const room = room1.roomId
       const calls: [string, Record<string, unknown>][] = [
         ['race_notify', { p_room: room, p_event: 'x', p_payload: {} }],
@@ -603,7 +620,8 @@ test.describe('server attack suite', { tag: ['@backend', '@security'] }, () => {
       }
     })
 
-    test('room and group operations need a session, and the right seat', async ({}, info) => {
+    test('room and group operations need a session, and the right seat', async () => {
+      const info = test.info()
       for (const [name, args] of [
         ['create_private_room', { p_language: 'en' }],
         ['join_by_code', { p_code: room1.code }],
@@ -646,7 +664,8 @@ test.describe('server attack suite', { tag: ['@backend', '@security'] }, () => {
       expect(guestStart.body ?? null).toBeNull()
     })
 
-    test('groups: a stranger cannot remove a member, rotate the code or read the group', async ({}, info) => {
+    test('groups: a stranger cannot remove a member, rotate the code or read the group', async () => {
+      const info = test.info()
       const made = rows(
         await asA.rpc('create_group', { p_name: `Attack ${Date.now() % 100_000}` }),
       )[0]
@@ -687,10 +706,11 @@ test.describe('server attack suite', { tag: ['@backend', '@security'] }, () => {
       expect(rows(await asD.select(`groups?id=eq.${group}&select=*`))).toHaveLength(0)
     })
 
-    test('the public leaderboard shows nicks and numbers, not identities', async ({}, info) => {
+    test('the public leaderboard shows nicks and numbers, not identities', async () => {
+      const info = test.info()
       const reply = await visit.rpc('leaderboard', {
-        p_scope: 'global',
-        p_period: 'all',
+        p_scope: 'all',
+        p_language: 'en',
         p_group: null,
         p_limit: 20,
       })
@@ -759,7 +779,8 @@ test.describe('server attack suite', { tag: ['@backend', '@security'] }, () => {
       return result
     }
 
-    test('a participant hears the room, a stranger and a visitor do not', async ({}, info) => {
+    test('a participant hears the room, a stranger and a visitor do not', async () => {
+      const info = test.info()
       const topic = `race:${room1.roomId}`
       const member = await join(a, topic)
       expect(member, 'the host joins its own room (control)').toBe('ok')
@@ -774,7 +795,8 @@ test.describe('server attack suite', { tag: ['@backend', '@security'] }, () => {
   // ---- delete-account ------------------------------------------------------------------------
 
   test.describe('delete-account', () => {
-    test('deletes only the caller, whoever the body names', async ({}, info) => {
+    test('deletes only the caller, whoever the body names', async () => {
+      const info = test.info()
       const reply = await caller(api, z).fn('delete-account', {
         userId: a.id,
         id: a.id,
@@ -797,7 +819,8 @@ test.describe('server attack suite', { tag: ['@backend', '@security'] }, () => {
 
   // ---- Anonymous sign-in ---------------------------------------------------------------------
 
-  test('a guest can be made without an email, and holds no more rights than a user', async ({}, info) => {
+  test('a guest can be made without an email, and holds no more rights than a user', async () => {
+    const info = test.info()
     const guest = await signUpGuest(api)
     const asGuest = caller(api, guest)
     const profile = await asGuest.select(`profiles?id=eq.${guest.id}&select=nickname,is_test`)
