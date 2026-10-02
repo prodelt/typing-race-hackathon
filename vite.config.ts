@@ -9,6 +9,19 @@ import { defineConfig, type Plugin, transformWithOxc } from 'vite'
 
 const appRoot = fileURLToPath(new URL('./apps/web', import.meta.url))
 
+/**
+ * The security headers production serves, read from `vercel.json` so `vite preview` — which every
+ * e2e run and every Lighthouse run uses — enforces the same Content-Security-Policy. A screen that
+ * needs something the policy forbids then fails locally instead of only on the deployed site.
+ */
+function productionHeaders(): Record<string, string> {
+  const config = JSON.parse(
+    readFileSync(fileURLToPath(new URL('./vercel.json', import.meta.url)), 'utf-8'),
+  ) as { headers?: { source: string; headers: { key: string; value: string }[] }[] }
+  const all = config.headers?.find((rule) => rule.source === '/(.*)')?.headers ?? []
+  return Object.fromEntries(all.map(({ key, value }) => [key, value]))
+}
+
 /** Ticket 15: initial JS at most 150 KB gzip, with Motion and the charts lazy-loaded. */
 const INITIAL_JS_BUDGET_BYTES = 150 * 1024
 
@@ -121,5 +134,8 @@ export default defineConfig({
   },
   server: {
     port: 5173,
+  },
+  preview: {
+    headers: productionHeaders(),
   },
 })

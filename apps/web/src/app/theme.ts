@@ -46,7 +46,20 @@ export function readEnvironment(): ThemeEnvironment {
  */
 export function applyPresentation(settings: Settings, environment: ThemeEnvironment): void {
   const root = document.documentElement
-  root.dataset['theme'] = resolveTheme(settings.theme, environment.prefersDark)
+  const theme = resolveTheme(settings.theme, environment.prefersDark)
+  if (root.dataset['theme'] !== theme) {
+    // A theme change is a swap, never a fade. Boot paints the default theme and the stored one
+    // arrives from IndexedDB a moment later; without this, every `transition: color` in the
+    // frame would fade from light to dark on each load (WebKit keeps those transitions alive for
+    // hundreds of milliseconds even at the motion-off duration). `data-theme-swap` turns
+    // transitions off (themes.css), the forced style flush makes the swap land under it, and
+    // removing it again leaves nothing to animate because nothing changes after that.
+    root.dataset['themeSwap'] = ''
+    root.dataset['theme'] = theme
+    void getComputedStyle(root).color
+    void document.body?.offsetHeight
+    delete root.dataset['themeSwap']
+  }
   root.dataset['motion'] = resolveMotion(settings.motion, environment.prefersReduced)
   root.dataset['sound'] = settings.sound
   root.style.setProperty('--text-typing', `${settings.textSizePx}px`)

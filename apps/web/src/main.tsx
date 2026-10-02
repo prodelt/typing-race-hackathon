@@ -3,6 +3,7 @@ import '@typing-race/ui/tokens.css'
 import '@typing-race/ui/themes.css'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import { isOutsideFrame } from './app/destinations.js'
 import { buildRouteTree } from './app/router.js'
 import { DEFAULT_SETTINGS, useAppStore } from './app/state/index.js'
 import { applyPresentation, readEnvironment, watchSystemPreferences } from './app/theme.js'
@@ -42,6 +43,21 @@ const router = createRouter({
   // simply swap the page — which is what they do today anyway.
   defaultViewTransition: true,
 })
+
+// The crossfade is the frame's: it moves the stage between two screens *of the frame*. The first
+// render has no screen to fade from, and the product page (/about) has no frame at all, so neither
+// takes one. WebKit's renderer crashes outright on a transition into /about (the stage named
+// `main` vanishes mid-transition), which is how this rule was found.
+const crossfade = router.startViewTransition.bind(router)
+router.startViewTransition = (update) => {
+  const from = router.state.resolvedLocation?.pathname
+  const to = router.latestLocation.pathname
+  if (from === undefined || isOutsideFrame(from) || isOutsideFrame(to)) {
+    delete router.shouldViewTransition
+    return update()
+  }
+  return crossfade(update)
+}
 
 declare module '@tanstack/react-router' {
   interface Register {

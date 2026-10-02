@@ -12,11 +12,11 @@
 .fr {
   --fr-gap: 8px;
   --fr-pad: clamp(16px, 1.7vw, 28px);
-  /* B's finger zones: white at the pinkies, deepening to the index fingers. */
-  --fz-0: var(--color-paper-raised);
-  --fz-1: color-mix(in srgb, var(--color-accent) 8%, var(--color-paper-raised));
-  --fz-2: color-mix(in srgb, var(--color-accent) 16%, var(--color-paper-raised));
-  --fz-3: color-mix(in srgb, var(--color-accent) 27%, var(--color-paper-raised));
+  /* B's finger zones (tokens.css): white at the pinkies, deepening to the index fingers. */
+  --fz-0: var(--color-zone-0);
+  --fz-1: var(--color-zone-1);
+  --fz-2: var(--color-zone-2);
+  --fz-3: var(--color-zone-3);
   height: 100%;
   min-height: 560px;
   display: grid;
@@ -542,7 +542,7 @@
   background: var(--fz, var(--fz-0));
   box-shadow: inset 0 -3px 0 rgb(20 20 20 / 10%);
   font: 500 calc(var(--k) * 0.36) / 1 var(--font-ui);
-  color: var(--color-ink-soft);
+  color: var(--color-zone-ink);
   transition:
     background-color var(--dur-quick) var(--ease-enter),
     color var(--dur-quick) linear,

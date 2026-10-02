@@ -1,6 +1,5 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
-  "shell_rail_label": "Розділи",
   "shell_dest_home": "Головна",
   "shell_dest_map": "Мапа",
   "shell_dest_races": "Перегони",
@@ -22,7 +21,6 @@
   "shell_streak_hint": "Серія: {days} дн. поспіль хоча б з однією завершеною спробою. Заморозка: один пропущений день не обнуляє серію.",
   "shell_freeze": "заморозка {n}",
   "shell_rating": "рейтинг перегонів",
-  "shell_rating_hint": "Рейтинг перегонів: змінюється тільки в перегонах, не в заняттях.",
   "shell_layout": "Розкладка",
   "shell_layout_hint": "Розкладка для занять і перегонів",
   "shell_sound_on": "Звук: увімкнено",
@@ -42,14 +40,5 @@
   "shell_tab_leaderboards": "Рейтинги",
   "shell_keyboard_title": "Потрібна фізична клавіатура",
   "shell_keyboard_body": "Сліпий набір вчать на справжній клавіатурі, тож заняття й перегони відкриваються на комп’ютері. Тут можна переглянути профіль, рейтинги й перегони.",
-  "profile_title": "Профіль",
-  "profile_lead": "Гість, без входу. Прогрес зберігається лише в цьому браузері.",
-  "profile_level": "Рівень",
-  "profile_streak": "Серія",
-  "profile_streak_value": "{days} дн.",
-  "profile_rating": "Рейтинг перегонів",
-  "profile_rating_none": "ще немає",
-  "profile_goal": "Мета дня",
-  "profile_goal_value": "{today} з {goal} хв",
-  "profile_soon": "Вхід через Google, історія і досягнення з’являться тут незабаром."
+  "profile_title": "Профіль"
 }

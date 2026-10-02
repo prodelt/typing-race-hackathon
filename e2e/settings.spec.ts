@@ -512,12 +512,23 @@ interface Traversal {
 }
 
 /**
+ * Whether Tab stops on links in this engine. WebKit follows Safari's platform default: Tab moves
+ * between form controls only, and links join the order only with "Press Tab to highlight each
+ * item" switched on (or Option+Tab on macOS, which Playwright's WebKit on other platforms does not
+ * emulate). That is the browser's choice, not a gap in the page, so on WebKit the traversal expects
+ * every control *except* plain links; Chromium and Firefox still prove the links are reachable.
+ */
+function tabStopsOnLinks(page: Page): boolean {
+  return page.context().browser()?.browserType().name() !== 'webkit'
+}
+
+/**
  * Tabs through the page and reports which tab stops were reached, which were not, and where focus
  * gave no visible sign. Radio groups are one tab stop each, by the platform's own rule, so the
  * expectation counts a group once; arrow keys inside a group are checked separately.
  */
 async function traverse(page: Page): Promise<Traversal> {
-  await page.evaluate(() => {
+  await page.evaluate((linksTabbable) => {
     const ids = new Map<Element, number>()
     const label = (element: Element): string => {
       // A number makes two radios, or two links with one name, two different stops.
@@ -537,6 +548,13 @@ async function traverse(page: Page): Promise<Traversal> {
     ].filter((element) => {
       if ((element as HTMLButtonElement).disabled) return false
       if (element.tabIndex < 0) return false
+      if (
+        !linksTabbable &&
+        element instanceof HTMLAnchorElement &&
+        !element.hasAttribute('tabindex')
+      ) {
+        return false
+      }
       // The skip link is visually hidden until focused; it is still a real tab stop.
       return visible(element) || element.classList.contains('sr-only')
     })
@@ -552,9 +570,17 @@ async function traverse(page: Page): Promise<Traversal> {
     const bag = window as unknown as { __stops: HTMLElement[]; __label: typeof label }
     bag.__stops = stops
     bag.__label = label
-    for (const stop of stops) label(stop)
+    for (const stop of stops)
+      label(stop)
+      // Start from the top of the document. A screen may autofocus its main action (the pre-start
+      // focuses «Почати»); `body.focus()` alone moves Chromium's starting point but not Firefox's,
+      // which then tabs on from the autofocused button and wraps through the browser's own UI.
+      // A focusable body, focused and released, resets the starting point in every engine.
+    ;(document.activeElement as HTMLElement | null)?.blur()
+    document.body.tabIndex = -1
     document.body.focus()
-  })
+    document.body.removeAttribute('tabindex')
+  }, tabStopsOnLinks(page))
 
   const expected = await page.evaluate(
     () =>
@@ -782,5 +808,55 @@ test.describe('US5 accessibility audit of every screen (SC-011)', () => {
         await audit(page)
       })
     }
+  }
+
+  // The screens the game shell added after the audit above was written, in all three themes. The
+  // Races lobby and Community ask the backend for their content (or say calmly that it is away),
+  // so the audit waits for the network to go quiet: either way it audits the settled screen.
+  for (const theme of ['light', 'dark', 'lowVision'] as const) {
+    for (const [name, path] of [
+      ['the Races lobby', '/races'],
+      ['Profile', '/profile'],
+      ['Community', '/groups'],
+      ['the leaderboards', '/leaderboards'],
+    ] as const) {
+      test(`${name} in the ${theme} theme has no accessibility violations`, async ({ page }) => {
+        await seedLearner(page, theme)
+        await page.goto(path)
+        await expect(page.getByRole('heading', { level: 1 }).first()).toBeVisible()
+        await page.waitForLoadState('networkidle')
+        await expect(html(page)).toHaveAttribute(
+          'data-theme',
+          theme === 'lowVision' ? 'low-vision' : theme,
+        )
+        await audit(page)
+      })
+    }
+
+    test(`the running typing screen with its keyboard in the ${theme} theme has no accessibility violations`, async ({
+      page,
+    }) => {
+      await seedLearner(page, theme)
+      await page.goto(`/exercise/${ANCHORS}?mode=practice`)
+      await page.getByRole('button', { name: 'Почати', exact: true }).click()
+      await expect(page.getByTestId('keyboard-guide')).toBeVisible()
+      await audit(page)
+    })
+
+    test(`the first run's finger scheme in the ${theme} theme has no accessibility violations`, async ({
+      page,
+    }) => {
+      await page.emulateMedia({ reducedMotion: 'reduce' })
+      await seedStore(page, {
+        settings: { ...MOTION_OFF_SETTINGS, theme },
+        startingLevelByLanguage: {},
+      } as never)
+      await page.goto('/today')
+      await openLevelStep(page)
+      await page.getByRole('radio', { name: /Ще не друкую наосліп/ }).check()
+      await page.getByTestId('first-run-next').click()
+      await expect(page.getByTestId('finger-scheme')).toBeVisible()
+      await audit(page)
+    })
   }
 })
