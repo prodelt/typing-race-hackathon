@@ -385,6 +385,33 @@ test.describe('US2 the result of an attempt', () => {
     await expect(region(page, 'Нова клавіша відкрита')).toHaveCount(0)
   })
 
+  test('a Practice Attempt says once that it does not count, and what its accuracy asks for next', async ({
+    page,
+  }) => {
+    await seedLearner(page, [
+      { id: 'above', scaleId: FIRST_KEY, mode: 'practice', accuracy: 0.952 },
+      { id: 'below', scaleId: FIRST_KEY, mode: 'practice', accuracy: 0.9 },
+    ])
+    const score = page.getByTestId('result-score')
+
+    await page.goto('/result/above')
+    await expect(score).toContainText(
+      'Точність 95,2% не нижча за поріг 95%. Тепер пройдіть залікову.',
+    )
+    await expect(score.getByText('не рахується в опанування')).toHaveCount(1)
+
+    await page.goto('/result/below')
+    await expect(score).toContainText(
+      'Точність 90,0% нижча за поріг 95%. Коли вона дотягнеться до 95%, пройдіть залікову.',
+    )
+    await expect(score.getByText('не рахується в опанування')).toHaveCount(1)
+
+    // The status bar counts days without a plural to get wrong: "1 дн. серія", never "1 днів серія".
+    const bar = page.getByRole('region', { name: 'Стан гравця' })
+    await expect(bar).toContainText('дн. серія')
+    await expect(bar).not.toContainText('днів')
+  })
+
   test('intervals over 400 ms are drawn in the error colour and marked without colour (scenario 9)', async ({
     page,
   }) => {
