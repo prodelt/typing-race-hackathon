@@ -2,7 +2,7 @@
   "format": "typing-race/academy@1",
   "language": "en",
   "layout": "qwerty",
-  "algorithmVersion": "1.0.0",
+  "algorithmVersion": "1.1.0",
   "modules": [
     {
       "id": "warm-up",
@@ -588,17 +588,17 @@
         },
         {
           "id": "academy.en.trigrams.5",
-          "title": "his · our",
-          "text": "his his his this his history his his whispering whistle whispers our our our your our course our our yourself four hours",
-          "focus": "his our",
+          "title": "ere · all",
+          "text": "ere ere ere there here where ere ere were different somewhere all all all all really call all all actually called shall",
+          "focus": "ere all",
           "targetSpm": null,
           "source": "derived"
         },
         {
           "id": "academy.en.trigrams.6",
-          "title": "for · wha",
-          "text": "for for for for before forget for for forgive forever forgot wha wha wha what whatever whale wha wha somewhat whatsoever whack",
-          "focus": "for wha",
+          "title": "his · our",
+          "text": "his his his this his history his his whispering whistle whispers our our our your our course our our yourself four hours",
+          "focus": "his our",
           "targetSpm": null,
           "source": "derived"
         },

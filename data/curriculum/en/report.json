@@ -1,7 +1,7 @@
 {
   "format": "typing-race/academy-report@1",
   "language": "en",
-  "algorithmVersion": "1.0.0",
+  "algorithmVersion": "1.1.0",
   "inputs": [
     {
       "path": "english/academy/typing-race-2026/course.json",
@@ -218,7 +218,7 @@
   ],
   "outputs": {
     "academy.json": {
-      "sha256": "c9c7541f7e98ec80cc6c7305ac3687cbbb71ead202cfb7264e87181a62676d8c"
+      "sha256": "01d921eeb138be720b76a085dae481081bbe939277ddd7b9b9d8dff9e5842e0b"
     }
   }
 }

@@ -1,4 +1,5 @@
 import {
+  academyLevel,
   introductionLevel,
   levels,
   MASTERY_STREAK,
@@ -48,6 +49,7 @@ export function Progression() {
             <tbody>
               {levels.map((level) => {
                 const inForce = level.id === introductionLevel.id
+                const inAcademy = level.id === academyLevel.id
                 return (
                   <tr key={level.id}>
                     <th scope="row">{level.name[language()]}</th>
@@ -55,8 +57,12 @@ export function Progression() {
                     <td className="ref-table__mono">{percent(level.accuracyFloor)}</td>
                     <td>{level.goal[language()]}</td>
                     <td>
-                      <span className={inForce ? 'scr-tag scr-tag--ink' : 'scr-tag'}>
-                        {inForce ? m.formulas_status_in_force() : m.formulas_status_informational()}
+                      <span className={inForce || inAcademy ? 'scr-tag scr-tag--ink' : 'scr-tag'}>
+                        {inForce
+                          ? m.formulas_status_in_force()
+                          : inAcademy
+                            ? m.formulas_status_academy()
+                            : m.formulas_status_informational()}
                       </span>
                     </td>
                   </tr>

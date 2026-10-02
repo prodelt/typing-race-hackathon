@@ -1,7 +1,7 @@
 {
   "format": "typing-race/academy-report@1",
   "language": "uk",
-  "algorithmVersion": "1.0.0",
+  "algorithmVersion": "1.1.0",
   "inputs": [
     {
       "path": "ukrainian/academy/typing-race-2026/course.json",
@@ -183,7 +183,7 @@
   ],
   "outputs": {
     "academy.json": {
-      "sha256": "6b612600453a5284e91d07e6ec0cd208cf8a844697aa3228557daf36a3db8fb2"
+      "sha256": "c05a91efbffbb3d4c52ac094d9f675fad4ff84cceb44f4c14234371dff122e9e"
     }
   }
 }

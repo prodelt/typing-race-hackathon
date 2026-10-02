@@ -42,15 +42,21 @@ const SOURCES = [
   },
   {
     name: 'Typing-Race 2026 (academy, knowledge, texts)',
-    licence: 'used with the organisers’ permission',
+    licence: 'supplied by the hackathon organisers; the package declares no licence',
     url: 'https://github.com/StsZu/Typing-race-2026',
     use: () => m.academy_licence_use(),
   },
   {
-    name: 'Unbounded, Onest',
+    name: 'Unbounded (© 2022 The Unbounded Project Authors)',
     licence: 'SIL Open Font License 1.1',
-    url: 'https://openfontlicense.org',
-    use: () => m.page_licences_fonts(),
+    url: '/licenses/OFL-Unbounded.txt',
+    use: () => m.page_licences_font_unbounded(),
+  },
+  {
+    name: 'Onest (© 2021 The Onest Project Authors)',
+    licence: 'SIL Open Font License 1.1',
+    url: '/licenses/OFL-Onest.txt',
+    use: () => m.page_licences_font_onest(),
   },
 ] as const
 
