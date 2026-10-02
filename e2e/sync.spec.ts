@@ -9,9 +9,10 @@ import { typeText } from './harness/type.js'
  * cloud through the outbox and `submit-attempt`, and B unions it into its own local history on its
  * next sync (here, the boot sync of a fresh load).
  *
- * The account is an anonymous test user created over the Auth REST API, because the sign-in UI is
- * another ticket; its session is planted where the app keeps it. Tagged `@backend` and skipped when
- * the build has no Supabase configuration.
+ * The account is a test user with an email identity, created over the Auth REST API because Google
+ * cannot be driven from a test; its session is planted where the app keeps it. It is deliberately
+ * not anonymous: a guest never syncs. Tagged `@backend` and skipped when the build has no Supabase
+ * configuration.
  */
 
 const SESSION_KEY = 'typing-race:race-auth'
@@ -34,13 +35,17 @@ interface Session {
   user: { id: string }
 }
 
-async function anonymousTestUser(): Promise<Session> {
+async function accountTestUser(): Promise<Session> {
   const response = await fetch(`${env('VITE_SUPABASE_URL')}/auth/v1/signup`, {
     method: 'POST',
     headers: { apikey: env('VITE_SUPABASE_ANON_KEY'), 'Content-Type': 'application/json' },
-    body: JSON.stringify({ data: { is_test: true } }),
+    body: JSON.stringify({
+      email: `e2e-${crypto.randomUUID()}@example.com`,
+      password: crypto.randomUUID(),
+      data: { is_test: true },
+    }),
   })
-  if (!response.ok) throw new Error(`anonymous sign-up failed: ${response.status}`)
+  if (!response.ok) throw new Error(`test sign-up failed: ${response.status}`)
   return (await response.json()) as Session
 }
 
@@ -88,7 +93,7 @@ test.describe('@backend sync', () => {
 
   test('an attempt typed on one device appears on the other after a sync', async ({ browser }) => {
     test.setTimeout(120_000)
-    const session = await anonymousTestUser()
+    const session = await accountTestUser()
     const [contextA, a] = await device(browser, session)
     const [contextB, b] = await device(browser, session)
 

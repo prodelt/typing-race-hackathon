@@ -22,7 +22,7 @@
   "acct_sync_rejected": "Attempts the server refused: {n} — their keystroke log did not pass the check. They stay in this device's history.",
   "acct_guest_body": "You are playing as a guest: progress lives in this browser only. Sign in with Google and your level, attempts and settings follow you to any device.",
   "acct_anon_body": "You are playing as a guest named {nick}. Sign in with Google and your nick, races and progress stay yours on any device.",
-  "acct_privacy": "Only your nick is public. Nobody sees your Google email, name or photo.",
+  "acct_privacy": "Only your nick is public. Nobody else sees your Google email, name or photo.",
   "acct_no_backend": "Sign-in is unavailable right now: the server cannot be reached. Training works without it — progress stays in this browser.",
   "acct_nick": "Nick",
   "acct_nick_public": "the only thing others see",
@@ -48,6 +48,8 @@
   "acct_signout_failed": "Signing out failed. Try again.",
   "acct_delete_title": "Delete all your data?",
   "acct_delete_body": "This deletes your account, nick, every attempt and race result — in the cloud and in this browser. Groups you created pass to their oldest member. It cannot be undone.",
+  "acct_delete_title_guest": "Delete the guest profile?",
+  "acct_delete_body_guest": "This deletes the guest profile on the server: nick, race results and group memberships. Your training progress stays in this browser — it never left it. It cannot be undone.",
   "acct_delete_confirm": "Delete for good",
   "acct_delete_cancel": "Cancel",
   "acct_deleting": "Deleting…",
@@ -64,5 +66,6 @@
   "acct_close": "Close",
   "acct_toast_signed_in": "You are signed in. Progress is syncing.",
   "acct_toast_signed_out": "You are signed out. This browser's progress was removed — it is safe in the cloud.",
-  "acct_toast_deleted": "Your data was deleted."
+  "acct_toast_deleted": "Your data was deleted.",
+  "acct_toast_deleted_guest": "Guest profile deleted. Your progress in this browser is untouched."
 }

@@ -43,6 +43,8 @@ export interface FakeSupabase {
   /** Nicks another learner already has. */
   readonly takenNicks: Set<string>
   readonly deleted: string[]
+  /** Calls `submit-attempt` received, whoever sent them and whatever the answer was. */
+  submitCalls: number
   readonly logouts: number[]
   /** Requests nothing here answers: a spec asserts this stays empty. */
   readonly unexpected: string[]
@@ -121,6 +123,7 @@ export async function fakeSupabase(target: Page | BrowserContext): Promise<FakeS
     refuseFrom: new Set(),
     takenNicks: new Set(),
     deleted: [],
+    submitCalls: 0,
     logouts: [],
     unexpected: [],
     session: (user) => issue(user),
@@ -255,6 +258,7 @@ export async function fakeSupabase(target: Page | BrowserContext): Promise<FakeS
 
     // ---- Edge Functions --------------------------------------------------------------------
     if (path === '/functions/v1/submit-attempt') {
+      fake.submitCalls += 1
       const user = caller(route)
       if (user === null) return json(route, 401, { error: 'not signed in' })
       if (fake.submitDown || fake.refuseFrom.has(user.id)) {

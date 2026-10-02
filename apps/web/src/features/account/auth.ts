@@ -136,15 +136,20 @@ export async function endSession(): Promise<void> {
  * "Delete my data": the `delete-account` function removes the user server-side, then the local
  * copy and the outbox go and the session ends. Nothing local is touched unless the server
  * confirmed the deletion.
+ *
+ * A guest's training never left this browser, so `keepLocal` ends only the server profile (nick,
+ * Race results, group memberships) and leaves the learner's progress where it is.
  */
-export async function deleteAccount(): Promise<'deleted' | 'failed' | 'no-backend'> {
+export async function deleteAccount(
+  options: { readonly keepLocal?: boolean } = {},
+): Promise<'deleted' | 'failed' | 'no-backend'> {
   const client = await supabaseClient()
   if (client === null) return 'no-backend'
   const { data, error } = await client.functions.invoke<{ deleted?: boolean }>('delete-account', {
     method: 'POST',
   })
   if (error || data?.deleted !== true) return 'failed'
-  await forgetLocalData()
+  if (options.keepLocal !== true) await forgetLocalData()
   await endSession()
   return 'deleted'
 }

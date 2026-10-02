@@ -98,6 +98,11 @@ function SignedOut() {
         {kind === 'anonymous' && nick !== null ? m.acct_anon_body({ nick }) : m.acct_guest_body()}
       </p>
       <p className="scr-note acct-privacy">{m.acct_privacy()}</p>
+      {kind === 'anonymous' ? (
+        <div className="acct-actions">
+          <DeleteData guest />
+        </div>
+      ) : null}
     </>
   )
 }
@@ -355,19 +360,23 @@ function SignOut() {
 
 /* ---- Delete my data -------------------------------------------------------------------------- */
 
-function DeleteData() {
+/**
+ * `guest`: the anonymous profile a Race made. Its training never left this browser, so deleting it
+ * removes the server side only and says that progress stays.
+ */
+function DeleteData({ guest = false }: { readonly guest?: boolean }) {
   const [state, dispatch] = useReducer(deleteStep, { step: 'idle' })
 
   async function confirm(): Promise<void> {
     dispatch({ type: 'confirm' })
     try {
-      const result = await (await auth()).deleteAccount()
+      const result = await (await auth()).deleteAccount({ keepLocal: guest })
       if (result !== 'deleted') {
         dispatch({ type: 'error' })
         return
       }
       dispatch({ type: 'deleted' })
-      setNotice('deleted')
+      setNotice(guest ? 'deleted-guest' : 'deleted')
     } catch {
       dispatch({ type: 'error' })
     }
@@ -388,7 +397,7 @@ function DeleteData() {
       </Button>
       {open ? (
         <Dialog
-          title={m.acct_delete_title()}
+          title={guest ? m.acct_delete_title_guest() : m.acct_delete_title()}
           tone="danger"
           onClose={() => dispatch({ type: 'cancel' })}
           testId="account-delete-dialog"
@@ -412,7 +421,7 @@ function DeleteData() {
             </>
           }
         >
-          <p>{m.acct_delete_body()}</p>
+          <p>{guest ? m.acct_delete_body_guest() : m.acct_delete_body()}</p>
           {state.step === 'failed' ? (
             <p role="alert" className="acct-dialog__error">
               {m.acct_delete_failed()}
