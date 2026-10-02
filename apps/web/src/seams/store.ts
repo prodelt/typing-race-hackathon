@@ -198,8 +198,9 @@ export function indexedDbStore(options: IndexedDbStoreOptions = {}): ProgressSto
       await mutate((current) => mergeAttempts(current, attempts))
     },
 
-    async saveSettings(settings) {
-      await mutate((current) => ({ ...current, settings }))
+    async saveSettings(settings, updatedAt) {
+      const settingsUpdatedAt = updatedAt ?? now()
+      await mutate((current) => ({ ...current, settings, settingsUpdatedAt }))
     },
 
     async saveStartingLevel(language, choice) {
@@ -265,8 +266,9 @@ export function memoryStore(
       return Promise.resolve()
     },
 
-    saveSettings(settings) {
-      mutate((current) => ({ ...current, settings }))
+    saveSettings(settings, updatedAt) {
+      const settingsUpdatedAt = updatedAt ?? now()
+      mutate((current) => ({ ...current, settings, settingsUpdatedAt }))
       return Promise.resolve()
     },
 
