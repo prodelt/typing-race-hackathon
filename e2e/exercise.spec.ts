@@ -348,6 +348,13 @@ test.describe('US1 typing an exercise', { tag: '@input' }, () => {
     const awaited = page.getByTestId('keyboard-guide').locator('[data-awaited="true"]')
     await expect(awaited).toHaveCount(1)
     await expect(awaited).toHaveText(first)
+    // The key gets its red through a transition: the Keycap has one, and the guide flips
+    // `data-awaited` after the key has been styled once. "Motion off" shortens it to a hundredth of
+    // a millisecond but does not remove it, and WebKit finishes a transition only on its next
+    // rendering update. Read at once, it still reports the zone the key came from (here the index
+    // zone, rgb(239, 174, 166)), however long the check took to get there. Wait for the
+    // transition to land, then read.
+    await settled(page)
     const ring = await awaited.evaluate((node) => {
       const style = getComputedStyle(node)
       return { style: style.outlineStyle, outline: style.outlineColor, fill: style.backgroundColor }
