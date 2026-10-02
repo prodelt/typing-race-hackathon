@@ -26,8 +26,8 @@ jobs:
 
       - name: before the fix, 60 repeats on webkit
         continue-on-error: true
-        run: pnpm exec playwright test e2e/zz-old.spec.ts -g "shows the keyboard, the next-key highlight" --project=webkit --repeat-each=60 --retries=0 --reporter=dot 2>&1 | grep -v WebServer | tail -15
+        run: pnpm exec playwright test e2e/zz-old.spec.ts -g "shows the keyboard, the next-key highlight" --project=webkit --repeat-each=60 --retries=0 --reporter=dot 2>&1 | grep -E "Expected:|Received:|[0-9]+ (passed|failed)" | sort | uniq -c
 
       - name: after the fix, 60 repeats on webkit
         continue-on-error: true
-        run: pnpm exec playwright test e2e/exercise.spec.ts -g "shows the keyboard, the next-key highlight" --project=webkit --repeat-each=60 --retries=0 --reporter=dot 2>&1 | grep -v WebServer | tail -15
+        run: pnpm exec playwright test e2e/exercise.spec.ts -g "shows the keyboard, the next-key highlight" --project=webkit --repeat-each=60 --retries=0 --reporter=dot 2>&1 | grep -E "Expected:|Received:|[0-9]+ (passed|failed)" | sort | uniq -c
