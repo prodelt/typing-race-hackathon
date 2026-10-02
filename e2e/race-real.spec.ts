@@ -124,7 +124,9 @@ test.describe('races on a real keyboard', { tag: ['@cdp', '@backend'] }, () => {
     await onUs.type([...text].slice(0, 2).join(''), { intended: 'yq' })
     // Two stray letters are a slip, not an alarm: a live race says nothing yet.
     await expect(notice).toHaveCount(0)
-    await onUs.type([...text].slice(2, 3).join(''), { intended: 'yq' })
+    // Six keys in all: some Ukrainian letters (ї, б, ю...) sit on keys a US layout turns into signs,
+    // and only letters count, so three foreign letters need a few more keys than three.
+    await onUs.type([...text].slice(2, 6).join(''), { intended: 'yq' })
     await expect(notice).toHaveAttribute('data-tone', 'wrong')
     await expect(notice).toContainText('ЙЦУКЕН')
     // The line did not move: nothing a US layout produces is a letter of this text.
