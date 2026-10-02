@@ -29,7 +29,6 @@ import {
 
 test.describe('server attack suite', { tag: ['@backend', '@security'] }, () => {
   test.skip(!localStackConfigured(), 'needs a Supabase stack on this machine')
-  test.describe.configure({ mode: 'serial' })
 
   const FUNCTIONS = ['submit-attempt', 'finish-race', 'delete-account'] as const
 
@@ -457,7 +456,7 @@ test.describe('server attack suite', { tag: ['@backend', '@security'] }, () => {
         elapsedMs: 1000,
       })
       await mark(info, 'huge race log', '200000 keystrokes', '4xx, not a long computation', flood)
-      expect(flood.status).toBeLessThan(500)
+      expect([400, 413]).toContain(flood.status)
       expect(flood.ms).toBeLessThan(15_000)
     })
   })
@@ -512,6 +511,8 @@ test.describe('server attack suite', { tag: ['@backend', '@security'] }, () => {
         'nickname'
       ]
       expect(nickNow).toBe(nickA)
+      // S has an attempt of its own to lose (this test does not rely on the order of the others).
+      await asS.fn('submit-attempt', { attempts: [submission(uuid())] })
       const wipe = await asB.remove(`attempts?user_id=eq.${s.id}`)
       expect(rows(wipe)).toHaveLength(0)
       expect(rows(await asS.select('attempts?select=id')).length).toBeGreaterThan(0)
