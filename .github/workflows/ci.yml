@@ -64,6 +64,63 @@ jobs:
           path: playwright-report/
           retention-days: 7
 
+  e2e-backend:
+    name: e2e against a local Supabase
+    runs-on: ubuntu-latest
+    # Nothing here ever reaches the live project: the build is pointed at a stack that exists only
+    # for this job, from this repository's migrations and Edge Functions.
+    env:
+      CSP_CONNECT_EXTRA: http://127.0.0.1:54321 ws://127.0.0.1:54321
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 2.116.0
+      - name: bundle the Edge Functions' shared code
+        run: pnpm supabase:bundle
+      - name: start the local stack
+        # Only what the app talks to: Postgres, Auth, the REST API, Realtime and the Edge runtime.
+        run: supabase start -x studio,imgproxy,vector,logflare,mailpit,postgres-meta,storage-api,supavisor
+      - name: point the build at it
+        run: |
+          supabase status -o env > "$RUNNER_TEMP/supabase.env"
+          {
+            echo "VITE_SUPABASE_URL=$(grep '^API_URL=' "$RUNNER_TEMP/supabase.env" | cut -d= -f2- | tr -d '"')"
+            echo "VITE_SUPABASE_ANON_KEY=$(grep '^ANON_KEY=' "$RUNNER_TEMP/supabase.env" | cut -d= -f2- | tr -d '"')"
+          } >> "$GITHUB_ENV"
+      - name: Edge Functions answer
+        run: |
+          set -x
+          docker ps --format '{{.Names}}'
+          curl -s -o /dev/null -w '%{http_code}
+' -X OPTIONS "$VITE_SUPABASE_URL/functions/v1/submit-attempt" || true
+
+      - name: chromium — the @backend scenarios
+        run: pnpm exec playwright test --project=chromium --grep @backend
+
+      - name: stack logs on failure
+        if: ${{ failure() }}
+        run: |
+          for name in $(docker ps --format '{{.Names}}'); do
+            echo "=== $name"; docker logs --tail 60 "$name" 2>&1 || true
+          done
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report-backend
+          path: playwright-report/
+          retention-days: 7
+
   secret-scan:
     name: secret scan
     runs-on: ubuntu-latest

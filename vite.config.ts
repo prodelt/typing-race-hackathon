@@ -19,7 +19,16 @@ function productionHeaders(): Record<string, string> {
     readFileSync(fileURLToPath(new URL('./vercel.json', import.meta.url)), 'utf-8'),
   ) as { headers?: { source: string; headers: { key: string; value: string }[] }[] }
   const all = config.headers?.find((rule) => rule.source === '/(.*)')?.headers ?? []
-  return Object.fromEntries(all.map(({ key, value }) => [key, value]))
+  const headers = Object.fromEntries(all.map(({ key, value }) => [key, value]))
+  // CI only: a local Supabase stack lives on http://127.0.0.1 and ws://127.0.0.1, which the
+  // production policy rightly refuses. The extra origins are named by the lane that needs them;
+  // `vercel.json`, and so production, never changes.
+  const extra = process.env['CSP_CONNECT_EXTRA']
+  const policy = headers['Content-Security-Policy']
+  if (extra !== undefined && extra !== '' && policy !== undefined) {
+    headers['Content-Security-Policy'] = policy.replace('connect-src ', `connect-src ${extra} `)
+  }
+  return headers
 }
 
 /** Ticket 15: initial JS at most 150 KB gzip, with Motion and the charts lazy-loaded. */
