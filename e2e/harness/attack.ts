@@ -108,12 +108,13 @@ export function caller(api: APIRequestContext, session: Session | null): Caller 
   return {
     fn: (name, data, options = {}) => {
       const token = options.token === undefined ? (session?.token ?? null) : options.token
+      const auth = token === null ? {} : { Authorization: `Bearer ${token}` }
       return reply(
         api.post(`/functions/v1/${name}`, {
-          headers: token === null ? {} : { Authorization: `Bearer ${token}` },
-          ...(options.raw === undefined
-            ? { data }
-            : { data: options.raw, headers: { 'Content-Type': 'application/json' } }),
+          // A raw body is sent as-is, as JSON that need not parse.
+          headers:
+            options.raw === undefined ? auth : { ...auth, 'Content-Type': 'application/json' },
+          ...(options.raw === undefined ? { data } : { data: options.raw }),
         }),
       )
     },
