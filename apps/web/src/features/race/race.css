@@ -785,8 +785,17 @@
 
 /* The one sentence a stop-on-letter race owes a learner on the wrong Active layout. Calm unless it
    is a warning; it sits above the line and never covers it. */
+/* A fixed slot, so the line never moves when the notice comes or goes (FR-058). */
+.race-layout-slot {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 76px;
+  margin-bottom: 12px;
+}
+
 .race-layout {
-  margin: 0 auto 12px;
+  margin: 0;
   max-width: 64ch;
   padding: 10px 16px;
   font-family: var(--font-ui);

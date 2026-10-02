@@ -201,13 +201,15 @@ export function RaceRun({
           if (liveRef.current && document.hasFocus()) textareaRef.current?.focus()
         }}
       />
-      <RaceLayoutNotice
-        layoutId={layoutId}
-        probe={probe}
-        proven={proven}
-        typedWrong={typedWrong}
-        live={live}
-      />
+      <div className="race-layout-slot">
+        <RaceLayoutNotice
+          layoutId={layoutId}
+          probe={probe}
+          proven={proven}
+          typedWrong={typedWrong}
+          live={live}
+        />
+      </div>
       <div className="race-run__line" data-live={live || undefined}>
         {engine === null ? null : <TypingLine engine={engine} text={text} sizePx={sizePx} />}
       </div>
