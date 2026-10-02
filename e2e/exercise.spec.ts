@@ -167,6 +167,16 @@ async function outsideTypingLine(page: Page): Promise<string[]> {
  * not about a frame.
  */
 async function audit(page: Page): Promise<void> {
+  await settled(page)
+  await expectNoAxeViolations(page)
+}
+
+/**
+ * Waits for every finite animation and transition to land. Colour read straight after a state
+ * change can be mid-transition: "motion off" is a hundredth of a millisecond, but WebKit finishes
+ * a transition only on its next rendering update, which under load can be a while away.
+ */
+async function settled(page: Page): Promise<void> {
   await page.evaluate(() =>
     Promise.all(
       document
@@ -186,7 +196,6 @@ async function audit(page: Page): Promise<void> {
         ),
     ),
   )
-  await expectNoAxeViolations(page)
 }
 
 test.describe('US1 typing an exercise', { tag: '@input' }, () => {
@@ -231,6 +240,7 @@ test.describe('US1 typing an exercise', { tag: '@input' }, () => {
     await expect(page.getByTestId('error-count')).toHaveText('1')
 
     // "Colour, a tint and an underline" (FR-016): three cues, so that none is colour alone.
+    await settled(page)
     const marked = await awaited.evaluate((node) => {
       const style = getComputedStyle(node)
       return { color: style.color, background: style.backgroundColor, shadow: style.boxShadow }
@@ -246,6 +256,7 @@ test.describe('US1 typing an exercise', { tag: '@input' }, () => {
     // The marked character does not look like the unmarked awaited one.
     await pressBackspace(page)
     await expect(awaited).not.toHaveAttribute('data-mark', 'wrong')
+    await settled(page)
     const unmarked = await awaited.evaluate((node) => {
       const style = getComputedStyle(node)
       return { color: style.color, background: style.backgroundColor }

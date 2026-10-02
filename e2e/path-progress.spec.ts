@@ -671,7 +671,10 @@ test.describe('US3 practice with the network away (§8.10)', () => {
     // there ("WebKit encountered an internal error" on the goto; the same navigation is served by
     // the worker in Chromium and Firefox). The worker's registration is still proven on WebKit by
     // the next test; the offline run itself is proven on the other two engines.
-    test.skip(browserName === 'webkit', 'WebKit offline emulation blocks service-worker navigations')
+    test.skip(
+      browserName === 'webkit',
+      'WebKit offline emulation blocks service-worker navigations',
+    )
     await seedLearner(page)
     await page.goto('/map')
     await expect(page.getByTestId('keyboard-summary')).toBeVisible()

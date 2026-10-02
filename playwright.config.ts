@@ -64,6 +64,14 @@ export default defineConfig({
     {
       name: 'webkit',
       use: { ...devices['Desktop Safari'] },
+      // Playwright's WebKit renders in software on Windows and Linux hosts and is by far the
+      // slowest engine here: an in-app navigation takes about half a second on an idle machine,
+      // a click that changes screens 1.3–2.5 s, and both grow several-fold when four WebKit pages
+      // share the CPU. The long scenarios that sit well inside 30 s on Chromium then end in
+      // timeouts that pass on their own and in repeats. So the lane runs two pages at a time and
+      // gives each test twice the time — the engine's pace, not a retry that would hide a failure.
+      workers: 2,
+      timeout: 60_000,
       testIgnore: ['latency.spec.ts'],
       grepInvert: CDP_ONLY,
     },
