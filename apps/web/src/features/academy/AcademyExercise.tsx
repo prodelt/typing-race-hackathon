@@ -21,6 +21,7 @@ import { FingerDiagram, NextKeyCard } from '../exercise/NextKey.js'
 import { PaceCue } from '../exercise/PaceCue.js'
 import { PauseOverlay } from '../exercise/PauseOverlay.js'
 import { seedFor } from '../exercise/plan.js'
+import { TypedLayoutNotice, useTypedWrongLayout } from '../exercise/TypedLayoutNotice.js'
 import { TypingLine } from '../exercise/TypingLine.js'
 import { useAttempt } from '../exercise/useAttempt.js'
 import { languageOfExercise, scaleShapeOf, useAcademyCourse } from './data.js'
@@ -147,6 +148,7 @@ function AcademySession({ course, module, exercise, mode }: SessionProps) {
     seed: frozen.seed,
   })
   const paused = useEnginePaused(engine)
+  const typedWrong = useTypedWrongLayout(input, layout, started)
 
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>): void => {
     if (event.key !== 'Escape' || engine === null) return
@@ -241,6 +243,7 @@ function AcademySession({ course, module, exercise, mode }: SessionProps) {
               ) : null}
             </div>
           </div>
+          <TypedLayoutNotice layout={layout} wrong={typedWrong} />
           {paused ? (
             <PauseOverlay
               layout={layout}
