@@ -203,7 +203,16 @@ function headline(model: ResultModel): { title: string; say: string } {
     }
   }
   if (attempt.mode === 'practice') {
-    return { title: m.result_h_practice(), say: m.result_say_practice({ floor }) }
+    // The note under the headline already says a practice attempt does not count; this line says
+    // what to do about the accuracy the learner just typed.
+    const say =
+      attempt.metrics.accuracy >= reward.floor
+        ? m.result_say_practice_ready
+        : m.result_say_practice_below
+    return {
+      title: m.result_h_practice(),
+      say: say({ accuracy: number(attempt.metrics.accuracy * 100, 1), floor }),
+    }
   }
   if (!reward.passed) {
     return {
