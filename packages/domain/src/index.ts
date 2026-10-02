@@ -420,6 +420,7 @@ export type InputEvent =
     }
 
 export interface LayoutProbe {
+  /** `false` only when the browser proves the layout cannot be typed; "cannot tell" is `true`. */
   readonly producible: boolean
   readonly suggestedLayoutId?: LayoutId
 }

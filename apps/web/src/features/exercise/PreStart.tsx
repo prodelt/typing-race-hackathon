@@ -44,6 +44,8 @@ export function PreStart({
 }: PreStartProps) {
   const [probe, setProbe] = useState<Probe>('checking')
   const [typedMismatch, setTypedMismatch] = useState(false)
+  // A letter of this layout has been typed: the one proof of the Active layout a browser can give.
+  const [confirmed, setConfirmed] = useState(false)
 
   const check = useCallback(() => {
     let live = true
@@ -62,7 +64,9 @@ export function PreStart({
     () =>
       input.subscribe((event) => {
         if (event.kind !== 'char' || !/\p{L}/u.test(event.char)) return
-        setTypedMismatch(keyOf(layout, event.char.toLowerCase()) === undefined)
+        const foreign = keyOf(layout, event.char.toLowerCase()) === undefined
+        setTypedMismatch(foreign)
+        setConfirmed(!foreign)
       }),
     [input, layout],
   )
@@ -115,7 +119,9 @@ export function PreStart({
           <p role="status" className="mt-6 font-ui text-sm leading-relaxed text-ink/80">
             {probe === 'checking'
               ? m.exercise_layout_checking()
-              : m.exercise_layout_ok({ layout: layoutName })}
+              : confirmed
+                ? m.exercise_layout_confirmed({ layout: layoutName })
+                : m.exercise_layout_ok({ layout: layoutName })}
           </p>
         )}
 
