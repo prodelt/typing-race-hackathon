@@ -1,21 +1,16 @@
 name: CI
 
+# THROWAWAY experiment on a scratch branch: repeat the one WebKit test, before and after the fix.
 on:
-  push:
-    branches: [main]
   pull_request:
-
-concurrency:
-  group: ci-${{ github.ref }}
-  cancel-in-progress: true
 
 env:
   NODE_VERSION: '24.19.0'
   PNPM_VERSION: '12.8.1'
 
 jobs:
-  checks:
-    name: typecheck, lint, unit, build
+  stress:
+    name: stress
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -27,50 +22,12 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm typecheck
-      - run: pnpm lint
-      - run: pnpm test
-      # The initial-JS budget plugin fails this step past 150 KB gzip.
-      - run: pnpm build
+      - run: pnpm exec playwright install --with-deps webkit
 
-  e2e:
-    name: e2e
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm exec playwright install --with-deps chromium firefox webkit
+      - name: before the fix, 60 repeats on webkit
+        continue-on-error: true
+        run: pnpm exec playwright test e2e/zz-old.spec.ts -g "shows the keyboard, the next-key highlight" --project=webkit --repeat-each=60 --retries=0 --reporter=dot 2>&1 | grep -v WebServer | tail -15
 
-      - name: chromium — every scenario, including the @axe audits
-        run: pnpm test:e2e
-
-      - name: firefox and webkit — the input path only
-        # Firefox ignores preventDefault() on beforeinput and delivers non-US characters as IME
-        # compositions, so the keystroke path is the one place the engines genuinely disagree.
-        # Everything else is Chromium-only on purpose.
-        run: pnpm test:e2e:input
-
-      - uses: actions/upload-artifact@v4
-        if: ${{ !cancelled() }}
-        with:
-          name: playwright-report
-          path: playwright-report/
-          retention-days: 7
-
-  secret-scan:
-    name: secret scan
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: gitleaks/gitleaks-action@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: after the fix, 60 repeats on webkit
+        continue-on-error: true
+        run: pnpm exec playwright test e2e/exercise.spec.ts -g "shows the keyboard, the next-key highlight" --project=webkit --repeat-each=60 --retries=0 --reporter=dot 2>&1 | grep -v WebServer | tail -15
