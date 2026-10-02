@@ -4,6 +4,7 @@ import type { KeystrokeEventLog, LayoutId } from '@typing-race/domain'
 import { computeMetrics } from '@typing-race/metrics'
 import { json, preflight } from '../_shared/cors.ts'
 import { overQuota } from '../_shared/rate-limit.ts'
+import { replay, scoreOf } from '../_shared/race-replay.ts'
 
 /**
  * `finish-race` — the only place a race finish becomes a Validated Result.
@@ -17,67 +18,11 @@ import { overQuota } from '../_shared/rate-limit.ts'
  * the replayed log, so the number on the results screen is the number the server computed.
  */
 
-/** Speed weighted by accuracy, with a floor: fast and dirty must not beat clean. */
-const ACCURACY_FLOOR = 0.9
-
 /** Slack for the round trip and for a timer that started a frame early. */
 const CLOCK_SLACK_MS = 2_000
 
 /** A human does not sustain more than this; faster is a script. */
 const MAX_PLAUSIBLE_SPM = 1_500
-
-const APOSTROPHES = new Set(['’', 'ʼ', '‘', '´'])
-const fold = (char: string): string => (APOSTROPHES.has(char) ? "'" : char)
-
-export function scoreOf(spm: number, accuracy: number): number {
-  if (accuracy < ACCURACY_FLOOR) return 0
-  // Squared, so the gap between 92% and 99% matters more than a linear weight would make it.
-  return Math.round(spm * accuracy * accuracy * 100) / 100
-}
-
-/**
- * Re-judges every character keystroke against the text under the race's error mode (stop on the
- * letter: a wrong key does not advance, Backspace neither advances nor retreats). Returns the log
- * with the server's own `correct` flags and how far into the text it got.
- */
-export function replay(
-  log: KeystrokeEventLog,
-  text: string,
-): { log: KeystrokeEventLog; reached: number } {
-  const awaited = Array.from(text)
-  const length = Math.min(log.kind.length, log.dt.length, log.char.length)
-  const dt: number[] = []
-  const kind: KeystrokeEventLog['kind'][number][] = []
-  const char: (string | null)[] = []
-  const correct: boolean[] = []
-  let cursor = 0
-
-  for (let i = 0; i < length; i++) {
-    const k = log.kind[i]
-    const delta = Number(log.dt[i])
-    if (!Number.isFinite(delta) || delta < 0) continue
-    if (k === 'char') {
-      const typed = log.char[i]
-      if (typeof typed !== 'string' || typed.length === 0 || cursor >= awaited.length) continue
-      const right = fold(typed) === fold(awaited[cursor] ?? '')
-      dt.push(delta)
-      kind.push('char')
-      char.push(fold(typed))
-      correct.push(right)
-      if (right) cursor += 1
-    } else if (k === 'backspace' || k === 'ignored') {
-      dt.push(delta)
-      kind.push(k)
-      char.push(null)
-      correct.push(false)
-    }
-  }
-
-  return {
-    log: { formatVersion: log.formatVersion, dt, kind, char, correct },
-    reached: cursor,
-  }
-}
 
 Deno.serve(async (request) => {
   const early = preflight(request)
