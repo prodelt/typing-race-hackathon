@@ -1,4 +1,16 @@
-import type { KeystrokeEventLog } from '@typing-race/domain'
+
+/**
+ * A keystroke log as `finish-race` reads it. Structurally the `KeystrokeEventLog` of
+ * `@typing-race/domain`, written out here so this file imports nothing and a unit test (which has
+ * no Deno import map) can load it.
+ */
+export interface RaceLog {
+  readonly formatVersion: number
+  readonly dt: readonly number[]
+  readonly kind: readonly ('char' | 'backspace' | 'ignored')[]
+  readonly char: readonly (string | null)[]
+  readonly correct: readonly boolean[]
+}
 
 /**
  * The server's own judgement of a race log, kept apart from `finish-race/index.ts` (which starts a
@@ -27,14 +39,11 @@ export function scoreOf(spm: number, accuracy: number): number {
  * Returns the log with the server's own `correct` flags and how far into the text it got. What the
  * client claimed about correctness is never read.
  */
-export function replay(
-  log: KeystrokeEventLog,
-  text: string,
-): { log: KeystrokeEventLog; reached: number } {
+export function replay(log: RaceLog, text: string): { log: RaceLog; reached: number } {
   const awaited = Array.from(text)
   const length = Math.min(log.kind.length, log.dt.length, log.char.length)
   const dt: number[] = []
-  const kind: KeystrokeEventLog['kind'][number][] = []
+  const kind: RaceLog['kind'][number][] = []
   const char: (string | null)[] = []
   const correct: boolean[] = []
   let cursor = 0

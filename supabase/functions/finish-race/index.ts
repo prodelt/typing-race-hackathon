@@ -24,6 +24,15 @@ const CLOCK_SLACK_MS = 2_000
 /** A human does not sustain more than this; faster is a script. */
 const MAX_PLAUSIBLE_SPM = 1_500
 
+/**
+ * Limits of one request. A race text is at most 400 characters (the `race_texts` check), so a log of
+ * twenty thousand events is not a race; it is a request that only burns the function's time.
+ */
+const MAX_BODY_BYTES = 2_000_000
+const MAX_LOG_EVENTS = 20_000
+const MAX_ELAPSED_MS = 3_600_000
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
 Deno.serve(async (request) => {
   const early = preflight(request)
   if (early) return early
@@ -48,23 +57,31 @@ Deno.serve(async (request) => {
   const limited = await overQuota(service, userId, 'finish-race')
   if (limited) return limited
 
-  let body: { roomId?: string; log?: KeystrokeEventLog; elapsedMs?: number }
+  const declared = Number(request.headers.get('Content-Length') ?? 0)
+  if (declared > MAX_BODY_BYTES) return json({ error: 'body_too_large', max: MAX_BODY_BYTES }, 413)
+
+  let body: { roomId?: unknown; log?: KeystrokeEventLog; elapsedMs?: unknown }
   try {
     body = await request.json()
   } catch {
     return json({ error: 'body is not JSON' }, 400)
   }
 
-  const { roomId, log, elapsedMs } = body
+  const { roomId, log, elapsedMs } = body ?? {}
   if (
     typeof roomId !== 'string' ||
+    !UUID.test(roomId) ||
     !log ||
     !Array.isArray(log.dt) ||
     !Array.isArray(log.kind) ||
     !Array.isArray(log.char) ||
+    log.dt.length > MAX_LOG_EVENTS ||
+    log.kind.length > MAX_LOG_EVENTS ||
+    log.char.length > MAX_LOG_EVENTS ||
     typeof elapsedMs !== 'number' ||
     !Number.isFinite(elapsedMs) ||
-    elapsedMs <= 0
+    elapsedMs <= 0 ||
+    elapsedMs > MAX_ELAPSED_MS
   ) {
     return json({ error: 'roomId, log and elapsedMs are required' }, 400)
   }

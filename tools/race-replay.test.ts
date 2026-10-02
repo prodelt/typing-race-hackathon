@@ -1,6 +1,10 @@
-import type { KeystrokeEventLog } from '@typing-race/domain'
 import { describe, expect, it } from 'vitest'
-import { ACCURACY_FLOOR, replay, scoreOf } from '../supabase/functions/_shared/race-replay.ts'
+import {
+  ACCURACY_FLOOR,
+  type RaceLog,
+  replay,
+  scoreOf,
+} from '../supabase/functions/_shared/race-replay'
 
 /**
  * The server judges a race log itself (finish-race) and never reads the client's `correct` flags.
@@ -11,7 +15,7 @@ import { ACCURACY_FLOOR, replay, scoreOf } from '../supabase/functions/_shared/r
 type Key = string | 'BS'
 
 /** A log of `keys` 60 ms apart; the `correct` flags are all `true`, as a forger would claim. */
-function logOf(keys: readonly Key[]): KeystrokeEventLog {
+function logOf(keys: readonly Key[]): RaceLog {
   return {
     formatVersion: 1,
     dt: keys.map(() => 60),
