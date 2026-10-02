@@ -189,6 +189,11 @@ export function supabaseClient(): Promise<SupabaseClient | null> {
         storageKey: 'typing-race:race-auth',
         persistSession: true,
         autoRefreshToken: true,
+        // Google sign-in is a PKCE redirect, and the return is handled by the Account feature
+        // (`features/account/auth.ts`): it reads errors, exchanges the code and cleans the URL
+        // itself, so the client must not race it for the code.
+        flowType: 'pkce',
+        detectSessionInUrl: false,
       },
     })
     return client
@@ -199,6 +204,24 @@ export function supabaseClient(): Promise<SupabaseClient | null> {
     if (found === null && pending === current) pending = null
   })
   return current
+}
+
+/** The name the race lobby offers by default; the Account keeps it equal to the nick. */
+export function rememberRaceName(nickname: string): void {
+  try {
+    safeStorage('local')?.setItem(NAME_KEY, nickname)
+  } catch {
+    // A full or blocked storage only costs the default.
+  }
+}
+
+/** On sign-out and deletion: a shared computer keeps nobody's name either. */
+export function forgetRaceName(): void {
+  try {
+    safeStorage('local')?.removeItem(NAME_KEY)
+  } catch {
+    // Nothing to forget.
+  }
 }
 
 let backend: RaceBackend | null = null

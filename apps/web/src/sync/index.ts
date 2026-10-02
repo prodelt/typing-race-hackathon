@@ -140,6 +140,11 @@ export interface Sync {
    * otherwise — it never discards an attempt the cloud does not have.
    */
   wipeLocalIfSynced(): Promise<'wiped' | 'pending'>
+  /**
+   * For "delete my data", once the server has deleted the account: detaches, empties the outbox
+   * and wipes the local copy unconditionally. There is no account left to upload anything to.
+   */
+  forgetLocal(): Promise<void>
   status(): SyncStatus
   subscribe(listener: (status: SyncStatus) => void): () => void
 }
@@ -393,6 +398,24 @@ export function createSync(deps: SyncDeps): Sync {
       return 'wiped'
     },
 
+    forgetLocal() {
+      remote = null
+      clearRetry()
+      stopListening?.()
+      stopListening = null
+      phase = 'off'
+      return serially(async () => {
+        const queued = await deps.outbox.all()
+        if (queued.length > 0) await deps.outbox.remove(queued.map((attempt) => attempt.id))
+        await deps.store.clear()
+        await refreshPending()
+        lastSyncAt = null
+        lastRejections = []
+        announce()
+        localChanged()
+      })
+    },
+
     status,
 
     subscribe(listener) {
@@ -479,4 +502,12 @@ export function setAccountNick(nick: string): Promise<string> {
  */
 export function wipeLocalIfSynced(): Promise<'wiped' | 'pending'> {
   return appSync().wipeLocalIfSynced()
+}
+
+/**
+ * The local half of "delete my data": after `delete-account` succeeded, the outbox and the local
+ * copy go too — unconditionally, since the account they would upload to no longer exists.
+ */
+export function forgetLocalData(): Promise<void> {
+  return appSync().forgetLocal()
 }
