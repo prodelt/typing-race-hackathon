@@ -238,11 +238,11 @@ Deno.serve(async (request) => {
 
   // The body is read before its size is judged: answering from `Content-Length` alone leaves the
   // upload unread, and the runtime then holds the connection until the client gives up.
-  const text = await request.text()
-  if (text.length > MAX_BODY_BYTES) return json({ error: 'body_too_large', max: MAX_BODY_BYTES }, 413)
+  const rawBody = await request.text()
+  if (rawBody.length > MAX_BODY_BYTES) return json({ error: 'body_too_large', max: MAX_BODY_BYTES }, 413)
   let body: { attempts?: unknown }
   try {
-    body = JSON.parse(text)
+    body = JSON.parse(rawBody)
   } catch {
     return json({ error: 'body is not JSON' }, 400)
   }
