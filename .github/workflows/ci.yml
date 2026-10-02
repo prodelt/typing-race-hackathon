@@ -102,8 +102,7 @@ jobs:
         run: |
           set -x
           docker ps --format '{{.Names}}'
-          curl -s -o /dev/null -w '%{http_code}
-' -X OPTIONS "$VITE_SUPABASE_URL/functions/v1/submit-attempt" || true
+          curl -s -o /dev/null -w '%{http_code}' -X OPTIONS "$VITE_SUPABASE_URL/functions/v1/submit-attempt" || true
 
       - name: chromium — the @backend scenarios
         run: pnpm exec playwright test --project=chromium --grep @backend
