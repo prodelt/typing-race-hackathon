@@ -83,6 +83,8 @@ Comprehensive domain model and conceptual glossary for the Typing-Race touch-typ
 - **Experience / XP (Досвід)**: Points earned only by Test Attempts that clear the level's accuracy floor; they fill the bar toward the next Level.
   _Avoid_: score, coins
 - **Streak (Серія)**: Consecutive days with at least one completed attempt; one missed day is forgiven by a freeze.
+- **Race (Перегони)**: A live contest in which several Learners type the same text at the same time, opened by quick match or by a private room code. Its result counts only once the server has replayed it (a Validated Race Result).
+  _Avoid_: multiplayer, match, game
 - **Race Rating (Рейтинг перегонів)**: A learner's competitive standing computed from Validated Race Results only; it exists in races and nowhere else.
 
 ## Curriculum Data Model
@@ -94,6 +96,10 @@ the archived data model (`git show archive/process-harness-2026-09-30:specs/001-
   Unlock Order. Two exist: `yq` (ЙЦУКЕН, Ukrainian) and `qwerty` (English). A Layout is generated
   and shipped, never written at runtime.
   _Avoid_: keymap, keyboard, locale
+- **Active layout (Активна розкладка)**: The layout the learner's operating system types characters
+  in right now. It can differ from the Layout an exercise or a Race expects, and it can change
+  while the page is open (the learner switches input language).
+  _Avoid_: current keyboard, input language, detected layout
 - **Key (Клавіша)**: One physical key in a Layout, carrying its row, hand, exactly one finger, the
   character it produces plain and shifted, and its kind (letter, digit, punctuation, space,
   modifier). "Key" is always the physical key; the thing on screen is a **character**.

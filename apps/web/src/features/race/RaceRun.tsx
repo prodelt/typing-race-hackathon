@@ -1,10 +1,18 @@
 import { layouts } from '@typing-race/curriculum'
-import type { InputEvent, InputSource, KeystrokeEventLog, Language } from '@typing-race/domain'
+import type {
+  InputEvent,
+  InputSource,
+  KeystrokeEventLog,
+  Language,
+  LayoutId,
+} from '@typing-race/domain'
 import { createEngine, type Engine } from '@typing-race/engine'
 import { useEffect, useRef, useState } from 'react'
 import { m } from '../../paraglide/messages.js'
 import { domInputSource, systemClock } from '../../seams/index.js'
 import { TypingLine } from '../exercise/TypingLine.js'
+import { RaceLayoutNotice, type RaceLayoutProbe } from './LayoutNotice.js'
+import { FOREIGN_STREAK, isOfLayout, nextForeignStreak } from './layoutHint.js'
 
 /** A racer who types nothing for this long steps back to watching. */
 const IDLE_MS = 25_000
@@ -58,16 +66,24 @@ export function RaceRun({
   const liveRef = useRef(live)
   const sourceRef = useRef<InputSource | null>(null)
   const [engine, setEngine] = useState<Engine | null>(null)
+  const [probe, setProbe] = useState<RaceLayoutProbe>('unknown')
+  const [proven, setProven] = useState(false)
+  const [typedWrong, setTypedWrong] = useState(false)
   const callbacks = useRef({ onProgress, onFinish, onIdle })
   callbacks.current = { onProgress, onFinish, onIdle }
+  const layoutId: LayoutId = language === 'uk' ? 'yq' : 'qwerty'
 
   useEffect(() => {
     const element = textareaRef.current
     if (element === null) return
-    const layout = layouts[language === 'uk' ? 'yq' : 'qwerty']
+    const layout = layouts[layoutId]
     // One DOM source per textarea: a development double-mount must not attach its listeners twice.
     sourceRef.current ??= domInputSource(element, systemClock, { expectedLayoutId: layout.id })
-    const source = gated(sourceRef.current, () => liveRef.current)
+    const raw = sourceRef.current
+    const source = gated(raw, () => liveRef.current)
+    // The line takes the keys during the countdown too, so a learner who starts tapping early is
+    // heard by the layout watch below; the gate keeps all of it away from the engine.
+    element.focus({ preventScroll: true })
     // A race is always stop-on-letter: it is the only mode the server replays.
     const created = createEngine({
       text,
@@ -84,13 +100,51 @@ export function RaceRun({
       callbacks.current.onProgress(total, total, speedOf(total, view.elapsedMs))
       callbacks.current.onFinish(created.finish(), view.elapsedMs)
     })
+    // Watches what is typed, not what the browser claims: a run of letters the layout cannot
+    // produce is the one signal that works in every browser. It listens to the raw source, so it
+    // hears the countdown as well. State changes only on a transition, so a keystroke never
+    // renders anything outside the typing line (FR-069).
+    let streak = 0
+    let shown = false
+    let proved = false
+    const unwatch = raw.subscribe((event) => {
+      streak = nextForeignStreak(streak, layout, event)
+      const wrong = streak >= FOREIGN_STREAK
+      if (wrong !== shown) {
+        shown = wrong
+        setTypedWrong(wrong)
+      }
+      if (!proved && isOfLayout(layout, event)) {
+        proved = true
+        setProven(true)
+      }
+    })
     setEngine(created)
     return () => {
       stop()
+      unwatch()
       if (!done) created.abandon()
       setEngine(null)
+      setTypedWrong(false)
+      setProven(false)
     }
-  }, [text, language])
+  }, [text, layoutId])
+
+  // What the browser can prove about the installed layouts, asked once per race. Chromium only,
+  // and it never says which layout is active: `wrong` means the layout is missing altogether,
+  // anything else stays `unknown` and the typed letters have to speak.
+  useEffect(() => {
+    const source = sourceRef.current
+    if (source === null || engine === null) return
+    let current = true
+    void source.probeLayout().then((result) => {
+      if (!current) return
+      setProbe(result.producible ? 'unknown' : 'wrong')
+    })
+    return () => {
+      current = false
+    }
+  }, [engine])
 
   // The start: open the gate, start the clock, take the focus.
   useEffect(() => {
@@ -147,6 +201,15 @@ export function RaceRun({
           if (liveRef.current && document.hasFocus()) textareaRef.current?.focus()
         }}
       />
+      <div className="race-layout-slot">
+        <RaceLayoutNotice
+          layoutId={layoutId}
+          probe={probe}
+          proven={proven}
+          typedWrong={typedWrong}
+          live={live}
+        />
+      </div>
       <div className="race-run__line" data-live={live || undefined}>
         {engine === null ? null : <TypingLine engine={engine} text={text} sizePx={sizePx} />}
       </div>

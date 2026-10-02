@@ -1,4 +1,5 @@
 import type { Clock, InputEvent, InputSource, LayoutId, LayoutProbe } from '@typing-race/domain'
+import { provesUnproducible, shapeOfLayoutMap } from './layoutMap.js'
 
 /**
  * T016–T018. The only seam that knows a keyboard exists.
@@ -151,27 +152,26 @@ export function domInputSource(
     },
 
     /**
-     * FR-021's pre-start check. `navigator.keyboard.getLayoutMap()` reports what the *physical*
-     * layout produces, which is the only way to catch a learner on a US layout opening a Ukrainian
-     * exercise before they have typed a wrong character into a permanent error count.
+     * FR-021's pre-start check, as far as the browser can answer it.
      *
-     * Absent outside Chromium. When it cannot tell, it reports `producible: true` — blocking an
-     * attempt on an unanswerable question would make Firefox and Safari unusable.
+     * `navigator.keyboard.getLayoutMap()` does **not** report the active layout: it returns the
+     * highest-priority Latin layout, so with US and Ukrainian both installed `KeyF` is «f» whichever
+     * is active. It can only *prove* a layout is missing (Russian-only for a Ukrainian text, no Latin
+     * layout for an English one). Everything else is "cannot tell" and reports `producible: true`:
+     * a false alarm for a learner who is on the right layout is worse than silence, and the letters
+     * they type settle it in every browser.
+     *
+     * Absent outside Chromium, where it is always "cannot tell".
      */
     async probeLayout(): Promise<LayoutProbe> {
       const keyboard = (navigator as Navigator & KeyboardLayoutCapableNavigator).keyboard
       if (!keyboard) return { producible: true }
 
       try {
-        const map = await keyboard.getLayoutMap()
-        // `KeyF` is the left index home key: `ф` on ЙЦУКЕН, `f` on QWERTY. One probe is enough to
-        // tell the two apart, and it is the key the home-row bump sits on in both.
-        const homeKey = map.get('KeyF')
-        if (homeKey === undefined) return { producible: true }
-
-        const actual: LayoutId = /[Ѐ-ӿ]/.test(homeKey) ? 'yq' : 'qwerty'
+        const shape = shapeOfLayoutMap(await keyboard.getLayoutMap())
         const expected = options.expectedLayoutId
-        if (expected === undefined || expected === actual) return { producible: true }
+        if (shape === undefined || expected === undefined) return { producible: true }
+        if (!provesUnproducible(shape, expected)) return { producible: true }
         return { producible: false, suggestedLayoutId: expected }
       } catch {
         // A permissions failure is not a layout mismatch. Let the learner type.
