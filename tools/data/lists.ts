@@ -28,6 +28,7 @@ export const RESIDUAL_RUSSIAN: readonly string[] = [
   ...['вернуться', 'вернуть', 'вернусь', 'вернулась', 'получить', 'получилось', 'получила'],
   ...['получили', 'пришла', 'пришли', 'позволь', 'позволить', 'забрал', 'держать', 'держись'],
   ...['смерти', 'крови', 'новости', 'ума', 'поводу'],
+  ...['мужчина', 'мужчины', 'мужчину', 'плохого', 'плохой'],
   // The source tokenizer split `п'ять` at the apostrophe; this is the orphaned tail.
   'ять',
 ]
@@ -56,9 +57,11 @@ export const CONTRACTION_FRAGMENTS: readonly string[] = [
 ]
 
 /**
- * Obscenities and slurs. `roots` match anywhere in a word (they are specific enough not to hit an
+ * Obscenities, slurs, and the sexual, insulting and violent vocabulary a jury demo should not put
+ * in front of a learner. `roots` match anywhere in a word (they are specific enough not to hit an
  * innocent one); `exact` entries match whole words only, because as substrings they would hit
- * innocent words (`сука` in `сукня`, `ass` in `class`). Over-filtering costs a typing trainer
+ * innocent words (`сука` in `сукня`, `ass` in `class`, `kill` in `skill`, `дупа` in `дупло`).
+ * Case forms are listed one by one for the same reason. Over-filtering costs a typing trainer
  * nothing. The English dictionary's own `NOSUGGEST` marks are applied on top of this.
  */
 export const PROFANITY: Readonly<
@@ -86,6 +89,11 @@ export const PROFANITY: Readonly<
       'шльондр',
       'курв',
       'сучар',
+      // Sexual and insulting vocabulary that is not an obscenity but is no help in a typing lesson.
+      ...['секс', 'порно', 'пеніс', 'вагін', 'цицьк', 'сиськ', 'трахн', 'трахав', 'трахат'],
+      ...['шлюх', 'проститут', 'бордел', 'збочен', 'придур', 'ідіот', 'кретин', 'дебіл'],
+      ...['виродк', 'виродок', 'вилупк', 'вилупок', 'йолоп', 'бовдур', 'сволот', 'мерзот'],
+      ...['тварюк', 'падлюк', 'наркоман', 'героїн', 'кокаїн'],
     ],
     exact: [
       'бля',
@@ -103,6 +111,8 @@ export const PROFANITY: Readonly<
       'сраку',
       'гівно',
       'лайно',
+      ...['дупа', 'дупу', 'дупи', 'дупі', 'дупою', 'дупо'],
+      ...['лайна', 'лайну', 'лайні', 'лайном', 'скотина', 'скотину', 'скотини', 'падло', 'падла'],
     ],
   },
   en: {
@@ -122,6 +132,9 @@ export const PROFANITY: Readonly<
       'dickhead',
       'jackass',
       'pussies',
+      ...['sexy', 'sexual', 'porn', 'penis', 'vagina', 'orgasm', 'erotic', 'horny', 'condom'],
+      ...['pervert', 'stripper', 'prostitut', 'molest', 'nipple', 'bimbo'],
+      ...['idiot', 'moron', 'murder', 'suicide', 'terroris'],
     ],
     exact: [
       'ass',
@@ -145,8 +158,26 @@ export const PROFANITY: Readonly<
       'goddamn',
       'crap',
       'bullshit',
+      ...['sex', 'nude', 'naked', 'boob', 'boobs', 'breast', 'breasts', 'rape', 'raped', 'banged'],
+      ...['balls', 'jerk', 'loser', 'scum', 'sucker', 'suck', 'sucks', 'sucked', 'butt', 'bum'],
+      ...['fart', 'poop', 'pee', 'bugger', 'bloody', 'dumb', 'stupid', 'dyke', 'homo', 'negro'],
+      ...['hoe', 'hooker', 'abortion', 'cripple', 'heroin', 'cocaine'],
+      ...['kill', 'killed', 'killing', 'killer', 'killers', 'kills'],
     ],
   },
+}
+
+/**
+ * Given names the spelling dictionary also lists in lower case (`john` is a toilet, `jack` a tool),
+ * so the proper-noun rule cannot see them. Only names with no other everyday meaning are here:
+ * `mark`, `will`, `rose` and `bill` stay because they are words first.
+ */
+export const FIRST_NAMES: Readonly<Record<Language, readonly string[]>> = {
+  uk: ['джек', 'мері', 'тоні', 'ігор', 'сем', 'бен'],
+  en: [
+    ...['john', 'jack', 'tom', 'bob', 'mike', 'harry', 'charlie', 'peter', 'tony', 'max', 'ted'],
+    ...['bobby', 'billy', 'johnny', 'jimmy', 'jenny', 'maria', 'terry', 'lily', 'ed'],
+  ],
 }
 
 export function isProfane(word: string, language: Language): boolean {

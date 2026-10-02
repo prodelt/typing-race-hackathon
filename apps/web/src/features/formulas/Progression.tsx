@@ -34,7 +34,13 @@ export function Progression() {
   return (
     <Section id="progression" title={m.formulas_progress_title()}>
       <Block title={m.formulas_levels_title()}>
-        <div className="ref-table-wrap">
+        <section
+          className="ref-table-wrap"
+          // The table scrolls sideways when a column grows; a scroll area must be reachable by keyboard.
+          // biome-ignore lint/a11y/noNoninteractiveTabindex: a scrollable region is focusable by design
+          tabIndex={0}
+          aria-label={m.formulas_levels_caption()}
+        >
           <table className="ref-table">
             <caption className="sr-only">{m.formulas_levels_caption()}</caption>
             <thead>
@@ -70,7 +76,7 @@ export function Progression() {
               })}
             </tbody>
           </table>
-        </div>
+        </section>
         <P>{m.formulas_levels_note()}</P>
       </Block>
 

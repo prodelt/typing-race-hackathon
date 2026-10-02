@@ -110,11 +110,11 @@
     },
     {
       "path": "data/derived/uk/words.json",
-      "sha256": "9a6c63c1a51ec2349e29718f1fb243287cf3dad68c1e4322f32ab3cb6733c94d"
+      "sha256": "bab91a02d86bbc54380f7140e2b9c9ec0a0b0a18841240365aa309e73043374d"
     },
     {
       "path": "data/derived/uk/ngrams.json",
-      "sha256": "56e0a6063e154c04a72b1e778fa4045439225039e05706ec9781248d024989a3"
+      "sha256": "3cdf4f23fb63055aa6b82d2a8b93dcd7bbac6533b3ccfd5bca75da2055c41e89"
     }
   ],
   "rules": {

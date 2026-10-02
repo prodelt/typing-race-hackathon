@@ -17,6 +17,7 @@ import { decodeUtf8, parseChecksums, readVerified, sha256, type VerifiedFile } f
 import { Hunspell } from './hunspell'
 import {
   CONTRACTION_FRAGMENTS,
+  FIRST_NAMES,
   HYPHEN_PARTICLES,
   isProfane,
   RESIDUAL_RUSSIAN,
@@ -30,7 +31,7 @@ import {
  *
  * Bump ALGORITHM_VERSION whenever a rule below changes what comes out.
  */
-export const ALGORITHM_VERSION = '1.0.0'
+export const ALGORITHM_VERSION = '1.1.0'
 
 /** Words kept per language, most frequent first. Stage 2 and the Academy never need more. */
 export const WORD_LIMIT = 20_000
@@ -118,7 +119,7 @@ const RULES = {
   properNouns:
     'A token the dictionary produces only in capitalised form (джон -> Джон, english -> English) is a proper noun and dropped.',
   stoplists:
-    'uk: residual Russian that shares a spelling with a rare Ukrainian form. en: contraction halves (don, didn, isn…). Both: an authored profanity list (roots and exact words); en also drops anything hunspell-en marks NOSUGGEST. Hyphenated reduplications (ха-ха) and single-letter parts (е-е, м-р; з and о excepted) are dropped as noise, and so are words of two or more letters with no vowel (хм, ll, tv).',
+    'uk: residual Russian that shares a spelling with a rare Ukrainian form. en: contraction halves (don, didn, isn…). Both: given names the dictionary also lists in lower case, and an authored list of obscenities, slurs and sexual, insulting or violent vocabulary (roots and exact words); en also drops anything hunspell-en marks NOSUGGEST. Hyphenated reduplications (ха-ха) and single-letter parts (е-е, м-р; з and о excepted) are dropped as noise, and so are words of two or more letters with no vowel (хм, ll, tv).',
   ranking: `Most frequent ${WORD_LIMIT} words are written. N-grams are counted over every surviving word, each word counted once, weighted by its frequency; the ${TRIGRAM_LIMIT} heaviest trigrams are written.`,
   difficulty:
     'sameFingerTransitions: adjacent pairs typed by the same finger, repeated keys included. rowChanges: adjacent pairs on different rows. tier 1-5: ceil((rank band + length band) / 2) with rank bands 500/2000/5000/10000 and length bands 3/5/7/9.',
@@ -360,7 +361,8 @@ function processLanguage(spec: LanguageSpec, snapshotDir: string, checksums: Map
       push(stopped, 'residual-russian', c)
     else if (spec.language === 'en' && CONTRACTION_FRAGMENTS.includes(c.word)) {
       push(stopped, 'contraction-fragment', c)
-    } else if (isHyphenNoise(c.word)) push(stopped, 'hyphen-noise', c)
+    } else if (FIRST_NAMES[spec.language].includes(c.word)) push(stopped, 'first-name', c)
+    else if (isHyphenNoise(c.word)) push(stopped, 'hyphen-noise', c)
     else if ([...c.word].length > 1 && !VOWELS[spec.language].test(c.word)) {
       push(stopped, 'no-vowel', c)
     } else return true

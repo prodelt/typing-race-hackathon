@@ -49,7 +49,7 @@
   "formulas_speed_none": "no requirement",
   "formulas_speed_range": "{min}–{max} SPM",
   "formulas_status_in_force": "in force for all of Stage 1",
-  "formulas_status_academy": "in force for the Academy (Stage 3)",
+  "formulas_status_academy": "in force in the Academy",
   "formulas_status_informational": "informational",
   "formulas_levels_note": "The table is read from one config file (packages/curriculum/src/levels/levels.json), so its values change without touching code. The level follows the stage, not the speed: all of Stage 1 and Stage 2 are judged against the Introduction floor, Academy exercises (Stage 3) against the Confident floor, so no gain in speed raises the accuracy floor. The speed benchmarks are informational and gate nothing.",
   "formulas_mastery_title": "The Mastery Rule",
