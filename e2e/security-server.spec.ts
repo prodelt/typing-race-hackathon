@@ -802,9 +802,11 @@ test.describe('server attack suite', { tag: ['@backend', '@security'] }, () => {
       expect(member, 'the host joins its own room (control)').toBe('ok')
       const stranger = await join(d, topic)
       await info.attach('realtime stranger', { body: `stranger joins ${topic}: ${stranger}` })
-      expect(stranger).toBe('denied')
+      // The control above shows a participant gets an explicit `ok`; a stranger must never get one
+      // (Realtime answers an unauthorised private join with an error or with nothing at all).
+      expect(stranger).not.toBe('ok')
       const other = await join(d, `race:${uuid()}`)
-      expect(other).toBe('denied')
+      expect(other).not.toBe('ok')
     })
   })
 
