@@ -17,7 +17,7 @@
   "shell_level": "Рівень",
   "shell_level_hint": "Рівень росте від XP за залікові спроби. До рівня {next} — ще {left} XP.",
   "shell_xp_of": "{have} / {need} XP",
-  "shell_streak_days": "днів серія",
+  "shell_streak_days": "дн. серія",
   "shell_streak_hint": "Серія: {days} дн. поспіль хоча б з однією завершеною спробою. Заморозка: один пропущений день не обнуляє серію.",
   "shell_freeze": "заморозка {n}",
   "shell_rating": "рейтинг перегонів",
