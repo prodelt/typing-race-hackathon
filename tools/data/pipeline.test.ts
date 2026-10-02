@@ -21,6 +21,7 @@ import {
   type WordBank,
 } from '../../packages/curriculum/src/words/index'
 import { ChecksumError, decodeUtf8, parseChecksums, readVerified, sha256 } from './checksums'
+import { FIRST_NAMES, isProfane, RESIDUAL_RUSSIAN } from './lists'
 import { runPipeline } from './pipeline'
 
 /**
@@ -81,6 +82,30 @@ describe('the committed word banks', () => {
       ).toBe(true)
     }
     for (const russian of ['что', 'это', 'как', 'нет', 'меня']) expect(uk).not.toContain(russian)
+  })
+
+  it('has no obscenity, sexual or insulting word, no lower-case first name and no known russism', () => {
+    for (const lang of ['uk', 'en'] as const) {
+      const words = banks[lang].words.map((w) => w.word)
+      expect(
+        words.filter((w) => isProfane(w, lang)),
+        `${lang} profane`,
+      ).toHaveLength(0)
+      expect(
+        words.filter((w) => FIRST_NAMES[lang].includes(w)),
+        `${lang} names`,
+      ).toEqual([])
+    }
+    const uk = new Set(banks.uk.words.map((w) => w.word))
+    expect(RESIDUAL_RUSSIAN.filter((w) => uk.has(w))).toEqual([])
+    // Read off the Stage 2 preview before the lists grew: each of these once showed up.
+    for (const word of ['дупу', 'шлюха', 'лайна', 'придурок', 'джек', 'мужчина', 'плохого']) {
+      expect(uk.has(word), word).toBe(false)
+    }
+    const en = new Set(banks.en.words.map((w) => w.word))
+    for (const word of ['sex', 'sexy', 'balls', 'idiot', 'kill', 'john', 'jack']) {
+      expect(en.has(word), word).toBe(false)
+    }
   })
 
   it('matches the output checksums its report states', () => {

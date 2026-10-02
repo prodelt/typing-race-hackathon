@@ -336,7 +336,7 @@
         {
           "id": "academy.en.same-finger.1",
           "title": "ed · lo",
-          "text": "ed ed ed need wanted happened ed ed called used killed lo lo lo look love long lo lo lot hello looking",
+          "text": "ed ed ed need wanted happened ed ed called used asked lo lo lo look love long lo lo lot hello looking",
           "focus": "ed lo",
           "targetSpm": null,
           "source": "derived"
@@ -352,7 +352,7 @@
         {
           "id": "academy.en.same-finger.3",
           "title": "un · my",
-          "text": "un un un around understand found un un run until young my my my myself army enemy my my jimmy mommy mystery",
+          "text": "un un un around understand found un un run until young my my my myself army enemy my my mommy mystery mummy",
           "focus": "un my",
           "targetSpm": null,
           "source": "derived"
@@ -652,7 +652,7 @@
         {
           "id": "academy.en.morphemes.3",
           "title": "-ing · -ed",
-          "text": "ing ing going something doing thing anything nothing everything ed ed need wanted happened called used killed asked",
+          "text": "ing ing going something doing thing anything nothing everything ed ed need wanted happened called used asked married",
           "focus": "ing ed",
           "targetSpm": null,
           "source": "derived"
