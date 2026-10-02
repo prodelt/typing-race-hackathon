@@ -52,7 +52,8 @@ describe('the metrics replay agrees with the engine', () => {
         const emit = (event: InputEvent): void => {
           const cursor = engine.view.cursor
           const before = handled
-          input.emit({ ...event, at: (at += 7) })
+          at += 7
+          input.emit({ ...event, at })
           if (handled !== before && event.kind === 'char' && event.char !== '') {
             expected.push(chars[cursor])
           }
