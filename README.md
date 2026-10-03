@@ -8,6 +8,7 @@
 - **Гра:** <https://typing-race-rosy.vercel.app>
 - **Код:** <https://github.com/prodelt/typing-race-hackathon>
 - **Автоматичні перевірки (CI):** <https://github.com/prodelt/typing-race-hackathon/actions>
+- **Контакт:** <stoliarenko.my@gmail.com>
 
 Для кого: для тих, хто вчиться друкувати не дивлячись на клавіатуру, за комп’ютером із фізичною
 клавіатурою (від 1024 px завширшки; на вужчому екрані навчання каже, що потрібна клавіатура, а
