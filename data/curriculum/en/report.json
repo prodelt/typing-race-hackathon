@@ -120,11 +120,11 @@
     },
     {
       "path": "data/derived/en/words.json",
-      "sha256": "f9d2ca0c7709176476bc641ffa07b71c1577966488f7cf7648366aab7e4279b8"
+      "sha256": "405e0c78b76e15ae5573610f93004c918fa9be31efd1bafa1cc98dfac1fb970b"
     },
     {
       "path": "data/derived/en/ngrams.json",
-      "sha256": "5d121c2b2e1b6d0d667b28520df7e217d1af2fb75b92b1fb127a614367e97e97"
+      "sha256": "db5f30286a2385e9db99cafed8cb5c5740376a5500ee53a248fb8f598869a55b"
     }
   ],
   "rules": {
@@ -218,7 +218,7 @@
   ],
   "outputs": {
     "academy.json": {
-      "sha256": "2f8f2b54bfe22da889536249b231e746324b2b425d44b4a0ad51efd3dae9ac97"
+      "sha256": "83accc2dbb4c0cd61b9c817c57bcbc37191997b546910bfc8b36c1891be1da03"
     }
   }
 }

@@ -31,7 +31,7 @@ import {
  *
  * Bump ALGORITHM_VERSION whenever a rule below changes what comes out.
  */
-export const ALGORITHM_VERSION = '1.1.0'
+export const ALGORITHM_VERSION = '1.2.0'
 
 /** Words kept per language, most frequent first. Stage 2 and the Academy never need more. */
 export const WORD_LIMIT = 20_000

@@ -102,10 +102,47 @@ describe('the committed word banks', () => {
     for (const word of ['дупу', 'шлюха', 'лайна', 'придурок', 'джек', 'мужчина', 'плохого']) {
       expect(uk.has(word), word).toBe(false)
     }
+    // Found by an independent audit in the words the focus drills reach: slang, slurs, russisms and
+    // lower-case first names the first round of lists missed.
+    const auditUk = ['чувак', 'знать', 'ухожу', 'дружище', 'засранець', 'трах', 'оргазм', 'повія']
+    const auditUkMore = [
+      'жид',
+      'негр',
+      'сучку',
+      'козел',
+      'яйця',
+      'алан',
+      'кларк',
+      'біллі',
+      'сперма',
+    ]
+    for (const word of [...auditUk, ...auditUkMore]) expect(uk.has(word), word).toBe(false)
     const en = new Set(banks.en.words.map((w) => w.word))
     for (const word of ['sex', 'sexy', 'balls', 'idiot', 'kill', 'john', 'jack']) {
       expect(en.has(word), word).toBe(false)
     }
+    const auditEn = ['sperm', 'hookers', 'lesbian', 'masturbation', 'dildo', 'queer', 'rapist']
+    const auditEnMore = ['crappy', 'farts', 'jerks', 'tit', 'cum', 'anal', 'semen', 'joey', 'molly']
+    for (const word of [...auditEn, ...auditEnMore]) expect(en.has(word), word).toBe(false)
+  })
+
+  it('does not take innocent words down with the vulgar ones that sit inside them', () => {
+    for (const word of ['страх', 'члени', 'яйце', 'жити', 'негативний']) {
+      expect(isProfane(word, 'uk'), word).toBe(false)
+    }
+    const en = new Set(banks.en.words.map((w) => w.word))
+    for (const word of [
+      'basement',
+      'therapist',
+      'scraping',
+      'analysis',
+      'title',
+      'class',
+      'skill',
+    ]) {
+      expect(isProfane(word, 'en'), word).toBe(false)
+    }
+    expect(en.has('basement')).toBe(true)
   })
 
   it('matches the output checksums its report states', () => {
