@@ -2,7 +2,7 @@
   "format": "typing-race/data-report@1",
   "language": "en",
   "layout": "qwerty",
-  "algorithmVersion": "1.0.0",
+  "algorithmVersion": "1.1.0",
   "inputs": [
     {
       "path": "english/wordlists/frequencywords-2018/en_50k.txt",
@@ -44,7 +44,7 @@
     "dedupe": "Raw tokens that normalise to the same word are merged and their counts summed. Sorted by frequency, then by UTF-16 code units (never locale collation).",
     "dictionary": "uk: must be produced by hunspell-uk (reverse affix lookup, lower case). en: must be produced by hunspell-en in lower case AND, unless it has an apostrophe or hyphen (which dwyl never has), be listed in dwyl words_alpha. The dictionaries only answer yes/no; no word is taken from them.",
     "properNouns": "A token the dictionary produces only in capitalised form (джон -> Джон, english -> English) is a proper noun and dropped.",
-    "stoplists": "uk: residual Russian that shares a spelling with a rare Ukrainian form. en: contraction halves (don, didn, isn…). Both: an authored profanity list (roots and exact words); en also drops anything hunspell-en marks NOSUGGEST. Hyphenated reduplications (ха-ха) and single-letter parts (е-е, м-р; з and о excepted) are dropped as noise, and so are words of two or more letters with no vowel (хм, ll, tv).",
+    "stoplists": "uk: residual Russian that shares a spelling with a rare Ukrainian form. en: contraction halves (don, didn, isn…). Both: given names the dictionary also lists in lower case, and an authored list of obscenities, slurs and sexual, insulting or violent vocabulary (roots and exact words); en also drops anything hunspell-en marks NOSUGGEST. Hyphenated reduplications (ха-ха) and single-letter parts (е-е, м-р; з and о excepted) are dropped as noise, and so are words of two or more letters with no vowel (хм, ll, tv).",
     "ranking": "Most frequent 20000 words are written. N-grams are counted over every surviving word, each word counted once, weighted by its frequency; the 4000 heaviest trigrams are written.",
     "difficulty": "sameFingerTransitions: adjacent pairs typed by the same finger, repeated keys included. rowChanges: adjacent pairs on different rows. tier 1-5: ceil((rank band + length band) / 2) with rank bands 500/2000/5000/10000 and length bands 3/5/7/9."
   },
@@ -257,16 +257,34 @@
     },
     {
       "step": "stoplists",
-      "kept": 30644,
+      "kept": 30511,
       "removed": {
         "contraction-fragment": 2,
+        "first-name": 20,
         "no-vowel": 75,
-        "profanity": 67
+        "profanity": 180
       },
       "examples": {
         "contraction-fragment": [
           "don",
           "haven"
+        ],
+        "first-name": [
+          "john",
+          "jack",
+          "charlie",
+          "mike",
+          "tom",
+          "peter",
+          "max",
+          "harry",
+          "bob",
+          "jimmy",
+          "tony",
+          "billy",
+          "johnny",
+          "bobby",
+          "ed"
         ],
         "no-vowel": [
           "mm",
@@ -289,7 +307,7 @@
     },
     {
       "step": "dedupe after restoration",
-      "kept": 30644,
+      "kept": 30511,
       "removed": {
         "merged-duplicate": 0
       }
@@ -298,59 +316,59 @@
       "step": "keep the 20000 most frequent",
       "kept": 20000,
       "removed": {
-        "below-cut": 10644
+        "below-cut": 10511
       }
     }
   ],
   "counts": {
     "before": 50000,
-    "afterFiltering": 30644,
+    "afterFiltering": 30511,
     "written": 20000,
     "bigrams": 534,
-    "trigramsCounted": 5113,
+    "trigramsCounted": 5105,
     "trigramsWritten": 4000
   },
   "written": {
     "byLength": {
       "1": 1,
-      "2": 76,
-      "3": 588,
-      "4": 1773,
-      "5": 2626,
-      "6": 3313,
-      "7": 3408,
-      "8": 2932,
-      "9": 2205,
-      "10": 1464,
-      "11": 860,
-      "12": 448,
+      "2": 75,
+      "3": 582,
+      "4": 1754,
+      "5": 2615,
+      "6": 3304,
+      "7": 3409,
+      "8": 2942,
+      "9": 2216,
+      "10": 1472,
+      "11": 869,
+      "12": 452,
       "13": 204,
-      "14": 75,
+      "14": 78,
       "15": 21,
       "16": 4,
       "17": 2
     },
     "byTier": {
       "1": 116,
-      "2": 1205,
-      "3": 4146,
-      "4": 8786,
-      "5": 5747
+      "2": 1193,
+      "3": 4133,
+      "4": 8785,
+      "5": 5773
     },
     "flags": {
-      "apostrophe": 17,
+      "apostrophe": 18,
       "apostrophe-restored": 0,
       "hyphen": 0,
-      "double-letter": 3921,
+      "double-letter": 3922,
       "uk-letter": 0
     }
   },
   "outputs": {
     "words.json": {
-      "sha256": "7d555b4f67e0b88c11f88d979cbea77eedf558409ff1ac0d5b4e9fe6bceb204e"
+      "sha256": "f9d2ca0c7709176476bc641ffa07b71c1577966488f7cf7648366aab7e4279b8"
     },
     "ngrams.json": {
-      "sha256": "d99a4d92ff2e82662ad98897bc0982d7b6edd08c3101f57610a623f7cf667d5b"
+      "sha256": "5d121c2b2e1b6d0d667b28520df7e217d1af2fb75b92b1fb127a614367e97e97"
     }
   }
 }
