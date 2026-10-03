@@ -1,6 +1,7 @@
 import { layouts, MASTERY_STREAK, XP_PER_PASS } from '@typing-race/curriculum'
 import type { AttemptSummary, Progress } from '@typing-race/domain'
 import { describe, expect, it } from 'vitest'
+import { totalKeyCount } from '../path/model'
 import { rewardFor } from './reward'
 
 const layout = layouts.yq
@@ -78,5 +79,17 @@ describe('rewardFor', () => {
     expect(reward.nextKey).toBe(layout.unlockOrder.find((c) => !layout.homeAnchors.includes(c)))
     expect(reward.keysOpen).toBe(layout.homeAnchors.length)
     expect(reward.weakest).toEqual({ element: 'а>о', meanIkiMs: 430 })
+  })
+
+  it('counts the keys of the route as the Home screen does, so the two never disagree', () => {
+    for (const language of [layouts.yq, layouts.qwerty]) {
+      const reward = rewardFor({
+        earlier: [],
+        attempt: attempt({}),
+        after: after(1),
+        layout: language,
+      })
+      expect(reward.keysTotal, language.id).toBe(totalKeyCount(language))
+    }
   })
 })
