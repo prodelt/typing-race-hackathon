@@ -10,9 +10,9 @@ import { createEngine, type Engine } from '@typing-race/engine'
 import { useEffect, useRef, useState } from 'react'
 import { m } from '../../paraglide/messages.js'
 import { domInputSource, systemClock } from '../../seams/index.js'
+import { FOREIGN_STREAK, isOfLayout, nextForeignStreak } from '../exercise/layoutHint.js'
 import { TypingLine } from '../exercise/TypingLine.js'
 import { RaceLayoutNotice, type RaceLayoutProbe } from './LayoutNotice.js'
-import { FOREIGN_STREAK, isOfLayout, nextForeignStreak } from './layoutHint.js'
 
 /** A racer who types nothing for this long steps back to watching. */
 const IDLE_MS = 25_000

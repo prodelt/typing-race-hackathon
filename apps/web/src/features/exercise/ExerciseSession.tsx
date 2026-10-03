@@ -8,6 +8,7 @@ import { useEnginePaused } from './engineHooks.js'
 import { PauseOverlay } from './PauseOverlay.js'
 import { PreStart } from './PreStart.js'
 import { type ExercisePlan, planExercise } from './plan.js'
+import { TypedLayoutNotice, useTypedWrongLayout } from './TypedLayoutNotice.js'
 import { TypingScreen } from './TypingScreen.js'
 import { useAttempt } from './useAttempt.js'
 import { type ExerciseTarget, type ExerciseWording, scaleWording } from './wording.js'
@@ -154,6 +155,7 @@ export function ExerciseRun({
     seed: plan.seed,
   })
   const paused = useEnginePaused(engine)
+  const typedWrong = useTypedWrongLayout(input, layout, started)
 
   // Escape is read from React's synthetic `keydown`, which bubbles up from the textarea and from
   // the pause dialog alike. It is not an input path: it reads no character and feeds no engine, so
@@ -219,6 +221,7 @@ export function ExerciseRun({
             keyConfidence={keyConfidence}
             last={last}
           />
+          <TypedLayoutNotice layout={layout} wrong={typedWrong} />
           {paused ? (
             <PauseOverlay
               layout={layout}
