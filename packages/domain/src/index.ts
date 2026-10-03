@@ -415,7 +415,7 @@ export type InputEvent =
   | { readonly kind: 'backspace'; readonly at: number }
   | {
       readonly kind: 'ignored'
-      readonly reason: 'modifier' | 'composition' | 'deadKey'
+      readonly reason: 'modifier' | 'composition' | 'deadKey' | 'repeat'
       readonly at: number
     }
 

@@ -29,6 +29,10 @@ export const RESIDUAL_RUSSIAN: readonly string[] = [
   ...['получили', 'пришла', 'пришли', 'позволь', 'позволить', 'забрал', 'держать', 'держись'],
   ...['смерти', 'крови', 'новости', 'ума', 'поводу'],
   ...['мужчина', 'мужчины', 'мужчину', 'плохого', 'плохой'],
+  // Colloquial Russian the Ukrainian dictionary lists as slang or by spelling: found in the focus
+  // drills' pools, which reach well down the bank.
+  ...['чувак', 'чувака', 'чуваки', 'чуваком', 'знать', 'ухожу', 'дружище'],
+  ...['парню', 'парнями', 'парне', 'парням', 'дурак', 'дурака', 'дураком'],
   // The source tokenizer split `п'ять` at the apostrophe; this is the orphaned tail.
   'ять',
 ]
@@ -94,6 +98,7 @@ export const PROFANITY: Readonly<
       ...['шлюх', 'проститут', 'бордел', 'збочен', 'придур', 'ідіот', 'кретин', 'дебіл'],
       ...['виродк', 'виродок', 'вилупк', 'вилупок', 'йолоп', 'бовдур', 'сволот', 'мерзот'],
       ...['тварюк', 'падлюк', 'наркоман', 'героїн', 'кокаїн'],
+      ...['засран', 'оргазм', 'стерв', 'заткн', 'сперм', 'мінет', 'відсмокт'],
     ],
     exact: [
       'бля',
@@ -113,6 +118,14 @@ export const PROFANITY: Readonly<
       'лайно',
       ...['дупа', 'дупу', 'дупи', 'дупі', 'дупою', 'дупо'],
       ...['лайна', 'лайну', 'лайні', 'лайном', 'скотина', 'скотину', 'скотини', 'падло', 'падла'],
+      // Forms of words that are a vulgarity only in one reading (`страх` holds `трах`, `член` is
+      // also a member), so they are listed whole.
+      ...['трах', 'трахається', 'трахались', 'трахаю', 'трахаєш', 'трахнув'],
+      ...['повія', 'повій', 'повії', 'повію', 'повією', 'повіям'],
+      ...['сучку', 'сучі', 'сучого', 'сучих', 'козел', 'козла', 'козлом', 'козли', 'козлів'],
+      ...['жид', 'жиди', 'жидів', 'жида', 'жидом', 'жидові', 'негр', 'негра', 'негрів', 'негри'],
+      ...['гнида', 'гниди', 'гнидо'],
+      ...['яйця', 'яйцях', 'яйцями', 'яєчка', 'член', 'оральний', 'анальний'],
     ],
   },
   en: {
@@ -135,6 +148,9 @@ export const PROFANITY: Readonly<
       ...['sexy', 'sexual', 'porn', 'penis', 'vagina', 'orgasm', 'erotic', 'horny', 'condom'],
       ...['pervert', 'stripper', 'prostitut', 'molest', 'nipple', 'bimbo'],
       ...['idiot', 'moron', 'murder', 'suicide', 'terroris'],
+      ...['sperm', 'hooker', 'lesbian', 'masturb', 'pedophil', 'striptease', 'testicle'],
+      ...['bondage', 'incest', 'dildo', 'vibrator', 'lingerie', 'fetish'],
+      ...['kinky', 'topless', 'rectum', 'orgy'],
     ],
     exact: [
       'ass',
@@ -162,7 +178,48 @@ export const PROFANITY: Readonly<
       ...['balls', 'jerk', 'loser', 'scum', 'sucker', 'suck', 'sucks', 'sucked', 'butt', 'bum'],
       ...['fart', 'poop', 'pee', 'bugger', 'bloody', 'dumb', 'stupid', 'dyke', 'homo', 'negro'],
       ...['hoe', 'hooker', 'abortion', 'cripple', 'heroin', 'cocaine'],
-      ...['kill', 'killed', 'killing', 'killer', 'killers', 'kills'],
+      ...['kill', 'killed', 'killing', 'killer', 'killers', 'kills', 'killings'],
+      // Whole words only: `anal` is in `analysis`, `cum` in `document`, `tit` in `title`,
+      // `rapist` in `therapist`, `raping` in `scraping`, `crapp` in `scrapping`, `semen` in `basement`.
+      'semen',
+      ...['rapist', 'rapists', 'raping', 'crappy', 'crapped', 'crapper'],
+      ...[
+        'anal',
+        'anus',
+        'cum',
+        'boner',
+        'thong',
+        'tit',
+        'tits',
+        'titty',
+        'titties',
+        'turd',
+        'turds',
+      ],
+      ...['retards', 'queer', 'queers', 'booby', 'boobies', 'craps', 'rapes', 'hoes', 'dammit'],
+      ...[
+        'farts',
+        'farting',
+        'farted',
+        'jerks',
+        'jerking',
+        'jerked',
+        'sucking',
+        'suckers',
+        'losers',
+      ],
+      ...[
+        'pisses',
+        'pooped',
+        'pooping',
+        'peed',
+        'peeing',
+        'buggers',
+        'buggered',
+        'prick',
+        'pricks',
+      ],
+      ...['buttocks', 'butts', 'fatso', 'fatty', 'sexier', 'sexiest', 'chink', 'gook', 'testicles'],
     ],
   },
 }
@@ -173,10 +230,14 @@ export const PROFANITY: Readonly<
  * `mark`, `will`, `rose` and `bill` stay because they are words first.
  */
 export const FIRST_NAMES: Readonly<Record<Language, readonly string[]>> = {
-  uk: ['джек', 'мері', 'тоні', 'ігор', 'сем', 'бен'],
+  uk: [
+    ...['джек', 'мері', 'тоні', 'ігор', 'сем', 'бен'],
+    ...['кларк', 'алан', 'біллі', 'гері', 'генрі', 'кайл', 'оскар', 'тім'],
+  ],
   en: [
     ...['john', 'jack', 'tom', 'bob', 'mike', 'harry', 'charlie', 'peter', 'tony', 'max', 'ted'],
     ...['bobby', 'billy', 'johnny', 'jimmy', 'jenny', 'maria', 'terry', 'lily', 'ed'],
+    ...['sally', 'molly', 'phoebe', 'joey', 'rick', 'josh'],
   ],
 }
 

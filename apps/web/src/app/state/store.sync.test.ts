@@ -104,4 +104,27 @@ describe('app store × sync', () => {
     expect(await appSync().wipeLocalIfSynced()).toBe('wiped')
     await vi.waitFor(() => expect(useAppStore.getState().attempts).toEqual([]))
   })
+
+  it('clearing local data empties the outbox too, so a later sign-in uploads nothing', async () => {
+    const queue = memoryOutbox()
+    setProgressStore(
+      memoryStore({
+        settings: DEFAULT_SETTINGS,
+        startingLevelByLanguage: { uk: 'neverTouchTyped' },
+        attempts: [],
+      }),
+      queue,
+    )
+    useAppStore.setState(initialState)
+    await useAppStore.getState().boot()
+    await useAppStore.getState().finishAttempt(attempt('typed', 3_000))
+    expect(await queue.all()).toHaveLength(1)
+
+    await useAppStore.getState().startFresh()
+
+    expect(await queue.all()).toEqual([])
+    const cloud = cloudWith([])
+    await appSync().connect(cloud)
+    expect(cloud.uploaded).toEqual([])
+  })
 })

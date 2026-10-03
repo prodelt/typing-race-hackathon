@@ -126,6 +126,16 @@ export function domInputSource(
   const onKeyDown = (event: KeyboardEvent): void => {
     const at = clock.now()
 
+    // A held key repeats `keydown`, and each repeat would insert another character: one press
+    // would score as a string of wrong letters. Cancelling the repeat's default stops its text.
+    // A held Backspace stays, since deleting several characters is what holding it is for, and a
+    // composition is left alone, because cancelling `keydown` there would break the input method.
+    if (event.repeat && event.key !== 'Backspace' && !event.isComposing && !composing) {
+      event.preventDefault()
+      emit({ kind: 'ignored', reason: 'repeat', at })
+      return
+    }
+
     if (event.key === 'Dead') {
       emit({ kind: 'ignored', reason: 'deadKey', at })
       return

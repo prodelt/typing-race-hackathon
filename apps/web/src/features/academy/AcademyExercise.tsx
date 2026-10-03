@@ -25,7 +25,7 @@ import { TypedLayoutNotice, useTypedWrongLayout } from '../exercise/TypedLayoutN
 import { TypingLine } from '../exercise/TypingLine.js'
 import { useAttempt } from '../exercise/useAttempt.js'
 import { languageOfExercise, scaleShapeOf, useAcademyCourse } from './data.js'
-import { LAYOUT_NAME, local, percent } from './model.js'
+import { LAYOUT_NAME, local, lockedLetters, percent } from './model.js'
 import './academy.css'
 import './exercise.css'
 
@@ -121,6 +121,14 @@ function AcademySession({ course, module, exercise, mode }: SessionProps) {
   })
   const scale = useMemo(() => scaleShapeOf(exercise, layout.id), [exercise, layout.id])
   const unlocked = useMemo(() => allCharacters(layout), [layout])
+  // What Stage 1 has not opened yet. Unknown when the profile trains the other language, so no warning.
+  const locked = useMemo(
+    () =>
+      derived.layout.id === layout.id && derived.progress !== null
+        ? lockedLetters(exercise.text, derived.progress.unlockedSet)
+        : [],
+    [derived.layout.id, derived.progress, exercise.text, layout.id],
+  )
   const n = course.modules.indexOf(module) + 1
 
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -196,6 +204,7 @@ function AcademySession({ course, module, exercise, mode }: SessionProps) {
           mode={mode}
           layout={layout}
           input={input}
+          locked={locked}
           streak={frozen.streak}
           mastered={frozen.mastered}
           testIsPrimary={frozen.testIsPrimary}
@@ -268,6 +277,7 @@ function PreStart({
   mode,
   layout,
   input,
+  locked,
   streak,
   mastered,
   testIsPrimary,
@@ -278,6 +288,7 @@ function PreStart({
   readonly mode: AttemptMode
   readonly layout: Layout
   readonly input: InputSource
+  readonly locked: readonly string[]
   readonly streak: number
   readonly mastered: boolean
   readonly testIsPrimary: boolean
@@ -331,6 +342,15 @@ function PreStart({
       <p className="academy-pre__hint">
         {mode === 'test' ? m.academy_ex_test_hint({ floor: FLOOR }) : m.academy_ex_practice_hint()}
       </p>
+
+      {locked.length > 0 ? (
+        <p className="academy-pre__locked" data-testid="academy-locked">
+          {m.academy_ex_locked({ letters: locked.join(' · ') })}{' '}
+          <Link to="/map" search={{ stage: 1 }} className="academy-pre__locked-link">
+            {m.academy_ex_locked_link()}
+          </Link>
+        </p>
+      ) : null}
 
       {probe === 'mismatch' ? (
         <div role="alert" className="academy-pre__alert">

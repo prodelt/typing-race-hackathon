@@ -33,7 +33,7 @@
   "exercise_layout_recheck": "Check again",
   "exercise_layout_typed_wrong": "Those are not letters of the {layout} layout, so the exercise counts them as errors. Switch your system to {layout} and keep typing.",
   "exercise_start": "Start",
-  "exercise_start_hint": "The attempt begins as soon as you type the first character.",
+  "exercise_start_hint": "Press Start: the timer begins as soon as you type the first character.",
   "exercise_type_to_begin": "Type the first character to begin",
   "exercise_input_label": "Exercise input field",
   "exercise_line_label": "Exercise line",

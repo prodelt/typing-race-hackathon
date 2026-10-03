@@ -2,7 +2,7 @@
   "format": "typing-race/data-report@1",
   "language": "en",
   "layout": "qwerty",
-  "algorithmVersion": "1.1.0",
+  "algorithmVersion": "1.2.0",
   "inputs": [
     {
       "path": "english/wordlists/frequencywords-2018/en_50k.txt",
@@ -257,12 +257,12 @@
     },
     {
       "step": "stoplists",
-      "kept": 30511,
+      "kept": 30426,
       "removed": {
         "contraction-fragment": 2,
-        "first-name": 20,
+        "first-name": 26,
         "no-vowel": 75,
-        "profanity": 180
+        "profanity": 259
       },
       "examples": {
         "contraction-fragment": [
@@ -307,7 +307,7 @@
     },
     {
       "step": "dedupe after restoration",
-      "kept": 30511,
+      "kept": 30426,
       "removed": {
         "merged-duplicate": 0
       }
@@ -316,33 +316,33 @@
       "step": "keep the 20000 most frequent",
       "kept": 20000,
       "removed": {
-        "below-cut": 10511
+        "below-cut": 10426
       }
     }
   ],
   "counts": {
     "before": 50000,
-    "afterFiltering": 30511,
+    "afterFiltering": 30426,
     "written": 20000,
     "bigrams": 534,
-    "trigramsCounted": 5105,
+    "trigramsCounted": 5101,
     "trigramsWritten": 4000
   },
   "written": {
     "byLength": {
       "1": 1,
       "2": 75,
-      "3": 582,
-      "4": 1754,
-      "5": 2615,
-      "6": 3304,
-      "7": 3409,
-      "8": 2942,
-      "9": 2216,
-      "10": 1472,
-      "11": 869,
-      "12": 452,
-      "13": 204,
+      "3": 580,
+      "4": 1748,
+      "5": 2602,
+      "6": 3297,
+      "7": 3408,
+      "8": 2946,
+      "9": 2224,
+      "10": 1479,
+      "11": 877,
+      "12": 453,
+      "13": 205,
       "14": 78,
       "15": 21,
       "16": 4,
@@ -351,24 +351,24 @@
     "byTier": {
       "1": 116,
       "2": 1193,
-      "3": 4133,
-      "4": 8785,
-      "5": 5773
+      "3": 4119,
+      "4": 8779,
+      "5": 5793
     },
     "flags": {
       "apostrophe": 18,
       "apostrophe-restored": 0,
       "hyphen": 0,
-      "double-letter": 3922,
+      "double-letter": 3920,
       "uk-letter": 0
     }
   },
   "outputs": {
     "words.json": {
-      "sha256": "f9d2ca0c7709176476bc641ffa07b71c1577966488f7cf7648366aab7e4279b8"
+      "sha256": "405e0c78b76e15ae5573610f93004c918fa9be31efd1bafa1cc98dfac1fb970b"
     },
     "ngrams.json": {
-      "sha256": "5d121c2b2e1b6d0d667b28520df7e217d1af2fb75b92b1fb127a614367e97e97"
+      "sha256": "db5f30286a2385e9db99cafed8cb5c5740376a5500ee53a248fb8f598869a55b"
     }
   }
 }

@@ -169,6 +169,32 @@ describe('domInputSource (T016, T018)', () => {
     ])
   })
 
+  it('ignores the auto-repeat of a held key, and cancels the text it would insert', () => {
+    const { element, seen } = harness()
+    const repeat = new KeyboardEvent('keydown', {
+      key: 'a',
+      repeat: true,
+      bubbles: true,
+      cancelable: true,
+    })
+    element.dispatchEvent(repeat)
+    expect(repeat.defaultPrevented).toBe(true)
+    expect(seen).toEqual([{ kind: 'ignored', reason: 'repeat', at: 0 }])
+  })
+
+  it('lets a held Backspace repeat: deleting several characters is what holding it is for', () => {
+    const { element, seen } = harness()
+    const repeat = new KeyboardEvent('keydown', {
+      key: 'Backspace',
+      repeat: true,
+      bubbles: true,
+      cancelable: true,
+    })
+    element.dispatchEvent(repeat)
+    expect(repeat.defaultPrevented).toBe(false)
+    expect(seen).toEqual([])
+  })
+
   it('emits ignored for a dead key', () => {
     const { element, seen } = harness()
     element.dispatchEvent(new KeyboardEvent('keydown', { key: 'Dead', bubbles: true }))
