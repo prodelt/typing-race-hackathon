@@ -1,5 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Attempt, Settings } from '@typing-race/domain'
+import { accountKind } from '../features/account/model.js'
 import {
   appSync,
   NickError,
@@ -24,6 +25,9 @@ let unsubscribeAuth: (() => void) | null = null
 /**
  * Connects the app's sync engine to the signed-in account, if there is one. Safe to call at boot
  * and again after sign-in; a second call re-reads the session and resyncs.
+ *
+ * A guest (the anonymous user a Race creates) is not an account: their attempts and keystroke logs
+ * stay in this browser, as `/privacy` promises. Only Google linking makes the session permanent.
  */
 export async function startSync(): Promise<StartResult> {
   const client = await supabaseClient()
@@ -31,6 +35,7 @@ export async function startSync(): Promise<StartResult> {
   const { data } = await client.auth.getSession()
   const user = data.session?.user
   if (!user) return 'no-session'
+  if (accountKind(user) !== 'google') return 'guest'
 
   unsubscribeAuth?.()
   const { data: listener } = client.auth.onAuthStateChange((event) => {

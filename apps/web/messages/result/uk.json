@@ -51,6 +51,7 @@
   "result_next_start": "Почати",
   "result_coach_lowerTempo": "Точність була {accuracy}% — нижче за поріг {floor}%. Зменшіть темп приблизно до {spm} SPM і повторіть цю шкалу, доки точність не дійде до порогу.",
   "result_coach_weakTransition": "Перехід {from} → {to} найслабший: упевненість {confidence}%. Його друкують пальці: {fromFinger} і {toFinger}. Потренуйте його зараз.",
+  "result_coach_weakTransitionOneFinger": "Перехід {from} → {to} найслабший: упевненість {confidence}%. Обидві клавіші друкує один палець — {finger}. Потренуйте його зараз.",
   "result_coach_evenRhythm": "Точність добра, але ритм нерівний ({rhythm}%). Повторіть цю шкалу рівним темпом.",
   "result_coach_nextKey": "Наступна клавіша: {key} ({finger}). Почніть її шкалу.",
   "result_coach_nextScale": "Наступна шкала: {scale}.",
@@ -62,11 +63,6 @@
   "result_unlock_opens_none": "Нові шкали відкриються з наступною клавішею.",
   "result_unlock_start": "До першого завдання",
   "result_unlock_reason": "Три залікові спроби поспіль із точністю не нижче порогу.",
-  "result_finger_pinky": "мізинець",
-  "result_finger_ring": "безіменний палець",
-  "result_finger_middle": "середній палець",
-  "result_finger_index": "вказівний палець",
-  "result_finger_thumb": "великий палець",
   "result_finger_unknown": "невідомий палець",
   "result_key_space": "пробіл",
   "result_scale_run": "прохід",
@@ -110,5 +106,8 @@
   "result_home": "На головну",
   "result_again": "Ще раз",
   "result_next_go": "Далі",
-  "result_details": "Деталі спроби"
+  "result_details": "Деталі спроби",
+  "result_label_academy": "Вправа Академії",
+  "result_label_words": "Слова",
+  "result_label_exercise": "Вправа"
 }

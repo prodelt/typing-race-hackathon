@@ -9,7 +9,7 @@
   "shell_brand": "Typing-Race, go home",
   "shell_season": "Season",
   "shell_season_left": "{days} days left",
-  "shell_season_hint": "A season lasts a calendar month; season rankings reset on the first.",
+  "shell_season_hint": "A season is a calendar month; the counter shows the days left. There are no separate season rankings yet: Race Rating runs continuously.",
   "shell_online": "online",
   "shell_status_label": "Player status",
   "shell_guest": "guest",

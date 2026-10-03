@@ -268,6 +268,69 @@ test.describe('US5 settings', () => {
     expect(sounds).toEqual([])
   })
 
+  test('with sound on, a result chimes and typing stays silent (FR-064)', async ({ page }) => {
+    // A fake AudioContext that only counts, so the test hears nothing and sees what was asked.
+    await page.addInitScript(() => {
+      const heard = { contexts: 0, notes: 0 }
+      ;(window as unknown as { __heard: typeof heard }).__heard = heard
+      const param = () => ({
+        value: 0,
+        setValueAtTime() {},
+        exponentialRampToValueAtTime() {},
+      })
+      class FakeAudio {
+        state = 'running'
+        currentTime = 0
+        destination = {}
+        constructor() {
+          heard.contexts += 1
+        }
+        resume() {
+          return Promise.resolve()
+        }
+        createOscillator() {
+          const node = {
+            type: '',
+            frequency: param(),
+            connect: (to: unknown) => to,
+            start() {
+              heard.notes += 1
+            },
+            stop() {},
+          }
+          return node
+        }
+        createGain() {
+          return { gain: param(), connect: (to: unknown) => to }
+        }
+      }
+      ;(window as unknown as Record<string, unknown>)['AudioContext'] = FakeAudio
+    })
+    await seedStore(page, {
+      settings: { ...MOTION_OFF_SETTINGS, motion: 'reduced', sound: 'on' },
+      startingLevelByLanguage: { uk: 'neverTouchTyped', en: 'neverTouchTyped' },
+    } as Parameters<typeof seedStore>[1])
+
+    await page.goto(`/exercise/${ANCHORS}?mode=practice`)
+    await page.getByRole('button', { name: 'Почати', exact: true }).click()
+    const text = (await page.getByTestId('typing-line').locator('p.sr-only').textContent()) ?? ''
+    // Nothing sounds while typing.
+    await typeChar(page, [...text][0] ?? '')
+    expect(
+      await page.evaluate(
+        () => (window as unknown as { __heard: { notes: number } }).__heard.notes,
+      ),
+    ).toBe(0)
+    await typeText(page, [...text].slice(1).join(''))
+    await expect(page).toHaveURL(/\/result\//)
+
+    await expect
+      .poll(() =>
+        page.evaluate(() => (window as unknown as { __heard: { notes: number } }).__heard.notes),
+      )
+      .toBeGreaterThanOrEqual(2)
+  })
+
   test('any size from 24 to 40 px is selectable and the preview and the typing line follow at once (scenario 4)', async ({
     page,
   }) => {

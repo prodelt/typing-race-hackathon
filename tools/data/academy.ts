@@ -19,7 +19,7 @@ import { decodeUtf8, parseChecksums, readVerified, sha256, type VerifiedFile } f
  *
  * Bump ACADEMY_VERSION whenever a rule or a blueprint changes what comes out.
  */
-export const ACADEMY_VERSION = '1.0.0'
+export const ACADEMY_VERSION = '1.1.0'
 
 const SOURCES: Record<
   Language,

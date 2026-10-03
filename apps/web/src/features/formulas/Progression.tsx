@@ -1,4 +1,5 @@
 import {
+  academyLevel,
   introductionLevel,
   levels,
   MASTERY_STREAK,
@@ -33,7 +34,13 @@ export function Progression() {
   return (
     <Section id="progression" title={m.formulas_progress_title()}>
       <Block title={m.formulas_levels_title()}>
-        <div className="ref-table-wrap">
+        <section
+          className="ref-table-wrap"
+          // The table scrolls sideways when a column grows; a scroll area must be reachable by keyboard.
+          // biome-ignore lint/a11y/noNoninteractiveTabindex: a scrollable region is focusable by design
+          tabIndex={0}
+          aria-label={m.formulas_levels_caption()}
+        >
           <table className="ref-table">
             <caption className="sr-only">{m.formulas_levels_caption()}</caption>
             <thead>
@@ -48,6 +55,7 @@ export function Progression() {
             <tbody>
               {levels.map((level) => {
                 const inForce = level.id === introductionLevel.id
+                const inAcademy = level.id === academyLevel.id
                 return (
                   <tr key={level.id}>
                     <th scope="row">{level.name[language()]}</th>
@@ -55,8 +63,12 @@ export function Progression() {
                     <td className="ref-table__mono">{percent(level.accuracyFloor)}</td>
                     <td>{level.goal[language()]}</td>
                     <td>
-                      <span className={inForce ? 'scr-tag scr-tag--ink' : 'scr-tag'}>
-                        {inForce ? m.formulas_status_in_force() : m.formulas_status_informational()}
+                      <span className={inForce || inAcademy ? 'scr-tag scr-tag--ink' : 'scr-tag'}>
+                        {inForce
+                          ? m.formulas_status_in_force()
+                          : inAcademy
+                            ? m.formulas_status_academy()
+                            : m.formulas_status_informational()}
                       </span>
                     </td>
                   </tr>
@@ -64,7 +76,7 @@ export function Progression() {
               })}
             </tbody>
           </table>
-        </div>
+        </section>
         <P>{m.formulas_levels_note()}</P>
       </Block>
 

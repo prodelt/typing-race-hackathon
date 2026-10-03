@@ -1,4 +1,9 @@
-import { realTextId, scaleById, WEAK_CONFIDENCE_CEILING } from '@typing-race/curriculum'
+import {
+  realTextId,
+  resolveWordDrill,
+  scaleById,
+  WEAK_CONFIDENCE_CEILING,
+} from '@typing-race/curriculum'
 import type {
   AttemptMode,
   AttemptSummary,
@@ -14,7 +19,8 @@ import { currentSpm, type SessionSize, sizeSession } from './sizing.js'
 /**
  * Block composition: warm-up, one target skill, consolidation, then real text (requirements §4.1).
  *
- * The three exercise blocks are Scales. The fourth is not planned here beyond its id: its text is
+ * The three exercise blocks are Scales, or a Stage 2 word drill as the target when that is what the
+ * Next Action names. The fourth is not planned here beyond its id: its text is
  * the Academy's sentences or real words from open keys, which need the course and the word bank,
  * so `RealTextBlock` builds it when the learner reaches it (`realTextBlock` in curriculum).
  */
@@ -27,7 +33,8 @@ export interface Block {
   /** Practice shows the keyboard guide; test hides it and counts toward mastery (FR-039). */
   readonly mode: AttemptMode
   readonly reps: number
-  readonly focus: FocusElement
+  /** `null` for a word drill over a whole property (sameFinger, alternation, a length band). */
+  readonly focus: FocusElement | null
   /** The warm-up fell back to the target skill because no weak Transition was available. */
   readonly fallback: boolean
 }
@@ -76,15 +83,44 @@ function warmUpScale(progress: Progress, startable: readonly Scale[]): Scale | u
   return undefined
 }
 
+/** What a block practises: an authored Scale, a Transition drill, or a Stage 2 word drill. */
+interface Target {
+  readonly id: string
+  readonly focus: FocusElement | null
+  readonly size: number
+}
+
+/**
+ * The Next Action's own exercise when the learner can start it, so a session trains what the
+ * result screen just recommended. `scaleById` resolves a Transition drill the coach built as well
+ * as an authored Scale; a Stage 2 word drill (including a focus drill) is resolved separately.
+ * Anything else falls back to the first startable Scale.
+ */
+function targetFor(
+  args: Pick<ComposeArgs, 'layout' | 'nextAction'>,
+  unlocked: ReadonlySet<string>,
+  startable: readonly Scale[],
+): Target | undefined {
+  const { layout, nextAction } = args
+  const named = scaleById(layout, nextAction.startsScaleId)
+  if (named?.requires.every((char) => unlocked.has(char)) === true) return named
+  const drill = resolveWordDrill(nextAction.startsScaleId)
+  if (
+    drill !== undefined &&
+    drill.layoutId === layout.id &&
+    drill.requires.every((char) => unlocked.has(char))
+  ) {
+    return drill
+  }
+  return startable[0]
+}
+
 export function composeSession(args: ComposeArgs): (SessionPlan & { size: SessionSize }) | null {
-  const { layout, catalogue, progress, nextAction, attempts } = args
+  const { layout, catalogue, progress, attempts } = args
   const unlocked = new Set(progress.unlockedSet)
   const startable = catalogue.filter((scale) => scale.requires.every((char) => unlocked.has(char)))
 
-  // `scaleById` resolves a Transition drill the coach built as well as an authored Scale; a Stage 2
-  // word drill is not a Scale, and the session then trains the first startable one instead.
-  const named = scaleById(layout, nextAction.startsScaleId)
-  const target = named?.requires.every((char) => unlocked.has(char)) === true ? named : startable[0]
+  const target = targetFor(args, unlocked, startable)
   if (target === undefined) return null
 
   const weak = warmUpScale(progress, startable)

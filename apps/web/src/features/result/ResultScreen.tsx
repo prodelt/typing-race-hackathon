@@ -10,6 +10,7 @@ import { Button, prefersReducedMotion, resolveMotion } from '@typing-race/ui'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { LiveGradient } from '../../app/LiveGradient.js'
 import { useScreenKeys } from '../../app/screenKeys.js'
+import { playCue } from '../../app/sound.js'
 import { useAppStore } from '../../app/state/index.js'
 import { m } from '../../paraglide/messages.js'
 import { AcademyNextCard } from '../academy/NextCard.js'
@@ -17,15 +18,10 @@ import { ReviewOutcome } from '../review/Outcome.js'
 import { UnlockWords } from '../words/UnlockWords.js'
 import { Comparison } from './Comparison.js'
 import { ErrorList } from './ErrorList.js'
+import { exerciseLabel, useAcademyTitle } from './exerciseLabel.js'
 import { duration, number } from './format.js'
 import { Metrics } from './Metrics.js'
-import {
-  buildResultModel,
-  displayChar,
-  type ResultModel,
-  scaleName,
-  transitionLabel,
-} from './model.js'
+import { buildResultModel, displayChar, type ResultModel, transitionLabel } from './model.js'
 import { NextActionCard } from './NextActionCard.js'
 import { RhythmChart } from './RhythmChart.js'
 import type { Reward } from './reward.js'
@@ -126,8 +122,7 @@ function RewardView({
     ...(academy ? {} : { Enter: next, KeyD: drill }),
   })
 
-  const scale = model.scales.find((candidate) => candidate.id === attempt.scaleId)
-  const label = scale === undefined ? attempt.scaleId : scaleName(scale)
+  const label = exerciseLabel(model.layout, attempt.scaleId, useAcademyTitle(attempt.scaleId))
 
   return (
     <div className="reward">
@@ -243,6 +238,13 @@ function ScorePanel({ model, label }: { readonly model: ResultModel; readonly la
   const academy = isAcademyExerciseId(attempt.scaleId)
   const chip = useRef<HTMLSpanElement>(null)
   const motion = useMotionOn()
+  const settings = useAppStore((state) => state.settings)
+
+  // A chime when the result opens, a rising one for a new key; silent unless the learner asked.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: once per attempt, not per setting change
+  useEffect(() => {
+    playCue(model.unlock === null ? 'result' : 'unlock', settings)
+  }, [attempt.id])
 
   // The XP chip flies into the status bar's XP bar once, when the result opens.
   // biome-ignore lint/correctness/useExhaustiveDependencies: once per attempt

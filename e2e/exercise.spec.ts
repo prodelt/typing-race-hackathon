@@ -573,6 +573,42 @@ test.describe('US1 typing an exercise', { tag: '@input' }, () => {
   })
 })
 
+test.describe('US1 wrong Active layout while typing', () => {
+  test('three letters of another layout explain themselves, without moving the line, and clear on a right letter', async ({
+    calmPage: page,
+  }) => {
+    await openExercise(page, UK_SCALE)
+    await begin(page)
+    const before = await positions(page)
+
+    // A learner on the US layout: the exercise counts q, w, e as errors and the line goes red.
+    await typeChar(page, 'q')
+    await typeChar(page, 'w')
+    await expect(page.getByTestId('typed-layout-notice')).toHaveCount(0)
+    await typeChar(page, 'e')
+    const notice = page.getByTestId('typed-layout-notice')
+    await expect(notice).toBeVisible()
+    await expect(notice).toHaveAttribute('role', 'alert')
+    await expect(notice).toContainText('ЙЦУКЕН')
+    // It floats: the typing line did not move for it.
+    expect(await positions(page)).toEqual(before)
+
+    // The system is switched to ЙЦУКЕН and the learner types a letter of it.
+    await typeChar(page, 'ф')
+    await expect(notice).toHaveCount(0)
+  })
+
+  test('a slip of one or two letters says nothing', async ({ calmPage: page }) => {
+    await openExercise(page, UK_SCALE)
+    await begin(page)
+    await typeChar(page, 'q')
+    await typeChar(page, 'ф')
+    await typeChar(page, 'w')
+    await typeChar(page, 'e')
+    await expect(page.getByTestId('typed-layout-notice')).toHaveCount(0)
+  })
+})
+
 test.describe('US1 layout check', { tag: '@cdp' }, () => {
   test('a Ukrainian exercise on an English layout reports the mismatch and does not start (scenario 8, FR-021)', async ({
     calmPage: page,

@@ -22,6 +22,7 @@ import { RouteLine, useSize } from '../map/RouteLine.js'
 import { keyLabel, nextActionText } from '../path/labels.js'
 import { MASTERY_STREAK, streakFor, totalKeyCount, unlockedKeyCount } from '../path/model.js'
 import { spotLabel } from '../review/format.js'
+import { blockSpot } from '../session/blockSpot.js'
 import { composeSession, type SessionPlan } from '../session/compose.js'
 import { useSessionStore } from '../session/store.js'
 import { goalChart, keyWindow, sessionXp, stepMinutes, weakTrend } from './model.js'
@@ -190,7 +191,7 @@ function ContinuePanel(props: {
       : [
           ...plan.blocks.map((block, i) => ({
             name: BLOCK_NAMES[i]?.() ?? '',
-            focus: spotLabel(block.focus.value),
+            focus: blockSpot(block),
             minutes: minutes[i] ?? 0,
           })),
           { name: BLOCK_NAMES[3](), focus: undefined, minutes: minutes[3] ?? 0 },

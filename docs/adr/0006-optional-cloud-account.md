@@ -12,7 +12,9 @@ settings and nick follow them to any device.
   so merging two devices is a conflict-free union. Level, XP, Streak and mastery are re-derived. On
   sign-in the local history uploads (through an outbox, idempotent) and the cloud history downloads.
   Settings sync last-write-wins by `updatedAt`. The nick lives on the server. No separate "sync" toggle:
-  signed in means syncing.
+  signed in means syncing. A guest (the anonymous user a Race creates) is not signed in: `startSync`
+  answers `'guest'`, so their training and keystroke logs stay in the browser, and the guest can
+  delete the server profile on its own while keeping the progress.
 - **Second device:** when the Google identity already belongs to another user, we sign into that
   account and upload this device's local attempts. The anonymous user's races stay under its guest
   nick and are not merged (a `merge-account` function is possible later).

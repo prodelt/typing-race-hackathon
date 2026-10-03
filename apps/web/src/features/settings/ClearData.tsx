@@ -2,6 +2,7 @@ import { Button } from '@typing-race/ui'
 import { useState } from 'react'
 import { useAppStore } from '../../app/state/index.js'
 import { m } from '../../paraglide/messages.js'
+import { useAccount } from '../account/state.js'
 
 /**
  * Clearing local data is irreversible, so it takes two steps: a button that only asks, and a second
@@ -10,6 +11,8 @@ import { m } from '../../paraglide/messages.js'
  */
 export function ClearData() {
   const startFresh = useAppStore((state) => state.startFresh)
+  // A signed-in learner's history also lives in the cloud, and clearing here does not reach it.
+  const signedIn = useAccount((state) => state.kind === 'google')
   const [step, setStep] = useState<'idle' | 'confirming' | 'done'>('idle')
 
   async function confirm(): Promise<void> {
@@ -19,11 +22,15 @@ export function ClearData() {
 
   return (
     <div className="set-stack">
-      <p className="set-hint">{m.settings_data_body()}</p>
+      <p className="set-hint">
+        {signedIn ? m.settings_data_body_signed_in() : m.settings_data_body()}
+      </p>
       {step === 'confirming' ? (
         <div role="alert" className="set-confirm">
           <p className="set-confirm__title">{m.settings_data_confirm_title()}</p>
-          <p className="set-hint">{m.settings_data_confirm_body()}</p>
+          <p className="set-hint">
+            {signedIn ? m.settings_data_confirm_body_signed_in() : m.settings_data_confirm_body()}
+          </p>
           <div className="set-row">
             <Button variant="danger" size="sm" onClick={() => void confirm()}>
               {m.settings_data_confirm_yes()}
