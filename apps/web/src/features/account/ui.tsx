@@ -244,6 +244,8 @@ export function AccountNotices() {
       return <Toast text={m.acct_toast_signed_out()} />
     case 'deleted':
       return <Toast text={m.acct_toast_deleted()} />
+    case 'deleted-guest':
+      return <Toast text={m.acct_toast_deleted_guest()} />
     default:
       return null
   }

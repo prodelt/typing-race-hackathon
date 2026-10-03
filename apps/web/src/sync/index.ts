@@ -450,13 +450,14 @@ export function appSync(): Sync {
   return shared
 }
 
-export type StartResult = 'syncing' | 'no-backend' | 'no-session'
+export type StartResult = 'syncing' | 'no-backend' | 'no-session' | 'guest'
 
 /**
  * Connects the signed-in account and runs a first full sync: the outbox uploads, the cloud history
- * unions in, settings reconcile. Call it after a sign-in (Google or the first race's guest) and at
- * boot. It never signs anyone in: with no session it answers `'no-session'` and touches nothing,
- * and with no backend configured `'no-backend'`. Never rejects.
+ * unions in, settings reconcile. Call it after a Google sign-in and at boot. It never signs anyone
+ * in: with no session it answers `'no-session'` and touches nothing, with a guest session (the
+ * anonymous user a Race creates) `'guest'` and the same, and with no backend configured
+ * `'no-backend'`. Never rejects.
  */
 export async function startSync(): Promise<StartResult> {
   try {

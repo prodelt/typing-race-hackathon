@@ -9,9 +9,11 @@ import { typeText } from './harness/type.js'
  * cloud through the outbox and `submit-attempt`, and B unions it into its own local history on its
  * next sync (here, the boot sync of a fresh load).
  *
- * The account is an anonymous test user created over the Auth REST API, because the sign-in UI is
- * another ticket; its session is planted where the app keeps it. Tagged `@backend` and skipped when
- * the build has no Supabase configuration.
+ * The account is a test user with an email identity, created over the Auth REST API because Google
+ * cannot be driven from a test; its session is planted where the app keeps it. It is deliberately
+ * not anonymous: a guest never syncs. Tagged `@backend` and skipped when the build has no Supabase
+ * configuration. It creates a real user, so point it at a local stack, never at the live project;
+ * the user is deleted at the end either way.
  */
 
 const SESSION_KEY = 'typing-race:race-auth'
@@ -34,14 +36,33 @@ interface Session {
   user: { id: string }
 }
 
-async function anonymousTestUser(): Promise<Session> {
+async function accountTestUser(): Promise<Session> {
   const response = await fetch(`${env('VITE_SUPABASE_URL')}/auth/v1/signup`, {
     method: 'POST',
     headers: { apikey: env('VITE_SUPABASE_ANON_KEY'), 'Content-Type': 'application/json' },
-    body: JSON.stringify({ data: { is_test: true } }),
+    body: JSON.stringify({
+      email: `e2e-${crypto.randomUUID()}@example.com`,
+      password: crypto.randomUUID(),
+      data: { is_test: true },
+    }),
   })
-  if (!response.ok) throw new Error(`anonymous sign-up failed: ${response.status}`)
+  if (!response.ok) throw new Error(`test sign-up failed: ${response.status}`)
   return (await response.json()) as Session
+}
+
+/**
+ * Removes the test user the way a learner does ("Delete my data"). The daily purge covers only
+ * anonymous users, so an email user left behind would stay for good; a failed cleanup is loud.
+ */
+async function deleteTestUser(session: Session): Promise<void> {
+  const response = await fetch(`${env('VITE_SUPABASE_URL')}/functions/v1/delete-account`, {
+    method: 'POST',
+    headers: {
+      apikey: env('VITE_SUPABASE_ANON_KEY'),
+      Authorization: `Bearer ${session.access_token}`,
+    },
+  })
+  if (!response.ok) console.warn(`test user ${session.user.id} was not deleted: ${response.status}`)
 }
 
 async function cloudAttemptIds(session: Session): Promise<string[]> {
@@ -88,27 +109,31 @@ test.describe('@backend sync', () => {
 
   test('an attempt typed on one device appears on the other after a sync', async ({ browser }) => {
     test.setTimeout(120_000)
-    const session = await anonymousTestUser()
-    const [contextA, a] = await device(browser, session)
-    const [contextB, b] = await device(browser, session)
+    const session = await accountTestUser()
+    try {
+      const [contextA, a] = await device(browser, session)
+      const [contextB, b] = await device(browser, session)
 
-    // Device A trains once.
-    await a.goto(`/exercise/${SCALE}?mode=practice`)
-    await a.getByRole('button', { name: 'Почати', exact: true }).click()
-    const text = await a.getByTestId('typing-line').locator('p.sr-only').textContent()
-    // Human-paced, so the server's plausibility checks accept it.
-    await typeText(a, text ?? '', 90)
-    await expect(a).toHaveURL(/\/result\//)
+      // Device A trains once.
+      await a.goto(`/exercise/${SCALE}?mode=practice`)
+      await a.getByRole('button', { name: 'Почати', exact: true }).click()
+      const text = await a.getByTestId('typing-line').locator('p.sr-only').textContent()
+      // Human-paced, so the server's plausibility checks accept it.
+      await typeText(a, text ?? '', 90)
+      await expect(a).toHaveURL(/\/result\//)
 
-    const [typed] = await localAttemptIds(a)
-    expect(typed).toBeDefined()
-    await expect.poll(() => cloudAttemptIds(session), { timeout: 30_000 }).toContain(typed)
+      const [typed] = await localAttemptIds(a)
+      expect(typed).toBeDefined()
+      await expect.poll(() => cloudAttemptIds(session), { timeout: 30_000 }).toContain(typed)
 
-    // Device B opens the app and syncs: the attempt is now part of its local history.
-    await b.goto('/')
-    await expect.poll(() => localAttemptIds(b), { timeout: 30_000 }).toContain(typed)
+      // Device B opens the app and syncs: the attempt is now part of its local history.
+      await b.goto('/')
+      await expect.poll(() => localAttemptIds(b), { timeout: 30_000 }).toContain(typed)
 
-    await contextA.close()
-    await contextB.close()
+      await contextA.close()
+      await contextB.close()
+    } finally {
+      await deleteTestUser(session)
+    }
   })
 })

@@ -170,6 +170,36 @@ test.describe('@backend account (Supabase faked in the page)', () => {
     await expect.poll(() => [...(fake.attempts.get(guest.id) ?? [])]).toContain(ATTEMPT_ID)
   })
 
+  test('a guest stays local: nothing uploads, and deleting the guest profile keeps the progress', async ({
+    page,
+  }) => {
+    const guest = addUser(fake, {
+      id: '5e3f2a1b-4d9c-4f8e-a031-7c6d5e4f3a04',
+      email: null,
+      anonymous: true,
+      nickname: 'quiet-guest',
+    })
+    await seedLearner(page, { session: fake.session(guest) })
+    await page.goto('/profile')
+    // The nick arrives from the server once the session is read; sync would have started by then.
+    await expect(account(page)).toContainText('quiet-guest')
+    await page.waitForLoadState('networkidle')
+    expect(fake.submitCalls).toBe(0)
+    expect(fake.attempts.get(guest.id)).toBeUndefined()
+    await expect(chip(page)).not.toContainText('синхронізовано')
+
+    await account(page).getByTestId('account-delete').click()
+    const confirm = page.getByRole('dialog', { name: 'Видалити гостьовий профіль?' })
+    await expect(confirm).toContainText('Прогрес тренувань лишиться в цьому браузері')
+    await confirm.getByRole('button', { name: 'Видалити назавжди' }).click()
+    await expect(page.getByTestId('account-toast')).toContainText('Гостьовий профіль видалено')
+    expect(fake.deleted).toEqual([guest.id])
+    await expect(chip(page)).toContainText('Увійти')
+    // The profile on the server is gone, the learner's training is not.
+    expect(await localAttemptIds(page)).toEqual([ATTEMPT_ID])
+    expect(await page.evaluate((key) => localStorage.getItem(key), SESSION_KEY)).toBeNull()
+  })
+
   test('sign-out with unsynced attempts explains and wipes nothing; a retry once online signs out', async ({
     page,
   }) => {

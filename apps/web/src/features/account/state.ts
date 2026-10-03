@@ -23,6 +23,7 @@ export type AccountNotice =
   | 'signed-in'
   | 'signed-out'
   | 'deleted'
+  | 'deleted-guest'
 
 export interface AccountState {
   /** `unknown` until the first read settles for a browser that has a session. */
