@@ -130,6 +130,110 @@ function nextWrittenAt(current: StoredEnvelope, now: number): number {
 }
 
 // -------------------------------------------------------------------------------------------
+// Reading what the page did not write
+// -------------------------------------------------------------------------------------------
+
+const isObject = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null && !Array.isArray(value)
+const isNumber = (value: unknown): value is number =>
+  typeof value === 'number' && Number.isFinite(value)
+
+/**
+ * Whether a stored attempt has the shape every screen reads. IndexedDB is the learner's own
+ * storage, but it can hold what an older build, a failed write or someone with the developer tools
+ * left there; one such entry used to turn Home into an error screen, or hang it, for good. An entry
+ * that fails here is left out of what the app reads (the stored copy is untouched until the next
+ * write), never repaired, because there is nothing to repair it from.
+ */
+export function isReadableAttempt(value: unknown): value is AttemptSummary {
+  if (!isObject(value)) return false
+  const { metrics, aggregates } = value
+  return (
+    typeof value['id'] === 'string' &&
+    value['id'].length > 0 &&
+    value['id'].length <= 64 &&
+    typeof value['scaleId'] === 'string' &&
+    value['scaleId'].length <= 200 &&
+    (value['layoutId'] === 'yq' || value['layoutId'] === 'qwerty') &&
+    (value['language'] === 'uk' || value['language'] === 'en') &&
+    (value['mode'] === 'practice' || value['mode'] === 'test') &&
+    isNumber(value['seed']) &&
+    isNumber(value['startedAt']) &&
+    isNumber(value['completedAt']) &&
+    isNumber(value['elapsedMs']) &&
+    isObject(metrics) &&
+    isNumber(metrics['spm']) &&
+    isNumber(metrics['accuracy']) &&
+    isObject(aggregates) &&
+    isObject(aggregates['keys']) &&
+    isObject(aggregates['transitions'])
+  )
+}
+
+const oneOf = <T extends string>(value: unknown, allowed: readonly T[], fallback: T): T =>
+  allowed.includes(value as T) ? (value as T) : fallback
+
+/**
+ * Settings the app may read: every field is checked against what it can hold and replaced by the
+ * default when it is not that, so a value out of range or of the wrong type can never reach the
+ * theme, the typing line or the router.
+ */
+export function readableSettings(value: unknown): Settings {
+  const given = isObject(value) ? value : {}
+  const size = given['textSizePx']
+  return {
+    theme: oneOf(given['theme'], ['system', 'light', 'dark', 'lowVision'], DEFAULT_SETTINGS.theme),
+    motion: oneOf(given['motion'], ['system', 'reduced', 'off'], DEFAULT_SETTINGS.motion),
+    sound: oneOf(given['sound'], ['on', 'off'], DEFAULT_SETTINGS.sound),
+    textSizePx: isNumber(size)
+      ? Math.min(40, Math.max(24, Math.round(size)))
+      : DEFAULT_SETTINGS.textSizePx,
+    errorMode: oneOf(
+      given['errorMode'],
+      ['stopOnLetter', 'freeBackspace'],
+      DEFAULT_SETTINGS.errorMode,
+    ),
+    typingLanguage: oneOf(given['typingLanguage'], ['uk', 'en'], DEFAULT_SETTINGS.typingLanguage),
+    layoutId: oneOf(given['layoutId'], ['yq', 'qwerty'], DEFAULT_SETTINGS.layoutId),
+    interfaceLanguage: oneOf(
+      given['interfaceLanguage'],
+      ['uk', 'en'],
+      DEFAULT_SETTINGS.interfaceLanguage,
+    ),
+  }
+}
+
+const LEVEL_CHOICES: readonly StartingLevelChoice[] = [
+  'neverTouchTyped',
+  'knowsHomeRow',
+  'touchTypesWantsAccuracy',
+]
+
+/**
+ * The envelope as the app may read it: attempts that are not attempts are not there, settings are
+ * in range, and every record the app indexes by language holds only what a language can hold.
+ */
+function readable(stored: StoredEnvelope): StoredEnvelope {
+  const attempts: unknown = stored.attempts
+  const levels = isObject(stored.startingLevelByLanguage) ? stored.startingLevelByLanguage : {}
+  const startingLevelByLanguage: Partial<Record<Language, StartingLevelChoice>> = {}
+  for (const language of ['uk', 'en'] as const) {
+    const choice = levels[language]
+    if (LEVEL_CHOICES.includes(choice as StartingLevelChoice)) {
+      startingLevelByLanguage[language] = choice as StartingLevelChoice
+    }
+  }
+  return {
+    ...stored,
+    attempts: Array.isArray(attempts) ? attempts.filter(isReadableAttempt) : [],
+    settings: readableSettings(stored.settings),
+    startingLevelByLanguage,
+    progressByLanguage: isObject(stored.progressByLanguage) ? stored.progressByLanguage : {},
+    logs: isObject(stored.logs) ? stored.logs : {},
+  }
+}
+
+// -------------------------------------------------------------------------------------------
 // The real adapter
 // -------------------------------------------------------------------------------------------
 
@@ -185,7 +289,7 @@ export function indexedDbStore(options: IndexedDbStoreOptions = {}): ProgressSto
         // FR-083: a version we do not recognise is never read as if it were current. The learner
         // is told and offered a deliberate fresh start, rather than being silently reset.
         if (stored.storeVersion !== STORE_VERSION) return 'unreadable-version'
-        return stored
+        return readable(stored)
       } catch {
         // FR-052: private mode, a disabled origin, a quota refusal. The learner is told plainly
         // and this visit's practice still runs — which is why this is a value, not a throw.

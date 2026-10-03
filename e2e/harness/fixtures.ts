@@ -76,6 +76,33 @@ export async function seedStore(page: Page, seed: SeedEnvelope): Promise<void> {
   )
 }
 
+/**
+ * Writes an envelope given as JSON **text**, parsed in the page. `JSON.parse` makes a `__proto__`
+ * key an own property, which a plain object literal passed through `seedStore` cannot express: this
+ * is how a hostile stored envelope is built.
+ */
+export async function seedRawEnvelope(page: Page, json: string): Promise<void> {
+  await page.addInitScript(
+    ({ dbName, dbVersion, storeName, key, text }) => {
+      const envelope = JSON.parse(text)
+      const request = indexedDB.open(dbName, dbVersion)
+      request.onupgradeneeded = () => {
+        request.result.createObjectStore(storeName)
+      }
+      request.onsuccess = () => {
+        request.result.transaction(storeName, 'readwrite').objectStore(storeName).put(envelope, key)
+      }
+    },
+    {
+      dbName: DB_NAME,
+      dbVersion: DB_VERSION,
+      storeName: STORE_NAME,
+      key: ENVELOPE_KEY,
+      text: json,
+    },
+  )
+}
+
 /** The attempt ids in the page's stored envelope, read from IndexedDB itself. */
 export async function localAttemptIds(page: Page): Promise<string[]> {
   return page.evaluate(
