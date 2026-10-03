@@ -35,6 +35,8 @@
   "academy_ex_layout_checking": "Checking the layout",
   "academy_ex_layout_ok": "The {layout} layout is on.",
   "academy_ex_layout_mismatch": "Another layout seems to be on. Switch to {layout} and check again.",
+  "academy_ex_locked": "This exercise uses letters you have not unlocked yet: {letters}. Stage 1 comes first, but you can start now.",
+  "academy_ex_locked_link": "Go to Stage 1",
   "academy_ex_recheck": "Check again",
   "academy_ex_rail": "About the exercise",
   "academy_result_heading": "Next in the Academy",

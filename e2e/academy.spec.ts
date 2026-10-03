@@ -155,4 +155,29 @@ test.describe('Academy', () => {
       'true',
     )
   })
+
+  test('an exercise with letters Stage 1 has not opened says so, and still lets the learner start', async ({
+    page,
+  }) => {
+    await seedLearner(page)
+    await page.goto('/academy/academy.uk.bigrams.1?mode=practice')
+
+    const note = page.getByTestId('academy-locked')
+    await expect(note).toContainText('яких ти ще не відкрив')
+    await expect(note.getByRole('link', { name: 'До Етапу 1' })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Почати' })).toBeEnabled()
+  })
+
+  test('a learner who already touch types sees no such note', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' })
+    await seedStore(page, {
+      settings: { ...MOTION_OFF_SETTINGS },
+      startingLevelByLanguage: { uk: 'touchTypesWantsAccuracy', en: 'touchTypesWantsAccuracy' },
+      attempts: [],
+    } as Parameters<typeof seedStore>[1])
+    await page.goto('/academy/academy.uk.bigrams.1?mode=practice')
+
+    await expect(page.getByRole('button', { name: 'Почати' })).toBeVisible()
+    await expect(page.getByTestId('academy-locked')).toHaveCount(0)
+  })
 })

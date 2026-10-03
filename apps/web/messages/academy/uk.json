@@ -35,6 +35,8 @@
   "academy_ex_layout_checking": "Перевіряємо розкладку",
   "academy_ex_layout_ok": "Розкладка {layout} на місці.",
   "academy_ex_layout_mismatch": "Схоже, увімкнено іншу розкладку. Перемкніть на {layout} і перевірте ще раз.",
+  "academy_ex_locked": "У цій вправі є літери, яких ти ще не відкрив: {letters}. Спершу краще пройти Етап 1, але почати можна й зараз.",
+  "academy_ex_locked_link": "До Етапу 1",
   "academy_ex_recheck": "Перевірити ще раз",
   "academy_ex_rail": "Про вправу",
   "academy_result_heading": "Далі в Академії",
