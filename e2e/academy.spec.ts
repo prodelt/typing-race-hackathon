@@ -88,7 +88,12 @@ test.describe('Academy', () => {
     await expect(bigrams.getByTestId('module-count')).toHaveText('0 з 6 опановано')
 
     await bigrams.click()
-    await page.getByTestId('module-bigrams').getByRole('link', { name: 'Залік: на · не' }).click()
+    // The first exercise is on the most frequent bigram of the data, whichever it is today.
+    await page
+      .getByTestId('module-bigrams')
+      .getByRole('link', { name: /^Залік: / })
+      .first()
+      .click()
     await expect(page).toHaveURL(/\/academy\/academy\.uk\.bigrams\.1\?mode=test/)
     // The exercise screen is a lazy chunk: wait until it has replaced the Map, whose own start
     // button has the same name.
@@ -100,7 +105,7 @@ test.describe('Academy', () => {
     await expect(page.getByText('Наступна клавіша')).toHaveCount(0)
 
     const text = (await page.getByTestId('typing-line').locator('p.sr-only').textContent()) ?? ''
-    expect(text.startsWith('на на на')).toBe(true)
+    expect(text).toMatch(/^(\S+) \1 \1 /)
     await typeText(page, text)
 
     await expect(page).toHaveURL(/\/result\//)
