@@ -146,6 +146,69 @@ function knownExercise(layoutId: LayoutId, scaleId: string): boolean {
   )
 }
 
+/**
+ * Limits of one request. The client uploads 50 attempts at a time (`UPLOAD_BATCH`), a keystroke log
+ * is a few hundred entries and the longest exercise text is a dictation of about two thousand
+ * characters, so these leave a wide margin and still stop a request that is only there to burn the
+ * function's time.
+ */
+const MAX_BATCH = 100
+const MAX_BODY_BYTES = 8_000_000
+const MAX_TEXT_CHARS = 20_000
+const MAX_LOG_EVENTS = 20_000
+const MAX_ELAPSED_MS = 86_400_000
+/** Dates the app could have produced: after the year 2000 and before 2100. */
+const MIN_TIME_MS = 946_684_800_000
+const MAX_TIME_MS = 4_102_444_800_000
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
+const isNumber = (value: unknown): value is number =>
+  typeof value === 'number' && Number.isFinite(value)
+
+/**
+ * The shape of one submission, checked before anything reads it. A body the type system trusted
+ * would turn a `null` or a string into a TypeError and a 500, or an impossible date into a failed
+ * insert that takes the whole batch with it; here it becomes a plain rejection of that one attempt.
+ */
+function shapeOf(raw: unknown): Submission | null {
+  if (typeof raw !== 'object' || raw === null) return null
+  const { attempt, log, dataVersion } = raw as Record<string, unknown>
+  if (typeof attempt !== 'object' || attempt === null) return null
+  if (typeof log !== 'object' || log === null) return null
+  const a = attempt as Record<string, unknown>
+  const l = log as Record<string, unknown>
+
+  if (typeof a['id'] !== 'string' || !UUID.test(a['id'])) return null
+  if (typeof a['scaleId'] !== 'string') return null
+  const layoutId = a['layoutId']
+  if (layoutId !== 'yq' && layoutId !== 'qwerty') return null
+  if (a['language'] !== layouts[layoutId].language) return null
+  if (a['mode'] !== 'practice' && a['mode'] !== 'test') return null
+  if (typeof a['text'] !== 'string' || a['text'].length === 0 || a['text'].length > MAX_TEXT_CHARS) {
+    return null
+  }
+  if (!isNumber(a['seed']) || !Number.isSafeInteger(a['seed'])) return null
+  for (const field of ['startedAt', 'completedAt'] as const) {
+    const value = a[field]
+    if (!isNumber(value) || value < MIN_TIME_MS || value > MAX_TIME_MS) return null
+  }
+  if (!isNumber(a['elapsedMs']) || a['elapsedMs'] <= 0 || a['elapsedMs'] > MAX_ELAPSED_MS) {
+    return null
+  }
+
+  if (!isNumber(l['formatVersion'])) return null
+  const arrays = [l['dt'], l['kind'], l['char'], l['correct']]
+  if (!arrays.every((entry) => Array.isArray(entry) && entry.length <= MAX_LOG_EVENTS)) return null
+  const lengths = arrays.map((entry) => (entry as unknown[]).length)
+  if (new Set(lengths).size !== 1) return null
+
+  return {
+    attempt: a as unknown as Submission['attempt'],
+    log: l as unknown as KeystrokeEventLog,
+    ...(typeof dataVersion === 'string' ? { dataVersion: dataVersion.slice(0, 64) } : {}),
+  }
+}
+
 Deno.serve(async (request) => {
   const early = preflight(request)
   if (early) return early
@@ -173,18 +236,39 @@ Deno.serve(async (request) => {
   const limited = await overQuota(service, userId, 'submit-attempt')
   if (limited) return limited
 
-  let body: { attempts?: Submission[] }
+  // The body is read before its size is judged: answering from `Content-Length` alone leaves the
+  // upload unread, and the runtime then holds the connection until the client gives up.
+  const rawBody = await request.text()
+  if (rawBody.length > MAX_BODY_BYTES) return json({ error: 'body_too_large', max: MAX_BODY_BYTES }, 413)
+  let body: { attempts?: unknown }
   try {
-    body = await request.json()
+    body = JSON.parse(rawBody)
   } catch {
     return json({ error: 'body is not JSON' }, 400)
   }
+  if (typeof body !== 'object' || body === null || !Array.isArray(body.attempts)) {
+    return json({ error: 'attempts must be a list' }, 400)
+  }
 
-  const submissions = body.attempts ?? []
-  if (submissions.length === 0) return json({ accepted: [], rejected: [], progress: null })
+  const raws: unknown[] = body.attempts
+  if (raws.length === 0) return json({ accepted: [], rejected: [], progress: null })
+  if (raws.length > MAX_BATCH) return json({ error: 'too_many_attempts', max: MAX_BATCH }, 413)
 
+  const submissions: Submission[] = []
   const accepted: string[] = []
   const rejected: Rejection[] = []
+  for (const raw of raws) {
+    const shaped = shapeOf(raw)
+    if (shaped === null) {
+      const claimed = (raw as { attempt?: { id?: unknown } } | null)?.attempt?.id
+      rejected.push({
+        id: typeof claimed === 'string' ? claimed.slice(0, 64) : '',
+        reason: 'log_malformed',
+      })
+    } else {
+      submissions.push(shaped)
+    }
+  }
   const rows: Record<string, unknown>[] = []
   const logRows: Record<string, unknown>[] = []
 
