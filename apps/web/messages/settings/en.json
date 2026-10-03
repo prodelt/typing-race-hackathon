@@ -21,7 +21,7 @@
   "settings_motion_off": "Off",
   "settings_motion_off_consequence": "Motion is off: nothing animates and nothing makes a sound. The sound switch below is unavailable.",
   "settings_sound_label": "Sound",
-  "settings_sound_hint": "Short cues on results and unlocks. Off by default.",
+  "settings_sound_hint": "Two short cues: when a result opens and when a new key unlocks. Nothing sounds while you type. Off by default.",
   "settings_sound_blocked": "Sound is unavailable while motion is off.",
   "settings_size_label": "Exercise text size",
   "settings_size_value": "{px} pixels",

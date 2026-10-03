@@ -242,10 +242,14 @@ const letters = (s: string) => /^\p{L}+$/u.test(s)
 
 function pickNgrams(context: Context, size: 2 | 3, count: number): string[] {
   const list = size === 2 ? context.ngrams.bigrams : context.ngrams.trigrams
-  return list
-    .map((n) => n.ngram)
-    .filter((g) => letters(g) && new Set(g).size === [...g].length)
-    .slice(0, count)
+  return (
+    list
+      .map((n) => n.ngram)
+      // A bigram of one letter twice is a double-letter pair and has its own drill; a trigram may
+      // repeat a letter (`ого`, `ити`, `ння`), which is exactly what makes it common.
+      .filter((g) => letters(g) && (size === 3 ? new Set(g).size > 1 : new Set(g).size === 2))
+      .slice(0, count)
+  )
 }
 
 function sameFingerBigrams(context: Context, count: number): string[] {
