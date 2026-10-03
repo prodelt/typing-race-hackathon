@@ -287,9 +287,10 @@ test.describe('US2 the result of an attempt', () => {
     await expectSingleNextAction(page)
     await expect(page.locator('[data-rule]')).toHaveAttribute('data-rule', 'weakTransition')
     await expect(page.locator('[data-rule]')).toContainText('Перехід ф → в найслабший')
-    // ф is the left pinky and в the left middle finger on ЙЦУКЕН.
+    // ф is the left pinky and в the left middle finger on ЙЦУКЕН: the hand is named, or "the
+    // index finger and the index finger" would not say which two fingers.
     await expect(page.locator('[data-rule]')).toContainText(
-      'Його друкують пальці: мізинець і середній палець',
+      'Його друкують пальці: лівий мізинець і лівий середній палець',
     )
   })
 
@@ -318,7 +319,7 @@ test.describe('US2 the result of an attempt', () => {
     await expect(page.locator('[data-rule]')).toHaveAttribute('data-rule', 'nextKey')
     // The first key of the Unlock Order on ЙЦУКЕН is п, typed by the left index finger.
     await expect(page.locator('[data-rule]')).toContainText(
-      'Наступна клавіша: п (вказівний палець)',
+      'Наступна клавіша: п (лівий вказівний палець)',
     )
 
     await region(page, 'Що робити далі').getByRole('button', { name: 'Далі' }).click()
@@ -348,7 +349,7 @@ test.describe('US2 the result of an attempt', () => {
     const unlock = region(page, 'Нова клавіша відкрита')
     await expect(unlock).toBeVisible()
     await expect(unlock).toContainText('Клавіша п')
-    await expect(unlock).toContainText('Її друкує вказівний палець.')
+    await expect(unlock).toContainText('Її друкує лівий вказівний палець.')
     await expect(unlock).toContainText('Три залікові спроби поспіль')
     const drill = unlock.getByRole('button', { name: 'До першого завдання' })
     await expect(drill).toBeVisible()
@@ -496,6 +497,28 @@ test.describe('US2 the result of an attempt', () => {
     await expect(region(page, 'Ритм')).toBeVisible()
     await audit(page)
   })
+})
+
+test.describe('the result names every kind of exercise', () => {
+  // Stage 2, the Academy, the weak-spot drill and a session's real text have no Scale to name them,
+  // and the header used to print their ids ("academy.uk.warm-up.1").
+  const kinds = [
+    { id: 'yq.words.first', name: 'Перші слова' },
+    { id: 'academy.uk.warm-up.1', name: 'Базовий ряд' },
+    { id: 'yq.review.KeyA', name: 'Повторення слабких місць' },
+    { id: 'yq.realtext', name: 'Справжній текст' },
+  ] as const
+
+  for (const { id, name } of kinds) {
+    test(`${id} reads as «${name}», not as an id`, async ({ page }) => {
+      await seedLearner(page, [{ id: 'one', scaleId: id, mode: 'practice', accuracy: 0.98 }])
+      await page.goto('/result/one')
+      const top = page.getByTestId('result-score')
+      await expect(top).toBeVisible()
+      await expect(top).toContainText(`Тренувальна спроба · ${name}`)
+      await expect(top).not.toContainText(id)
+    })
+  }
 })
 
 test.describe('the result as a reward', () => {

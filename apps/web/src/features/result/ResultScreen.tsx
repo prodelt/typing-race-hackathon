@@ -18,15 +18,10 @@ import { ReviewOutcome } from '../review/Outcome.js'
 import { UnlockWords } from '../words/UnlockWords.js'
 import { Comparison } from './Comparison.js'
 import { ErrorList } from './ErrorList.js'
+import { exerciseLabel, useAcademyTitle } from './exerciseLabel.js'
 import { duration, number } from './format.js'
 import { Metrics } from './Metrics.js'
-import {
-  buildResultModel,
-  displayChar,
-  type ResultModel,
-  scaleName,
-  transitionLabel,
-} from './model.js'
+import { buildResultModel, displayChar, type ResultModel, transitionLabel } from './model.js'
 import { NextActionCard } from './NextActionCard.js'
 import { RhythmChart } from './RhythmChart.js'
 import type { Reward } from './reward.js'
@@ -127,8 +122,7 @@ function RewardView({
     ...(academy ? {} : { Enter: next, KeyD: drill }),
   })
 
-  const scale = model.scales.find((candidate) => candidate.id === attempt.scaleId)
-  const label = scale === undefined ? attempt.scaleId : scaleName(scale)
+  const label = exerciseLabel(model.layout, attempt.scaleId, useAcademyTitle(attempt.scaleId))
 
   return (
     <div className="reward">

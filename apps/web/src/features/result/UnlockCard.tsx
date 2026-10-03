@@ -98,7 +98,7 @@ export function UnlockCard({
       <div className="mt-4 flex items-center gap-4">
         <Keycap
           glyph={displayChar(unlock.key)}
-          finger={unlock.finger ?? 'thumb'}
+          finger={unlock.finger?.finger ?? 'thumb'}
           tier="learning"
           className="result-unlock-glyph h-16 w-16 text-3xl"
         />

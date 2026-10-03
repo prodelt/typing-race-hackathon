@@ -4,6 +4,7 @@ import { useMemo } from 'react'
 import { useAppStore, useDerived } from '../../app/state/index.js'
 import { m } from '../../paraglide/messages.js'
 import { BetweenBlocks } from './BetweenBlocks.js'
+import { blockSpot } from './blockSpot.js'
 import { type Block, composeSession, type SessionPlan } from './compose.js'
 import { completedBlocks, positionOf, sessionAttempts } from './machine.js'
 import { RealTextBlock } from './RealTextBlock.js'
@@ -189,9 +190,11 @@ export function SessionScreen() {
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="font-ui font-semibold text-ink">{blockName(index)}</span>
                       <Chip>{m.session_block_attempts({ count: block.reps })}</Chip>
-                      <Chip tone="muted">
-                        {m.session_block_focus({ focus: block.focus.value })}
-                      </Chip>
+                      {blockSpot(block) === undefined ? null : (
+                        <Chip tone="muted">
+                          {m.session_block_focus({ focus: blockSpot(block) ?? '' })}
+                        </Chip>
+                      )}
                     </div>
                     <p className="font-ui text-sm text-ink/80">{blockBody(block)}</p>
                   </Card>
