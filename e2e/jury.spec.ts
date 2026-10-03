@@ -97,7 +97,9 @@ test('the jury script, §9: a new profile to the sources page', async ({ page })
   // 4. An Academy exercise on a frequent bigram.
   await page.goto(`/academy/${ACADEMY_BIGRAM}?mode=test`)
   const bigram = await begin(page)
-  expect(bigram.startsWith('на на на')).toBe(true)
+  // The most frequent bigram of the data, repeated three times to start; which one it is changes
+  // whenever the word banks are refreshed.
+  expect(bigram).toMatch(/^(\S+) \1 \1 /)
   await typeText(page, bigram)
   await expect(page).toHaveURL(/\/result\//)
   await expect(page.getByRole('region', { name: 'Далі в Академії' })).toBeVisible()

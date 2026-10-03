@@ -37,3 +37,17 @@ export const LAYOUT_NAME: Record<Language, string> = { uk: 'ЙЦУКЕН', en: '
 export function percent(fraction: number): number {
   return Math.round(fraction * 100)
 }
+
+/**
+ * The letters of an exercise text the learner has not unlocked yet, lower case, in order of first
+ * appearance. Only letters count: punctuation, digits and the Shift forms of an open letter are not
+ * what Stage 1 opens one key at a time.
+ */
+export function lockedLetters(text: string, unlocked: readonly string[]): string[] {
+  const open = new Set(unlocked)
+  const seen = new Set<string>()
+  for (const char of text.toLowerCase()) {
+    if (/\p{L}/u.test(char) && !open.has(char)) seen.add(char)
+  }
+  return [...seen]
+}

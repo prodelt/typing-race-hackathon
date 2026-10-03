@@ -272,17 +272,17 @@
         },
         {
           "id": "academy.en.bigrams.3",
-          "title": "er · an",
-          "text": "er er er there here her er er where were very an an an and can want an an man mean thank",
-          "focus": "er an",
+          "title": "er · yo",
+          "text": "er er er there here her er er where were very yo yo yo you your yourself yo yo everyone anyone young",
+          "focus": "er yo",
           "targetSpm": null,
           "source": "derived"
         },
         {
           "id": "academy.en.bigrams.4",
-          "title": "yo · re",
-          "text": "yo yo yo you your yourself yo yo everyone anyone young re re re are there here re re where were really",
-          "focus": "yo re",
+          "title": "an · re",
+          "text": "an an an and can want an an man mean thank re re re are there here re re where were really",
+          "focus": "an re",
           "targetSpm": null,
           "source": "derived"
         },

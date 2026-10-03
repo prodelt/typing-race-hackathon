@@ -44,17 +44,18 @@ export interface AppStore extends AppState {
  * lives outside React (ADR-0003) and must reach it too.
  */
 let progressStore: ProgressStore = indexedDbStore()
-let sync: Sync = makeSync(progressStore, indexedDbOutbox())
+let outbox: OutboxStore = indexedDbOutbox()
+let sync: Sync = makeSync(progressStore, outbox)
 
 /**
  * The sync engine over the same store. Every finished attempt goes through it, so it is queued in
  * the outbox whether or not anyone is signed in (ADR-0006); it leaves the browser only once
  * `startSync` connects an account.
  */
-function makeSync(store: ProgressStore, outbox: OutboxStore): Sync {
+function makeSync(store: ProgressStore, queue: OutboxStore): Sync {
   const created = createSync({
     store,
-    outbox,
+    outbox: queue,
     // A pull, cloud settings or a wipe changed the store underneath us: re-read it, and derived
     // state (progress, Level, XP, Streak) recomputes through the normal path.
     onLocalChanged: () => void useAppStore.getState().reload(),
@@ -63,10 +64,11 @@ function makeSync(store: ProgressStore, outbox: OutboxStore): Sync {
   return created
 }
 
-export function setProgressStore(store: ProgressStore, outbox: OutboxStore = memoryOutbox()): void {
+export function setProgressStore(store: ProgressStore, queue: OutboxStore = memoryOutbox()): void {
   sync.disconnect()
   progressStore = store
-  sync = makeSync(store, outbox)
+  outbox = queue
+  sync = makeSync(store, queue)
 }
 
 export const useAppStore = create<AppStore>()((set, get) => ({
@@ -152,6 +154,10 @@ export const useAppStore = create<AppStore>()((set, get) => ({
 
   async startFresh() {
     await progressStore.clear()
+    // The outbox holds whole attempts, text and keystroke log included: "clear local data" that left
+    // it behind would upload the "deleted" history at the next sign-in.
+    const queued = await outbox.all()
+    await outbox.remove(queued.map((attempt) => attempt.id))
     get().dispatch({ type: 'store/reset' })
   },
 }))

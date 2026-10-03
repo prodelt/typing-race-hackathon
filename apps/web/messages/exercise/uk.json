@@ -33,7 +33,7 @@
   "exercise_layout_recheck": "Перевірити ще раз",
   "exercise_layout_typed_wrong": "Це не літери розкладки {layout}, тож вправа бачить їх як помилки. Перемкніть систему на {layout} і друкуйте далі.",
   "exercise_start": "Почати",
-  "exercise_start_hint": "Спроба почнеться, щойно ви надрукуєте перший символ.",
+  "exercise_start_hint": "Натисніть «Почати»: таймер піде, щойно ви надрукуєте перший символ.",
   "exercise_type_to_begin": "Друкуйте перший символ, щоб почати",
   "exercise_input_label": "Поле введення вправи",
   "exercise_line_label": "Рядок вправи",

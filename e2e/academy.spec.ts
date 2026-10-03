@@ -88,7 +88,12 @@ test.describe('Academy', () => {
     await expect(bigrams.getByTestId('module-count')).toHaveText('0 з 6 опановано')
 
     await bigrams.click()
-    await page.getByTestId('module-bigrams').getByRole('link', { name: 'Залік: на · не' }).click()
+    // The first exercise is on the most frequent bigram of the data, whichever it is today.
+    await page
+      .getByTestId('module-bigrams')
+      .getByRole('link', { name: /^Залік: / })
+      .first()
+      .click()
     await expect(page).toHaveURL(/\/academy\/academy\.uk\.bigrams\.1\?mode=test/)
     // The exercise screen is a lazy chunk: wait until it has replaced the Map, whose own start
     // button has the same name.
@@ -100,7 +105,7 @@ test.describe('Academy', () => {
     await expect(page.getByText('Наступна клавіша')).toHaveCount(0)
 
     const text = (await page.getByTestId('typing-line').locator('p.sr-only').textContent()) ?? ''
-    expect(text.startsWith('на на на')).toBe(true)
+    expect(text).toMatch(/^(\S+) \1 \1 /)
     await typeText(page, text)
 
     await expect(page).toHaveURL(/\/result\//)
@@ -154,5 +159,30 @@ test.describe('Academy', () => {
       'aria-pressed',
       'true',
     )
+  })
+
+  test('an exercise with letters Stage 1 has not opened says so, and still lets the learner start', async ({
+    page,
+  }) => {
+    await seedLearner(page)
+    await page.goto('/academy/academy.uk.bigrams.1?mode=practice')
+
+    const note = page.getByTestId('academy-locked')
+    await expect(note).toContainText('яких ти ще не відкрив')
+    await expect(note.getByRole('link', { name: 'До Етапу 1' })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Почати' })).toBeEnabled()
+  })
+
+  test('a learner who already touch types sees no such note', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' })
+    await seedStore(page, {
+      settings: { ...MOTION_OFF_SETTINGS },
+      startingLevelByLanguage: { uk: 'touchTypesWantsAccuracy', en: 'touchTypesWantsAccuracy' },
+      attempts: [],
+    } as Parameters<typeof seedStore>[1])
+    await page.goto('/academy/academy.uk.bigrams.1?mode=practice')
+
+    await expect(page.getByRole('button', { name: 'Почати' })).toBeVisible()
+    await expect(page.getByTestId('academy-locked')).toHaveCount(0)
   })
 })

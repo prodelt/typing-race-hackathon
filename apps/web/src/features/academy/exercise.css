@@ -98,6 +98,26 @@
   color: var(--color-muted);
 }
 
+.academy-pre__locked {
+  max-width: 64ch;
+  margin: 0;
+  padding: 12px 14px;
+  border-left: 3px solid var(--color-terracotta);
+  border-radius: var(--radius-field);
+  background: var(--color-terracotta-tint);
+  font-family: var(--font-ui);
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--color-ink);
+}
+
+.academy-pre__locked-link {
+  color: var(--color-terracotta-ink);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 .academy-pre__alert {
   display: grid;
   justify-items: start;

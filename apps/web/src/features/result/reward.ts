@@ -4,6 +4,7 @@ import {
   levelForStage,
   MASTERY_STREAK,
   nextLockedKey,
+  SHIFT_TOKEN,
   xpPerAttempt,
 } from '@typing-race/curriculum'
 import type { AttemptSummary, Layout, Progress } from '@typing-race/domain'
@@ -68,8 +69,9 @@ export function rewardFor(args: {
     current: a.id === attempt.id,
   }))
 
+  // Space and the Shift token are not keys in the "N of M" line: the Home screen counts the same way.
   const order = [...new Set([...layout.homeAnchors, ...layout.unlockOrder])].filter(
-    (c) => c !== ' ',
+    (c) => c !== ' ' && c !== SHIFT_TOKEN,
   )
   const open = new Set(after.unlockedSet)
 

@@ -2,7 +2,7 @@
   "format": "typing-race/data-report@1",
   "language": "uk",
   "layout": "yq",
-  "algorithmVersion": "1.1.0",
+  "algorithmVersion": "1.2.0",
   "inputs": [
     {
       "path": "ukrainian/wordlists/frequencywords-2018/uk_50k.txt",
@@ -230,22 +230,30 @@
     },
     {
       "step": "stoplists",
-      "kept": 26949,
+      "kept": 26873,
       "removed": {
-        "first-name": 6,
+        "first-name": 14,
         "hyphen-noise": 37,
         "no-vowel": 25,
-        "profanity": 138,
-        "residual-russian": 66
+        "profanity": 192,
+        "residual-russian": 80
       },
       "examples": {
         "first-name": [
           "джек",
+          "алан",
           "бен",
           "сем",
+          "кларк",
+          "біллі",
           "тоні",
+          "кайл",
           "мері",
-          "ігор"
+          "тім",
+          "генрі",
+          "оскар",
+          "ігор",
+          "гері"
         ],
         "hyphen-noise": [
           "е-е",
@@ -296,13 +304,13 @@
           "во",
           "потом",
           "парень",
-          "найти"
+          "знать"
         ]
       }
     },
     {
       "step": "dedupe after restoration",
-      "kept": 26949,
+      "kept": 26873,
       "removed": {
         "merged-duplicate": 0
       }
@@ -311,32 +319,32 @@
       "step": "keep the 20000 most frequent",
       "kept": 20000,
       "removed": {
-        "below-cut": 6949
+        "below-cut": 6873
       }
     }
   ],
   "counts": {
     "before": 50000,
-    "afterFiltering": 26949,
+    "afterFiltering": 26873,
     "written": 20000,
     "bigrams": 758,
-    "trigramsCounted": 6117,
+    "trigramsCounted": 6110,
     "trigramsWritten": 4000
   },
   "written": {
     "byLength": {
       "1": 10,
       "2": 89,
-      "3": 492,
-      "4": 1525,
-      "5": 2842,
-      "6": 3438,
-      "7": 3532,
-      "8": 3007,
-      "9": 2314,
-      "10": 1477,
-      "11": 753,
-      "12": 313,
+      "3": 491,
+      "4": 1521,
+      "5": 2827,
+      "6": 3430,
+      "7": 3541,
+      "8": 3012,
+      "9": 2317,
+      "10": 1479,
+      "11": 760,
+      "12": 315,
       "13": 143,
       "14": 48,
       "15": 7,
@@ -344,25 +352,25 @@
     },
     "byTier": {
       "1": 132,
-      "2": 1100,
-      "3": 4100,
-      "4": 9242,
-      "5": 5426
+      "2": 1095,
+      "3": 4094,
+      "4": 9240,
+      "5": 5439
     },
     "flags": {
       "apostrophe": 14,
       "apostrophe-restored": 14,
       "hyphen": 73,
       "double-letter": 678,
-      "uk-letter": 6747
+      "uk-letter": 6766
     }
   },
   "outputs": {
     "words.json": {
-      "sha256": "bab91a02d86bbc54380f7140e2b9c9ec0a0b0a18841240365aa309e73043374d"
+      "sha256": "1226c74653ed7a97b99d31e77179d6c75938c12bf1f783db902dd974c5eb53bb"
     },
     "ngrams.json": {
-      "sha256": "3cdf4f23fb63055aa6b82d2a8b93dcd7bbac6533b3ccfd5bca75da2055c41e89"
+      "sha256": "04ac95893ed43f37bfe165dc77b08148181dd143bcd54d5c7c850862976ba4ef"
     }
   }
 }
