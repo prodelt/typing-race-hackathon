@@ -16,8 +16,8 @@ import { type ExerciseTarget, type ExerciseWording, scaleWording } from './wordi
 export interface ExerciseSessionProps {
   readonly scale: Scale
   readonly mode: AttemptMode
-  /** Start as soon as the keyboard checks out, skipping the pre-start screen (the first run). */
-  readonly autostart?: boolean
+  /** The learner arrives from the first run: the pre-start screen is the three-line start card. */
+  readonly firstRun?: boolean
 }
 
 /** Everything one run needs, decided before it starts. Stage 2 word drills render this directly. */
@@ -30,7 +30,7 @@ export interface RunProps {
   readonly last: Parameters<typeof TypingScreen>[0]['last']
   readonly keyConfidence: Parameters<typeof TypingScreen>[0]['keyConfidence']
   readonly testIsPrimary: boolean
-  readonly autostart?: boolean
+  readonly firstRun?: boolean
 }
 
 /**
@@ -41,7 +41,7 @@ export interface RunProps {
  * hand the engine a different exercise at the moment it completes, and a recomputed "last exercise"
  * would unfreeze the rail (FR-059).
  */
-export function ExerciseSession({ scale, mode, autostart = false }: ExerciseSessionProps) {
+export function ExerciseSession({ scale, mode, firstRun = false }: ExerciseSessionProps) {
   const derived = useDerived()
   const attempts = useAppStore((state) => state.attempts)
 
@@ -74,7 +74,7 @@ export function ExerciseSession({ scale, mode, autostart = false }: ExerciseSess
       mode={mode}
       plan={plan}
       layout={derived.layout}
-      autostart={autostart}
+      firstRun={firstRun}
       {...frozen}
     />
   )
@@ -107,7 +107,7 @@ export function ExerciseRun({
   last,
   keyConfidence,
   testIsPrimary,
-  autostart = false,
+  firstRun = false,
 }: RunProps) {
   const settings = useAppStore((state) => state.settings)
   const navigate = useNavigate()
@@ -128,21 +128,15 @@ export function ExerciseRun({
     source.focus()
   }, [scale.layoutId])
 
-  // The first run lands here ready to type: once the layout probe agrees, the run starts and Play
-  // Mode takes the screen. A mismatch leaves the pre-start screen up, which says what to switch.
-  // The flag is dropped from the address so a reload shows the pre-start screen as usual.
-  useEffect(() => {
-    if (!autostart || input === null) return
-    let live = true
-    void input.probeLayout().then((probe) => {
-      if (!live || !probe.producible) return
-      setStarted(true)
+  // The first run lands on the start card and waits for the learner: a newcomer who is dropped into
+  // a running line, with no word on hands or eyes, does not know how to begin. The flag leaves the
+  // address once the run starts, so a reload shows the ordinary pre-start screen.
+  const begin = (): void => {
+    setStarted(true)
+    if (firstRun) {
       void navigate({ to: '.', search: { mode }, replace: true, viewTransition: false })
-    })
-    return () => {
-      live = false
     }
-  }, [autostart, input, mode, navigate])
+  }
 
   const engine = useAttempt({
     active: started,
@@ -203,7 +197,8 @@ export function ExerciseRun({
           layout={layout}
           input={input}
           testIsPrimary={testIsPrimary}
-          onStart={() => setStarted(true)}
+          firstRun={firstRun}
+          onStart={begin}
         />
       ) : null}
 

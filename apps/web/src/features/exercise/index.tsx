@@ -51,7 +51,7 @@ export function ExerciseScreen() {
       key={`${scale.id}:${mode}`}
       scale={scale}
       mode={mode}
-      autostart={search.start === true}
+      firstRun={search.start === true}
     />
   )
 }
