@@ -1,5 +1,5 @@
 import { fingerOf } from '@typing-race/curriculum'
-import type { Layout } from '@typing-race/domain'
+import type { AttemptMode, Layout } from '@typing-race/domain'
 import type { EngineView } from '@typing-race/engine'
 import { Button, Card } from '@typing-race/ui'
 import { useEffect, useRef } from 'react'
@@ -8,6 +8,7 @@ import { displayChar, fingerLabel } from './labels.js'
 
 export interface PauseOverlayProps {
   readonly layout: Layout
+  readonly mode: AttemptMode
   /** Captured when the pause began; `lastError` survives Backspace, so it is the last real slip. */
   readonly lastError: EngineView['lastError']
   readonly onResume: () => void
@@ -20,8 +21,11 @@ export interface PauseOverlayProps {
  * This is the only place during an attempt that names the finger behind the last error. The same
  * sentence inline, below and left of the line, would cost the learner a saccade exactly when they
  * have stumbled (ticket 20, item 17), so it is shown on request and never while typing.
+ *
+ * A Test Attempt carries no hints (spec §3.1, §4.2): there the pause names the slip but not the
+ * finger, so it cannot be used to look the key up.
  */
-export function PauseOverlay({ layout, lastError, onResume, onLeave }: PauseOverlayProps) {
+export function PauseOverlay({ layout, mode, lastError, onResume, onLeave }: PauseOverlayProps) {
   const overlayRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -49,11 +53,16 @@ export function PauseOverlay({ layout, lastError, onResume, onLeave }: PauseOver
         <p data-testid="pause-sentence" className="mt-3 font-ui leading-relaxed">
           {lastError === null || finger === undefined
             ? m.exercise_pause_no_error()
-            : m.exercise_pause_last_error({
-                expected: displayChar(lastError.expected),
-                got: displayChar(lastError.got),
-                finger: fingerLabel(finger),
-              })}
+            : mode === 'test'
+              ? m.exercise_pause_last_error_test({
+                  expected: displayChar(lastError.expected),
+                  got: displayChar(lastError.got),
+                })
+              : m.exercise_pause_last_error({
+                  expected: displayChar(lastError.expected),
+                  got: displayChar(lastError.got),
+                  finger: fingerLabel(finger),
+                })}
         </p>
         <div className="mt-5 flex flex-wrap items-center gap-3">
           <Button variant="primary" onClick={onResume}>

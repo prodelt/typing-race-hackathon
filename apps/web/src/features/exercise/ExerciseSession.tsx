@@ -225,6 +225,7 @@ export function ExerciseRun({
           {paused ? (
             <PauseOverlay
               layout={layout}
+              mode={mode}
               lastError={engine.view.lastError}
               onResume={resume}
               onLeave={() => void navigate({ to: '/map' })}

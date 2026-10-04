@@ -477,6 +477,32 @@ test.describe('US1 typing an exercise', { tag: '@input' }, () => {
     await expect(page).toHaveURL(/\/result\//)
   })
 
+  test('the pause of a Test Attempt names the slip but not the finger (§3.1, §4.2)', async ({
+    calmPage: page,
+  }) => {
+    await openExercise(page, UK_SCALE, 'test')
+    await begin(page)
+
+    const text = [...(await exerciseText(page))]
+    await typeText(page, text.slice(0, 3).join(''))
+    await typeChar(page, 'ъ')
+
+    await typingSurface(page).focus()
+    await page.keyboard.press('Escape')
+
+    await expect(page.getByRole('dialog', { name: 'Пауза' })).toBeVisible()
+    const sentence = page.getByTestId('pause-sentence')
+    await expect(sentence).toContainText('натиснуто «ъ»')
+    await expect(sentence).not.toContainText(/мізинець|палець|вказівний|середній|безіменний/)
+  })
+
+  test('a Stage 1 exercise says on its pre-start card that its line is mechanics, not words (§3.2)', async ({
+    calmPage: page,
+  }) => {
+    await openExercise(page, UK_SCALE)
+    await expect(page.getByTestId('mechanics-note')).toContainText('не є словами')
+  })
+
   test('between two keystrokes nothing outside the typing line changes in a Test Attempt (scenario 9, FR-069)', async ({
     calmPage: page,
   }) => {
