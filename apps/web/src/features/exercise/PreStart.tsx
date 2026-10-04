@@ -91,7 +91,16 @@ export function PreStart({
           <Chip tone={mode === 'test' ? 'terracotta' : 'sage'}>
             {mode === 'test' ? m.exercise_mode_test() : m.exercise_mode_practice()}
           </Chip>
+          {wording.mechanics ? <Chip tone="neutral">{m.exercise_mechanics_tag()}</Chip> : null}
         </div>
+        {wording.mechanics ? (
+          <p
+            data-testid="mechanics-note"
+            className="mt-3 font-ui text-sm leading-relaxed text-ink/80"
+          >
+            {m.exercise_mechanics_note()}
+          </p>
+        ) : null}
         <p className="mt-3 font-ui text-sm leading-relaxed text-ink/80">
           {mode === 'test' ? m.exercise_mode_test_hint() : m.exercise_mode_practice_hint()}
         </p>

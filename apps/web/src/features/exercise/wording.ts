@@ -20,6 +20,8 @@ export interface ExerciseWording {
   readonly goalLabel: string
   readonly goal: string
   readonly focus: string
+  /** The line is made of key strings, not words: the pre-start card says so (§3.2). */
+  readonly mechanics?: boolean
 }
 
 export function scaleWording(scale: Scale): ExerciseWording {
@@ -28,5 +30,6 @@ export function scaleWording(scale: Scale): ExerciseWording {
     goalLabel: m.exercise_goal_label(),
     goal: GOAL_MESSAGES[scale.type](),
     focus: focusLabel(scale.focus),
+    mechanics: true,
   }
 }
