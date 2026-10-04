@@ -229,9 +229,22 @@ test.describe('first run', () => {
       await expect(page).toHaveURL(/\/$/)
       await page.keyboard.press('Enter')
 
-      // The first exercise, in the chosen language, running: Play Mode has taken the frame.
+      // The first exercise, in the chosen language, waits behind a start card: where the hands go,
+      // where the eyes go, how to begin. Nothing is running until the learner presses Enter.
       await expect(page).toHaveURL(new RegExp(`/exercise/${layout}\\.`))
+      const card = page.getByTestId('first-start')
+      await expect(card).toBeVisible()
+      await expect(card.getByRole('listitem')).toHaveCount(3)
+      await expect(card).toContainText(
+        language === 'uk' ? 'Ф І В А · О Л Д Ж' : 'A S D F · J K L ;',
+      )
+      await expect(page.getByTestId('typing-line')).toHaveCount(0)
+      await page.keyboard.press('Enter')
+
+      // Running: Play Mode has taken the frame, and the Enter that started it was not typed.
       await expect(page.getByTestId('typing-line')).toBeVisible()
+      await expect(page).not.toHaveURL(/start=/)
+      await expect(page.getByTestId('error-count')).toHaveText('0')
       await expect(rail(page)).toBeHidden()
       await expect(statusBar(page)).toBeHidden()
 

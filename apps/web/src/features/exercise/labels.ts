@@ -27,6 +27,12 @@ export const GOAL_MESSAGES: Record<ScaleType, () => string> = {
 /** Proper names of layouts; they are not translated. */
 export const LAYOUT_NAMES: Record<LayoutId, string> = { yq: 'ЙЦУКЕН', qwerty: 'QWERTY' }
 
+/** The eight keys the fingers rest on, left hand then right: what the first start card names. */
+export const HOME_ROW: Record<LayoutId, string> = {
+  yq: 'Ф І В А · О Л Д Ж',
+  qwerty: 'A S D F · J K L ;',
+}
+
 const FINGER_MESSAGES = {
   pinky: m.exercise_finger_pinky,
   ring: m.exercise_finger_ring,
