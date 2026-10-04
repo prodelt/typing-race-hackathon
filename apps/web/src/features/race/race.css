@@ -761,6 +761,15 @@
   grid-area: 1 / 1;
 }
 
+/* The countdown and the race share one stage height, so the caption never jumps when the start gate opens.
+   The countdown begins below the layout notice's slot (76 px + 12 px margin): before this its label and its
+   digit were printed over the notice. The line keeps its place (the run is top-aligned). */
+.race-play[data-phase="countdown"] .race-play__stage,
+.race-play[data-phase="racing"] .race-play__stage {
+  min-height: 272px;
+  align-items: start;
+}
+
 .race-play__watching {
   text-align: center;
 }
@@ -824,6 +833,10 @@
   justify-items: center;
   gap: 4px;
   pointer-events: none;
+}
+
+.race-play[data-phase="countdown"] .race-countdown {
+  padding-top: 88px;
 }
 
 .race-countdown__label {
