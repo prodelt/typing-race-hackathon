@@ -115,8 +115,11 @@ function Hub({ nextAction }: { readonly nextAction: NextAction }) {
         )
 
   const dailyDone = useMemo(
-    () => clearedDays(attempts, accuracyFloor, readStoredDays()).includes(localDay(new Date())),
-    [attempts, accuracyFloor],
+    () =>
+      clearedDays(attempts, accuracyFloor, readStoredDays(language), language).includes(
+        localDay(new Date()),
+      ),
+    [attempts, accuracyFloor, language],
   )
 
   const running = session.status === 'running'
