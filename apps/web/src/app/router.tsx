@@ -137,6 +137,13 @@ const ownTextRoute = createRoute({
   component: lazyRouteComponent(() => import('../features/owntext/index.js'), 'OwnTextScreen'),
 })
 
+/** The daily challenge: one shared exercise a day, free practice. */
+const dailyRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/daily',
+  component: lazyRouteComponent(() => import('../features/daily/index.js'), 'DailyScreen'),
+})
+
 const resultRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/result/$attemptId',
@@ -298,6 +305,7 @@ export function buildRouteTree(pages: { readonly home: FunctionComponent }) {
     reviewRoute,
     sprintRoute,
     ownTextRoute,
+    dailyRoute,
     resultRoute,
     sessionRoute,
     settingsRoute,

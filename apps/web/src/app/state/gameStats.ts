@@ -17,6 +17,7 @@ import {
 import type { AttemptSummary, LayoutId, StartingLevelChoice } from '@typing-race/domain'
 import { useMemo } from 'react'
 import { useAcademyCourse } from '../../features/academy/data.js'
+import { isDailyId } from '../../features/daily/model.js'
 import { useRaceStanding } from './raceStanding.js'
 import { useAppStore } from './store.js'
 
@@ -88,7 +89,10 @@ export function deriveGameStats(input: GameStatsInput): GameStats {
   })
 
   const standing = levelStanding({
-    attempts: input.attempts.filter((attempt) => attempt.layoutId === input.layoutId),
+    // A daily challenge is free practice: no XP.
+    attempts: input.attempts.filter(
+      (attempt) => attempt.layoutId === input.layoutId && !isDailyId(attempt.scaleId),
+    ),
     masteryAt,
     floorFor,
   })
