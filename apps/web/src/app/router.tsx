@@ -123,6 +123,27 @@ const reviewRoute = createRoute({
   component: lazyRouteComponent(() => import('../features/review/index.js'), 'ReviewScreen'),
 })
 
+/** Sprint 60 s: free practice against the clock; records nothing. */
+const sprintRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/sprint',
+  component: lazyRouteComponent(() => import('../features/sprint/index.js'), 'SprintScreen'),
+})
+
+/** Own text: a pasted text or a `.txt`/`.md` file, typed as free practice. */
+const ownTextRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/own',
+  component: lazyRouteComponent(() => import('../features/owntext/index.js'), 'OwnTextScreen'),
+})
+
+/** The daily challenge: one shared exercise a day, free practice. */
+const dailyRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/daily',
+  component: lazyRouteComponent(() => import('../features/daily/index.js'), 'DailyScreen'),
+})
+
 const resultRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/result/$attemptId',
@@ -282,6 +303,9 @@ export function buildRouteTree(pages: { readonly home: FunctionComponent }) {
     academyRoute,
     academyExerciseRoute,
     reviewRoute,
+    sprintRoute,
+    ownTextRoute,
+    dailyRoute,
     resultRoute,
     sessionRoute,
     settingsRoute,

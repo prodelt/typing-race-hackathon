@@ -16,6 +16,7 @@ import {
   type FlowMode,
   type FlowState,
   finishPlan,
+  firstExerciseId,
   initialFlow,
   LAYOUT_OF,
   levelOffered,
@@ -111,7 +112,9 @@ function Flow(props: {
     }
     void navigate({
       to: '/exercise/$scaleId',
-      params: { scaleId: nextAction.startsScaleId },
+      params: {
+        scaleId: firstExerciseId(layout, plan.level, nextAction.startsScaleId),
+      },
       search: { mode: 'practice', start: true },
     })
   }

@@ -6,7 +6,6 @@ import { BootGate } from './BootGate.js'
 import { CommandPalette } from './CommandPalette.js'
 import { DESTINATIONS, destinationOf, isOutsideFrame, needsKeyboard } from './destinations.js'
 import { GuideHost } from './guide/GuideHost.js'
-import { LiveGradient } from './LiveGradient.js'
 import { usePlayMode } from './playMode.js'
 import { Rail } from './Rail.js'
 import { StatusBar } from './StatusBar.js'
@@ -93,7 +92,6 @@ export function Shell() {
 
       <main id="main" className="stage">
         <div className="stage__in">
-          <LiveGradient tone={play ? 'soft' : 'bright'} />
           {/* biome-ignore lint/a11y/noNoninteractiveTabindex: a scrollable region must be reachable by keyboard */}
           <div className="stage__scroll" data-stage-scroll="" tabIndex={0}>
             <div className="stage__content">

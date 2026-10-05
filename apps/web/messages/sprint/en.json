@@ -1,0 +1,16 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "sprint_title": "Sprint 60 s",
+  "sprint_instruction": "The clock starts on your first letter.",
+  "sprint_loading": "Getting words ready…",
+  "sprint_locked": "Open more letters to make words.",
+  "sprint_done": "Time is up",
+  "sprint_new_best": "New best",
+  "sprint_pace": "chars/min",
+  "sprint_accuracy": "Accuracy",
+  "sprint_best": "Best",
+  "sprint_below_floor": "A best needs {floor}% accuracy.",
+  "sprint_again": "Again",
+  "sprint_home": "Home",
+  "sprint_entry": "Sprint 60 s"
+}

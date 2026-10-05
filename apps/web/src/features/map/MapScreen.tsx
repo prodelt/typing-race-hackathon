@@ -144,6 +144,7 @@ function MapBody() {
     })
   }
   const review = (): void => void navigate({ to: '/review' })
+  const own = (): void => void navigate({ to: '/own' })
   const free = (): void => {
     if (model === null) return
     void navigate({
@@ -169,6 +170,7 @@ function MapBody() {
     ArrowLeft: () => move(-1),
     KeyR: review,
     KeyP: free,
+    KeyT: own,
   })
 
   if (model === null || view === null) return null
@@ -203,6 +205,9 @@ function MapBody() {
             onClick={free}
           >
             {m.map_free()}
+          </Button>
+          <Button variant="secondary" size="sm" hint="T" aria-keyshortcuts="T" onClick={own}>
+            {m.map_own()}
           </Button>
           <Button
             variant="quiet"
