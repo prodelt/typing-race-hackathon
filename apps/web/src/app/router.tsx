@@ -123,6 +123,13 @@ const reviewRoute = createRoute({
   component: lazyRouteComponent(() => import('../features/review/index.js'), 'ReviewScreen'),
 })
 
+/** Own text: a pasted text or a `.txt`/`.md` file, typed as free practice. */
+const ownTextRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/own',
+  component: lazyRouteComponent(() => import('../features/owntext/index.js'), 'OwnTextScreen'),
+})
+
 const resultRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/result/$attemptId',
@@ -282,6 +289,7 @@ export function buildRouteTree(pages: { readonly home: FunctionComponent }) {
     academyRoute,
     academyExerciseRoute,
     reviewRoute,
+    ownTextRoute,
     resultRoute,
     sessionRoute,
     settingsRoute,
