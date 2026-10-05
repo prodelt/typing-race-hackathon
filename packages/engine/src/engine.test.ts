@@ -120,6 +120,38 @@ describe('construction and lifecycle', () => {
     expect(engine.finish().kind).toEqual(['char', 'char'])
   })
 
+  it('stop() completes a time-boxed run where it stands, so finish() returns the log so far', () => {
+    const { engine, input, clock } = setup('abcdef', 'freeBackspace')
+    input.emit(char('a', 0))
+    input.emit(char('x', 100))
+    clock.advance(250)
+    engine.stop()
+    expect(engine.view.state).toBe('completed')
+    expect(engine.view.cursor).toBe(2)
+    expect(engine.view.elapsedMs).toBe(250)
+    clock.advance(500)
+    input.emit(char('c', 800))
+    expect(engine.view.elapsedMs).toBe(250)
+    const log = engine.finish()
+    expect(log.char).toEqual(['a', 'x'])
+    expect(log.correct).toEqual([true, false])
+  })
+
+  it('stop() also ends a paused run, and does nothing to an idle or finished one', () => {
+    const paused = setup('abc')
+    paused.input.emit(char('a', 0))
+    paused.engine.pause()
+    paused.engine.stop()
+    expect(paused.engine.view.state).toBe('completed')
+    const idle = setup('abc')
+    idle.engine.stop()
+    expect(idle.engine.view.state).toBe('idle')
+    const left = setup('abc')
+    left.engine.abandon()
+    left.engine.stop()
+    expect(left.engine.view.state).toBe('abandoned')
+  })
+
   it('stops listening once completed', () => {
     const { engine, input, views } = setup('a')
     input.emit(char('a', 1))

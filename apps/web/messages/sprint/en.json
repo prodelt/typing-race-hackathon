@@ -12,5 +12,6 @@
   "sprint_below_floor": "A best needs {floor}% accuracy.",
   "sprint_again": "Again",
   "sprint_home": "Home",
-  "sprint_entry": "Sprint 60 s"
+  "sprint_entry": "Sprint 60 s",
+  "sprint_intro": "One minute of words from your open letters."
 }
