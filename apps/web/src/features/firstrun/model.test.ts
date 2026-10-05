@@ -1,4 +1,4 @@
-import { layouts } from '@typing-race/curriculum'
+import { catalogue, layouts } from '@typing-race/curriculum'
 import { describe, expect, it } from 'vitest'
 import {
   canContinue,
@@ -7,6 +7,7 @@ import {
   type FlowState,
   fingerZones,
   finishPlan,
+  firstExerciseId,
   initialFlow,
   levelOffered,
   recommendLevel,
@@ -69,7 +70,10 @@ describe('the diagnostic', () => {
   const atLevel = walk(first, { type: 'next' })
 
   it('is optional: the level step continues without it', () => {
-    const picked = walk(atLevel, { type: 'pickLevel', level: 'neverTouchTyped' })
+    const picked = walk(atLevel, {
+      type: 'pickLevel',
+      level: 'neverTouchTyped',
+    })
     expect(canContinue(picked)).toBe(true)
   })
 
@@ -148,14 +152,22 @@ describe('the diagnostic', () => {
 
 describe('start over', () => {
   it('begins at the first step with the current language and the recorded level picked', () => {
-    const again = initialFlow({ mode: 'again', language: 'en', recorded: { en: 'knowsHomeRow' } })
+    const again = initialFlow({
+      mode: 'again',
+      language: 'en',
+      recorded: { en: 'knowsHomeRow' },
+    })
     expect(again.step).toBe('language')
     expect(again.language).toBe('en')
     expect(again.level).toBe('knowsHomeRow')
   })
 
   it('switching language picks that language’s recorded level, or none', () => {
-    const again = initialFlow({ mode: 'again', language: 'uk', recorded: { uk: 'knowsHomeRow' } })
+    const again = initialFlow({
+      mode: 'again',
+      language: 'uk',
+      recorded: { uk: 'knowsHomeRow' },
+    })
     expect(walk(again, { type: 'pickLanguage', language: 'en' }).level).toBeNull()
     expect(
       walk(
@@ -175,7 +187,11 @@ describe('start over', () => {
   })
 
   it('ignores picking a level that is not offered', () => {
-    const again = initialFlow({ mode: 'again', language: 'uk', recorded: { uk: 'knowsHomeRow' } })
+    const again = initialFlow({
+      mode: 'again',
+      language: 'uk',
+      recorded: { uk: 'knowsHomeRow' },
+    })
     const atLevel = walk(again, { type: 'next' })
     expect(walk(atLevel, { type: 'pickLevel', level: 'neverTouchTyped' }).level).toBe(
       'knowsHomeRow',
@@ -183,14 +199,53 @@ describe('start over', () => {
   })
 
   it('resets the flow only: finishing keeps history and switches the language only if it changed', () => {
-    expect(finishPlan({ currentLanguage: 'uk', language: 'uk', level: 'knowsHomeRow' })).toEqual({
+    expect(
+      finishPlan({
+        currentLanguage: 'uk',
+        language: 'uk',
+        level: 'knowsHomeRow',
+      }),
+    ).toEqual({
       switchLanguage: null,
       level: 'knowsHomeRow',
       clearsHistory: false,
     })
-    expect(finishPlan({ currentLanguage: 'uk', language: 'en', level: 'neverTouchTyped' })).toEqual(
-      { switchLanguage: 'en', level: 'neverTouchTyped', clearsHistory: false },
+    expect(
+      finishPlan({
+        currentLanguage: 'uk',
+        language: 'en',
+        level: 'neverTouchTyped',
+      }),
+    ).toEqual({
+      switchLanguage: 'en',
+      level: 'neverTouchTyped',
+      clearsHistory: false,
+    })
+  })
+})
+
+describe('the first exercise', () => {
+  it('opens the home-row run of the chosen layout for a learner who never touch-typed', () => {
+    for (const layout of [layouts.yq, layouts.qwerty]) {
+      const id = firstExerciseId(layout, 'neverTouchTyped', `${layout.id}.run.KeyG`)
+      const scale = catalogue[layout.id as 'yq' | 'qwerty'].find((each) => each.id === id)
+      expect(scale?.type).toBe('run')
+      expect(layout.homeAnchors).toContain(scale?.focus.value)
+    }
+    expect(firstExerciseId(layouts.yq, 'neverTouchTyped', 'yq.run.KeyG')).toBe('yq.run.anchors')
+    expect(firstExerciseId(layouts.qwerty, 'neverTouchTyped', 'qwerty.run.KeyG')).toBe(
+      'qwerty.run.anchors',
     )
+  })
+
+  it('keeps the first closed key for the other levels', () => {
+    for (const layout of [layouts.yq, layouts.qwerty]) {
+      for (const level of ['knowsHomeRow', 'touchTypesWantsAccuracy'] as const) {
+        expect(firstExerciseId(layout, level, `${layout.id}.run.KeyQ`)).toBe(
+          `${layout.id}.run.KeyQ`,
+        )
+      }
+    }
   })
 })
 
