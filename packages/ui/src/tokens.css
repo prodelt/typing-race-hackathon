@@ -33,20 +33,20 @@
 
 @theme static {
   /* ---- Canvas, surfaces, ink (light theme, the default) --------------------------------
-   * The game client's palette (prototype b-red): white frame, a warm pink paper for the stage
-   * and for tiles inside a panel, near-black ink. Panels are white and float on the paper. */
-  --color-paper: #fcf1ef;
-  --color-paper-deep: #f9e6e3;
+   * The game client's palette: a white page, a neutral light grey for tiles inside a panel,
+   * near-black ink. Panels are white too and read by a neutral edge (`shell.css`). */
+  --color-paper: #ffffff;
+  --color-paper-deep: #f4f5f7;
   --color-paper-raised: #ffffff;
   --color-ink: #141414;
   --color-ink-soft: #2e2e2e;
   /* 6.4:1 on white, 5.6:1 on the paper, 5.2:1 on the deep paper: small text may use it. */
   --color-muted: #5f5f5f;
   /* Display-size text only (4.5:1 on white): the quiet half of a two-tone headline. */
-  --color-ink-faint: #7a6764;
+  --color-ink-faint: #6b6f76;
 
-  --color-hairline: #f2dcd9;
-  --color-hairline-strong: #cdb2ad;
+  --color-hairline: #e4e6ea;
+  --color-hairline-strong: #c3c7ce;
 
   /* ---- The accent: brand red and its steps ---------------------------------------------
    * White on the red is 6.0:1, the red on the canvas 5.0:1, so it may carry text either way.
@@ -63,7 +63,7 @@
    * secondary role — progress, typed text, links, the selected option — is ink, as in the
    * prototype's segmented switch and route line. */
   --color-sage: #2e2e2e;
-  --color-sage-tint: #f9e6e3;
+  --color-sage-tint: #f4f5f7;
   --color-sage-ink: #141414;
   --color-steel: #2e2e2e;
 
@@ -71,7 +71,7 @@
   --color-terracotta-tint: #fbe3e0;
   --color-terracotta-ink: #9c170d;
 
-  --color-nav-dimmed: #857370;
+  --color-nav-dimmed: #6f747c;
 
   /* ---- Finger zones: B's one language for "which finger" ---------------------------------
    * Four steps of the paper deepening towards the red, white at the pinkies to the deepest at
