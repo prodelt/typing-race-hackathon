@@ -3,6 +3,7 @@ import type { Language } from '@typing-race/domain'
 import {
   IconCog,
   IconFlame,
+  IconHelp,
   IconInfo,
   IconSnow,
   IconSwords,
@@ -14,6 +15,7 @@ import { initialOf } from '../features/account/model.js'
 import { useAccount } from '../features/account/state.js'
 import { AccountChip } from '../features/account/ui.js'
 import { m } from '../paraglide/messages.js'
+import { replayGuide, useGuide } from './guide/model.js'
 import { useGameStats } from './state/gameStats.js'
 import { useAppStore } from './state/index.js'
 import { refreshRaceStanding, signed, useRaceStanding } from './state/raceStanding.js'
@@ -95,6 +97,25 @@ function SoundToggle() {
         onClick={() => void changeSettings({ sound: on ? 'off' : 'on' })}
       >
         {on ? <IconVolume size={20} /> : <IconVolumeOff size={20} />}
+      </button>
+    </Tip>
+  )
+}
+
+/** «?»: replays the coach-marks of the screen on view; quiet where a screen has none. */
+function GuideButton() {
+  const screen = useGuide((state) => state.screen)
+  return (
+    <Tip text={m.shell_guide()}>
+      <button
+        type="button"
+        className="iconbtn"
+        data-guide="help"
+        aria-label={m.shell_guide()}
+        aria-disabled={screen === null || undefined}
+        onClick={replayGuide}
+      >
+        <IconHelp size={20} />
       </button>
     </Tip>
   )
@@ -266,6 +287,7 @@ export function StatusBar({ settingsActive }: { readonly settingsActive: boolean
             <IconCog size={20} />
           </Link>
         </Tip>
+        <GuideButton />
         <AboutMenu />
         <AccountChip />
       </div>

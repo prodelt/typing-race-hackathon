@@ -9,6 +9,7 @@ import {
 import type { Language } from '@typing-race/domain'
 import { Button, cx } from '@typing-race/ui'
 import { type CSSProperties, type KeyboardEvent, useEffect, useMemo, useRef, useState } from 'react'
+import { useGuideScreen } from '../../app/guide/model.js'
 import { useScreenKeys } from '../../app/screenKeys.js'
 import { useAppStore, useDerived } from '../../app/state/index.js'
 import { m } from '../../paraglide/messages.js'
@@ -160,6 +161,8 @@ function MapBody() {
     if (view !== null) setChosen(stepSelection(view, selectedId, delta))
   }
 
+  useGuideScreen('map')
+
   useScreenKeys({
     Enter: () => activate(selected),
     ArrowRight: () => move(1),
@@ -176,7 +179,7 @@ function MapBody() {
     <div className="map">
       <header className="map-head">
         <h1 className="map-head__title">{m.map_title()}</h1>
-        <p className="map-head__here" data-testid="map-here">
+        <p className="map-head__here" data-testid="map-here" data-guide="map-here">
           {current === undefined ? (
             m.map_here_all()
           ) : (
@@ -367,7 +370,12 @@ function RoutePanel(props: {
   const stepCount = view.nodes.filter((node) => node.kind === 'step').length
 
   return (
-    <section className="map-route" aria-labelledby="map-route-title" data-testid="map-route">
+    <section
+      className="map-route"
+      aria-labelledby="map-route-title"
+      data-testid="map-route"
+      data-guide="map-route"
+    >
       <h2 id="map-route-title" className="sr-only">
         {m.map_aria({ count: stepCount })}
       </h2>
@@ -520,7 +528,7 @@ function NodeButton(props: {
 
 function Legend() {
   return (
-    <div className="map-legend" role="note" aria-label={m.map_legend()}>
+    <div className="map-legend" role="note" aria-label={m.map_legend()} data-guide="map-legend">
       <span>
         <i className="lg2 lg2--done" />
         {m.map_legend_done()}

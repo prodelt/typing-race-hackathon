@@ -23,7 +23,7 @@ export function NextActionCard({
   const { next } = model
 
   return (
-    <section aria-labelledby="result-next" className="reward-next">
+    <section aria-labelledby="result-next" className="reward-next" data-guide="result-next">
       <h2 id="result-next" className="reward-next__title">
         {m.result_next_heading()}
       </h2>

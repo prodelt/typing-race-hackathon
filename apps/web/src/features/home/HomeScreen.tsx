@@ -10,6 +10,7 @@ import {
 import type { Language, NextAction, Scale } from '@typing-race/domain'
 import { Button, IconFlame } from '@typing-race/ui'
 import { lazy, Suspense, useMemo, useRef } from 'react'
+import { useGuideScreen } from '../../app/guide/model.js'
 import { LiveGradient } from '../../app/LiveGradient.js'
 import { useScreenKeys } from '../../app/screenKeys.js'
 import { useGameStats } from '../../app/state/gameStats.js'
@@ -137,6 +138,8 @@ function Hub({ nextAction }: { readonly nextAction: NextAction }) {
     })
   }
 
+  useGuideScreen('home')
+
   useScreenKeys({
     Enter: start,
     KeyQ: () => race('quick', 'uk'),
@@ -198,7 +201,12 @@ function ContinuePanel(props: {
         ]
 
   return (
-    <section className="hub-go on-red" aria-labelledby="hub-go-title" data-testid="home-continue">
+    <section
+      className="hub-go on-red"
+      aria-labelledby="hub-go-title"
+      data-testid="home-continue"
+      data-guide="home-start"
+    >
       <LiveGradient tone="ember" />
       <div className="hub-go__top">
         <span className="hub-idx">01</span>
@@ -259,7 +267,7 @@ function RacePanel(props: {
   readonly language: Language
 }) {
   return (
-    <section className="hub-panel hub-race" aria-labelledby="hub-race-title">
+    <section className="hub-panel hub-race" aria-labelledby="hub-race-title" data-guide="home-race">
       <div className="hub-panel__head">
         <span className="hub-idx">02</span>
         <h2 className="hub-panel__title" id="hub-race-title">

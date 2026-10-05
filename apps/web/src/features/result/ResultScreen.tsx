@@ -8,6 +8,7 @@ import {
 import type { AttemptSummary } from '@typing-race/domain'
 import { Button, prefersReducedMotion, resolveMotion } from '@typing-race/ui'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { useGuideScreen } from '../../app/guide/model.js'
 import { LiveGradient } from '../../app/LiveGradient.js'
 import { useScreenKeys } from '../../app/screenKeys.js'
 import { playCue } from '../../app/sound.js'
@@ -116,6 +117,8 @@ function RewardView({
       search: { mode: 'practice' },
     })
   }
+
+  useGuideScreen('result')
 
   useScreenKeys({
     Escape: home,
@@ -280,6 +283,7 @@ function ScorePanel({ model, label }: { readonly model: ResultModel; readonly la
       className="reward-score on-red"
       aria-labelledby="reward-score-title"
       data-testid="result-score"
+      data-guide="result-score"
     >
       <LiveGradient tone="ember" />
       <div className="reward-score__top">
@@ -378,7 +382,7 @@ function Tiles({
     },
   ]
   return (
-    <section aria-label={m.result_tiles_label()} className="reward-cells">
+    <section aria-label={m.result_tiles_label()} className="reward-cells" data-guide="result-tiles">
       <dl>
         {cells.map((cell, i) => (
           <div key={cell.key} className={`reward-cell${i === 0 ? ' reward-cell--main' : ''}`}>

@@ -5,6 +5,7 @@ import { m } from '../paraglide/messages.js'
 import { BootGate } from './BootGate.js'
 import { CommandPalette } from './CommandPalette.js'
 import { DESTINATIONS, destinationOf, isOutsideFrame, needsKeyboard } from './destinations.js'
+import { GuideHost } from './guide/GuideHost.js'
 import { LiveGradient } from './LiveGradient.js'
 import { usePlayMode } from './playMode.js'
 import { Rail } from './Rail.js'
@@ -82,7 +83,7 @@ export function Shell() {
         {m.skip_to_content()}
       </a>
 
-      <div className="frame__rail" inert={play || undefined}>
+      <div className="frame__rail" data-guide="rail" inert={play || undefined}>
         <Rail active={active} online={null} />
       </div>
 
@@ -118,6 +119,7 @@ export function Shell() {
 
       <CommandPalette />
       <AccountNotices />
+      <GuideHost />
     </div>
   )
 }
