@@ -33,10 +33,10 @@
 
 @theme static {
   /* ---- Canvas, surfaces, ink (light theme, the default) --------------------------------
-   * The game client's palette: a white page, a neutral light grey for tiles inside a panel,
-   * near-black ink. Panels are white too and read by a neutral edge (`shell.css`). */
-  --color-paper: #ffffff;
-  --color-paper-deep: #f4f5f7;
+   * The game client's palette: a white page and white panels (`shell.css` paints the page with
+   * `paper-raised`), neutral light greys for tiles inside a panel, near-black ink. */
+  --color-paper: #f4f5f7;
+  --color-paper-deep: #eceef1;
   --color-paper-raised: #ffffff;
   --color-ink: #141414;
   --color-ink-soft: #2e2e2e;
