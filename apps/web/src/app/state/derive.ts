@@ -9,6 +9,7 @@ import {
 } from '@typing-race/curriculum'
 import type { Layout, NextAction, Progress, Scale } from '@typing-race/domain'
 import { confidenceOf, foldConfidence } from '@typing-race/metrics'
+import { isDailyId } from '../../features/daily/model.js'
 import type { AppState } from './reduce.js'
 
 /**
@@ -52,7 +53,8 @@ export function derive(state: AppState): DerivedState {
   }
 
   const progress = deriveProgress({
-    attempts: state.attempts,
+    // A daily challenge is free practice: it earns no XP, mastery or unlocks.
+    attempts: state.attempts.filter((a) => !isDailyId(a.scaleId)),
     layout,
     catalogue: scales,
     startingLevelChoice: state.startingLevelChoice,

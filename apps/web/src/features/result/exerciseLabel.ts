@@ -11,6 +11,7 @@ import type { Layout } from '@typing-race/domain'
 import { useEffect, useState } from 'react'
 import { m } from '../../paraglide/messages.js'
 import { languageOfExercise, loadAcademyCourse } from '../academy/data.js'
+import { isDailyId } from '../daily/model.js'
 import { drillName } from '../words/labels.js'
 import { scaleName } from './model.js'
 
@@ -34,6 +35,7 @@ export function exerciseLabel(
   }
   if (isReviewDrillId(scaleId)) return m.review_drill_title()
   if (isRealTextId(scaleId)) return m.session_realtext_title()
+  if (isDailyId(scaleId)) return m.daily_title()
   if (isAcademyExerciseId(scaleId)) return academyTitle ?? m.result_label_academy()
   return m.result_label_exercise()
 }

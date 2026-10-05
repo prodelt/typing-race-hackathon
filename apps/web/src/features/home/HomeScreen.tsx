@@ -442,6 +442,9 @@ function MapPanel() {
           <i className="lg lg--lock" />
           {m.home_legend_locked()}
         </span>
+        <Link to="/daily" className="hub-link">
+          {m.daily_home_link()}
+        </Link>
         <Link to="/map" className="hub-link" aria-keyshortcuts="2">
           {m.home_map_all()}
           <span className="kbd" aria-hidden="true">
