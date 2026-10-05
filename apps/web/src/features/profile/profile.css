@@ -59,11 +59,103 @@
   display: grid;
   gap: var(--scr-gap);
   grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-  grid-template-rows: auto auto 1fr;
+  grid-template-rows: auto auto auto 1fr;
   grid-template-areas:
     "level stats"
+    "badges badges"
     "mastery history"
     "account history";
+}
+
+/* ---- Achievements: earned badges are inked, locked ones dimmed with a how-to hint ---------- */
+
+.prof-badges {
+  grid-area: badges;
+  /* The last badges' hint bubbles must not widen the page. */
+  overflow-x: clip;
+}
+
+.prof-badges__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.prof-badge {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  border: 1px dashed var(--color-hairline-strong);
+  border-radius: 8px;
+  color: var(--color-ink-soft);
+  opacity: 0.55;
+  cursor: help;
+  transition:
+    opacity var(--dur-fast) ease,
+    border-color var(--dur-fast) ease;
+}
+
+.prof-badge.is-earned {
+  opacity: 1;
+  color: var(--color-ink);
+  border-style: solid;
+  border-color: var(--color-ink);
+}
+
+.prof-badge:hover,
+.prof-badge:focus-visible {
+  opacity: 1;
+}
+
+.prof-badge__mark {
+  font-family: var(--font-display);
+  font-size: 20px;
+  line-height: 1;
+}
+
+.prof-badge.is-earned .prof-badge__mark {
+  color: var(--color-accent);
+}
+
+.prof-badge__name {
+  font-size: 13px;
+  line-height: 1.25;
+}
+
+.prof-who__badge {
+  margin-left: 8px;
+  padding: 1px 6px;
+  border: 1px solid var(--color-hairline-strong);
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 500;
+  vertical-align: middle;
+}
+
+.prof-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+  .prof-badges__list {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .prof-badge {
+    transition: none;
+  }
 }
 
 .prof-level {
@@ -400,6 +492,7 @@
     grid-template-areas:
       "level"
       "stats"
+      "badges"
       "history"
       "mastery"
       "account";

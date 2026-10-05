@@ -9,7 +9,7 @@ import {
 } from '@typing-race/curriculum'
 import type { AttemptSummary } from '@typing-race/domain'
 import { IconFlame } from '@typing-race/ui'
-import { useMemo } from 'react'
+import { useId, useMemo } from 'react'
 import { Panel, Screen, ScreenHead } from '../../app/Screen.js'
 import { useScreenKeys } from '../../app/screenKeys.js'
 import { localDay, useGameStats } from '../../app/state/gameStats.js'
@@ -23,7 +23,15 @@ import { useAccount } from '../account/state.js'
 import { keyLabel, scaleName } from '../path/labels.js'
 import { totalKeyCount, unlockedKeyCount } from '../path/model.js'
 import { drillName } from '../words/labels.js'
-import { attemptKind, careerTotals, RECENT_WINDOW, recentAttempts, speedTrend } from './model.js'
+import {
+  attemptKind,
+  type BadgeId,
+  badges,
+  careerTotals,
+  RECENT_WINDOW,
+  recentAttempts,
+  speedTrend,
+} from './model.js'
 import './profile.css'
 
 /**
@@ -66,6 +74,7 @@ export function ProfileScreen() {
           tests={totals.tests}
         />
         <Numbers stats={stats} totals={totals} />
+        <Badges course={course} stats={stats} totals={totals} />
         <Mastery course={course} />
         <History attempts={attempts} course={course} />
         <AccountPanel />
@@ -85,7 +94,12 @@ function ProfileWho() {
         {initialOf(name)}
       </span>
       <span className="prof-who__text">
-        <b>{name}</b>
+        <b>
+          {name}
+          {kind === 'google' ? (
+            <span className="prof-who__badge">{m.prof_badge_google()}</span>
+          ) : null}
+        </b>
         <span>{kind === 'google' ? m.acct_sub_google() : m.prof_guest_sub()}</span>
       </span>
     </div>
@@ -194,6 +208,91 @@ function Numbers({
         ))}
       </dl>
     </Panel>
+  )
+}
+
+/* ---- Achievements ----------------------------------------------------------------------- */
+
+const BADGE_COPY: Record<BadgeId, { readonly name: () => string; readonly how: () => string }> = {
+  first: { name: m.prof_badge_first_name, how: m.prof_badge_first_how },
+  test: { name: m.prof_badge_test_name, how: m.prof_badge_test_how },
+  keys10: { name: m.prof_badge_keys10_name, how: m.prof_badge_keys10_how },
+  speed200: { name: m.prof_badge_speed200_name, how: m.prof_badge_speed200_how },
+  streak7: { name: m.prof_badge_streak7_name, how: m.prof_badge_streak7_how },
+  module: { name: m.prof_badge_module_name, how: m.prof_badge_module_how },
+  race: { name: m.prof_badge_race_name, how: m.prof_badge_race_how },
+}
+
+function Badges({
+  course,
+  stats,
+  totals,
+}: {
+  readonly course: CourseState
+  readonly stats: ReturnType<typeof useGameStats>
+  readonly totals: ReturnType<typeof careerTotals>
+}) {
+  const { progress } = useDerived()
+  const attempts = useAppStore((state) => state.attempts)
+  const modulesComplete = useMemo(
+    () =>
+      course.status === 'ready' ? academyProgress(course.course, attempts).modulesComplete : 0,
+    [course, attempts],
+  )
+  const list = badges({
+    attempts: totals.attempts,
+    tests: totals.tests,
+    bestSpm: totals.bestSpm,
+    streakDays: stats.streak.days,
+    keysOpen: progress === null ? 0 : unlockedKeyCount(progress),
+    modulesComplete,
+    raceRating: stats.raceRating,
+  })
+  const have = list.filter((badge) => badge.earned).length
+
+  return (
+    <section
+      className="scr-panel prof-badges"
+      aria-labelledby="prof-badges-title"
+      data-testid="profile-badges"
+    >
+      <div className="scr-panel__head">
+        <h2 className="scr-panel__title" id="prof-badges-title">
+          {m.prof_badges_title()}
+        </h2>
+        <span className="scr-note">{m.prof_badges_meta({ have, total: list.length })}</span>
+      </div>
+      <ul className="prof-badges__list">
+        {list.map((badge, i) => (
+          <Badge key={badge.id} id={badge.id} n={i + 1} earned={badge.earned} />
+        ))}
+      </ul>
+    </section>
+  )
+}
+
+function Badge(props: { readonly id: BadgeId; readonly n: number; readonly earned: boolean }) {
+  const tipId = useId()
+  const copy = BADGE_COPY[props.id]
+  return (
+    <li
+      className={`prof-badge tip${props.earned ? ' is-earned' : ''}`}
+      // biome-ignore lint/a11y/noNoninteractiveTabindex: focusable so the hint reaches keyboard users
+      tabIndex={0}
+      aria-describedby={tipId}
+      data-earned={props.earned}
+    >
+      <span className="prof-badge__mark num" aria-hidden="true">
+        {String(props.n).padStart(2, '0')}
+      </span>
+      <span className="prof-badge__name">{copy.name()}</span>
+      <span className="prof-sr">
+        {props.earned ? m.prof_badges_earned() : m.prof_badges_locked()}
+      </span>
+      <span role="tooltip" id={tipId} className="tip__bubble">
+        {copy.how()}
+      </span>
+    </li>
   )
 }
 
