@@ -3,6 +3,7 @@ import { keyOf } from '@typing-race/curriculum'
 import type { AttemptMode, InputSource, Layout } from '@typing-race/domain'
 import { Button, Card, Chip } from '@typing-race/ui'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { useGuideScreen } from '../../app/guide/model.js'
 import { m } from '../../paraglide/messages.js'
 import { HOME_ROW, LAYOUT_NAMES } from './labels.js'
 import { ModeToggle } from './ModeToggle.js'
@@ -63,6 +64,9 @@ export function PreStart({
 
   useEffect(() => check(), [check])
 
+  // The first exercise has its own start card; the guide waits for the next ones.
+  useGuideScreen('prestart', !firstRun)
+
   useEffect(
     () =>
       input.subscribe((event) => {
@@ -98,12 +102,13 @@ export function PreStart({
             <p className="mt-6 font-ui text-xs text-ink/70">{wording.goalLabel}</p>
             <p
               data-testid="scale-goal"
+              data-guide="prestart-goal"
               className="mt-1 max-w-[60ch] font-ui text-lg leading-relaxed"
             >
               {wording.goal}
             </p>
 
-            <div className="mt-5 flex flex-wrap items-center gap-2">
+            <div className="mt-5 flex flex-wrap items-center gap-2" data-guide="prestart-mode">
               <Chip tone="neutral">{wording.focus}</Chip>
               <Chip tone={mode === 'test' ? 'terracotta' : 'sage'}>
                 {mode === 'test' ? m.exercise_mode_test() : m.exercise_mode_practice()}
@@ -159,6 +164,7 @@ export function PreStart({
             variant={mode === 'practice' && testIsPrimary ? 'secondary' : 'primary'}
             disabled={mismatch}
             onClick={onStart}
+            data-guide="prestart-start"
             {...(firstRun ? { hint: 'Enter', 'aria-keyshortcuts': 'Enter' } : {})}
           >
             {m.exercise_start()}

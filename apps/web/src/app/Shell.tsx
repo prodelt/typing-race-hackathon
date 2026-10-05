@@ -5,6 +5,7 @@ import { m } from '../paraglide/messages.js'
 import { BootGate } from './BootGate.js'
 import { CommandPalette } from './CommandPalette.js'
 import { DESTINATIONS, destinationOf, isOutsideFrame, needsKeyboard } from './destinations.js'
+import { GuideHost } from './guide/GuideHost.js'
 import { usePlayMode } from './playMode.js'
 import { Rail } from './Rail.js'
 import { StatusBar } from './StatusBar.js'
@@ -116,6 +117,7 @@ export function Shell() {
 
       <CommandPalette />
       <AccountNotices />
+      <GuideHost />
     </div>
   )
 }

@@ -211,6 +211,14 @@ export const IconInfo = (p: IconProps) => (
   </Icon>
 )
 
+/** A question mark in a ring: replays the screen's coach-marks. */
+export const IconHelp = (p: IconProps) => (
+  <Icon {...p}>
+    <circle cx="12" cy="12" r="9" />
+    <path d="M9.5 9.5a2.5 2.5 0 1 1 3.4 2.33c-.55.22-.9.75-.9 1.34v.58M12 16.75v.5" />
+  </Icon>
+)
+
 /** The streak flame — filled, the one solid glyph. */
 export const IconFlame = ({ size = 24, ...rest }: IconProps) => (
   <svg

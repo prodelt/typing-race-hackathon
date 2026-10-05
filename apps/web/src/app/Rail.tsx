@@ -52,7 +52,7 @@ export function Rail({
         </Link>
       </div>
 
-      <div className="rail__nav">
+      <div className="rail__nav" data-guide="rail">
         {DESTINATIONS.map(({ id, key, to }) => {
           const Icon = ICONS[id]
           const label = LABELS[id]()

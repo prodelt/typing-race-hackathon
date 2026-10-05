@@ -1,0 +1,120 @@
+/* ---- Coach-marks: one ink bubble at a time, a ring on what it points at ------------------ */
+
+.coach-ring {
+  position: fixed;
+  z-index: 90;
+  border-radius: 12px;
+  pointer-events: none;
+  box-shadow:
+    0 0 0 2px var(--color-paper-raised),
+    0 0 0 4px var(--color-ink),
+    0 0 0 100vmax color-mix(in srgb, var(--color-ink) 22%, transparent);
+  transition:
+    left var(--dur-base) var(--ease-standard),
+    top var(--dur-base) var(--ease-standard),
+    width var(--dur-base) var(--ease-standard),
+    height var(--dur-base) var(--ease-standard);
+}
+
+.coach {
+  --coach-arrow: 50%;
+  position: fixed;
+  z-index: 91;
+  width: max-content;
+  max-width: min(320px, calc(100vw - 24px));
+  padding: 16px 18px 14px;
+  border-radius: 0 16px 0 0;
+  background: var(--color-ink);
+  color: var(--color-paper-raised);
+  box-shadow: var(--shadow-raised);
+  animation: coach-in var(--dur-base) var(--ease-enter);
+}
+
+.coach__arrow {
+  position: absolute;
+  top: -7px;
+  left: var(--coach-arrow);
+  width: 14px;
+  height: 14px;
+  background: inherit;
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.coach--above .coach__arrow {
+  top: auto;
+  bottom: -7px;
+}
+
+.coach--right .coach__arrow {
+  top: var(--coach-arrow);
+  left: -7px;
+  transform: translateY(-50%) rotate(45deg);
+}
+
+.coach__count {
+  margin: 0 0 6px;
+  font: 600 11px / 1 var(--font-display);
+  letter-spacing: 0.08em;
+  color: color-mix(in srgb, var(--color-paper-raised) 60%, transparent);
+}
+
+.coach__text {
+  margin: 0;
+  max-width: 28ch;
+  font: 500 15px / 1.4 var(--font-ui);
+}
+
+.coach__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 14px;
+}
+
+.coach__skip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 0;
+  border: 0;
+  background: none;
+  color: color-mix(in srgb, var(--color-paper-raised) 72%, transparent);
+  font: 500 13px / 1 var(--font-ui);
+  cursor: pointer;
+}
+
+.coach__skip:hover,
+.coach__skip:focus-visible {
+  color: var(--color-paper-raised);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.coach__skip .kbd {
+  background: color-mix(in srgb, var(--color-paper-raised) 14%, transparent);
+  color: inherit;
+  box-shadow: none;
+}
+
+.coach :focus-visible {
+  outline: 2px solid var(--color-paper-raised);
+  outline-offset: 2px;
+}
+
+@keyframes coach-in {
+  from {
+    opacity: 0;
+    translate: 0 4px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .coach {
+    animation: none;
+  }
+
+  .coach-ring {
+    transition: none;
+  }
+}
