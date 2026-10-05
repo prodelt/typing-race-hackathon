@@ -22,6 +22,7 @@ const STEPS: Readonly<Record<GuideScreen, () => readonly GuideStep[]>> = {
   home: () => [
     { target: guideTarget('home-start'), text: m.guide_home_start() },
     { target: guideTarget('home-race'), text: m.guide_home_race() },
+    { target: guideTarget('home-modes'), text: m.guide_home_modes() },
     { target: guideTarget('rail'), text: m.guide_home_rail() },
     { target: guideTarget('help'), text: m.guide_home_help() },
   ],

@@ -588,6 +588,12 @@
   transform: translate(0, -50%);
 }
 
+.tip__bubble--above {
+  top: auto;
+  bottom: calc(100% + 10px);
+  transform: translate(-50%, 4px);
+}
+
 .tip.tip--hidden > .tip__bubble {
   opacity: 0;
   visibility: hidden;
@@ -914,7 +920,9 @@
 
   .who,
   .bar .sb:not(.lvl),
+  .bar .tipw:has(> .sb:not(.lvl)),
   .seg,
+  .bar .tipw:has(> .seg),
   .gchip,
   .xp__txt {
     display: none;
