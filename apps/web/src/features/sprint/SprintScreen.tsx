@@ -65,7 +65,7 @@ function SprintRun({
 }) {
   const { layout, accuracyFloor } = useDerived()
   const errorMode = useAppStore((state) => state.settings.errorMode)
-  const [text] = useState(() => sprintText(words, Math.random, 120))
+  const [text] = useState(() => sprintText(words, Math.random, 90))
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const [input, setInput] = useState<InputSource | null>(null)
   const [engine, setEngine] = useState<Engine | null>(null)
@@ -91,8 +91,11 @@ function SprintRun({
       done = true
       const view = created.view
       const typed = view.cursor
+      // Finishing the whole line early still scores per minute of the time actually used.
+      const used = startedAt === null ? SPRINT_MS : performance.now() - startedAt
+      const minutes = Math.max(1000, Math.min(SPRINT_MS, used)) / 60_000
       const value: SprintScore = {
-        spm: Math.round((typed * 60_000) / SPRINT_MS),
+        spm: Math.round(typed / minutes),
         accuracy: typed + view.errorCount === 0 ? 0 : typed / (typed + view.errorCount),
       }
       created.abandon()
@@ -185,7 +188,7 @@ function SprintRun({
         <p className="font-ui text-ink-soft">{m.sprint_instruction()}</p>
       </section>
       <div className="play__line">
-        {engine === null ? null : <TypingLine engine={engine} text={text} sizePx={32} />}
+        {engine === null ? null : <TypingLine engine={engine} text={text} sizePx={28} />}
       </div>
     </div>
   )
