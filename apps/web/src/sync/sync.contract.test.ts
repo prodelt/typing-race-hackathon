@@ -391,6 +391,36 @@ describe('sync — the outbox', () => {
     expect(a.sync.status()).toMatchObject({ connected: false, pending: 1 })
     await expect(a.sync.flush()).resolves.toMatchObject({ accepted: [], pending: 1 })
   })
+
+  it('keeps free practice local: a daily or own-text attempt is stored but never queued', async () => {
+    const cloud = fakeCloud()
+    const a = device()
+    await a.sync.submitAttempt({ ...attempt('daily'), scaleId: 'yq.daily' })
+    await a.sync.submitAttempt({ ...attempt('own'), scaleId: 'yq.owntext' })
+    expect(await localIds(a.store)).toEqual(['daily', 'own'])
+    expect(await a.outbox.all()).toEqual([])
+    expect(a.sync.status().pending).toBe(0)
+    await a.sync.connect(cloud.remote())
+    expect(cloud.pushes).toEqual([])
+  })
+
+  it('drops free practice an older build queued, so sync never stays pending on it', async () => {
+    const cloud = fakeCloud()
+    const a = device()
+    await a.outbox.put({ ...attempt('old-daily', 1_000), scaleId: 'yq.daily' })
+    await a.outbox.put(attempt('a1', 2_000))
+    await a.sync.connect(cloud.remote())
+    expect([...cloud.attempts.keys()]).toEqual(['a1'])
+    expect(await a.outbox.all()).toEqual([])
+    expect(a.sync.status().pending).toBe(0)
+  })
+
+  it('does not count queued free practice as pending, even signed out', async () => {
+    const a = device({ online: () => false })
+    await a.outbox.put({ ...attempt('old-daily'), scaleId: 'qwerty.daily' })
+    expect(await a.sync.wipeLocalIfSynced()).toBe('wiped')
+    expect(await a.outbox.all()).toEqual([])
+  })
 })
 
 describe('sync — settings, last write wins', () => {
@@ -475,6 +505,19 @@ describe('sync — wipe on sign-out', () => {
     await expect(a.store.load()).resolves.toBe('empty')
     expect(a.onLocalChanged).toHaveBeenCalled()
   })
+
+  it('wipes the other local learner data with the copy, and only once it is wiped', async () => {
+    const forgetDeviceData = vi.fn()
+    const store = memoryStore()
+    const outbox = memoryOutbox()
+    const sync = createSync({ store, outbox, isOnline: () => false, forgetDeviceData })
+    await sync.submitAttempt(attempt('a1'))
+    expect(await sync.wipeLocalIfSynced()).toBe('pending')
+    expect(forgetDeviceData).not.toHaveBeenCalled()
+    await outbox.remove(['a1'])
+    expect(await sync.wipeLocalIfSynced()).toBe('wiped')
+    expect(forgetDeviceData).toHaveBeenCalledOnce()
+  })
 })
 
 describe('sync — forget after delete', () => {
@@ -489,5 +532,17 @@ describe('sync — forget after delete', () => {
     expect(await a.outbox.all()).toEqual([])
     expect(a.sync.status()).toMatchObject({ connected: false, phase: 'off', pending: 0 })
     expect(a.onLocalChanged).toHaveBeenCalled()
+  })
+
+  it('forgets the other local learner data too', async () => {
+    const forgetDeviceData = vi.fn()
+    const sync = createSync({
+      store: memoryStore(),
+      outbox: memoryOutbox(),
+      isOnline: () => false,
+      forgetDeviceData,
+    })
+    await sync.forgetLocal()
+    expect(forgetDeviceData).toHaveBeenCalledOnce()
   })
 })

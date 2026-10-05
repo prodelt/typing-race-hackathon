@@ -7,6 +7,13 @@ export {
   REVIEW_DRILL_SPOTS,
   reviewDrillId,
 } from './drill'
+export {
+  dailyId,
+  isDailyId,
+  isFreePracticeId,
+  isOwnTextId,
+  ownTextId,
+} from './free-practice'
 export type { RealText, RealTextArgs, RealTextKind } from './real-text'
 export {
   courseSentences,

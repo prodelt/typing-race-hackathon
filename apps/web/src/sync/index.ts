@@ -1,5 +1,7 @@
+import { isFreePracticeId } from '@typing-race/curriculum'
 import type { Attempt, Settings } from '@typing-race/domain'
 import type { OutboxStore, ProgressStore } from '../seams/index.js'
+import { browserStorage, wipeLearnerData } from './localData.js'
 import { batches, missingFrom, resolveSettings, retryDelay, settleUpload } from './policy.js'
 
 /**
@@ -161,6 +163,11 @@ export interface SyncDeps {
   /** Local data changed underneath the application (a pull, cloud settings, a wipe): reload it. */
   readonly onLocalChanged?: () => void
   readonly now?: () => number
+  /**
+   * Wipes the learner data kept outside the progress store (the daily challenge, sprint bests)
+   * whenever the local copy is wiped. Defaults to the browser's `localStorage` (`localData.ts`).
+   */
+  readonly forgetDeviceData?: () => void
 }
 
 const defaultIsOnline = (): boolean => globalThis.navigator?.onLine ?? true
@@ -182,6 +189,7 @@ export function createSync(deps: SyncDeps): Sync {
   const schedule = deps.schedule ?? defaultSchedule
   const now = deps.now ?? (() => Date.now())
   const localChanged = () => deps.onLocalChanged?.()
+  const forgetDeviceData = deps.forgetDeviceData ?? (() => wipeLearnerData(browserStorage()))
 
   const listeners = new Set<(status: SyncStatus) => void>()
   let remote: Remote | null = null
@@ -209,8 +217,21 @@ export function createSync(deps: SyncDeps): Sync {
     for (const listener of listeners) listener(snapshot)
   }
 
+  /**
+   * What is waiting to upload. Free practice (the daily challenge, own text) never goes to the
+   * server, which would refuse it as an unknown exercise forever; an older build queued it, so any
+   * such item still in the outbox is dropped here rather than left to hold sync at "pending".
+   */
+  const queued = async (): Promise<readonly Attempt[]> => {
+    const all = await deps.outbox.all()
+    const free = all.filter((attempt) => isFreePracticeId(attempt.scaleId))
+    if (free.length === 0) return all
+    await deps.outbox.remove(free.map((attempt) => attempt.id))
+    return all.filter((attempt) => !isFreePracticeId(attempt.scaleId))
+  }
+
   const refreshPending = async (): Promise<number> => {
-    pending = (await deps.outbox.all()).length
+    pending = (await queued()).length
     return pending
   }
 
@@ -239,12 +260,15 @@ export function createSync(deps: SyncDeps): Sync {
 
   /** Uploads the outbox. Throws on a network or server failure; the caller decides about retries. */
   const upload = async (target: Remote): Promise<FlushReport> => {
-    const queued = await deps.outbox.all()
-    if (queued.length === 0) return { accepted: [], rejected: [], pending: 0 }
+    const waiting = await queued()
+    if (waiting.length === 0) {
+      pending = 0
+      return { accepted: [], rejected: [], pending: 0 }
+    }
     const accepted: string[] = []
     const rejected: Rejection[] = []
     // Oldest first, so an interrupted upload leaves the newest work queued, not a gap in the past.
-    const ordered = [...queued].sort((x, y) => x.completedAt - y.completedAt)
+    const ordered = [...waiting].sort((x, y) => x.completedAt - y.completedAt)
     for (const batch of batches(ordered, UPLOAD_BATCH)) {
       const result = await target.push(batch)
       // Settled per batch: a failure further on keeps only what was not sent.
@@ -332,7 +356,8 @@ export function createSync(deps: SyncDeps): Sync {
   return {
     async submitAttempt(attempt) {
       await deps.store.appendAttempts([attempt])
-      await deps.outbox.put(attempt)
+      // Free practice stays on the device: no server sync (it would be refused as unknown).
+      if (!isFreePracticeId(attempt.scaleId)) await deps.outbox.put(attempt)
       await refreshPending()
       announce()
       if (remote !== null && isOnline()) void flush()
@@ -393,6 +418,7 @@ export function createSync(deps: SyncDeps): Sync {
         return 'pending'
       }
       await deps.store.clear()
+      forgetDeviceData()
       announce()
       localChanged()
       return 'wiped'
@@ -405,9 +431,10 @@ export function createSync(deps: SyncDeps): Sync {
       stopListening = null
       phase = 'off'
       return serially(async () => {
-        const queued = await deps.outbox.all()
-        if (queued.length > 0) await deps.outbox.remove(queued.map((attempt) => attempt.id))
+        const everything = await deps.outbox.all()
+        if (everything.length > 0) await deps.outbox.remove(everything.map((attempt) => attempt.id))
         await deps.store.clear()
+        forgetDeviceData()
         await refreshPending()
         lastSyncAt = null
         lastRejections = []
