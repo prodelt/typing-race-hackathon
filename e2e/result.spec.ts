@@ -429,15 +429,11 @@ test.describe('US2 the result of an attempt', () => {
     const score = page.getByTestId('result-score')
 
     await page.goto('/result/above')
-    await expect(score).toContainText(
-      'Точність 95,2% не нижча за поріг 95%. Тепер пройдіть залікову.',
-    )
+    await expect(score).toContainText('Точність 95,2%, поріг 95%. Пройдіть залікову.')
     await expect(score.getByText('не рахується в опанування')).toHaveCount(1)
 
     await page.goto('/result/below')
-    await expect(score).toContainText(
-      'Точність 90,0% нижча за поріг 95%. Коли вона дотягнеться до 95%, пройдіть залікову.',
-    )
+    await expect(score).toContainText('Точність 90,0%, поріг 95%. Тренуйтеся до 95%.')
     await expect(score.getByText('не рахується в опанування')).toHaveCount(1)
 
     // The status bar counts days without a plural to get wrong: "1 дн. серія", never "1 днів серія".
