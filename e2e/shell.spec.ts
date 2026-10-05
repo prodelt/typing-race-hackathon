@@ -230,8 +230,9 @@ test.describe('first run', () => {
       await page.keyboard.press('Enter')
 
       // The first exercise, in the chosen language, waits behind a start card: where the hands go,
-      // where the eyes go, how to begin. Nothing is running until the learner presses Enter.
-      await expect(page).toHaveURL(new RegExp(`/exercise/${layout}\\.`))
+      // where the eyes go, how to begin. Nothing is running until the learner presses Enter. A
+      // learner who never touch-typed starts on the home-row anchors the card names, not on «п».
+      await expect(page).toHaveURL(new RegExp(`/exercise/${layout}\\.run\\.anchors\\?`))
       const card = page.getByTestId('first-start')
       await expect(card).toBeVisible()
       await expect(card.getByRole('listitem')).toHaveCount(3)

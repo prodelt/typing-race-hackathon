@@ -56,7 +56,10 @@ export const LEVELS: readonly StartingLevelChoice[] = [
 ]
 
 /** The layout each typing language trains on in the first run. */
-export const LAYOUT_OF: Record<Language, 'yq' | 'qwerty'> = { uk: 'yq', en: 'qwerty' }
+export const LAYOUT_OF: Record<Language, 'yq' | 'qwerty'> = {
+  uk: 'yq',
+  en: 'qwerty',
+}
 
 /** Lower-case letters and spaces only, so a beginner is not stopped by Shift or punctuation. */
 export const DIAGNOSTIC_TEXT: Record<Language, string> = {
@@ -164,7 +167,10 @@ export function reduceFlow(state: FlowState, event: FlowEvent): FlowState {
     case 'back':
       if (state.step === 'fingers') return { ...state, step: 'level' }
       if (state.step === 'diagnostic' || state.step === 'level') {
-        return { ...state, step: state.step === 'diagnostic' ? 'level' : 'language' }
+        return {
+          ...state,
+          step: state.step === 'diagnostic' ? 'level' : 'language',
+        }
       }
       return state
 
@@ -218,10 +224,29 @@ export function finishPlan(input: {
   }
 }
 
+/**
+ * The exercise the first run opens. A learner who never touch-typed starts on the home-row anchors
+ * the Start Card names (the "run" drill on the anchors), not on the first closed key; the other
+ * levels open at the first closed key, as Home does.
+ */
+export function firstExerciseId(
+  layout: Layout,
+  level: StartingLevelChoice,
+  firstClosedScaleId: string,
+): string {
+  return level === 'neverTouchTyped' ? `${layout.id}.run.anchors` : firstClosedScaleId
+}
+
 /** B's finger zones: 0 pinky (white) → 3 index (deepest pink), the same on both hands. */
 export type Zone = 0 | 1 | 2 | 3
 
-const ZONE_OF: Record<Finger, Zone> = { pinky: 0, ring: 1, middle: 2, index: 3, thumb: 0 }
+const ZONE_OF: Record<Finger, Zone> = {
+  pinky: 0,
+  ring: 1,
+  middle: 2,
+  index: 3,
+  thumb: 0,
+}
 
 export function fingerZones(layout: Layout): ReadonlyMap<string, Zone> {
   return new Map(layout.keys.map((key) => [key.code, ZONE_OF[key.finger]]))
