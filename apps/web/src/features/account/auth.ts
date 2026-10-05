@@ -110,24 +110,33 @@ export function nickSaved(nick: string, kind: AccountKind, email: string | null)
   setAccount({ kind, nick, email })
 }
 
+function dropStoredSession(): void {
+  try {
+    globalThis.localStorage.removeItem(SESSION_KEY)
+  } catch {
+    // Nothing stored.
+  }
+}
+
 /**
  * The second half of sign-out, once `wipeLocalIfSynced()` said `'wiped'`: ends this browser's
  * session (only this one — other devices stay signed in) and forgets the name and the rating.
+ *
+ * `accountGone`: the server already deleted the user and every session with it, so its logout
+ * would only answer 403 (a red line in the console). The stored session goes first; sign-out then
+ * finds no token to send and just clears this browser, still telling its listeners.
  */
-export async function endSession(): Promise<void> {
+export async function endSession(options: { readonly accountGone?: boolean } = {}): Promise<void> {
   stopSync()
   forgetRaceName()
   setRaceStanding({ kind: 'guest' })
   const client = await supabaseClient()
   try {
+    if (options.accountGone === true) dropStoredSession()
     if (client !== null) await client.auth.signOut({ scope: 'local' })
   } finally {
     // Unreachable backend or not, the session must not survive on a shared computer.
-    try {
-      globalThis.localStorage.removeItem(SESSION_KEY)
-    } catch {
-      // Nothing stored.
-    }
+    dropStoredSession()
     setAccount({ kind: 'guest', nick: null, email: null })
   }
 }
@@ -150,6 +159,6 @@ export async function deleteAccount(
   })
   if (error || data?.deleted !== true) return 'failed'
   if (options.keepLocal !== true) await forgetLocalData()
-  await endSession()
+  await endSession({ accountGone: true })
   return 'deleted'
 }
