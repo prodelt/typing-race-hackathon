@@ -981,3 +981,9 @@
   outline: 1px solid #8a9099;
   outline-offset: -1px;
 }
+
+/* The page itself is white in the light theme; `paper` is the grey tile inside a panel. */
+:root:not([data-theme="dark"]):not([data-theme="low-vision"]),
+:root:not([data-theme="dark"]):not([data-theme="low-vision"]) :is(body, .stage__in, .landing) {
+  background: var(--color-paper-raised);
+}
