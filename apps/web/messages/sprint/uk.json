@@ -1,0 +1,16 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "sprint_title": "Спринт 60 с",
+  "sprint_instruction": "Час піде з першої літери.",
+  "sprint_loading": "Готуємо слова…",
+  "sprint_locked": "Відкрий більше літер, щоб складати слова.",
+  "sprint_done": "Час вийшов",
+  "sprint_new_best": "Новий рекорд",
+  "sprint_pace": "зн/хв",
+  "sprint_accuracy": "Точність",
+  "sprint_best": "Рекорд",
+  "sprint_below_floor": "Рекорд рахується від {floor}% точності.",
+  "sprint_again": "Ще раз",
+  "sprint_home": "На головну",
+  "sprint_entry": "Спринт 60 с"
+}

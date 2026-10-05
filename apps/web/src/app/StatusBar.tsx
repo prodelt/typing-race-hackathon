@@ -17,6 +17,7 @@ import { m } from '../paraglide/messages.js'
 import { useGameStats } from './state/gameStats.js'
 import { useAppStore } from './state/index.js'
 import { refreshRaceStanding, signed, useRaceStanding } from './state/raceStanding.js'
+import { Tip } from './Tip.js'
 
 /**
  * The status bar: who is playing, their Level and XP, the Streak with its freeze, the Race Rating
@@ -85,16 +86,17 @@ function SoundToggle() {
   const on = sound === 'on'
   const label = on ? m.shell_sound_on() : m.shell_sound_off()
   return (
-    <button
-      type="button"
-      className="iconbtn"
-      aria-pressed={on}
-      aria-label={label}
-      title={label}
-      onClick={() => void changeSettings({ sound: on ? 'off' : 'on' })}
-    >
-      {on ? <IconVolume size={20} /> : <IconVolumeOff size={20} />}
-    </button>
+    <Tip text={label}>
+      <button
+        type="button"
+        className="iconbtn"
+        aria-pressed={on}
+        aria-label={label}
+        onClick={() => void changeSettings({ sound: on ? 'off' : 'on' })}
+      >
+        {on ? <IconVolume size={20} /> : <IconVolumeOff size={20} />}
+      </button>
+    </Tip>
   )
 }
 
@@ -104,15 +106,11 @@ function AboutMenu() {
   const close = () => document.getElementById(id)?.hidePopover?.()
   return (
     <>
-      <button
-        type="button"
-        className="iconbtn"
-        popoverTarget={id}
-        aria-label={m.shell_menu()}
-        title={m.shell_menu()}
-      >
-        <IconInfo size={20} />
-      </button>
+      <Tip text={m.shell_menu()}>
+        <button type="button" className="iconbtn" popoverTarget={id} aria-label={m.shell_menu()}>
+          <IconInfo size={20} />
+        </button>
+      </Tip>
       <div id={id} popover="auto" className="menu">
         <p className="menu__title">{m.shell_menu()}</p>
         <ul>
@@ -258,15 +256,16 @@ export function StatusBar({ settingsActive }: { readonly settingsActive: boolean
       <div className="bar__right">
         <LayoutSwitch />
         <SoundToggle />
-        <Link
-          to="/settings"
-          className="iconbtn"
-          aria-label={m.shell_settings()}
-          title={m.shell_settings()}
-          aria-current={settingsActive ? 'page' : undefined}
-        >
-          <IconCog size={20} />
-        </Link>
+        <Tip text={m.shell_settings()}>
+          <Link
+            to="/settings"
+            className="iconbtn"
+            aria-label={m.shell_settings()}
+            aria-current={settingsActive ? 'page' : undefined}
+          >
+            <IconCog size={20} />
+          </Link>
+        </Tip>
         <AboutMenu />
         <AccountChip />
       </div>

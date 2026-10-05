@@ -3,6 +3,7 @@ import { IconFlag, IconHome, IconMap, IconPeople, IconUser } from '@typing-race/
 import type { ComponentType } from 'react'
 import { m } from '../paraglide/messages.js'
 import { DESTINATIONS, type DestinationId } from './destinations.js'
+import { Tip } from './Tip.js'
 
 /**
  * The rail: the brand mark, the five destinations with their index numbers and key hints, and a
@@ -57,34 +58,37 @@ export function Rail({
           const label = LABELS[id]()
           const current = id === active
           return (
-            <Link
-              key={id}
-              to={to}
-              className="rail__item"
-              aria-current={current ? 'page' : undefined}
-              aria-keyshortcuts={String(key)}
-              title={m.shell_dest_key_hint({ name: label, key: String(key) })}
-              data-destination={id}
-            >
-              <span className="rail__n" aria-hidden="true">
-                {String(key).padStart(2, '0')}
-              </span>
-              <Icon size={24} className="rail__icon" />
-              <span className="rail__label">{label}</span>
-            </Link>
+            <Tip key={id} side text={m.shell_dest_key_hint({ name: label, key: String(key) })}>
+              <Link
+                to={to}
+                className="rail__item"
+                aria-current={current ? 'page' : undefined}
+                aria-keyshortcuts={String(key)}
+                data-destination={id}
+              >
+                <span className="rail__n" aria-hidden="true">
+                  {String(key).padStart(2, '0')}
+                </span>
+                <Icon size={24} className="rail__icon" />
+                <span className="rail__label">{label}</span>
+              </Link>
+            </Tip>
           )
         })}
       </div>
 
       <div className="rail__foot">
-        <div className="season tip" title={m.shell_season_hint()}>
-          <span className="season__lab">{m.shell_season()}</span>
-          <span className="season__n">{String(season.number).padStart(2, '0')}</span>
-          <small>{m.shell_season_left({ days: String(season.daysLeft) })}</small>
-          <i className="season__bar" aria-hidden="true">
-            <b style={{ width: `${Math.round(season.elapsed * 100)}%` }} />
-          </i>
-        </div>
+        <Tip side text={m.shell_season_hint()}>
+          {/* biome-ignore lint/a11y/noNoninteractiveTabindex: focusable so keyboard users reach the hint */}
+          <div className="season" tabIndex={0}>
+            <span className="season__lab">{m.shell_season()}</span>
+            <span className="season__n">{String(season.number).padStart(2, '0')}</span>
+            <small>{m.shell_season_left({ days: String(season.daysLeft) })}</small>
+            <i className="season__bar" aria-hidden="true">
+              <b style={{ width: `${Math.round(season.elapsed * 100)}%` }} />
+            </i>
+          </div>
+        </Tip>
         {online === null ? null : (
           <p className="online">
             <span className="online__dot" aria-hidden="true" />

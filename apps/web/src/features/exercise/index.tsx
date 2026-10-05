@@ -3,6 +3,8 @@ import { isRealTextId, isReviewDrillId, isWordDrillId, scaleById } from '@typing
 import type { AttemptMode } from '@typing-race/domain'
 import { useDerived } from '../../app/state/index.js'
 import { m } from '../../paraglide/messages.js'
+import { DailyExercise } from '../daily/DailyExercise.js'
+import { isDailyId } from '../daily/model.js'
 import { ReviewDrillExercise } from '../review/ReviewDrill.js'
 import { RealTextExercise } from '../session/RealTextExercise.js'
 import { WordExercise } from '../words/WordExercise.js'
@@ -30,6 +32,8 @@ export function ExerciseScreen() {
   if (params.scaleId !== undefined && isReviewDrillId(params.scaleId)) {
     return <ReviewDrillExercise key={params.scaleId} drillId={params.scaleId} mode={mode} />
   }
+  if (params.scaleId !== undefined && isDailyId(params.scaleId))
+    return <DailyExercise mode={mode} />
   if (params.scaleId !== undefined && isRealTextId(params.scaleId)) {
     return <RealTextExercise mode={mode} />
   }
