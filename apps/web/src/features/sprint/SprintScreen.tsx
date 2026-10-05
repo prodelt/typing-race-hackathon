@@ -92,7 +92,7 @@ function SprintRun({
       const view = created.view
       const typed = view.cursor
       // Finishing the whole line early still scores per minute of the time actually used.
-      const used = startedAt === null ? SPRINT_MS : performance.now() - startedAt
+      const used = startedAt === null ? SPRINT_MS : systemClock.now() - startedAt
       const minutes = Math.max(1000, Math.min(SPRINT_MS, used)) / 60_000
       const value: SprintScore = {
         spm: Math.round(typed / minutes),
@@ -108,12 +108,12 @@ function SprintRun({
       setScore({ value, best: newBest })
     }
     const stop = created.onChange((view) => {
-      if (view.state === 'running' && startedAt === null) startedAt = performance.now()
+      if (view.state === 'running' && startedAt === null) startedAt = systemClock.now()
       if (view.state === 'completed') end()
     })
     const timer = window.setInterval(() => {
       if (startedAt === null || done) return
-      const elapsed = performance.now() - startedAt
+      const elapsed = systemClock.now() - startedAt
       setLeft(secondsLeft(elapsed))
       if (elapsed >= SPRINT_MS) end()
     }, 200)
