@@ -85,5 +85,20 @@
   "map_review_step2_body": "Оцінка після п’яти натискань.",
   "map_review_step3_title": "Слабкі місця тут",
   "map_review_step3_body": "Найслабші з’являться тут із вправою.",
-  "map_review_empty_free": "Справжній текст лише з відкритих клавіш, поза маршрутом."
+  "map_review_empty_free": "Справжній текст лише з відкритих клавіш, поза маршрутом.",
+  "map_own": "Свій текст",
+  "map_own_title": "Свій текст",
+  "map_own_lead": "Вставте текст або виберіть файл .txt чи .md.",
+  "map_own_text_label": "Текст",
+  "map_own_file_label": "Файл .txt або .md",
+  "map_own_start": "Почати",
+  "map_own_goal": "Ваш текст, вільна практика",
+  "map_own_chip": "свій текст",
+  "map_own_cut": "Взято перші {count} знаків.",
+  "map_own_error_prefix": "Помилка:",
+  "map_own_error_type": "потрібен файл .txt або .md.",
+  "map_own_error_size": "файл завеликий, до 20 КБ.",
+  "map_own_error_encoding": "це не текст у UTF-8.",
+  "map_own_error_empty": "текст порожній.",
+  "map_own_error_chars": "немає на цій розкладці: {chars}. Приберіть їх або змініть мову."
 }

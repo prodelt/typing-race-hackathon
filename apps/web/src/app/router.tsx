@@ -130,6 +130,13 @@ const sprintRoute = createRoute({
   component: lazyRouteComponent(() => import('../features/sprint/index.js'), 'SprintScreen'),
 })
 
+/** Own text: a pasted text or a `.txt`/`.md` file, typed as free practice. */
+const ownTextRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/own',
+  component: lazyRouteComponent(() => import('../features/owntext/index.js'), 'OwnTextScreen'),
+})
+
 const resultRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/result/$attemptId',
@@ -290,6 +297,7 @@ export function buildRouteTree(pages: { readonly home: FunctionComponent }) {
     academyExerciseRoute,
     reviewRoute,
     sprintRoute,
+    ownTextRoute,
     resultRoute,
     sessionRoute,
     settingsRoute,

@@ -85,5 +85,20 @@
   "map_review_step2_body": "Judged after five presses.",
   "map_review_step3_title": "Weak spots appear here",
   "map_review_step3_body": "Your weakest show up here, with a drill.",
-  "map_review_empty_free": "Real text from your open keys only, off the route."
+  "map_review_empty_free": "Real text from your open keys only, off the route.",
+  "map_own": "Own text",
+  "map_own_title": "Own text",
+  "map_own_lead": "Paste a text or pick a .txt or .md file.",
+  "map_own_text_label": "Text",
+  "map_own_file_label": ".txt or .md file",
+  "map_own_start": "Start",
+  "map_own_goal": "Your text, free practice",
+  "map_own_chip": "own text",
+  "map_own_cut": "Took the first {count} characters.",
+  "map_own_error_prefix": "Error:",
+  "map_own_error_type": "pick a .txt or .md file.",
+  "map_own_error_size": "the file is too large, up to 20 KB.",
+  "map_own_error_encoding": "this is not UTF-8 text.",
+  "map_own_error_empty": "the text is empty.",
+  "map_own_error_chars": "not on this layout: {chars}. Remove them or switch language."
 }
