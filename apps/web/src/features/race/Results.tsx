@@ -4,10 +4,10 @@ import { useEffect, useState } from 'react'
 import { useScreenKeys } from '../../app/screenKeys.js'
 import { refreshRaceStanding, signed, useRaceStanding } from '../../app/state/raceStanding.js'
 import { m } from '../../paraglide/messages.js'
-import type { RaceResult, RoomSnapshot } from '../../sync/race.js'
-import { raceBackend } from '../../sync/race.js'
+import type { RaceBackend, RaceResult, RematchInvite, RoomSnapshot } from '../../sync/race.js'
 import type { Mine } from './backend.js'
 import { RATING_ACCURACY_FLOOR } from './rating.js'
+import { rematch, rematchPlan } from './rematch.js'
 import { type Lane, Track } from './Track.js'
 
 const NUMBER = new Intl.NumberFormat('uk-UA')
@@ -24,15 +24,26 @@ function percent(accuracy: number): string {
  * The results, as a reward: the learner's place in big type with their own numbers and what the
  * race did to their Race Rating, beside the server's ranking. Validated results rank by score; the
  * ones that did not rank say why; whoever is still typing is listed last, with the live track.
+ *
+ * «Ще заїзд» goes back to quick match from a quick match; from a private room it keeps the friends
+ * together (`rematch.ts`): it opens the next room and calls the others, or follows the friend who
+ * already did.
  */
 export function Results({
+  backend,
   snapshot,
   mine,
   lanes,
+  invite,
+  announce,
 }: {
+  readonly backend: RaceBackend
   readonly snapshot: RoomSnapshot
   readonly mine: Mine
   readonly lanes: readonly Lane[]
+  /** A friend's next room, broadcast from this room's results. */
+  readonly invite: RematchInvite | null
+  readonly announce: (invite: RematchInvite) => Promise<void>
 }) {
   const navigate = useNavigate()
   const [again, setAgain] = useState(false)
@@ -46,6 +57,7 @@ export function Results({
   )
   const myPlace = placed.findIndex((result) => result.userId === snapshot.me)
   const myResult = snapshot.results.find((result) => result.userId === snapshot.me)
+  const plan = rematchPlan(snapshot, invite)
 
   // The rating is computed by the server in the same transaction that finishes the room.
   useEffect(() => {
@@ -55,10 +67,9 @@ export function Results({
   const raceAgain = async () => {
     if (again) return
     setAgain(true)
-    const backend = await raceBackend()
-    if (backend === null) return setAgain(false)
+    const me = snapshot.participants.find((person) => person.userId === snapshot.me)
     try {
-      const roomId = await backend.quickMatch(snapshot.language)
+      const roomId = await rematch(plan, { backend, announce, me: me?.nickname ?? '' })
       await navigate({ to: '/races/room/$roomId', params: { roomId } })
     } catch {
       setAgain(false)
@@ -120,6 +131,18 @@ export function Results({
           alone={startLine(snapshot) < 2}
         />
 
+        {plan.kind === 'quick' ? null : (
+          <p
+            className="rr-again"
+            data-invite={plan.kind === 'join' || undefined}
+            role="status"
+            data-testid="race-again-note"
+          >
+            {plan.kind === 'join'
+              ? m.race_again_invite({ name: plan.from })
+              : m.race_again_private()}
+          </p>
+        )}
         <div className="race-gather__actions rr-actions">
           <Button
             variant="primary"
@@ -127,8 +150,9 @@ export function Results({
             hint="Enter"
             disabled={again}
             onClick={() => void raceAgain()}
+            data-testid="race-again"
           >
-            {m.race_again()}
+            {plan.kind === 'join' ? m.race_again_join() : m.race_again()}
           </Button>
           <Button
             variant="secondary"

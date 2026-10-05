@@ -10,6 +10,7 @@ import {
 } from 'react'
 import { createPortal } from 'react-dom'
 import { m } from '../../paraglide/messages.js'
+import { takeKey } from '../../seams/keys.js'
 import { type GuideScreen, type GuideStep, guideTarget, presentSteps } from './model.js'
 import './guide.css'
 
@@ -163,16 +164,7 @@ export default function CoachMarks({
   }, [step, last, onClose])
 
   // Esc closes the guide wherever focus is, before the screen's own Esc can act on it.
-  useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent): void => {
-      if (event.key !== 'Escape') return
-      event.preventDefault()
-      event.stopPropagation()
-      onClose()
-    }
-    document.addEventListener('keydown', onKeyDown, true)
-    return () => document.removeEventListener('keydown', onKeyDown, true)
-  }, [onClose])
+  useEffect(() => takeKey('Escape', onClose), [onClose])
 
   if (step === undefined) return null
 
