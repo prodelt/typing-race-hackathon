@@ -1,11 +1,12 @@
 import { Link } from '@tanstack/react-router'
-import { isOwnTextId, keyOf } from '@typing-race/curriculum'
+import { isOwnTextId } from '@typing-race/curriculum'
 import type { AttemptMode, InputSource, Layout } from '@typing-race/domain'
 import { Button, Card, Chip } from '@typing-race/ui'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { useGuideScreen } from '../../app/guide/model.js'
 import { m } from '../../paraglide/messages.js'
-import { HOME_ROW, LAYOUT_NAMES } from './labels.js'
+import { LayoutStatus, useLayoutCheck } from './LayoutCheck.js'
+import { HOME_ROW } from './labels.js'
 import { ModeToggle } from './ModeToggle.js'
 import type { ExerciseTarget, ExerciseWording } from './wording.js'
 
@@ -21,18 +22,12 @@ export interface PreStartProps {
   readonly onStart: () => void
 }
 
-type Probe = 'checking' | 'ok' | 'mismatch'
-
 /**
  * T084. The pre-start screen (E1).
  *
  * It states the one goal this scale serves before anything is typed (FR-010) and checks, before the
- * first keystroke can be counted, that the learner's keyboard can produce the exercise (FR-021).
- *
- * The check has two halves because no single one works everywhere. `navigator.keyboard` reports the
- * physical layout but exists only in Chromium; the `InputSource` probe therefore reports "cannot
- * tell" elsewhere, and the typed-character half catches the rest: a Latin letter typed against a
- * Ukrainian exercise, or the reverse, is a mismatch no matter which browser said nothing.
+ * first keystroke can be counted, that the learner's keyboard can produce the exercise (FR-021,
+ * `useLayoutCheck`).
  *
  * Repeating any unlocked exercise starts here too (FR-045).
  */
@@ -46,40 +41,11 @@ export function PreStart({
   firstRun = false,
   onStart,
 }: PreStartProps) {
-  const [probe, setProbe] = useState<Probe>('checking')
-  const [typedMismatch, setTypedMismatch] = useState(false)
-  // A letter of this layout has been typed: the one proof of the Active layout a browser can give.
-  const [confirmed, setConfirmed] = useState(false)
-
-  const check = useCallback(() => {
-    let live = true
-    setProbe('checking')
-    void input.probeLayout().then((result) => {
-      if (live) setProbe(result.producible ? 'ok' : 'mismatch')
-    })
-    return () => {
-      live = false
-    }
-  }, [input])
-
-  useEffect(() => check(), [check])
+  const layoutCheck = useLayoutCheck(input, layout)
+  const { mismatch } = layoutCheck
 
   // The first exercise has its own start card; the guide waits for the next ones.
   useGuideScreen('prestart', !firstRun)
-
-  useEffect(
-    () =>
-      input.subscribe((event) => {
-        if (event.kind !== 'char' || !/\p{L}/u.test(event.char)) return
-        const foreign = keyOf(layout, event.char.toLowerCase()) === undefined
-        setTypedMismatch(foreign)
-        setConfirmed(!foreign)
-      }),
-    [input, layout],
-  )
-
-  const mismatch = probe === 'mismatch' || typedMismatch
-  const layoutName = LAYOUT_NAMES[layout.id]
 
   // Enter starts the first exercise, as it continues every step of the first run: the start button
   // takes the focus, so the key presses it natively and no listener is needed outside the seam.
@@ -138,34 +104,8 @@ export function PreStart({
           </>
         )}
 
-        {mismatch ? (
-          <div
-            role="alert"
-            data-testid="layout-mismatch"
-            className="mt-6 rounded-[var(--radius-field)] border-[length:var(--border-hairline)] border-terracotta bg-terracotta-tint p-4"
-          >
-            <p className="font-ui leading-relaxed">
-              {m.exercise_layout_mismatch({ layout: layoutName })}
-            </p>
-            <Button
-              className="mt-3"
-              onClick={() => {
-                setTypedMismatch(false)
-                check()
-              }}
-            >
-              {m.exercise_layout_recheck()}
-            </Button>
-          </div>
-        ) : firstRun ? null : (
-          <p role="status" className="mt-6 font-ui text-sm leading-relaxed text-ink/80">
-            {probe === 'checking'
-              ? m.exercise_layout_checking()
-              : confirmed
-                ? m.exercise_layout_confirmed({ layout: layoutName })
-                : m.exercise_layout_ok({ layout: layoutName })}
-          </p>
-        )}
+        {/* The first run's start card stays three lines unless the layout is actually wrong. */}
+        {firstRun && !mismatch ? null : <LayoutStatus layout={layout} check={layoutCheck} />}
 
         <div ref={actionsRef} className="mt-8 flex flex-wrap items-center gap-3">
           <Button

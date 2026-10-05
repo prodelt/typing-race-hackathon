@@ -47,7 +47,8 @@ export const initialState: MachineState = {
   wrong: [],
 }
 
-// Lifecycle: idle -> running -> (paused <-> running) -> completed, and any live phase -> abandoned.
+// Lifecycle: idle -> running -> (paused <-> running) -> completed (by the last character, or by
+// stop() when a time-boxed run's time is up), and any live phase -> abandoned.
 // Each returns the same object when the transition does not apply, so callers can detect a no-op
 // by identity and stay silent instead of repainting.
 
@@ -61,6 +62,12 @@ export function pause(state: MachineState): MachineState {
 
 export function resume(state: MachineState): MachineState {
   return state.phase === 'paused' ? { ...state, phase: 'running' } : state
+}
+
+/** A time-boxed run's whistle: a live run ends where it stands, with whatever it has typed. */
+export function stop(state: MachineState): MachineState {
+  const live = state.phase === 'running' || state.phase === 'paused'
+  return live ? { ...state, phase: 'completed' } : state
 }
 
 export function abandon(state: MachineState): MachineState {
