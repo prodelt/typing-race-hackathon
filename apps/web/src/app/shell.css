@@ -566,6 +566,39 @@
   transform: none;
 }
 
+/* The <Tip> wrapper: one short line, Esc hides it, the rail's bubble sits to the side. */
+.tipw {
+  display: inline-flex;
+}
+
+.rail__nav > .tipw {
+  display: flex;
+  flex-direction: column;
+}
+
+.tip__bubble--side {
+  left: calc(100% + 10px);
+  top: 50%;
+  width: max-content;
+  transform: translate(-4px, -50%);
+}
+
+.tip:hover > .tip__bubble--side,
+.tip:focus-within > .tip__bubble--side {
+  transform: translate(0, -50%);
+}
+
+.tip.tip--hidden > .tip__bubble {
+  opacity: 0;
+  visibility: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tip__bubble {
+    transition: none;
+  }
+}
+
 /* ---- The «Про гру» menu: a native popover under the bar ----------------------------------- */
 
 .menu {
