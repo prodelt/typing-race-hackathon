@@ -89,6 +89,15 @@ function Review({
                 </p>
               </>
             )}
+            {words ? (
+              <Link
+                to="/sprint"
+                className={cx(buttonClass('secondary', 'md'), 'review-panel__cta')}
+                data-testid="sprint-entry"
+              >
+                {m.sprint_entry()}
+              </Link>
+            ) : null}
           </div>
 
           <dl className="review-facts">

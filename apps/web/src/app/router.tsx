@@ -123,6 +123,13 @@ const reviewRoute = createRoute({
   component: lazyRouteComponent(() => import('../features/review/index.js'), 'ReviewScreen'),
 })
 
+/** Sprint 60 s: free practice against the clock; records nothing. */
+const sprintRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/sprint',
+  component: lazyRouteComponent(() => import('../features/sprint/index.js'), 'SprintScreen'),
+})
+
 const resultRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/result/$attemptId',
@@ -282,6 +289,7 @@ export function buildRouteTree(pages: { readonly home: FunctionComponent }) {
     academyRoute,
     academyExerciseRoute,
     reviewRoute,
+    sprintRoute,
     resultRoute,
     sessionRoute,
     settingsRoute,
