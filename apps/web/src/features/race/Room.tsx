@@ -5,12 +5,19 @@ import { type KeyboardEvent, useCallback, useEffect, useRef, useState } from 're
 import { useHoldPlayMode } from '../../app/playMode.js'
 import { useAppStore } from '../../app/state/index.js'
 import { m } from '../../paraglide/messages.js'
-import type { ProgressMessage, RaceBackend, RoomConnection, RoomSnapshot } from '../../sync/race.js'
+import type {
+  ProgressMessage,
+  RaceBackend,
+  RematchInvite,
+  RoomConnection,
+  RoomSnapshot,
+} from '../../sync/race.js'
 import '../exercise/play.css'
 import { type Mine, useServerNow } from './backend.js'
 import { describe } from './Lobby.js'
 import { RaceRun } from './RaceRun.js'
 import { Results } from './Results.js'
+import { readInvite } from './rematch.js'
 import { lanesOf, placeOf, Track } from './Track.js'
 
 /** How long a quick-match room gathers once a second racer is in, and how long a lone racer waits. */
@@ -35,6 +42,8 @@ export function Room({
   const [progress, setProgress] = useState<Record<string, ProgressMessage>>({})
   const [mine, setMine] = useState<Mine>({ kind: 'none' })
   const [stepBack, setStepBack] = useState(false)
+  // A friend's next room, if one was opened from this room's results. The first one counts.
+  const [invite, setInvite] = useState<RematchInvite | null>(null)
   const connection = useRef<RoomConnection | null>(null)
   const sizePx = useAppStore((state) => state.settings.textSizePx)
 
@@ -53,6 +62,10 @@ export function Room({
       .connect(roomId, {
         onProgress: (message) => setProgress((all) => ({ ...all, [message.userId]: message })),
         onChange: () => void refresh(),
+        onRematch: (payload) => {
+          const found = readInvite(payload)
+          if (found !== null) setInvite((first) => first ?? found)
+        },
       })
       .then((opened) => {
         if (live) connection.current = opened
@@ -121,6 +134,11 @@ export function Room({
     [backend, roomId, refresh],
   )
 
+  const announce = useCallback(
+    (next: RematchInvite) => connection.current?.sendRematch(next) ?? Promise.resolve(),
+    [],
+  )
+
   const onIdle = useCallback(() => {
     setStepBack(true)
     void backend.becomeSpectator(roomId).then(() => refresh())
@@ -147,7 +165,16 @@ export function Room({
   const lanes = lanesOf(snapshot, progress)
 
   if (phase === 'results') {
-    return <Results snapshot={snapshot} mine={mine} lanes={lanes} />
+    return (
+      <Results
+        backend={backend}
+        snapshot={snapshot}
+        mine={mine}
+        lanes={lanes}
+        invite={invite}
+        announce={announce}
+      />
+    )
   }
 
   if (phase === 'gathering') {

@@ -73,3 +73,5 @@ export { domInputSource, scriptedInput } from './input.js'
 export { indexedDbOutbox, memoryOutbox, type OutboxStore } from './outbox.js'
 export { seededRandom } from './random.js'
 export { indexedDbStore, memoryStore } from './store.js'
+// `takeKey` (an overlay's key, `keys.ts`) is imported from its own file, so it stays in the lazy
+// chunk of the one overlay that uses it.

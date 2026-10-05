@@ -71,8 +71,19 @@ export interface ProgressMessage {
   readonly spm: number
 }
 
+/**
+ * A private room's next race, told to whoever is still on its results: the new room's join code
+ * and who opened it.
+ */
+export interface RematchInvite {
+  readonly code: string
+  readonly from: string
+}
+
 export interface RoomConnection {
   sendProgress(message: ProgressMessage): void
+  /** Settles once the invite is handed to the channel; it never needs to be answered. */
+  sendRematch(invite: RematchInvite): Promise<void>
   close(): void
 }
 
@@ -116,7 +127,12 @@ export interface RaceBackend {
   finish(roomId: string, log: KeystrokeEventLog, elapsedMs: number): Promise<FinishReply>
   connect(
     roomId: string,
-    handlers: { onProgress(message: ProgressMessage): void; onChange(): void },
+    handlers: {
+      onProgress(message: ProgressMessage): void
+      onChange(): void
+      /** Unchecked: whatever another racer broadcast as an invite. */
+      onRematch?(payload: unknown): void
+    },
   ): Promise<RoomConnection>
 }
 
@@ -400,6 +416,9 @@ function createBackend(client: SupabaseClient): RaceBackend {
           .on('broadcast', { event: 'roster' }, changed)
           .on('broadcast', { event: 'state' }, changed)
           .on('broadcast', { event: 'result' }, changed)
+          .on('broadcast', { event: 'rematch' }, ({ payload }) => {
+            for (const listener of listeners) listener.onRematch?.(payload)
+          })
           .subscribe()
         shared = { channel, listeners }
         rooms.set(topic, shared)
@@ -411,6 +430,14 @@ function createBackend(client: SupabaseClient): RaceBackend {
       return {
         sendProgress(message) {
           if (!closed) void channel.send({ type: 'broadcast', event: 'progress', payload: message })
+        },
+        async sendRematch(invite) {
+          if (closed) return
+          // Joined, this settles at once; only the REST fallback of a dropped socket waits, briefly.
+          await channel.send(
+            { type: 'broadcast', event: 'rematch', payload: invite },
+            { timeout: 2_000 },
+          )
         },
         close() {
           if (closed) return
