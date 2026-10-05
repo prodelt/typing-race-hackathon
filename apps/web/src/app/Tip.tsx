@@ -18,11 +18,19 @@ export function Tip({
   const bubble = useRef<HTMLSpanElement>(null)
   const [hidden, setHidden] = useState(false)
   const [dx, setDx] = useState(0)
+  const [at, setAt] = useState<{ left: number; top: number } | null>(null)
 
   const show = () => {
     setHidden(false)
     const el = bubble.current
     if (el === null) return
+    if (side) {
+      // The rail clips its overflow, so a side bubble is fixed next to the control instead.
+      const target = el.parentElement?.getBoundingClientRect()
+      if (target !== undefined)
+        setAt({ left: target.right + 10, top: target.top + target.height / 2 })
+      return
+    }
     const rect = el.getBoundingClientRect()
     const margin = 8
     const shift =
@@ -54,7 +62,13 @@ export function Tip({
         role="tooltip"
         id={id}
         className={`tip__bubble${side ? ' tip__bubble--side' : ''}`}
-        style={dx === 0 ? undefined : { translate: `${dx}px 0` }}
+        style={
+          side && at !== null
+            ? { position: 'fixed', left: at.left, top: at.top }
+            : dx === 0
+              ? undefined
+              : { translate: `${dx}px 0` }
+        }
       >
         {text}
       </span>
