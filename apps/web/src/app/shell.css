@@ -957,3 +957,27 @@
   min-height: 100dvh;
   background: var(--color-paper);
 }
+
+/* ---- Panels on the white page (light theme) -------------------------------------------------
+ * The page and the panels are both white, so a panel reads by its edge: a neutral 1px line at
+ * 3.2:1 on white. An outline, not a border or a shadow, so it never shifts the layout or fights a
+ * panel's own shadow. Dark and low-vision keep their own surfaces. */
+:root:not([data-theme="dark"]):not([data-theme="low-vision"])
+:is(
+  .scr-head,
+  .scr-panel,
+  .hub-panel,
+  .map-head,
+  .map-route,
+  .reward-panel,
+  .reward-actions,
+  .rl-panel,
+  .race-calm,
+  .review-card,
+  .fr-head,
+  .fr-body,
+  .fr-foot
+) {
+  outline: 1px solid #8a9099;
+  outline-offset: -1px;
+}
