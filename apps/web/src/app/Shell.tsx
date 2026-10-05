@@ -83,7 +83,7 @@ export function Shell() {
         {m.skip_to_content()}
       </a>
 
-      <div className="frame__rail" data-guide="rail" inert={play || undefined}>
+      <div className="frame__rail" inert={play || undefined}>
         <Rail active={active} online={null} />
       </div>
 

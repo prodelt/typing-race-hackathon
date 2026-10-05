@@ -45,6 +45,12 @@
   bottom: -7px;
 }
 
+.coach--right .coach__arrow {
+  top: var(--coach-arrow);
+  left: -7px;
+  transform: translateY(-50%) rotate(45deg);
+}
+
 .coach__count {
   margin: 0 0 6px;
   font: 600 11px / 1 var(--font-display);

@@ -46,39 +46,54 @@ const GAP = 14
 const MARGIN = 12
 const RING = 6
 
+type Side = 'below' | 'above' | 'right'
+
 interface Placement {
   readonly ring: { left: number; top: number; width: number; height: number }
   readonly left: number
   readonly top: number
-  readonly below: boolean
+  readonly side: Side
   readonly arrow: number
 }
 
+const clamp = (value: number, low: number, high: number): number =>
+  Math.min(Math.max(value, low), Math.max(low, high))
+
+/** Below the target, else above it, else (a tall target such as the rail) to its right; clamped. */
 function place(target: DOMRect, bubble: { width: number; height: number }): Placement {
   const vw = document.documentElement.clientWidth
   const vh = document.documentElement.clientHeight
-  const roomBelow = vh - target.bottom
-  const below = roomBelow >= bubble.height + GAP + MARGIN || roomBelow >= target.top
-  const rawTop = below ? target.bottom + GAP : target.top - GAP - bubble.height
-  const top = Math.min(Math.max(rawTop, MARGIN), Math.max(MARGIN, vh - bubble.height - MARGIN))
-  const centre = target.left + target.width / 2
-  const left = Math.min(
-    Math.max(centre - bubble.width / 2, MARGIN),
-    Math.max(MARGIN, vw - bubble.width - MARGIN),
-  )
-  const arrow = Math.min(Math.max(centre - left, 18), bubble.width - 18)
-  return {
-    ring: {
-      left: target.left - RING,
-      top: target.top - RING,
-      width: target.width + RING * 2,
-      height: target.height + RING * 2,
-    },
-    left,
-    top,
-    below,
-    arrow,
+  const ring = {
+    left: target.left - RING,
+    top: target.top - RING,
+    width: target.width + RING * 2,
+    height: target.height + RING * 2,
   }
+  const need = bubble.height + GAP + MARGIN
+  const side: Side =
+    vh - target.bottom >= need
+      ? 'below'
+      : target.top >= need
+        ? 'above'
+        : vw - target.right >= bubble.width + GAP + MARGIN
+          ? 'right'
+          : 'below'
+  if (side === 'right') {
+    const middle = Math.max(target.top, 0) + Math.min(target.height, vh) / 2
+    const top = clamp(middle - bubble.height / 2, MARGIN, vh - bubble.height - MARGIN)
+    return {
+      ring,
+      left: target.right + GAP,
+      top,
+      side,
+      arrow: clamp(middle - top, 18, bubble.height - 18),
+    }
+  }
+  const rawTop = side === 'below' ? target.bottom + GAP : target.top - GAP - bubble.height
+  const top = clamp(rawTop, MARGIN, vh - bubble.height - MARGIN)
+  const centre = target.left + target.width / 2
+  const left = clamp(centre - bubble.width / 2, MARGIN, vw - bubble.width - MARGIN)
+  return { ring, left, top, side, arrow: clamp(centre - left, 18, bubble.width - 18) }
 }
 
 export default function CoachMarks({
@@ -175,7 +190,7 @@ export default function CoachMarks({
         role="dialog"
         aria-modal="false"
         aria-labelledby={textId}
-        className={`coach${placement?.below === false ? ' coach--above' : ''}`}
+        className={`coach coach--${placement?.side ?? 'below'}`}
         style={
           placement === null
             ? { opacity: 0, left: 0, top: 0 }
