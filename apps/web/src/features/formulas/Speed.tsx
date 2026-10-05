@@ -10,6 +10,7 @@ export function Speed() {
       <Block title={m.formulas_spm_title()}>
         <Formula>{'SPM = characterKeystrokes × 60 000 ÷ elapsedMs'}</Formula>
         <P>{m.formulas_spm_body()}</P>
+        <P>{m.formulas_spm_sprint()}</P>
       </Block>
 
       <Block

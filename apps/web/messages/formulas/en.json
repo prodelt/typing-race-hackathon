@@ -73,5 +73,6 @@
   "formulas_conf_gates_head": "Confidence gates nothing.",
   "formulas_conf_gates_body": "It only chooses what to practise and how much guidance the keyboard shows. Mastery is accuracy alone and speed never gates progression, so the speed factor inside confidence smuggles in no speed requirement.",
   "formulas_col_goal": "Main goal",
-  "formulas_speed_open": "{min}+ SPM"
+  "formulas_speed_open": "{min}+ SPM",
+  "formulas_spm_sprint": "Sprint 60 s uses the same formulas. The time is the typing time up to 60 s, or up to the end of the line if it ends sooner. Keys pressed after the minute do not count."
 }
