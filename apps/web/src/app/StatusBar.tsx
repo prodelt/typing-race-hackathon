@@ -29,7 +29,7 @@ import { Tip } from './Tip.js'
 
 const NUMBER = new Intl.NumberFormat('uk-UA')
 
-/** A stat with a tooltip that keyboard users reach too: focusable, and described by the bubble. */
+/** A stat with a tooltip that keyboard users reach too: focusable, described by the bubble, Esc hides it. */
 function Stat({
   tip,
   className,
@@ -39,15 +39,13 @@ function Stat({
   readonly className?: string
   readonly children: ReactNode
 }) {
-  const id = useId()
   return (
-    // biome-ignore lint/a11y/noNoninteractiveTabindex: focusable so the explanation reaches keyboard users
-    <div className={`sb tip ${className ?? ''}`} tabIndex={0} aria-describedby={id}>
-      {children}
-      <span role="tooltip" id={id} className="tip__bubble">
-        {tip}
-      </span>
-    </div>
+    <Tip text={tip}>
+      {/* biome-ignore lint/a11y/noNoninteractiveTabindex: focusable so the explanation reaches keyboard users */}
+      <div className={`sb ${className ?? ''}`} tabIndex={0}>
+        {children}
+      </div>
+    </Tip>
   )
 }
 
@@ -59,26 +57,24 @@ const LAYOUTS: readonly { readonly value: Language; readonly label: string }[] =
 function LayoutSwitch() {
   const current = useAppStore((state) => state.settings.typingLanguage)
   const changeSettings = useAppStore((state) => state.changeSettings)
-  const id = useId()
   return (
-    // biome-ignore lint/a11y/useSemanticElements: a pair of toggle buttons, not a fieldset of inputs
-    <div role="group" aria-label={m.shell_layout()} aria-describedby={id} className="seg tip">
-      {LAYOUTS.map(({ value, label }) => (
-        <button
-          key={value}
-          type="button"
-          aria-pressed={value === current}
-          onClick={() => {
-            if (value !== current) void changeSettings({ typingLanguage: value })
-          }}
-        >
-          {label}
-        </button>
-      ))}
-      <span role="tooltip" id={id} className="tip__bubble">
-        {m.shell_layout_hint()}
-      </span>
-    </div>
+    <Tip text={m.shell_layout_hint()}>
+      {/* biome-ignore lint/a11y/useSemanticElements: a pair of toggle buttons, not a fieldset of inputs */}
+      <div role="group" aria-label={m.shell_layout()} className="seg">
+        {LAYOUTS.map(({ value, label }) => (
+          <button
+            key={value}
+            type="button"
+            aria-pressed={value === current}
+            onClick={() => {
+              if (value !== current) void changeSettings({ typingLanguage: value })
+            }}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+    </Tip>
   )
 }
 
