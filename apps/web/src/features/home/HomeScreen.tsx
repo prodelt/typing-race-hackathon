@@ -1,6 +1,7 @@
 import { Link, useNavigate } from '@tanstack/react-router'
 import {
   ERROR_RATE_FLOOR,
+  REVIEW_DRILL_SPOTS,
   rankWeakSpots,
   reviewDrillId,
   SLOW_IKI_MS,
@@ -9,7 +10,7 @@ import {
 } from '@typing-race/curriculum'
 import type { Language, NextAction, Scale } from '@typing-race/domain'
 import { Button, IconFlame } from '@typing-race/ui'
-import { lazy, Suspense, useMemo, useRef } from 'react'
+import { lazy, Suspense, useId, useMemo, useRef } from 'react'
 import { LiveGradient } from '../../app/LiveGradient.js'
 import { useScreenKeys } from '../../app/screenKeys.js'
 import { useGameStats } from '../../app/state/gameStats.js'
@@ -94,11 +95,17 @@ function Hub({ nextAction }: { readonly nextAction: NextAction }) {
         : composeSession({ layout, catalogue, progress, nextAction, attempts }),
     [layout, catalogue, progress, nextAction, attempts],
   )
-  const spot: WeakSpot | undefined = useMemo(
-    () => (progress === null ? undefined : rankWeakSpots(progress, layout, 1)[0]),
+  const spots: readonly WeakSpot[] = useMemo(
+    () => (progress === null ? [] : rankWeakSpots(progress, layout, REVIEW_DRILL_SPOTS)),
     [progress, layout],
   )
-  const drillId = spot === undefined ? undefined : reviewDrillId(layout, [spot.element])
+  const drillId =
+    spots.length === 0
+      ? undefined
+      : reviewDrillId(
+          layout,
+          spots.map((spot) => spot.element),
+        )
 
   const running = session.status === 'running'
 
@@ -162,9 +169,10 @@ function Hub({ nextAction }: { readonly nextAction: NextAction }) {
       <MapPanel />
       <div className="hub__pair">
         <WeakPanel
-          spot={spot}
+          spots={spots}
           history={progress.history}
           onDrill={drillId === undefined ? undefined : drill}
+          onStart={start}
         />
         <GoalPanel />
       </div>
@@ -482,28 +490,34 @@ function MapGlyph({ node }: { readonly node: MapNode }) {
 
 /* ---- 04 Weak spot ------------------------------------------------------------------------ */
 
+/** Why one spot is weak, in one sentence: the hover/focus hint on its chip. */
+function spotWhy(spot: WeakSpot): string {
+  const what = spot.kind === 'transition' ? m.home_weak_transition() : m.home_weak_key()
+  const label = `«${spotLabel(spot.element)}»`
+  const slow = (spot.meanIkiMs ?? 0) >= SLOW_IKI_MS
+  return slow
+    ? m.home_weak_slow({ what, label, ms: Math.round(spot.meanIkiMs ?? 0), target: SLOW_IKI_MS })
+    : m.home_weak_errors({
+        what,
+        label,
+        rate: Math.round(spot.errorRate * 100),
+        target: Math.round(ERROR_RATE_FLOOR * 100),
+      })
+}
+
+/**
+ * Mistakes review (Робота над помилками): the weakest keys and moves as chips, and one button
+ * that starts the review drill built from all of them (real words once Stage 2 is open).
+ */
 function WeakPanel(props: {
-  readonly spot: WeakSpot | undefined
+  readonly spots: readonly WeakSpot[]
   readonly history: Parameters<typeof weakTrend>[0]
   readonly onDrill: (() => void) | undefined
+  readonly onStart: () => void
 }) {
-  const { spot } = props
+  const { spots } = props
+  const spot = spots[0]
   const trend = spot === undefined ? [] : weakTrend(props.history, spot.element)
-
-  let sentence = m.home_weak_none()
-  if (spot !== undefined) {
-    const what = spot.kind === 'transition' ? m.home_weak_transition() : m.home_weak_key()
-    const label = `«${spotLabel(spot.element)}»`
-    const slow = (spot.meanIkiMs ?? 0) >= SLOW_IKI_MS
-    sentence = slow
-      ? m.home_weak_slow({ what, label, ms: Math.round(spot.meanIkiMs ?? 0), target: SLOW_IKI_MS })
-      : m.home_weak_errors({
-          what,
-          label,
-          rate: Math.round(spot.errorRate * 100),
-          target: Math.round(ERROR_RATE_FLOOR * 100),
-        })
-  }
 
   return (
     <section
@@ -517,20 +531,45 @@ function WeakPanel(props: {
           {m.home_weak_title()}
         </h2>
       </div>
-      <p className="hub-say">{sentence}</p>
+      <p className="hub-say">{spot === undefined ? m.home_weak_none() : m.home_weak_lead()}</p>
+      {spots.length > 0 && (
+        <ul className="hub-chips" data-testid="home-weak-chips">
+          {spots.map((item) => (
+            <WeakChip key={item.element} spot={item} />
+          ))}
+        </ul>
+      )}
       {trend.length >= 2 && <Spark points={trend} />}
-      {props.onDrill !== undefined && (
+      {props.onDrill === undefined ? (
+        <Button variant="secondary" size="sm" onClick={props.onStart}>
+          {m.home_weak_first()}
+        </Button>
+      ) : (
         <Button
           variant="secondary"
           size="sm"
           hint="D"
           aria-keyshortcuts="D"
           onClick={props.onDrill}
+          data-testid="home-weak-drill"
         >
           {m.home_weak_drill()}
         </Button>
       )}
     </section>
+  )
+}
+
+function WeakChip({ spot }: { readonly spot: WeakSpot }) {
+  const id = useId()
+  return (
+    // biome-ignore lint/a11y/noNoninteractiveTabindex: focusable so the explanation reaches keyboard users
+    <li className="hub-chip tip" tabIndex={0} aria-describedby={id}>
+      {spotLabel(spot.element)}
+      <span role="tooltip" id={id} className="tip__bubble">
+        {spotWhy(spot)}
+      </span>
+    </li>
   )
 }
 
