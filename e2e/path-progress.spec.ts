@@ -391,10 +391,14 @@ test.describe('US3 the path and mastery', () => {
     await expect(page).toHaveURL(/\/result\//)
     // Practice never unlocks anything, however clean.
     await expect(region(page, 'Нова клавіша відкрита')).toHaveCount(0)
+    // The headline says "now take the test attempt", so "Далі" opens it instead of practice again.
     await region(page, 'Що робити далі').getByRole('button', { name: 'Далі' }).click()
-    await expect(page).toHaveURL(/\/exercise\/yq\.run\.KeyG\?mode=practice/)
+    await expect(page).toHaveURL(/\/exercise\/yq\.run\.KeyG\?mode=test/)
 
-    // Now "take the test attempt" is the filled action, and Start has stepped back.
+    // Back to practice inside the app (a reload would seed the store again): "take the test
+    // attempt" is the filled action, and Start has stepped back.
+    await page.getByRole('button', { name: 'Потренуватися' }).click()
+    await expect(page).toHaveURL(/\/exercise\/yq\.run\.KeyG\?mode=practice/)
     await expect(page.getByRole('button', { name: 'Почати', exact: true })).toBeVisible()
     expect(await filled('Пройти залікову спробу')).toBe(primary)
     expect(await filled('Почати')).not.toBe(primary)

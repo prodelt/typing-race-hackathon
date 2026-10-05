@@ -8,8 +8,10 @@ import { coachSentence, type ResultModel } from './model.js'
  * "Exactly one" is a property of the data, not of this component: `nextAction` returns a single
  * `NextAction`, never a list, so there is nothing here to filter down and no second slot to fill.
  * The component renders that value and nothing else, and deliberately has no "other suggestions"
- * affordance. It always starts in Practice mode: the Test Attempt becomes the primary action on the
- * exercise screen once practice clears the floor (FR-039).
+ * affordance. The button starts in Practice mode, except when a Practice Attempt has just cleared the
+ * floor on the exercise the coach points back at: then it opens the Test Attempt, as the headline
+ * says (`nextStartMode`). In practice mode the exercise screen makes the Test Attempt its primary
+ * action once practice has cleared the floor (FR-036, FR-039).
  */
 export function NextActionCard({
   model,

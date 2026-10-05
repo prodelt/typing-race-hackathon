@@ -23,6 +23,7 @@ import { duration, number } from './format.js'
 import { Metrics } from './Metrics.js'
 import { buildResultModel, displayChar, type ResultModel, transitionLabel } from './model.js'
 import { NextActionCard } from './NextActionCard.js'
+import { nextStartMode } from './nextStart.js'
 import { RhythmChart } from './RhythmChart.js'
 import type { Reward } from './reward.js'
 import { UnlockCard } from './UnlockCard.js'
@@ -104,7 +105,7 @@ function RewardView({
     void navigate({
       to: '/exercise/$scaleId',
       params: { scaleId: model.next.startsScaleId },
-      search: { mode: 'practice' },
+      search: { mode: nextStartMode(attempt, model.next, reward.floor) },
     })
   }
   const drill = (): void => {

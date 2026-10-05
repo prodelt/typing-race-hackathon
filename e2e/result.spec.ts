@@ -329,6 +329,39 @@ test.describe('US2 the result of an attempt', () => {
     await expect(page.getByRole('heading', { name: /Гама: клавіша п/ })).toBeVisible()
   })
 
+  test('after a Practice Attempt that cleared the floor, the button opens the test attempt of the same exercise', async ({
+    page,
+  }) => {
+    await seedLearner(page, [
+      { id: 'cleared', scaleId: ANCHORS, mode: 'practice', accuracy: 0.98, rhythm: 55 },
+    ])
+    await page.goto('/result/cleared')
+
+    // The coach points back at this exercise (uneven rhythm), and the headline already says to take
+    // the test: the button does that instead of reopening practice.
+    await expect(page.locator('[data-rule]')).toHaveAttribute('data-rule', 'evenRhythm')
+    await region(page, 'Що робити далі').getByRole('button', { name: 'Далі' }).click()
+    await expect(page).toHaveURL(
+      new RegExp(`/exercise/${ANCHORS.replaceAll('.', '\\.')}\\?mode=test`),
+    )
+    await expect(page.getByRole('button', { name: 'Залікова спроба', pressed: true })).toBeVisible()
+  })
+
+  test('after a Practice Attempt below the floor, the button stays in practice', async ({
+    page,
+  }) => {
+    await seedLearner(page, [
+      { id: 'below', scaleId: ANCHORS, mode: 'practice', accuracy: 0.9, rhythm: 90 },
+    ])
+    await page.goto('/result/below')
+
+    await expect(page.locator('[data-rule]')).toHaveAttribute('data-rule', 'lowerTempo')
+    await region(page, 'Що робити далі').getByRole('button', { name: 'Далі' }).click()
+    await expect(page).toHaveURL(
+      new RegExp(`/exercise/${ANCHORS.replaceAll('.', '\\.')}\\?mode=practice`),
+    )
+  })
+
   test('the third passing Test Attempt shows the Key Unlock card, and the second does not (scenario 8)', async ({
     page,
   }) => {
