@@ -178,7 +178,7 @@ export default function CoachMarks({
         className={`coach${placement?.below === false ? ' coach--above' : ''}`}
         style={
           placement === null
-            ? { visibility: 'hidden', left: 0, top: 0 }
+            ? { opacity: 0, left: 0, top: 0 }
             : ({
                 left: placement.left,
                 top: placement.top,
