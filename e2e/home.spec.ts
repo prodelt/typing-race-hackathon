@@ -8,7 +8,7 @@ import {
 
 /**
  * Home, the hub: one Continue that starts the session, the race tiles, the mini-map, the weak
- * spot and the daily goal, each reachable by one key.
+ * spot and the daily goal, each reachable by one key, and the row of free-practice modes.
  */
 
 function stats(count: number, misses: number, iki: number) {
@@ -95,6 +95,42 @@ test('Q opens a quick Ukrainian race and D drills the weak spot', async ({ page 
   await expect(page.getByTestId('home-weak')).toBeVisible()
   await page.keyboard.press('KeyD')
   await expect(page).toHaveURL(/\/exercise\/.+\?mode=practice/)
+})
+
+test('the Modes row opens Daily and Mistakes; a locked Sprint says how it opens', async ({
+  page,
+}) => {
+  await page.goto('/')
+  const modes = page.getByTestId('home-modes')
+  await expect(modes.getByRole('link', { name: /Свій текст/ })).toBeVisible()
+
+  // Stage 2 is not open for this learner, so Sprint is locked and its tooltip says why; Esc hides it.
+  const sprint = modes.getByRole('button', { name: /Спринт 60 с/ })
+  await expect(sprint).toHaveAttribute('aria-disabled', 'true')
+  await sprint.focus()
+  const why = page.getByRole('tooltip').filter({ hasText: 'Відкриється з етапом «Слова»' })
+  await expect(why).toBeVisible()
+  await page.keyboard.press('Escape')
+  await expect(why).toBeHidden()
+
+  await modes.getByRole('button', { name: /Помилки/ }).click()
+  await expect(page).toHaveURL(/\/exercise\/.+\?mode=practice/)
+
+  await page.goto('/')
+  await page
+    .getByTestId('home-modes')
+    .getByRole('link', { name: /Виклик дня/ })
+    .click()
+  await expect(page).toHaveURL(/\/daily$/)
+})
+
+test('Esc closes a weak-spot chip tooltip', async ({ page }) => {
+  await page.goto('/')
+  await page.getByTestId('home-weak-chips').getByText('о → л', { exact: true }).focus()
+  const why = page.getByRole('tooltip').filter({ hasText: '«о → л»' })
+  await expect(why).toBeVisible()
+  await page.keyboard.press('Escape')
+  await expect(why).toBeHidden()
 })
 
 test('Home has no accessibility violations', async ({ page }) => {
