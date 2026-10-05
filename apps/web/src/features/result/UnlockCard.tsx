@@ -15,12 +15,6 @@ import { displayChar, fingerName, scaleName, type Unlock } from './model.js'
 const NAMED_SCALES = 3
 
 /**
- * The confetti palette. Canvas cannot read CSS custom properties, so these repeat two tokens from
- * `tokens.css`: sage and cream paper.
- */
-const CONFETTI_COLOURS = ['#4a7c59', '#faf9f5']
-
-/**
  * T104, FR-041, FR-043. The Key Unlock card: a deep sage card with the new key on a keycap, the
  * finger that types it, what it opens and one button to the first drill. This is the requirements'
  * demo step, so it is a card on the result and never a full-screen moment.
@@ -29,7 +23,8 @@ const CONFETTI_COLOURS = ['#4a7c59', '#faf9f5']
  *
  * The burst is the one celebration on the screen. `canvas-confetti` is imported dynamically and
  * only after `allowsCelebration` says yes, so with motion reduced or off the chunk is never
- * fetched at all (motion.md) — the flag is a bundle decision, not merely a visual one.
+ * fetched at all (motion.md) — the flag is a bundle decision, not merely a visual one. The drawing
+ * lives in `burst.ts`, which keeps the library's worker off so the burst passes the site's CSP.
  */
 export function UnlockCard({
   unlock,
@@ -49,23 +44,12 @@ export function UnlockCard({
   useEffect(() => {
     if (!celebrate) return
     let cancelled = false
-    void import('canvas-confetti')
-      .then(({ default: confetti }) => {
+    void import('./burst.js')
+      .then(({ burst }) => {
         if (cancelled) return
+        // Read once the chunk is here: the card has settled by then.
         const rect = cardRef.current?.getBoundingClientRect()
-        void confetti({
-          particleCount: 40,
-          spread: 70,
-          colors: CONFETTI_COLOURS,
-          // One burst from the card's centre, as a fraction of the viewport.
-          origin: rect
-            ? {
-                x: (rect.left + rect.width / 2) / window.innerWidth,
-                y: (rect.top + rect.height / 2) / window.innerHeight,
-              }
-            : { x: 0.5, y: 0.5 },
-          disableForReducedMotion: true,
-        })
+        return burst(rect, { width: window.innerWidth, height: window.innerHeight })
       })
       .catch(() => {
         // A celebration is never worth an error: a blocked canvas simply means no burst.
