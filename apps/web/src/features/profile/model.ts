@@ -60,6 +60,32 @@ export function speedTrend(attempts: readonly AttemptSummary[], n: number): numb
     .map((attempt) => Math.round(attempt.metrics.spm))
 }
 
+export type BadgeId = 'first' | 'test' | 'keys10' | 'speed200' | 'streak7' | 'module' | 'race'
+
+export interface BadgeInput {
+  readonly attempts: number
+  readonly tests: number
+  readonly bestSpm: number | null
+  readonly streakDays: number
+  readonly keysOpen: number
+  readonly modulesComplete: number
+  readonly raceRating: number | null
+}
+
+/** The badge strip: every badge in a fixed order, earned or not, read off progress already kept. */
+export function badges(input: BadgeInput): { readonly id: BadgeId; readonly earned: boolean }[] {
+  const earned: Record<BadgeId, boolean> = {
+    first: input.attempts > 0,
+    test: input.tests > 0,
+    keys10: input.keysOpen >= 10,
+    speed200: (input.bestSpm ?? 0) >= 200,
+    streak7: input.streakDays >= 7,
+    module: input.modulesComplete > 0,
+    race: input.raceRating !== null,
+  }
+  return (Object.keys(earned) as BadgeId[]).map((id) => ({ id, earned: earned[id] }))
+}
+
 export type AttemptKind = 'scale' | 'words' | 'academy' | 'review'
 
 /** Which part of the route an exercise id belongs to. */

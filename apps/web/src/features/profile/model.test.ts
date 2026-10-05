@@ -1,6 +1,37 @@
 import type { AttemptSummary } from '@typing-race/domain'
 import { describe, expect, it } from 'vitest'
-import { attemptKind, careerTotals, recentAttempts, speedTrend } from './model'
+import { attemptKind, badges, careerTotals, recentAttempts, speedTrend } from './model'
+
+describe('badges', () => {
+  const none = {
+    attempts: 0,
+    tests: 0,
+    bestSpm: null,
+    streakDays: 0,
+    keysOpen: 0,
+    modulesComplete: 0,
+    raceRating: null,
+  }
+
+  it('a new player sees every badge, none earned', () => {
+    const list = badges(none)
+    expect(list).toHaveLength(7)
+    expect(list.every((badge) => !badge.earned)).toBe(true)
+  })
+
+  it('earns each badge at its threshold', () => {
+    const list = badges({
+      attempts: 3,
+      tests: 1,
+      bestSpm: 200,
+      streakDays: 7,
+      keysOpen: 10,
+      modulesComplete: 1,
+      raceRating: 1000,
+    })
+    expect(list.every((badge) => badge.earned)).toBe(true)
+  })
+})
 
 const DAY = 86_400_000
 const T0 = Date.UTC(2026, 8, 1, 12)
