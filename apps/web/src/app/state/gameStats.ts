@@ -8,6 +8,7 @@ import {
   dayKeyAtOffset,
   deriveProgress,
   isAcademyExerciseId,
+  isFreePracticeId,
   layouts,
   levelForStage,
   levelStanding,
@@ -17,7 +18,6 @@ import {
 import type { AttemptSummary, LayoutId, StartingLevelChoice } from '@typing-race/domain'
 import { useMemo } from 'react'
 import { useAcademyCourse } from '../../features/academy/data.js'
-import { isDailyId } from '../../features/daily/model.js'
 import { useRaceStanding } from './raceStanding.js'
 import { useAppStore } from './store.js'
 
@@ -88,11 +88,11 @@ export function deriveGameStats(input: GameStatsInput): GameStats {
     modulesCompleted: course === null ? 0 : academyProgress(course, prefix).modulesComplete,
   })
 
+  // Free practice (the daily challenge, own text) earns no XP and counts toward neither the streak
+  // nor the daily goal.
+  const counted = input.attempts.filter((attempt) => !isFreePracticeId(attempt.scaleId))
   const standing = levelStanding({
-    // A daily challenge is free practice: no XP.
-    attempts: input.attempts.filter(
-      (attempt) => attempt.layoutId === input.layoutId && !isDailyId(attempt.scaleId),
-    ),
+    attempts: counted.filter((attempt) => attempt.layoutId === input.layoutId),
     masteryAt,
     floorFor,
   })
@@ -103,10 +103,10 @@ export function deriveGameStats(input: GameStatsInput): GameStats {
     xpInLevel: standing.xpInLevel,
     xpForNextLevel: standing.xpForNextLevel,
     streak: streakOf(
-      input.attempts.map((attempt) => dayOf(attempt.completedAt)),
+      counted.map((attempt) => dayOf(attempt.completedAt)),
       input.today,
     ),
-    dailyGoal: dailyGoal(input.attempts, {
+    dailyGoal: dailyGoal(counted, {
       today: input.today,
       dayOf,
       goalMinutes: input.goalMinutes ?? DEFAULT_GOAL_MINUTES,

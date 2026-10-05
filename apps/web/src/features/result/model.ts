@@ -3,6 +3,7 @@ import {
   deriveProgress,
   fingerOf,
   focusDrillFor,
+  isFreePracticeId,
   layouts,
   nextAction,
   scaleById,
@@ -86,9 +87,10 @@ export function buildResultModel(input: ModelInput): ResultModel | null {
   // Progress is a fold over the history (FR-050), so "as of this attempt" is the fold over the
   // attempts up to and including it. That is what makes this screen right for an old result too,
   // not just the newest one.
+  // Free practice is left out of the fold, as `derive` leaves it out of the live progress.
   const foldTo = (count: number) =>
     deriveProgress({
-      attempts: attempts.slice(0, count),
+      attempts: attempts.slice(0, count).filter((a) => !isFreePracticeId(a.scaleId)),
       layout,
       catalogue: scales,
       startingLevelChoice,

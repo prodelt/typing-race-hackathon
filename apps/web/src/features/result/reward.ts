@@ -1,6 +1,7 @@
 import {
   academyLevel,
   isAcademyExerciseId,
+  isFreePracticeId,
   levelForStage,
   MASTERY_STREAK,
   nextLockedKey,
@@ -57,7 +58,9 @@ export function rewardFor(args: {
 }): Reward {
   const { earlier, attempt, after, layout } = args
   const floor = floorFor(attempt)
-  const passed = attempt.mode === 'test' && attempt.metrics.accuracy >= floor
+  // Free practice (the daily challenge, own text) counts toward nothing: no pass, no XP.
+  const free = isFreePracticeId(attempt.scaleId)
+  const passed = !free && attempt.mode === 'test' && attempt.metrics.accuracy >= floor
   const streak = Math.min(MASTERY_STREAK, after.consecutivePasses[attempt.scaleId] ?? 0)
 
   const sameScale = (a: AttemptSummary) =>
@@ -88,7 +91,7 @@ export function rewardFor(args: {
     streak: passed ? Math.max(1, streak) : streak,
     target: MASTERY_STREAK,
     slots: passed ? slots : [],
-    xp: xpPerAttempt([...earlier, attempt], floorFor).at(-1) ?? 0,
+    xp: free ? 0 : (xpPerAttempt([...earlier, attempt], floorFor).at(-1) ?? 0),
     nextKey: nextLockedKey(layout, after.unlockedSet),
     keysOpen: order.filter((c) => open.has(c)).length,
     keysTotal: order.length,

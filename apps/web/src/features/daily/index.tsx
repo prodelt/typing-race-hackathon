@@ -1,26 +1,24 @@
 import { Link } from '@tanstack/react-router'
+import { dailyId } from '@typing-race/curriculum'
 import { buttonClass } from '@typing-race/ui'
 import { useEffect, useMemo } from 'react'
 import { useAppStore, useDerived } from '../../app/state/index.js'
 import { m } from '../../paraglide/messages.js'
-import {
-  clearedDays,
-  dailyId,
-  dayStreak,
-  localDay,
-  readStoredDays,
-  writeStoredDays,
-} from './model.js'
+import { clearedDays, dayStreak, localDay, readStoredDays, writeStoredDays } from './model.js'
 
-/** The daily challenge: one shared exercise a day, a done-today state and a day count. */
+/**
+ * The daily challenge: one shared exercise a day per language, with a done-today state and a day
+ * count of its own in each language.
+ */
 export function DailyScreen() {
   const { layout, accuracyFloor } = useDerived()
+  const { language } = layout
   const attempts = useAppStore((state) => state.attempts)
   const days = useMemo(
-    () => clearedDays(attempts, accuracyFloor, readStoredDays()),
-    [attempts, accuracyFloor],
+    () => clearedDays(attempts, accuracyFloor, readStoredDays(language), language),
+    [attempts, accuracyFloor, language],
   )
-  useEffect(() => writeStoredDays(days), [days])
+  useEffect(() => writeStoredDays(language, days), [language, days])
 
   const now = new Date()
   const done = days.includes(localDay(now))

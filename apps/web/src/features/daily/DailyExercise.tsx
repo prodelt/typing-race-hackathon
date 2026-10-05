@@ -1,11 +1,11 @@
-import type { WordBank } from '@typing-race/curriculum'
+import { dailyId, type WordBank } from '@typing-race/curriculum'
 import type { AttemptMode } from '@typing-race/domain'
 import { useState } from 'react'
 import { useAppStore, useDerived } from '../../app/state/index.js'
 import { m } from '../../paraglide/messages.js'
 import { ExerciseRun } from '../exercise/ExerciseSession.js'
 import { useWordBank } from '../words/useWordBank.js'
-import { dailyId, dailySeed, localDay, pickDailyWords } from './model.js'
+import { dailySeed, localDay, pickDailyWords } from './model.js'
 
 /** Today's challenge on the ordinary exercise screen: same engine, guides and result screen. */
 export function DailyExercise({ mode }: { readonly mode: AttemptMode }) {

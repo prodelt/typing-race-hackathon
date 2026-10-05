@@ -1,26 +1,33 @@
-import { initialUnlockedSet, keyOf, realTextId } from '@typing-race/curriculum'
+import { keyOf } from '@typing-race/curriculum'
 import { Button } from '@typing-race/ui'
 import { type ChangeEvent, type FormEvent, useId, useState } from 'react'
-import { useAppStore, useDerived } from '../../app/state/index.js'
+import { useDerived } from '../../app/state/index.js'
 import { m } from '../../paraglide/messages.js'
-import { ExerciseRun } from '../exercise/ExerciseSession.js'
+import { type OwnText, rememberOwnText } from './model.js'
+import { OwnTextRun } from './OwnTextRun.js'
 import { decodeFile, judgeText, OWN_TEXT_MAX_CHARS } from './sanitize.js'
 
 /**
  * Own text: the learner pastes a text or picks a `.txt`/`.md` file and types it as free practice,
- * on the same engine, guides and result screen as the real-text block.
+ * on the same engine, guides and result screen as the real-text block, under its own id.
  */
 export function OwnTextScreen() {
-  const [text, setText] = useState<string | null>(null)
-  if (text !== null) return <Run text={text} />
-  return <Form onStart={setText} />
+  const [own, setOwn] = useState<OwnText | null>(null)
+  if (own !== null) return <OwnTextRun own={own} />
+  return (
+    <Form
+      onStart={(next) => {
+        rememberOwnText(next)
+        setOwn(next)
+      }}
+    />
+  )
 }
 
-function Form({ onStart }: { readonly onStart: (text: string) => void }) {
+function Form({ onStart }: { readonly onStart: (own: OwnText) => void }) {
   const { layout } = useDerived()
   const [draft, setDraft] = useState('')
   const [error, setError] = useState<string | null>(null)
-  const [notice, setNotice] = useState<string | null>(null)
   const textId = useId()
   const fileId = useId()
   const errorId = useId()
@@ -56,8 +63,8 @@ function Form({ onStart }: { readonly onStart: (text: string) => void }) {
       return
     }
     setError(null)
-    if (verdict.cut) setNotice(m.map_own_cut({ count: OWN_TEXT_MAX_CHARS }))
-    onStart(verdict.text)
+    // A cut text is named on the pre-start card that replaces this form (`ownTextWording`).
+    onStart({ text: verdict.text, cut: verdict.cut, layoutId: layout.id })
   }
 
   return (
@@ -93,11 +100,6 @@ function Form({ onStart }: { readonly onStart: (text: string) => void }) {
             {m.map_own_error_prefix()} {error}
           </p>
         )}
-        {notice === null ? null : (
-          <p role="status" className="font-ui text-ink-soft">
-            {notice}
-          </p>
-        )}
         <div>
           <Button type="submit" variant="primary" size="md">
             {m.map_own_start()}
@@ -105,31 +107,5 @@ function Form({ onStart }: { readonly onStart: (text: string) => void }) {
         </div>
       </form>
     </section>
-  )
-}
-
-function Run({ text }: { readonly text: string }) {
-  const { layout, progress } = useDerived()
-  const attempts = useAppStore((state) => state.attempts)
-  // Read once: the attempt list changes when this attempt ends.
-  const [frozen] = useState(() => ({
-    plan: { text, seed: 0, unlocked: progress?.unlockedSet ?? initialUnlockedSet(layout) },
-    wording: {
-      title: m.map_own_title(),
-      goalLabel: m.session_realtext_goal_label(),
-      goal: m.map_own_goal(),
-      focus: m.map_own_chip(),
-    },
-    last: attempts.at(-1) ?? null,
-    keyConfidence: progress?.keyConfidence ?? {},
-  }))
-  return (
-    <ExerciseRun
-      scale={{ id: realTextId(layout), layoutId: layout.id, focus: null, targetSpm: null }}
-      mode="practice"
-      layout={layout}
-      testIsPrimary={false}
-      {...frozen}
-    />
   )
 }

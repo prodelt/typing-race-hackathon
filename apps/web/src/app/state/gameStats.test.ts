@@ -87,6 +87,20 @@ describe('deriveGameStats', () => {
     expect(deriveGameStats({ ...base, attempts }).xpInLevel).toBe(XP_PER_PASS)
   })
 
+  it('ignores free practice: no XP, no streak day, no daily-goal minutes', () => {
+    const yesterday = Date.parse('2026-09-30T12:00:00Z')
+    const attempts = [
+      attempt({ scaleId: 'yq.daily' }),
+      attempt({ scaleId: 'yq.owntext' }),
+      attempt({ scaleId: 'yq.owntext', completedAt: yesterday }),
+    ]
+    const stats = deriveGameStats({ ...base, attempts })
+    expect(stats.xpInLevel).toBe(0)
+    expect(stats.streak.days).toBe(0)
+    expect(stats.dailyGoal.minutesToday).toBe(0)
+    expect(stats.dailyGoal.last7.every((day) => day.minutes === 0)).toBe(true)
+  })
+
   it('does not count another layout toward level or XP, but does count its minutes', () => {
     const stats = deriveGameStats({ ...base, attempts: [attempt({ layoutId: 'qwerty' })] })
     expect(stats.xpInLevel).toBe(0)

@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import { keyOf } from '@typing-race/curriculum'
+import { isOwnTextId, keyOf } from '@typing-race/curriculum'
 import type { AttemptMode, InputSource, Layout } from '@typing-race/domain'
 import { Button, Card, Chip } from '@typing-race/ui'
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -107,6 +107,15 @@ export function PreStart({
             >
               {wording.goal}
             </p>
+            {wording.notice === undefined ? null : (
+              <p
+                role="status"
+                data-testid="prestart-notice"
+                className="mt-2 max-w-[60ch] font-ui text-sm leading-relaxed text-ink/80"
+              >
+                {wording.notice}
+              </p>
+            )}
 
             <div className="mt-5 flex flex-wrap items-center gap-2" data-guide="prestart-mode">
               <Chip tone="neutral">{wording.focus}</Chip>
@@ -171,7 +180,10 @@ export function PreStart({
           </Button>
           {firstRun ? null : (
             <>
-              <ModeToggle scaleId={scale.id} mode={mode} testIsPrimary={testIsPrimary} />
+              {/* Own text is free practice only: there is no test of it to switch to. */}
+              {isOwnTextId(scale.id) ? null : (
+                <ModeToggle scaleId={scale.id} mode={mode} testIsPrimary={testIsPrimary} />
+              )}
               <Link to="/map" className="font-ui text-sm text-sage underline underline-offset-4">
                 {m.exercise_back_to_path()}
               </Link>

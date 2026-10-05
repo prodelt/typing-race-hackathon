@@ -3,13 +3,13 @@ import {
   deriveProgress,
   focusDrillFor,
   isAcademyExerciseId,
+  isFreePracticeId,
   layouts,
   levelFor,
   nextAction,
 } from '@typing-race/curriculum'
 import type { Layout, NextAction, Progress, Scale } from '@typing-race/domain'
 import { confidenceOf, foldConfidence } from '@typing-race/metrics'
-import { isDailyId } from '../../features/daily/model.js'
 import type { AppState } from './reduce.js'
 
 /**
@@ -53,8 +53,9 @@ export function derive(state: AppState): DerivedState {
   }
 
   const progress = deriveProgress({
-    // A daily challenge is free practice: it earns no XP, mastery or unlocks.
-    attempts: state.attempts.filter((a) => !isDailyId(a.scaleId)),
+    // Free practice (the daily challenge, own text) earns no mastery or unlocks and feeds neither
+    // key confidence nor weak spots, which are both folded from this history.
+    attempts: state.attempts.filter((a) => !isFreePracticeId(a.scaleId)),
     layout,
     catalogue: scales,
     startingLevelChoice: state.startingLevelChoice,
@@ -63,7 +64,11 @@ export function derive(state: AppState): DerivedState {
 
   // The coach answers for Stage 1. An Academy attempt has its own next step on its result screen,
   // and a Stage 1 recommendation must never point at an Academy exercise id.
-  const lastAttempt = state.attempts.findLast((a) => !isAcademyExerciseId(a.scaleId)) ?? null
+  // Free practice has no next step on the path either.
+  const lastAttempt =
+    state.attempts.findLast(
+      (a) => !isAcademyExerciseId(a.scaleId) && !isFreePracticeId(a.scaleId),
+    ) ?? null
 
   return {
     layout,

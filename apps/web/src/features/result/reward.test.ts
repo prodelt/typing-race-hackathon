@@ -58,6 +58,20 @@ describe('rewardFor', () => {
     expect(reward.xp).toBe(0)
   })
 
+  it('gives free practice no XP and no pass, even as a passing test', () => {
+    for (const scaleId of ['yq.daily', 'yq.owntext']) {
+      const reward = rewardFor({
+        earlier: [],
+        attempt: attempt({ scaleId }),
+        after: after(0),
+        layout,
+      })
+      expect(reward.xp).toBe(0)
+      expect(reward.passed).toBe(false)
+      expect(reward.slots).toEqual([])
+    }
+  })
+
   it('does not count a test below the floor', () => {
     const reward = rewardFor({
       earlier: [],
