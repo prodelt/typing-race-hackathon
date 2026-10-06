@@ -6,6 +6,7 @@ import {
   SLOW_IKI_MS,
 } from '@typing-race/curriculum'
 import type { AttemptSummary } from '@typing-race/domain'
+import { MAX_HUMAN_SPM, MIN_HUMAN_MEDIAN_IKI_MS } from '@typing-race/metrics'
 import { Button, prefersReducedMotion, resolveMotion } from '@typing-race/ui'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useGuideScreen } from '../../app/guide/model.js'
@@ -195,6 +196,16 @@ function headline(model: ResultModel): { title: string; say: string } {
     reward.nextKey === undefined
       ? ''
       : ` ${m.result_say_next_key({ key: displayChar(reward.nextKey) })}`
+  if (reward.implausible !== null) {
+    // Before anything else: however accurate, typing no hand produces counts toward nothing.
+    return {
+      title: m.result_h_implausible(),
+      say:
+        reward.implausible === 'burst'
+          ? m.result_say_burst({ ms: MIN_HUMAN_MEDIAN_IKI_MS })
+          : m.result_say_too_fast({ spm: number(attempt.metrics.spm), max: number(MAX_HUMAN_SPM) }),
+    }
+  }
   if (unlock !== null) {
     return {
       title: m.result_h_unlocked({ key: displayChar(unlock.key) }),
@@ -243,7 +254,8 @@ function useMotionOn(): boolean {
 function ScorePanel({ model, label }: { readonly model: ResultModel; readonly label: string }) {
   const { attempt, reward } = model
   const { title, say } = headline(model)
-  const academy = isAcademyExerciseId(attempt.scaleId)
+  // The Academy keeps its own plain title, unless the attempt did not count at all.
+  const plainTitle = isAcademyExerciseId(attempt.scaleId) && reward.implausible === null
   const chip = useRef<HTMLSpanElement>(null)
   const motion = useMotionOn()
   const settings = useAppStore((state) => state.settings)
@@ -302,11 +314,15 @@ function ScorePanel({ model, label }: { readonly model: ResultModel; readonly la
       ) : null}
       <div className="reward-score__body">
         <h1 className="reward-score__h" id="reward-score-title">
-          {academy ? m.result_title() : title}
+          {plainTitle ? m.result_title() : title}
         </h1>
-        {academy ? null : <p className="reward-score__say">{say}</p>}
-        <p className="reward-score__note">
-          {attempt.mode === 'test' ? m.result_note_test() : m.result_note_practice()}
+        {plainTitle ? null : <p className="reward-score__say">{say}</p>}
+        <p className="reward-score__note" data-testid="result-note">
+          {reward.implausible !== null
+            ? m.result_note_implausible()
+            : attempt.mode === 'test'
+              ? m.result_note_test()
+              : m.result_note_practice()}
         </p>
       </div>
       <Comparison attempt={attempt} previous={model.previousBest} />

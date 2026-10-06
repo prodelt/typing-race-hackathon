@@ -1,3 +1,4 @@
+import { typedByHand } from '@typing-race/curriculum'
 import type { AttemptSummary } from '@typing-race/domain'
 
 /**
@@ -23,9 +24,13 @@ export const FALLBACK_SPM = 100
 /** How many recent attempts say what "current speed" is. */
 const SPEED_WINDOW = 5
 
-/** Mean characters per minute over the most recent attempts, or `null` with none to go on. */
+/**
+ * Mean characters per minute over the most recent attempts typed by hand, or `null` with none to
+ * go on. A script's speed would size a session for a learner who does not exist.
+ */
 export function currentSpm(attempts: readonly AttemptSummary[]): number | null {
   const recent = attempts
+    .filter(typedByHand)
     .slice(-SPEED_WINDOW)
     .map((attempt) => attempt.metrics.spm)
     .filter((spm) => spm > 0)

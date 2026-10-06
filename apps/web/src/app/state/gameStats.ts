@@ -14,6 +14,7 @@ import {
   levelStanding,
   type MasteryCount,
   streakOf,
+  typedByHand,
 } from '@typing-race/curriculum'
 import type { AttemptSummary, LayoutId, StartingLevelChoice } from '@typing-race/domain'
 import { useMemo } from 'react'
@@ -76,6 +77,9 @@ export function deriveGameStats(input: GameStatsInput): GameStats {
   const scales = catalogue[input.layoutId]
   const course = input.academyCourse?.layout === input.layoutId ? input.academyCourse : null
   const { startingLevelChoice } = input
+  // Typing no hand produces earns nothing here: no XP, no level, no streak day, no minutes
+  // (ADR-0003, 2026-10-06). It keeps its result screen and its place in the profile's list.
+  const attempts = input.attempts.filter(typedByHand)
 
   const masteryAt = (prefix: readonly AttemptSummary[]): MasteryCount => ({
     keysUnlocked:
@@ -90,7 +94,7 @@ export function deriveGameStats(input: GameStatsInput): GameStats {
 
   // Free practice (the daily challenge, own text) earns no XP and counts toward neither the streak
   // nor the daily goal.
-  const counted = input.attempts.filter((attempt) => !isFreePracticeId(attempt.scaleId))
+  const counted = attempts.filter((attempt) => !isFreePracticeId(attempt.scaleId))
   const standing = levelStanding({
     attempts: counted.filter((attempt) => attempt.layoutId === input.layoutId),
     masteryAt,

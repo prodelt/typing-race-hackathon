@@ -38,7 +38,13 @@ const T0 = Date.UTC(2026, 8, 1, 12)
 
 function attempt(
   n: number,
-  over: { scaleId?: string; mode?: 'practice' | 'test'; spm?: number; accuracy?: number } = {},
+  over: {
+    scaleId?: string
+    mode?: 'practice' | 'test'
+    spm?: number
+    accuracy?: number
+    implausible?: 'burst' | 'tooFast'
+  } = {},
 ): AttemptSummary {
   return {
     id: `a${n}`,
@@ -59,6 +65,7 @@ function attempt(
       rhythmConsistency: { value: 80, breaksExcluded: 0 },
       meanIkiByKey: {},
       meanIkiByTransition: {},
+      ...(over.implausible === undefined ? {} : { implausible: over.implausible }),
     },
     aggregates: { keys: {}, transitions: {} },
   } as AttemptSummary
@@ -102,6 +109,19 @@ describe('careerTotals', () => {
     expect(careerTotals([attempt(0, { spm: 400 })], dayOf).bestSpm).toBeNull()
   })
 
+  it('never takes a record, or a counted test, from typing that was not by hand', () => {
+    // The audit's case: a script at 4 264 SPM became the personal best.
+    const list = [
+      attempt(1, { mode: 'test', spm: 180 }),
+      attempt(2, { mode: 'test', spm: 4264, implausible: 'burst' }),
+      attempt(3, { mode: 'test', spm: 1600, implausible: 'tooFast' }),
+    ]
+    const totals = careerTotals(list, dayOf)
+    expect(totals.bestSpm).toBe(180)
+    expect(totals.tests).toBe(1)
+    expect(totals.attempts).toBe(3)
+  })
+
   it('averages accuracy over the last ten attempts, newest by completion', () => {
     const old = Array.from({ length: 5 }, (_, i) => attempt(i, { accuracy: 0.5 }))
     const recent = Array.from({ length: 10 }, (_, i) => attempt(10 + i, { accuracy: 0.9 }))
@@ -121,6 +141,11 @@ describe('speedTrend', () => {
     const list = [attempt(3, { spm: 30 }), attempt(1, { spm: 10 }), attempt(2, { spm: 20 })]
     expect(speedTrend(list, 2)).toEqual([20, 30])
     expect(speedTrend(list, 10)).toEqual([10, 20, 30])
+  })
+
+  it('leaves out typing that was not by hand: it is not the learner speed', () => {
+    const list = [attempt(1, { spm: 10 }), attempt(2, { spm: 9949, implausible: 'burst' })]
+    expect(speedTrend(list, 5)).toEqual([10])
   })
 
   it('rounds to whole characters per minute', () => {

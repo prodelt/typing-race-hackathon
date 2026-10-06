@@ -91,6 +91,13 @@ export function domInputSource(
       inputEvent.preventDefault()
       drain()
       const text = inputEvent.data ?? (inputEvent.inputType === 'insertText' ? '' : '\n')
+      if ([...text].length > 1) {
+        // One key makes one character. Several in one insertion is a script or an extension typing
+        // for the learner, the way a paste would (ADR-0003, 2026-10-06). An input method commits
+        // through `compositionend` instead, which is still judged character by character.
+        emit({ kind: 'ignored', reason: 'burst', at })
+        return
+      }
       emitText(text, at)
       return
     }

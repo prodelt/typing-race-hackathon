@@ -1,6 +1,7 @@
 import type { Page } from '@playwright/test'
 import { keyOf, layouts } from '../../packages/curriculum/src/layout/index'
 import type { LayoutId } from '../../packages/domain/src/index'
+import { HAND_GAP_MS } from './type.js'
 
 /**
  * The real-input driver — Chromium only, through the DevTools Protocol.
@@ -81,7 +82,9 @@ export async function realKeyboard(page: Page, active: LayoutId): Promise<RealKe
           const out = produced(active, key.code, shifted) ?? char
           await press(key.code, out, shifted)
         }
-        if (options.delayMs !== undefined) await page.waitForTimeout(options.delayMs)
+        // A hand's pace by default: the product does not count typing faster than a hand can type
+        // (ADR-0003, 2026-10-06), and two CDP calls a key alone are far faster than that.
+        await page.waitForTimeout(options.delayMs ?? HAND_GAP_MS)
       }
     },
     backspace: () => tap(BACKSPACE),

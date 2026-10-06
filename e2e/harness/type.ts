@@ -52,13 +52,23 @@ export async function typeChar(page: Page, char: string): Promise<void> {
 }
 
 /**
+ * The gap between two characters typed by the harness, in milliseconds: about 1 300 SPM over an
+ * exercise. Fast, but a hand's pace. The product does not count typing whose median interval is
+ * under 25 ms or whose speed is above 1 500 SPM (ADR-0003, 2026-10-06), and 45 ms keeps a line of
+ * a dozen characters or more under that ceiling with room for a timer that fires a little early.
+ * The product has no test-only escape from the rule, so the harness types like a person instead.
+ */
+export const HAND_GAP_MS = 45
+
+/**
  * Types a whole string, still one `beforeinput` per character, from **inside** the page.
  *
  * One Playwright round trip per character made a 60-character exercise cost 60 CDP calls, and under
  * a parallel full-suite run each call queues behind every other worker's: that, not the app, was
  * what pushed the long scenarios past their timeout. The loop yields a macrotask between characters
- * (`gapMs`, 8 ms by default, close to the old per-call cadence) so the engine, React and the router
- * see the same sequence of separate keystrokes a learner produces, just without the transport cost.
+ * (`gapMs`, {@link HAND_GAP_MS} unless a longer delay is asked for) so the engine, React and the
+ * router see the same sequence of separate keystrokes a learner produces, just without the
+ * transport cost, and at a pace the product counts as typing by hand.
  */
 export async function typeText(page: Page, text: string, delayMs = 0): Promise<void> {
   if (text.length === 0) return
@@ -76,7 +86,7 @@ export async function typeText(page: Page, text: string, delayMs = 0): Promise<v
         await new Promise((resolve) => setTimeout(resolve, payload.gapMs))
       }
     },
-    { chars: [...text], gapMs: Math.max(delayMs, 8) },
+    { chars: [...text], gapMs: Math.max(delayMs, HAND_GAP_MS) },
   )
 }
 

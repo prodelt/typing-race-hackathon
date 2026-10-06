@@ -34,7 +34,7 @@ Comprehensive domain model and conceptual glossary for the Typing-Race touch-typ
 
 ## Speed & Performance Metrics
 
-- **SPM / CPM (Characters Per Minute)**: Primary typing speed metric: `(total_printable_characters_typed / elapsed_time_seconds) * 60`.
+- **SPM / CPM (Characters Per Minute)**: Primary typing speed metric: `(characters_of_the_text_typed_correctly / elapsed_time_seconds) * 60`, each character counted once, so a finished attempt reads `60 · N / T`. A wrong keystroke is not in it: it costs accuracy and time (ADR-0003, 2026-10-06).
 - **WPM (Words Per Minute)**: Secondary speed metric calculated via standardized formula: `WPM = SPM / 5`.
 - **Gross WPM**: Speed calculated across all keystrokes.
 - **Net WPM**: Speed calculated strictly across correct final characters.
@@ -54,6 +54,8 @@ Comprehensive domain model and conceptual glossary for the Typing-Race touch-typ
 - **Focus Element (Фокус вправи)**: The weakest key or transition an exercise is built around; it appears in every item of that exercise.
 - **Test Attempt (Залікова спроба)**: An attempt that counts toward mastery, run in Zero-Peek Test Mode — the next-key hint and on-screen keyboard are hidden, errors stay visible.
   _Avoid_: exam, blind mode
+- **Typed by Hand (Набір руками)**: The check every attempt passes before it can count: the median interval between its character keystrokes is at least 25 ms and its speed at most 1 500 SPM. An attempt that fails it is shown as «Не зараховано: набір не схожий на ручний» and kept, but counts toward nothing: mastery, unlocks, Confidence, XP, records, Streak, the Race.
+  _Avoid_: cheat detection, bot check (the check judges the typing, not the person)
 - **Practice Attempt (Тренувальна спроба)**: An attempt with the on-screen keyboard and next-key hint visible; it never counts toward mastery. The learner switches to a test attempt, which becomes the primary action once practice clears the accuracy floor.
 - **Key Unlock (Відкриття клавіші)**: The moment a key joins the learner's unlocked set after the Mastery Rule is met on an exercise focused on it; shown on the result screen together with its finger and first words.
 - **Next Action (Наступна дія)**: The one Actionable Recommendation shown on Home and on every result, with a button that starts it.

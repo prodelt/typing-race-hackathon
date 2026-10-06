@@ -1,4 +1,5 @@
 import type { AttemptSummary } from '@typing-race/domain'
+import { typedByHand } from '../progress/by-hand'
 import { MASTERY_STREAK } from '../progress/derive'
 import { byCompletion } from '../progress/order'
 
@@ -64,8 +65,8 @@ export function levelForPoints(points: number): number {
  * XP earned by each attempt, in the order given (callers pass completion order).
  *
  * The streak mirrors the Mastery Rule: per scale, a passing test advances it, a failing test resets
- * it, practice does neither. The bonus is paid once per scale, on the pass that first reaches
- * {@link MASTERY_STREAK}.
+ * it, practice and an attempt not typed by hand do neither. The bonus is paid once per scale, on the
+ * pass that first reaches {@link MASTERY_STREAK}.
  */
 export function xpPerAttempt(
   attempts: readonly AttemptSummary[],
@@ -74,7 +75,8 @@ export function xpPerAttempt(
   const streaks = new Map<string, number>()
   const mastered = new Set<string>()
   return attempts.map((attempt) => {
-    if (attempt.mode !== 'test') return 0
+    // Neither practice nor typing no hand produces advances or resets the streak.
+    if (attempt.mode !== 'test' || !typedByHand(attempt)) return 0
     const scale = `${attempt.layoutId}|${attempt.scaleId}`
     if (attempt.metrics.accuracy < floorFor(attempt)) {
       streaks.set(scale, 0)

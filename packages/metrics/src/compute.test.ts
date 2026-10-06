@@ -31,8 +31,9 @@ describe('computeMetrics: fixed worked examples', () => {
 
   it('corrected error: the wrong key stays counted, the Backspace does not', () => {
     // "cat": c, x (wrong, awaited a), Backspace, a, t in 2400 ms.
-    // Character keystrokes: c x a t = 4 (Backspace excluded). SPM = 4 x 60000 / 2400 = 100;
-    // WPM = 20. Correct 3 of 4 gives accuracy 0.75. errorCount 1, blamed on the awaited a.
+    // Character keystrokes: c x a t = 4 (Backspace excluded), 3 of them correct. SPM counts the
+    // characters of the text, not the wrong key: 3 x 60000 / 2400 = 75; WPM = 15. Correct 3 of 4
+    // gives accuracy 0.75. errorCount 1, blamed on the awaited a.
     // Key a: one miss (x) and one hit with interval 250, so the mean over hits is 250.
     // Key t: one hit, interval 300. Transition c>a: miss + hit 250; a>t: hit 300.
     // Rhythm: a follows a Backspace and is ineligible; only t (300) is eligible. One interval has
@@ -42,8 +43,8 @@ describe('computeMetrics: fixed worked examples', () => {
       'cat',
       2400,
     )
-    expect(m.spm).toBe(100)
-    expect(m.wpm).toBe(20)
+    expect(m.spm).toBe(75)
+    expect(m.wpm).toBe(15)
     expect(m.accuracy).toBe(0.75)
     expect(m.errorCount).toBe(1)
     expect(m.errorsByChar).toEqual({ a: 1 })
@@ -54,17 +55,68 @@ describe('computeMetrics: fixed worked examples', () => {
 
   it('two corrections of the same key: "ab" with x, x, Backspace, Backspace, b', () => {
     // a, x, x, Backspace x2, b: 4 character keystrokes, 2 correct, so accuracy 0.5; errorCount 2,
-    // both blamed on the awaited b. SPM = 4 x 60000 / 3000 = 80; WPM = 16.
+    // both blamed on the awaited b. SPM = 2 characters x 60000 / 3000 = 40; WPM = 8.
     const m = metricsOf(
       [ok('a', 400), bad('x', 100), bad('x', 100), back(100), back(100), ok('b', 100)],
       'ab',
       3000,
     )
-    expect(m.spm).toBe(80)
-    expect(m.wpm).toBe(16)
+    expect(m.spm).toBe(40)
+    expect(m.wpm).toBe(8)
     expect(m.accuracy).toBe(0.5)
     expect(m.errorCount).toBe(2)
     expect(m.errorsByChar).toEqual({ b: 2 })
+  })
+
+  it('matches the jury method: k errors, k-1 corrected, SPM = 60 N / T and accuracy (N - k) / N', () => {
+    // COMPETITION_RULES §6.1: type exactly N characters with k wrong keystrokes, correct k-1 of them,
+    // and take T from the first and the last keystroke. Under stop-on-letter the uncorrected wrong
+    // key is simply followed by the right one, so the text still needs N correct keystrokes.
+    const text = 'фіва олдж '.repeat(6).slice(0, 59)
+    const chars = [...text]
+    const k = 7
+    const events: RawEvent[] = []
+    for (const [i, char] of chars.entries()) {
+      if (i > 0 && i <= k) {
+        events.push(bad('ъ', 150))
+        if (i < k) events.push(back(150))
+      }
+      events.push(ok(char, i === 0 ? 800 : 150))
+    }
+    // T runs from the first keystroke to the last, so the delay before the first is not in it.
+    const elapsedMs = events.slice(1).reduce((sum, event) => sum + event.dt, 0)
+    const m = metricsOf(events, text, elapsedMs)
+    expect(m.spm).toBeCloseTo((60_000 * chars.length) / elapsedMs, 9)
+    expect(m.errorCount).toBe(k)
+    expect(m.accuracy).toBe(chars.length / (chars.length + k))
+  })
+
+  it('counts a character of the text once, even when it was erased and typed again', () => {
+    // "ab": a, b, Backspace, b in 1000 ms. Three correct keystrokes, but the text has two
+    // characters, and retyping one is not typing more text.
+    const m = metricsOf([ok('a', 100), ok('b', 100), back(100), ok('b', 100)], 'ab', 1000)
+    expect(m.spm).toBe(120)
+    expect(m.accuracy).toBe(1)
+  })
+
+  it('reports no verdict for typing a hand could do', () => {
+    const m = metricsOf([ok('c', 600), ok('a', 300), ok('t', 300)], 'cat', 1500)
+    expect('implausible' in m).toBe(false)
+  })
+
+  it('marks an attempt whose keys arrived together as implausible', () => {
+    // The whole word in one insertion: the intervals are 0, and so is the elapsed time.
+    const m = metricsOf([ok('c', 600), ok('a', 0), ok('t', 0)], 'cat', 0)
+    expect(m.implausible).toBe('burst')
+  })
+
+  it('marks an attempt faster than the human ceiling as implausible', () => {
+    // 30 characters 30 ms apart: about 2 070 SPM, with a median interval that is not a burst.
+    const text = 'a'.repeat(30)
+    const events = [...text].map((char, i) => ok(char, i === 0 ? 400 : 30))
+    const m = metricsOf(events, text, 29 * 30)
+    expect(m.spm).toBeGreaterThan(2000)
+    expect(m.implausible).toBe('tooFast')
   })
 
   it('an ignored event is neither a keystroke nor an error', () => {

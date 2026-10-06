@@ -1,3 +1,4 @@
+export { typedByHand } from './by-hand'
 export type { DeriveProgressArgs } from './derive'
 export {
   DERIVED_VERSION,

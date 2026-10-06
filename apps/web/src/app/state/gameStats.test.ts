@@ -170,6 +170,16 @@ describe('deriveGameStats', () => {
     expect(withCourse.level).toBeGreaterThan(without.level)
   })
 
+  it('pays nothing and keeps no streak for typing that was not by hand', () => {
+    const script = { ...attempt().metrics, implausible: 'burst' as const }
+    const attempts = [1, 2, 3].map(() => attempt({ metrics: script, elapsedMs: 5 * 60_000 }))
+    const stats = deriveGameStats({ ...base, attempts })
+    expect(stats.level).toBe(1)
+    expect(stats.xpInLevel).toBe(0)
+    expect(stats.streak.days).toBe(0)
+    expect(stats.dailyGoal.minutesToday).toBe(0)
+  })
+
   it('reports streak and daily minutes from local days', () => {
     const yesterday = Date.parse('2026-09-30T12:00:00Z')
     const attempts = [

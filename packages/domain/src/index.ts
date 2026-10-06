@@ -212,9 +212,22 @@ export interface RhythmConsistency {
   readonly breaksExcluded: number
 }
 
+/**
+ * Why an attempt's typing is not what a hand at a keyboard produces (ADR-0003, 2026-10-06):
+ *
+ * - `burst`: half or more of the character keystrokes came less than 25 ms after the one before,
+ *   which is what a paste-like insertion, a whole-line composition or a script's event series
+ *   looks like;
+ * - `tooFast`: the speed is above the published human ceiling of 1 500 SPM.
+ */
+export type ImplausibleReason = 'burst' | 'tooFast'
+
 /** All derived from the log after the fact, never accumulated as the learner types — FR-019. */
 export interface AttemptMetrics {
-  /** Characters per minute. The primary figure. */
+  /**
+   * Characters per minute: the characters of the text typed correctly (each once), over the
+   * elapsed time. The primary figure. A wrong keystroke is not in it: it costs accuracy and time.
+   */
   readonly spm: number
   /** Exactly `spm / 5` — FR-023. */
   readonly wpm: number
@@ -229,6 +242,12 @@ export interface AttemptMetrics {
   readonly rhythmConsistency: RhythmConsistency
   readonly meanIkiByKey: Readonly<Record<string, number>>
   readonly meanIkiByTransition: Readonly<Record<TransitionKey, number>>
+  /**
+   * Present only when the typing was not plausibly by hand. Such an attempt is kept and shown, but
+   * counts toward nothing: mastery, unlocks, XP, records, streak. An attempt stored before the
+   * rule existed has no verdict, and counts.
+   */
+  readonly implausible?: ImplausibleReason
 }
 
 /**
@@ -415,7 +434,8 @@ export type InputEvent =
   | { readonly kind: 'backspace'; readonly at: number }
   | {
       readonly kind: 'ignored'
-      readonly reason: 'modifier' | 'composition' | 'deadKey' | 'repeat'
+      /** `burst`: one insertion carrying several characters at once, which no single key makes. */
+      readonly reason: 'modifier' | 'composition' | 'deadKey' | 'repeat' | 'burst'
       readonly at: number
     }
 
