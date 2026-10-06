@@ -67,6 +67,12 @@ describe('daily challenge', () => {
     expect(clearedDays(attempts, 0.95, [], 'en')).toEqual(['2026-10-05'])
   })
 
+  it('does not clear a day with typing no hand produces (ADR-0003, 2026-10-06)', () => {
+    const burst = daily('uk', new Date(2026, 9, 5, 12))
+    const attempts = [{ ...burst, metrics: { ...burst.metrics, implausible: 'burst' as const } }]
+    expect(clearedDays(attempts, 0.95, [], 'uk')).toEqual([])
+  })
+
   it('stores the cleared days per language', () => {
     writeStoredDays('uk', ['2026-10-05'])
     expect(readStoredDays('uk')).toEqual(['2026-10-05'])

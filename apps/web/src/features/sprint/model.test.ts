@@ -128,6 +128,10 @@ describe('sprint best', () => {
     expect(isNewBest({ spm: 200, accuracy: 0.95 }, null, 0.9)).toBe(true)
   })
 
+  it('sets no best from typing no hand produces (ADR-0003, 2026-10-06)', () => {
+    expect(isNewBest({ spm: 900, accuracy: 1, implausible: 'burst' }, null, 0.9)).toBe(false)
+  })
+
   it('needs a faster pace than the stored best', () => {
     const best = { spm: 150, accuracy: 0.97 }
     expect(isNewBest({ spm: 150, accuracy: 0.99 }, best, 0.9)).toBe(false)

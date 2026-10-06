@@ -1,4 +1,11 @@
-import type { InputSource, KeystrokeEventLog, Language, Layout, Random } from '@typing-race/domain'
+import type {
+  ImplausibleReason,
+  InputSource,
+  KeystrokeEventLog,
+  Language,
+  Layout,
+  Random,
+} from '@typing-race/domain'
 import { createEngine, type Engine, type EngineOptions } from '@typing-race/engine'
 import { computeMetrics } from '@typing-race/metrics'
 
@@ -14,11 +21,13 @@ export function secondsLeft(elapsedMs: number): number {
 export interface SprintScore {
   readonly spm: number
   readonly accuracy: number
+  /** Set only when the typing was not done by hand (ADR-0003, 2026-10-06): such a sprint sets no best. */
+  readonly implausible?: ImplausibleReason
 }
 
 /**
  * The score of a sprint, from the published formulas (`packages/metrics`, the `/formulas` page): SPM
- * counts every character keystroke, accuracy is correct keystrokes over all of them, so a wrong
+ * counts the right character keystrokes, accuracy is correct keystrokes over all of them, so a wrong
  * letter left in the line counts against it. The time is the typing time, capped at the minute;
  * a line finished early is scored over the time it took.
  */
@@ -29,7 +38,8 @@ export function sprintScore(args: {
   readonly elapsedMs: number
 }): SprintScore {
   const metrics = computeMetrics({ ...args, elapsedMs: Math.min(SPRINT_MS, args.elapsedMs) })
-  return { spm: Math.round(metrics.spm), accuracy: metrics.accuracy }
+  const score = { spm: Math.round(metrics.spm), accuracy: metrics.accuracy }
+  return metrics.implausible === undefined ? score : { ...score, implausible: metrics.implausible }
 }
 
 export interface Sprint {
@@ -98,7 +108,7 @@ export function startSprint(
  * and the pace must beat the stored best, if there is one.
  */
 export function isNewBest(score: SprintScore, best: SprintScore | null, floor: number): boolean {
-  if (score.accuracy < floor || score.spm <= 0) return false
+  if (score.implausible !== undefined || score.accuracy < floor || score.spm <= 0) return false
   return best === null || score.spm > best.spm
 }
 

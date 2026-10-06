@@ -1,4 +1,4 @@
-import { isDailyId, type WordBank } from '@typing-race/curriculum'
+import { isDailyId, typedByHand, type WordBank } from '@typing-race/curriculum'
 import type { AttemptSummary, Language } from '@typing-race/domain'
 import { seededRandom } from '../../seams/index.js'
 
@@ -55,7 +55,12 @@ export function clearedDays(
 ): readonly string[] {
   const days = new Set(stored)
   for (const a of attempts) {
-    if (isDailyId(a.scaleId) && a.language === language && a.metrics.accuracy >= floor) {
+    if (
+      isDailyId(a.scaleId) &&
+      a.language === language &&
+      typedByHand(a) &&
+      a.metrics.accuracy >= floor
+    ) {
       days.add(localDay(new Date(a.completedAt)))
     }
   }
