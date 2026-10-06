@@ -84,6 +84,8 @@
   gap: 8px;
 }
 
+/* A locked badge is told by its shape, not by fading: a dashed edge, a lock and muted text that
+   still reads at 4.5:1 in every theme. An earned one is solid, in ink, its number in red. */
 .prof-badge {
   position: relative;
   display: flex;
@@ -92,16 +94,12 @@
   padding: 10px 12px;
   border: 1px dashed var(--color-hairline-strong);
   border-radius: 8px;
-  color: var(--color-ink-soft);
-  opacity: 0.55;
+  color: var(--color-muted);
   cursor: help;
-  transition:
-    opacity var(--dur-fast) ease,
-    border-color var(--dur-fast) ease;
+  transition: border-color var(--dur-fast) ease;
 }
 
 .prof-badge.is-earned {
-  opacity: 1;
   color: var(--color-ink);
   border-style: solid;
   border-color: var(--color-ink);
@@ -109,7 +107,14 @@
 
 .prof-badge:hover,
 .prof-badge:focus-visible {
-  opacity: 1;
+  border-color: var(--color-ink-soft);
+}
+
+.prof-badge__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
 }
 
 .prof-badge__mark {
@@ -119,7 +124,11 @@
 }
 
 .prof-badge.is-earned .prof-badge__mark {
-  color: var(--color-accent);
+  color: var(--color-terracotta);
+}
+
+.prof-badge__lock {
+  flex: none;
 }
 
 .prof-badge__name {

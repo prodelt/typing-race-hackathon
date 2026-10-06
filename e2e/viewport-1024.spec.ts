@@ -2,6 +2,7 @@ import { writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import {
   expect,
+  expectFocusablesNamed,
   expectNoAxeViolations,
   MOTION_OFF_SETTINGS,
   seedStore,
@@ -12,7 +13,8 @@ import {
  * §6: the interface works from 1024 px wide. The rest of the suite runs at 1280x720, so nothing else
  * would notice a screen that overflows or hides its controls at the narrowest width a jury laptop
  * may use. Every main screen is opened at 1024x768; none may scroll sideways, and none may have an
- * accessibility violation. The screenshots are attached to the report for a look.
+ * accessibility violation or a focus stop without a role and a name. The screenshots are attached
+ * to the report for a look.
  */
 
 test.use({ viewport: { width: 1024, height: 768 }, serviceWorkers: 'block' })
@@ -67,6 +69,7 @@ for (const [name, route] of ROUTES) {
       overflow.page,
       `horizontal overflow, widest: ${overflow.wide.join(' | ')}`,
     ).toBeLessThanOrEqual(0)
+    await expectFocusablesNamed(page)
     await expectNoAxeViolations(page)
   })
 }

@@ -3,7 +3,6 @@ import {
   type AcademyCourse,
   type AcademyExercise,
   type AcademyModule,
-  type AcademyModuleKind,
   academyLevel,
   academyProgress,
   findExercise,
@@ -26,7 +25,7 @@ import { TypedLayoutNotice, useTypedWrongLayout } from '../exercise/TypedLayoutN
 import { TypingLine } from '../exercise/TypingLine.js'
 import { useAttempt } from '../exercise/useAttempt.js'
 import { languageOfExercise, scaleShapeOf, useAcademyCourse } from './data.js'
-import { LAYOUT_NAME, local, lockedLetters, percent } from './model.js'
+import { isMechanics, LAYOUT_NAME, local, lockedLetters, percent } from './model.js'
 import './academy.css'
 import './exercise.css'
 
@@ -39,18 +38,6 @@ import './exercise.css'
  */
 
 const FLOOR = percent(academyLevel.accuracyFloor)
-
-/** Modules whose lines repeat letter groups rather than read as words: marked "mechanics" (§3.2). */
-const MECHANICS_KINDS: ReadonlySet<AcademyModuleKind> = new Set([
-  'bigrams',
-  'sameFinger',
-  'rolls',
-  'alternation',
-  'doubles',
-  'trigrams',
-  'morphemes',
-  'clusters',
-])
 
 export function AcademyExerciseScreen() {
   const params = useParams({ strict: false }) as { exerciseId?: string }
@@ -186,7 +173,7 @@ function AcademySession({ course, module, exercise, mode }: SessionProps) {
     else engine.pause()
   }
 
-  const mechanics = MECHANICS_KINDS.has(module.kind)
+  const mechanics = isMechanics(course, module, exercise)
   const heading = (
     <>
       <p className="academy-ex__crumb">

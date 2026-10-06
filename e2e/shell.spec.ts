@@ -159,6 +159,14 @@ test.describe('the game shell', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'Профіль' })).toBeVisible()
     const dock = await rail(page).boundingBox()
     expect(dock?.y ?? 0).toBeGreaterThan(700)
+
+    // The free-practice modes type too, so they ask for the keyboard the same way.
+    for (const path of ['/sprint', '/daily', '/own']) {
+      await page.goto(path)
+      await expect(
+        page.getByRole('heading', { level: 1, name: 'Потрібна фізична клавіатура' }),
+      ).toBeVisible()
+    }
   })
 })
 
@@ -194,10 +202,16 @@ test.describe('first run', () => {
       ).toBeChecked()
       // A digit picks; it does not switch destinations.
       await expect(page).toHaveURL(/\/$/)
+      // The status bar's layout switch shows the pick at once, not only on the exercise.
+      const layoutSwitch = page
+        .getByRole('group', { name: 'Розкладка' })
+        .getByRole('button', { name: language === 'uk' ? 'УКР' : 'ENG' })
+      await expect(layoutSwitch).toHaveAttribute('aria-pressed', 'true')
       await page.keyboard.press('Enter')
 
       // 2 — the level. Enter waits for an answer.
       await expect(page.getByRole('heading', { level: 1, name: 'З чого почнемо?' })).toBeVisible()
+      await expect(layoutSwitch).toHaveAttribute('aria-pressed', 'true')
       await expect(step(page)).toContainText('Рівень')
       await expect(page.getByTestId('first-run-next')).toBeDisabled()
       await page.keyboard.press('Enter')

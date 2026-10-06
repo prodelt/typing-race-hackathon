@@ -154,4 +154,47 @@ export async function expectNoAxeViolations(page: Page): Promise<void> {
   expect(results.violations, `axe violations:\n${summary}`).toEqual([])
 }
 
+/** Roles that mean "no role" in Chromium's accessibility tree. */
+const NO_ROLE = new Set(['generic', 'none', 'presentation', 'GenericContainer', 'Unknown'])
+
+/**
+ * Every focus stop on the page, as the accessibility tree has it, with a role and an accessible
+ * name — what the jury reads with DevTools' snapshot (rules 6.8). axe has no rule for a focusable
+ * `div` that is neither a widget nor named, so this asks Chromium's own tree, the one a screen
+ * reader gets. Elsewhere it is a no-op: the tree comes from the Chrome DevTools Protocol.
+ */
+export async function expectFocusablesNamed(page: Page): Promise<void> {
+  if (page.context().browser()?.browserType().name() !== 'chromium') return
+  const cdp = await page.context().newCDPSession(page)
+  try {
+    const { nodes } = await cdp.send('Accessibility.getFullAXTree')
+    const unnamed: string[] = []
+    for (const node of nodes) {
+      if (node.ignored) continue
+      const focusable = node.properties?.some(
+        (property) => property.name === 'focusable' && property.value.value === true,
+      )
+      const role = String(node.role?.value ?? '')
+      if (!focusable || role === 'RootWebArea' || role === 'WebArea') continue
+      const name = String(node.name?.value ?? '').trim()
+      if (!NO_ROLE.has(role) && name !== '') continue
+      let element = '?'
+      if (node.backendDOMNodeId !== undefined) {
+        const { node: dom } = await cdp.send('DOM.describeNode', {
+          backendNodeId: node.backendDOMNodeId,
+        })
+        const attributes = dom.attributes ?? []
+        const className = attributes[attributes.indexOf('class') + 1] ?? ''
+        element = `${dom.localName}${attributes.includes('class') ? `.${className.split(' ').join('.')}` : ''}`
+      }
+      unnamed.push(`${element} (role ${role || 'none'}, name "${name}")`)
+    }
+    expect(unnamed, `focusable elements without a role or a name:\n${unnamed.join('\n')}`).toEqual(
+      [],
+    )
+  } finally {
+    await cdp.detach()
+  }
+}
+
 export { expect }

@@ -24,7 +24,7 @@ import { duration, number } from './format.js'
 import { Metrics } from './Metrics.js'
 import { buildResultModel, displayChar, type ResultModel, transitionLabel } from './model.js'
 import { NextActionCard } from './NextActionCard.js'
-import { nextStartMode } from './nextStart.js'
+import { nextStartMode, practiceAdvice } from './nextStart.js'
 import { RhythmChart } from './RhythmChart.js'
 import type { Reward } from './reward.js'
 import { UnlockCard } from './UnlockCard.js'
@@ -203,11 +203,15 @@ function headline(model: ResultModel): { title: string; say: string } {
   }
   if (attempt.mode === 'practice') {
     // The note under the headline already says a practice attempt does not count; this line says
-    // what to do about the accuracy the learner just typed.
+    // what to do about the accuracy the learner just typed, and asks for the test only when
+    // «Далі» opens it (`practiceAdvice`).
+    const advice = practiceAdvice(attempt, model.next, reward.floor)
     const say =
-      attempt.metrics.accuracy >= reward.floor
+      advice === 'takeTest'
         ? m.result_say_practice_ready
-        : m.result_say_practice_below
+        : advice === 'cleared'
+          ? m.result_say_practice_cleared
+          : m.result_say_practice_below
     return {
       title: m.result_h_practice(),
       say: say({ accuracy: number(attempt.metrics.accuracy * 100, 1), floor }),

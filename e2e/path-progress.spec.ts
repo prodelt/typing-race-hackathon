@@ -381,7 +381,7 @@ test.describe('US3 the path and mastery', () => {
     // Control: before any passing practice, Start is the filled button and the test is not.
     await page.goto(`/exercise/${FIRST_KEY}?mode=practice`)
     const primary = await filled('Почати')
-    expect(await filled('Пройти залікову спробу')).not.toBe(primary)
+    expect(await filled('Залікова спроба')).not.toBe(primary)
 
     // A perfect Practice Attempt, then on to the next action without reloading.
     await page.getByRole('button', { name: 'Почати', exact: true }).click()
@@ -397,10 +397,10 @@ test.describe('US3 the path and mastery', () => {
 
     // Back to practice inside the app (a reload would seed the store again): "take the test
     // attempt" is the filled action, and Start has stepped back.
-    await page.getByRole('button', { name: 'Потренуватися' }).click()
+    await page.getByRole('button', { name: 'Тренувальна спроба', exact: true }).click()
     await expect(page).toHaveURL(/\/exercise\/yq\.run\.KeyG\?mode=practice/)
     await expect(page.getByRole('button', { name: 'Почати', exact: true })).toBeVisible()
-    expect(await filled('Пройти залікову спробу')).toBe(primary)
+    expect(await filled('Залікова спроба')).toBe(primary)
     expect(await filled('Почати')).not.toBe(primary)
 
     // And the streak did not move: still two, and the key is still locked.

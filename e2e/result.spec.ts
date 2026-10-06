@@ -257,12 +257,12 @@ test.describe('US2 the result of an attempt', () => {
     await expectSingleNextAction(page)
     await expect(page.locator('[data-rule]')).toHaveAttribute('data-rule', 'lowerTempo')
     // 80% of the speed just typed, to the nearest 5.
-    await expect(page.locator('[data-rule]')).toContainText(/нижче за поріг 95%/)
-    await expect(page.locator('[data-rule]')).toContainText('до 190 SPM')
+    await expect(page.locator('[data-rule]')).toContainText('Сповільніться до 190 SPM')
+    await expect(page.locator('[data-rule]')).toContainText('точність 90%, поріг 95%')
     // No second recommendation is smuggled in beside it.
     const next = region(page, 'Що робити далі')
-    await expect(next).not.toContainText('Перехід')
-    await expect(next).not.toContainText('ритм нерівний')
+    await expect(next).not.toContainText('Потренуйте')
+    await expect(next).not.toContainText('рівним темпом')
     await expect(next).not.toContainText('Наступна клавіша')
   })
 
@@ -286,12 +286,13 @@ test.describe('US2 the result of an attempt', () => {
 
     await expectSingleNextAction(page)
     await expect(page.locator('[data-rule]')).toHaveAttribute('data-rule', 'weakTransition')
-    await expect(page.locator('[data-rule]')).toContainText('Перехід ф → в найслабший')
+    const line = page.locator('[data-rule]')
+    await expect(line).toContainText('Потренуйте ф → в')
     // ф is the left pinky and в the left middle finger on ЙЦУКЕН: the hand is named, or "the
-    // index finger and the index finger" would not say which two fingers.
-    await expect(page.locator('[data-rule]')).toContainText(
-      'Його друкують пальці: лівий мізинець і лівий середній палець',
-    )
+    // index finger and the index finger" would not say which two fingers. Named in full and shown
+    // in full: the line wraps, it is never cut to an ellipsis.
+    await expect(line).toContainText('лівий мізинець і лівий середній палець')
+    expect(await line.evaluate((node) => node.scrollWidth <= node.clientWidth)).toBe(true)
   })
 
   test('with uneven rhythm and no weak Transition the one Next Action asks for even tempo (scenario 6, rule 3)', async ({
@@ -304,7 +305,7 @@ test.describe('US2 the result of an attempt', () => {
 
     await expectSingleNextAction(page)
     await expect(page.locator('[data-rule]')).toHaveAttribute('data-rule', 'evenRhythm')
-    await expect(page.locator('[data-rule]')).toContainText(/ритм нерівний \(55%\)/)
+    await expect(page.locator('[data-rule]')).toContainText('Повторіть рівним темпом: ритм 55%')
   })
 
   test('with even rhythm and nothing weak the one Next Action offers the next key, and its button starts it (scenarios 6 and 7)', async ({
@@ -425,6 +426,7 @@ test.describe('US2 the result of an attempt', () => {
     await seedLearner(page, [
       { id: 'above', scaleId: FIRST_KEY, mode: 'practice', accuracy: 0.952 },
       { id: 'below', scaleId: FIRST_KEY, mode: 'practice', accuracy: 0.9 },
+      { id: 'elsewhere', scaleId: ANCHORS, mode: 'practice', accuracy: 0.98 },
     ])
     const score = page.getByTestId('result-score')
 
@@ -440,6 +442,14 @@ test.describe('US2 the result of an attempt', () => {
     const bar = page.getByRole('region', { name: 'Стан гравця' })
     await expect(bar).toContainText('дн. серія')
     await expect(bar).not.toContainText('днів')
+
+    // Cleared, but the coach points at the next key: the headline does not ask for a test that
+    // «Далі» would not open; the card names where it goes, and the button goes there.
+    await page.goto('/result/elsewhere')
+    await expect(score).toContainText('Точність 98,0%, поріг 95% взято.')
+    await expect(score).not.toContainText('Пройдіть залікову')
+    await region(page, 'Що робити далі').getByRole('button', { name: 'Далі' }).click()
+    await expect(page).toHaveURL(/\/exercise\/yq\.run\.KeyG\?mode=practice/)
   })
 
   test('intervals over 400 ms are drawn in the error colour and marked without colour (scenario 9)', async ({

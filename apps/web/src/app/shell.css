@@ -897,8 +897,20 @@
     padding: 0;
   }
 
+  /* Each tab sits in its tooltip wrapper: the wrapper takes an even fifth of the dock. */
+  .rail__nav > .tipw {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  /* No hover on a phone, and the side bubble would land off-screen; the tab names itself. */
+  .rail__nav .tip__bubble {
+    display: none;
+  }
+
   .rail__item {
     flex: 1;
+    min-width: 0;
     align-content: center;
     gap: 3px;
     padding: 6px 2px;
