@@ -69,7 +69,8 @@ describe('sprint score', () => {
     press('c', 40_000)
     press('d', 60_000)
     // Four keys were pressed, but the minute was up before the fourth: it counts for nothing.
-    expect(scores).toEqual([{ spm: 3, accuracy: 2 / 3 }])
+    // SPM counts only the right keystrokes (ADR-0003, 2026-10-06): a and c in one minute.
+    expect(scores).toEqual([{ spm: 2, accuracy: 2 / 3 }])
   })
 
   it('stops at 60 s of typing time, not wall time: a pause does not eat the minute', () => {
