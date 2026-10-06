@@ -79,8 +79,17 @@ export function Rail({
 
       <div className="rail__foot">
         <Tip side text={m.shell_season_hint()}>
-          {/* biome-ignore lint/a11y/noNoninteractiveTabindex: focusable so keyboard users reach the hint */}
-          <div className="season" tabIndex={0}>
+          {/* biome-ignore lint/a11y/useSemanticElements: a labelled read-out, not a fieldset of inputs */}
+          <div
+            role="group"
+            aria-label={m.shell_season_name({
+              n: String(season.number).padStart(2, '0'),
+              days: String(season.daysLeft),
+            })}
+            className="season"
+            // biome-ignore lint/a11y/noNoninteractiveTabindex: focusable so keyboard users reach the hint
+            tabIndex={0}
+          >
             <span className="season__lab">{m.shell_season()}</span>
             <span className="season__n">{String(season.number).padStart(2, '0')}</span>
             <small>{m.shell_season_left({ days: String(season.daysLeft) })}</small>

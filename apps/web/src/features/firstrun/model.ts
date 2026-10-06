@@ -130,6 +130,9 @@ export function reduceFlow(state: FlowState, event: FlowEvent): FlowState {
       if (event.language === state.language) return state
       return {
         ...state,
+        // The status bar's switch can change the language past step 1: the check and the finger
+        // scheme belong to a layout, so the flow goes back to the level for the new one.
+        step: state.step === 'language' ? 'language' : 'level',
         language: event.language,
         level: state.recorded[event.language] ?? null,
         recommended: null,

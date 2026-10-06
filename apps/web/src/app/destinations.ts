@@ -52,6 +52,10 @@ const TRAINING = [
   '/exercise',
   '/session',
   '/start',
+  // The free-practice modes type too: a phone gets the same notice, not a half-usable run.
+  '/sprint',
+  '/daily',
+  '/own',
 ]
 
 export function needsKeyboard(pathname: string): boolean {

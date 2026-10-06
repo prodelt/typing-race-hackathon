@@ -92,14 +92,20 @@ export function Shell() {
 
       <main id="main" className="stage">
         <div className="stage__in">
-          {/* biome-ignore lint/a11y/noNoninteractiveTabindex: a scrollable region must be reachable by keyboard */}
-          <div className="stage__scroll" data-stage-scroll="" tabIndex={0}>
+          {/* A scroll area is a focus stop, so it is a named region: a role and a name to land on. */}
+          <section
+            aria-label={m.shell_stage_label()}
+            className="stage__scroll"
+            data-stage-scroll=""
+            // biome-ignore lint/a11y/noNoninteractiveTabindex: a scrollable region must be reachable by keyboard
+            tabIndex={0}
+          >
             <div className="stage__content">
               <BootGate>
                 <Outlet />
               </BootGate>
             </div>
-          </div>
+          </section>
           <section className="keyboard-needed" aria-labelledby="keyboard-needed-title">
             <span className="keyboard-needed__mark" aria-hidden="true">
               ТР

@@ -86,6 +86,7 @@
   "result_say_next_key": "The next key to open is “{key}”.",
   "result_say_failed": "Accuracy {accuracy}% is below {floor}%. Streak restarts.",
   "result_say_practice_ready": "Accuracy {accuracy}%, floor {floor}%. Take the test.",
+  "result_say_practice_cleared": "Accuracy {accuracy}%, the {floor}% floor is cleared.",
   "result_say_practice_below": "Accuracy {accuracy}%, floor {floor}%. Practise up to {floor}%.",
   "result_note_test": "No guides, counts toward mastery.",
   "result_note_practice": "With guides, does not count toward mastery.",

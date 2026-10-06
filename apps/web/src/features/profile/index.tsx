@@ -279,11 +279,30 @@ function Badge(props: { readonly id: BadgeId; readonly n: number; readonly earne
       className={`prof-badge tip${props.earned ? ' is-earned' : ''}`}
       // biome-ignore lint/a11y/noNoninteractiveTabindex: focusable so the hint reaches keyboard users
       tabIndex={0}
+      // A focus stop needs a name: the badge and whether it is earned; the bubble describes how.
+      aria-label={`${copy.name()}: ${props.earned ? m.prof_badges_earned() : m.prof_badges_locked()}`}
       aria-describedby={tipId}
       data-earned={props.earned}
     >
-      <span className="prof-badge__mark num" aria-hidden="true">
-        {String(props.n).padStart(2, '0')}
+      <span className="prof-badge__top" aria-hidden="true">
+        <span className="prof-badge__mark num">{String(props.n).padStart(2, '0')}</span>
+        {props.earned ? null : (
+          <svg
+            aria-hidden="true"
+            className="prof-badge__lock"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <rect x="4" y="11" width="16" height="10" rx="2" />
+            <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+          </svg>
+        )}
       </span>
       <span className="prof-badge__name">{copy.name()}</span>
       <span className="prof-sr">

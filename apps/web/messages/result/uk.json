@@ -86,6 +86,7 @@
   "result_say_next_key": "Наступною відкриється клавіша «{key}».",
   "result_say_failed": "Точність {accuracy}% нижча за {floor}%. Серія спочатку.",
   "result_say_practice_ready": "Точність {accuracy}%, поріг {floor}%. Пройдіть залікову.",
+  "result_say_practice_cleared": "Точність {accuracy}%, поріг {floor}% взято.",
   "result_say_practice_below": "Точність {accuracy}%, поріг {floor}%. Тренуйтеся до {floor}%.",
   "result_note_test": "Без підказок, рахується в опанування.",
   "result_note_practice": "З підказками, не рахується в опанування.",

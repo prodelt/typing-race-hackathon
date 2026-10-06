@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { nextStartMode } from './nextStart'
+import { nextStartMode, practiceAdvice } from './nextStart'
 
 const FLOOR = 0.95
 
@@ -49,5 +49,40 @@ describe('nextStartMode', () => {
         FLOOR,
       ),
     ).toBe('practice')
+  })
+})
+
+describe('practiceAdvice: the headline and «Далі» say the same thing', () => {
+  it('asks for the test only when «Далі» opens it', () => {
+    const last = attempt({ mode: 'practice', accuracy: 0.98 })
+    const same = { startsScaleId: 'yq.run.KeyG' }
+    expect(practiceAdvice(last, same, FLOOR)).toBe('takeTest')
+    expect(nextStartMode(last, same, FLOOR)).toBe('test')
+  })
+
+  it('only says the floor is cleared when the coach points at the next key’s scale', () => {
+    // The audit's case: «Пройдіть залікову» above a button that opened the next key in practice.
+    const last = attempt({ mode: 'practice', accuracy: 0.98 })
+    const nextKey = { startsScaleId: 'yq.run.KeyH' }
+    expect(practiceAdvice(last, nextKey, FLOOR)).toBe('cleared')
+    expect(nextStartMode(last, nextKey, FLOOR)).toBe('practice')
+  })
+
+  it('asks to practise up to the floor below it, wherever the coach points', () => {
+    const last = attempt({ mode: 'practice', accuracy: 0.9 })
+    expect(practiceAdvice(last, { startsScaleId: 'yq.run.KeyG' }, FLOOR)).toBe('below')
+    expect(practiceAdvice(last, { startsScaleId: 'yq.run.KeyH' }, FLOOR)).toBe('below')
+  })
+
+  it('never disagrees: the button opens the test exactly when the advice is to take it', () => {
+    for (const accuracy of [0.5, 0.94, FLOOR, 0.97, 1]) {
+      for (const startsScaleId of ['yq.run.KeyG', 'yq.run.KeyH', 'yq.review.KeyG-KeyH']) {
+        const last = attempt({ mode: 'practice', accuracy })
+        const next = { startsScaleId }
+        expect(nextStartMode(last, next, FLOOR) === 'test').toBe(
+          practiceAdvice(last, next, FLOOR) === 'takeTest',
+        )
+      }
+    }
   })
 })

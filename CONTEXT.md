@@ -83,10 +83,20 @@ Comprehensive domain model and conceptual glossary for the Typing-Race touch-typ
 - **Level (Рівень)**: A learner's standing derived from mastery alone (keys unlocked, Academy modules completed); speed never raises it.
 - **Experience / XP (Досвід)**: Points earned only by Test Attempts that clear the level's accuracy floor; they fill the bar toward the next Level.
   _Avoid_: score, coins
-- **Streak (Серія)**: Consecutive days with at least one completed attempt; one missed day is forgiven by a freeze.
+- **Streak (Серія)**: Consecutive days with at least one completed attempt; one missed day is forgiven by a freeze. Not the Daily run, which counts cleared Daily challenges only.
 - **Race (Перегони)**: A live contest in which several Learners type the same text at the same time, opened by quick match or by a private room code. Its result counts only once the server has replayed it (a Validated Race Result).
   _Avoid_: multiplayer, match, game
 - **Race Rating (Рейтинг перегонів)**: A learner's competitive standing computed from Validated Race Results only; it exists in races and nowhere else.
+- **Modes (Режими)**: The row on Home that opens the four side modes below. A locked mode stays in the row, dimmed, and says how it opens.
+- **Free practice (Вільна практика)**: Typing that earns no XP, never counts toward mastery or unlocks, and is not synced to an Account. Daily challenge, Sprint and Own text are free practice.
+- **Daily challenge (Виклик дня)**: One exercise a day of frequent words, the same for every learner on that day and language. Free practice; a completed run at or above the accuracy floor clears the day.
+  _Avoid_: daily goal (the Home panel of minutes per day)
+- **Daily run (Викликів поспіль)**: Consecutive days with a cleared Daily challenge, ending today or yesterday; no freeze. Kept apart from the Streak.
+  _Avoid_: streak, days in a row
+- **Sprint (Спринт 60 с)**: Sixty seconds of words from the learner's unlocked keys; the clock starts on the first keystroke. Free practice that records no Attempt at all. Opens with Stage 2.
+- **Own text (Свій текст)**: A pasted text or a `.txt`/`.md` file, typed on the ordinary exercise engine as free practice. Characters the layout cannot type are named and must be removed first.
+- **Mistakes review (Робота над помилками)**: A drill built from the learner's weakest keys and transitions — real words once Stage 2 is open, moves before. It is a Practice Attempt, so it earns no XP and never counts toward mastery or unlocks, but its aggregates still feed Confidence, which is how the review shows whether the spots improved.
+  _Avoid_: error drill, weak-spot test
 
 ## Curriculum Data Model
 

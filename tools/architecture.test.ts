@@ -50,6 +50,9 @@ const EXEMPT = [
   // and feeding no engine. Its typed check goes through InputSource like any attempt.
   'apps/web/src/features/firstrun/FirstRun.tsx',
   'apps/web/src/features/firstrun/FingerScheme.tsx',
+  // The coach-marks' Enter («Далі») and Esc («Пропустити») while a guide bubble is open:
+  // accelerators again, and a guide never opens during a run, so they never meet an attempt.
+  'apps/web/src/app/guide/CoachMarks.tsx',
 ]
 
 interface Rule {

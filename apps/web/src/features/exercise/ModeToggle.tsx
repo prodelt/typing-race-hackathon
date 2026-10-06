@@ -17,6 +17,9 @@ export interface ModeToggleProps {
  * rebuilt from scratch: there is no way to flip a running attempt into a guided one. Once practice
  * has cleared the floor, "take the test attempt" is the filled button, because only a Test Attempt
  * counts toward mastery (FR-039).
+ *
+ * The two buttons keep one pair of names in both states, the same as the HUD and the result say:
+ * which one is on is the pressed state and the ring, never a different wording.
  */
 /** The chosen mode is ringed as well as pressed: state is never colour alone (FR-066). */
 const CURRENT = 'ring-2 ring-sage ring-offset-1'
@@ -37,7 +40,7 @@ export function ModeToggle({ scaleId, mode, testIsPrimary }: ModeToggleProps) {
         className={mode === 'practice' ? CURRENT : undefined}
         onClick={() => go('practice')}
       >
-        {mode === 'practice' ? m.exercise_mode_practice() : m.exercise_mode_take_practice()}
+        {m.exercise_mode_practice()}
       </Button>
       <Button
         aria-pressed={mode === 'test'}
@@ -45,7 +48,7 @@ export function ModeToggle({ scaleId, mode, testIsPrimary }: ModeToggleProps) {
         className={mode === 'test' ? CURRENT : undefined}
         onClick={() => go('test')}
       >
-        {mode === 'test' ? m.exercise_mode_test() : m.exercise_mode_take_test()}
+        {m.exercise_mode_test()}
       </Button>
     </fieldset>
   )
