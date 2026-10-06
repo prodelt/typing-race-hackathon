@@ -21,9 +21,6 @@ import { replay, scoreOf } from '../_shared/race-replay.ts'
 /** Slack for the round trip and for a timer that started a frame early. */
 const CLOCK_SLACK_MS = 2_000
 
-/** A human does not sustain more than this; faster is a script. */
-const MAX_PLAUSIBLE_SPM = 1_500
-
 /**
  * Limits of one request. A race text is at most 400 characters (the `race_texts` check), so a log of
  * twenty thousand events is not a race; it is a request that only burns the function's time.
@@ -141,7 +138,11 @@ Deno.serve(async (request) => {
   if (replayed.reached < Array.from(text).length) reason = 'text_mismatch'
   else if (sinceStart + CLOCK_SLACK_MS < elapsedMs) reason = 'future_timestamp'
   else if (loggedMs > elapsedMs + CLOCK_SLACK_MS) reason = 'log_malformed'
-  else if (metrics.spm > MAX_PLAUSIBLE_SPM) reason = 'too_fast'
+  // The same verdict the browser shows (ADR-0003, 2026-10-06): above `MAX_HUMAN_SPM` (1 500) is a
+  // script typing steadily, and a median interval under 25 ms is a burst that a wait before it
+  // would otherwise hide inside an ordinary-looking speed.
+  else if (metrics.implausible === 'tooFast') reason = 'too_fast'
+  else if (metrics.implausible === 'burst') reason = 'implausible_interval'
 
   const validated = reason === null
   const score = validated ? scoreOf(metrics.spm, metrics.accuracy) : 0

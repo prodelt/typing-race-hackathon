@@ -64,6 +64,23 @@ describe('the step order', () => {
   it('a language change is kept when picked', () => {
     expect(walk(first, { type: 'pickLanguage', language: 'en' }).language).toBe('en')
   })
+
+  it('a language switched past step 1 (the status bar) returns to the level for that language', () => {
+    const atFingers = walk(
+      first,
+      { type: 'next' },
+      { type: 'pickLevel', level: 'knowsHomeRow' },
+      { type: 'next' },
+    )
+    const switched = walk(atFingers, { type: 'pickLanguage', language: 'en' })
+    expect(switched.step).toBe('level')
+    expect(switched.language).toBe('en')
+    expect(switched.level).toBeNull()
+    const inCheck = walk(first, { type: 'next' }, { type: 'startDiagnostic' })
+    expect(walk(inCheck, { type: 'pickLanguage', language: 'en' }).step).toBe('level')
+    // The same language again changes nothing, wherever the flow is.
+    expect(walk(atFingers, { type: 'pickLanguage', language: 'uk' })).toBe(atFingers)
+  })
 })
 
 describe('the diagnostic', () => {

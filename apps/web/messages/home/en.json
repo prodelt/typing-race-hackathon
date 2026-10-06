@@ -53,5 +53,20 @@
   "home_goal_chart": "Minutes over the last 7 days: {values}. Goal {goal}.",
   "home_streak": "{n}-day streak",
   "home_freeze": "{n} freeze",
-  "home_freeze_tip": "A freeze: one missed day does not break the streak."
+  "home_freeze_tip": "A freeze: one missed day does not break the streak.",
+  "home_modes_title": "Modes",
+  "home_modes_sub": "free practice, no XP",
+  "home_mode_daily": "Daily challenge",
+  "home_mode_daily_sub": "One exercise a day, same for everyone",
+  "home_mode_daily_done": "done",
+  "home_mode_sprint": "Sprint 60 s",
+  "home_mode_sprint_sub": "How many words in one minute",
+  "home_mode_sprint_locked": "Opens with the Words stage: finish the scales on the Map.",
+  "home_mode_own": "Own text",
+  "home_mode_own_glyph": "Aa",
+  "home_mode_own_sub": "Paste any text or a file",
+  "home_mode_mistakes": "Mistakes",
+  "home_mode_mistakes_sub": "A drill on your weak spots",
+  "home_mode_mistakes_locked": "Opens once weak spots show up: do a few exercises.",
+  "home_mode_locked": "locked"
 }

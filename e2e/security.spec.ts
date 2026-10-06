@@ -318,6 +318,8 @@ test.describe('paste, drop and edit commands on the typing surface', () => {
             }),
           )
         for (const type of [
+          // The whole line in one ordinary text insertion: one key never makes a line.
+          'insertText',
           'insertFromPaste',
           'insertFromDrop',
           'insertReplacementText',
@@ -342,6 +344,65 @@ test.describe('paste, drop and edit commands on the typing surface', () => {
     expect(await awaited()).toBe(0)
     await expect(page).not.toHaveURL(/\/result\//)
   })
+
+  // COMPETITION_RULES §4.4.4: "a series of instant identical events". Each one is a keystroke the
+  // seam accepts, so the exercise completes; what must not happen is that it counts.
+  for (const [label, send] of [
+    ['one character per event, all at once', 'series'],
+    ['the whole line committed as one composition', 'composition'],
+  ] as const) {
+    test(`a test typed as ${label} completes but counts for nothing`, async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: 'reduce' })
+      await seedStore(page, {
+        settings: { ...MOTION_OFF_SETTINGS },
+        startingLevelByLanguage: { uk: 'neverTouchTyped', en: 'neverTouchTyped' },
+      } as Parameters<typeof seedStore>[1])
+      await page.goto('/exercise/yq.run.anchors?mode=test')
+      await page.getByRole('button', { name: 'Почати', exact: true }).click()
+      const line = page.getByTestId('typing-line')
+      await expect(line).toBeVisible()
+      const text = (await line.locator('p.sr-only').textContent()) ?? ''
+
+      await page
+        .locator('textarea')
+        .first()
+        .evaluate(
+          (area, { whole, how }) => {
+            if (how === 'composition') {
+              area.dispatchEvent(new CompositionEvent('compositionstart', { bubbles: true }))
+              area.dispatchEvent(
+                new CompositionEvent('compositionend', { data: whole, bubbles: true }),
+              )
+              return
+            }
+            for (const char of whole) {
+              area.dispatchEvent(
+                new InputEvent('beforeinput', {
+                  inputType: 'insertText',
+                  data: char,
+                  bubbles: true,
+                  cancelable: true,
+                }),
+              )
+            }
+          },
+          { whole: text, how: send },
+        )
+
+      await expect(page).toHaveURL(/\/result\//)
+      const score = page.getByTestId('result-score')
+      await expect(score.getByRole('heading', { level: 1 })).toHaveText(
+        'Не зараховано: набір не схожий на ручний',
+      )
+      await expect(page.getByTestId('result-note')).toHaveText(
+        'Спробу збережено, але вона не йде ні в опанування, ні в досвід, ні в рекорди.',
+      )
+      // 100% accurate, and still no XP and no slot in the mastery streak.
+      await expect(score).toContainText(/100[.,]0\s*%/)
+      await expect(score.locator('.reward-xp')).toHaveCount(0)
+      await expect(page.locator('.reward-slot.is-ok')).toHaveCount(0)
+    })
+  }
 })
 
 // ---- Hostile data from the server --------------------------------------------------------------

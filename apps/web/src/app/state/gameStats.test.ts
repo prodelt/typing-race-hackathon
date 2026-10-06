@@ -87,6 +87,20 @@ describe('deriveGameStats', () => {
     expect(deriveGameStats({ ...base, attempts }).xpInLevel).toBe(XP_PER_PASS)
   })
 
+  it('ignores free practice: no XP, no streak day, no daily-goal minutes', () => {
+    const yesterday = Date.parse('2026-09-30T12:00:00Z')
+    const attempts = [
+      attempt({ scaleId: 'yq.daily' }),
+      attempt({ scaleId: 'yq.owntext' }),
+      attempt({ scaleId: 'yq.owntext', completedAt: yesterday }),
+    ]
+    const stats = deriveGameStats({ ...base, attempts })
+    expect(stats.xpInLevel).toBe(0)
+    expect(stats.streak.days).toBe(0)
+    expect(stats.dailyGoal.minutesToday).toBe(0)
+    expect(stats.dailyGoal.last7.every((day) => day.minutes === 0)).toBe(true)
+  })
+
   it('does not count another layout toward level or XP, but does count its minutes', () => {
     const stats = deriveGameStats({ ...base, attempts: [attempt({ layoutId: 'qwerty' })] })
     expect(stats.xpInLevel).toBe(0)
@@ -154,6 +168,16 @@ describe('deriveGameStats', () => {
     const without = deriveGameStats({ ...base, attempts })
     const withCourse = deriveGameStats({ ...base, academyCourse: course, attempts })
     expect(withCourse.level).toBeGreaterThan(without.level)
+  })
+
+  it('pays nothing and keeps no streak for typing that was not by hand', () => {
+    const script = { ...attempt().metrics, implausible: 'burst' as const }
+    const attempts = [1, 2, 3].map(() => attempt({ metrics: script, elapsedMs: 5 * 60_000 }))
+    const stats = deriveGameStats({ ...base, attempts })
+    expect(stats.level).toBe(1)
+    expect(stats.xpInLevel).toBe(0)
+    expect(stats.streak.days).toBe(0)
+    expect(stats.dailyGoal.minutesToday).toBe(0)
   })
 
   it('reports streak and daily minutes from local days', () => {

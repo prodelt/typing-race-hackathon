@@ -173,6 +173,17 @@ describe('Academy progress', () => {
     )
   })
 
+  it('attempts not typed by hand do not count, and are not even attempts of the exercise', () => {
+    const id = smallIds[0] as string
+    const history = [1, 2, 3].map((t) => {
+      const a = attempt(id, 'test', 1, t)
+      return { ...a, metrics: { ...a.metrics, implausible: 'burst' as const } }
+    })
+    const progress = academyProgress(small, history)
+    expect(progress.exercises[id]?.mastered).toBe(false)
+    expect(progress.exercises[id]?.attempts).toBe(0)
+  })
+
   it('attempts on another layout do not count', () => {
     const id = smallIds[0] as string
     const history = [1, 2, 3].map((t) => ({

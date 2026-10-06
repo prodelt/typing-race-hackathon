@@ -74,6 +74,25 @@ describe('the Mastery Rule (FR-039)', () => {
     expect(progress.unlockedSet).toContain('d')
   })
 
+  it('ignores an attempt not typed by hand: it neither advances nor resets the count', () => {
+    const progress = derive([
+      makeAttempt({ completedAt: 1 }),
+      makeAttempt({ completedAt: 2, implausible: 'burst' }),
+      makeAttempt({ completedAt: 3, implausible: 'tooFast', accuracy: 0.5 }),
+      makeAttempt({ completedAt: 4 }),
+    ])
+    expect(progress.consecutivePasses).toEqual({ 'sc-d': 2 })
+    expect(progress.history.map((attempt) => attempt.completedAt)).toEqual([1, 4])
+  })
+
+  it('never unlocks a key from three perfect attempts that were not typed by hand', () => {
+    const progress = derive(
+      [0, 1, 2].map((i) => makeAttempt({ completedAt: 10 + i, implausible: 'burst' })),
+    )
+    expect(progress.completedScales).toEqual([])
+    expect(progress.unlockedSet).not.toContain('d')
+  })
+
   it('keeps a scale complete after a later failure', () => {
     const progress = derive([...mastery('sc-d', 1), makeAttempt({ completedAt: 9, accuracy: 0.5 })])
     expect(progress.completedScales).toEqual(['sc-d'])
@@ -226,7 +245,7 @@ describe('Stage 1 completion (FR-044)', () => {
 
   it('reports an empty history as incomplete', () => {
     expect(derive([]).stage.stage1Complete).toBe(false)
-    expect(derive([]).derivedVersion).toBe(1)
+    expect(derive([]).derivedVersion).toBe(2)
   })
 })
 
@@ -258,6 +277,24 @@ describe('confidence', () => {
       'g>f': 0.5,
     })
     expect(progress.keyConfidence).toEqual({})
+  })
+
+  it('learns nothing from an attempt not typed by hand', () => {
+    // Its intervals are a script's, not the learner's: folding them in would call a slow key fast.
+    const progress = deriveProgress({
+      attempts: [
+        makeAttempt({
+          completedAt: 1,
+          aggregates: transitionAggregates('g', 'f', 6, 3),
+          implausible: 'burst',
+        }),
+      ],
+      layout,
+      catalogue,
+      startingLevelChoice: 'neverTouchTyped',
+      confidence: fakeConfidence,
+    })
+    expect(progress.transitionConfidence).toEqual({})
   })
 
   it('carries keys too', () => {

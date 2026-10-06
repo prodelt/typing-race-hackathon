@@ -29,25 +29,34 @@ import { Tip } from './Tip.js'
 
 const NUMBER = new Intl.NumberFormat('uk-UA')
 
-/** A stat with a tooltip that keyboard users reach too: focusable, and described by the bubble. */
+/**
+ * A stat with a tooltip that keyboard users reach too: focusable, described by the bubble, Esc
+ * hides it. A focus stop needs a role and a name, so it is a group whose `label` says the value.
+ */
 function Stat({
   tip,
+  label,
   className,
   children,
 }: {
   readonly tip: string
+  readonly label: string
   readonly className?: string
   readonly children: ReactNode
 }) {
-  const id = useId()
   return (
-    // biome-ignore lint/a11y/noNoninteractiveTabindex: focusable so the explanation reaches keyboard users
-    <div className={`sb tip ${className ?? ''}`} tabIndex={0} aria-describedby={id}>
-      {children}
-      <span role="tooltip" id={id} className="tip__bubble">
-        {tip}
-      </span>
-    </div>
+    <Tip text={tip}>
+      {/* biome-ignore lint/a11y/useSemanticElements: a labelled read-out, not a fieldset of inputs */}
+      <div
+        role="group"
+        aria-label={label}
+        className={`sb ${className ?? ''}`}
+        // biome-ignore lint/a11y/noNoninteractiveTabindex: focusable so the explanation reaches keyboard users
+        tabIndex={0}
+      >
+        {children}
+      </div>
+    </Tip>
   )
 }
 
@@ -59,26 +68,24 @@ const LAYOUTS: readonly { readonly value: Language; readonly label: string }[] =
 function LayoutSwitch() {
   const current = useAppStore((state) => state.settings.typingLanguage)
   const changeSettings = useAppStore((state) => state.changeSettings)
-  const id = useId()
   return (
-    // biome-ignore lint/a11y/useSemanticElements: a pair of toggle buttons, not a fieldset of inputs
-    <div role="group" aria-label={m.shell_layout()} aria-describedby={id} className="seg tip">
-      {LAYOUTS.map(({ value, label }) => (
-        <button
-          key={value}
-          type="button"
-          aria-pressed={value === current}
-          onClick={() => {
-            if (value !== current) void changeSettings({ typingLanguage: value })
-          }}
-        >
-          {label}
-        </button>
-      ))}
-      <span role="tooltip" id={id} className="tip__bubble">
-        {m.shell_layout_hint()}
-      </span>
-    </div>
+    <Tip text={m.shell_layout_hint()}>
+      {/* biome-ignore lint/a11y/useSemanticElements: a pair of toggle buttons, not a fieldset of inputs */}
+      <div role="group" aria-label={m.shell_layout()} className="seg">
+        {LAYOUTS.map(({ value, label }) => (
+          <button
+            key={value}
+            type="button"
+            aria-pressed={value === current}
+            onClick={() => {
+              if (value !== current) void changeSettings({ typingLanguage: value })
+            }}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+    </Tip>
   )
 }
 
@@ -192,7 +199,15 @@ function RatingStat() {
         ? m.race_rating_tip_unavailable()
         : m.race_rating_tip_guest()
   return (
-    <Stat tip={tip} className={rated ? '' : 'sb--absent'}>
+    <Stat
+      tip={tip}
+      label={
+        rated
+          ? m.shell_rating_name({ rating: NUMBER.format(standing.rating) })
+          : m.shell_rating_name_none()
+      }
+      className={rated ? '' : 'sb--absent'}
+    >
       <IconSwords size={22} className="swords" />
       <div className="sb__col">
         <span className="num" data-testid="status-rating">
@@ -234,6 +249,11 @@ export function StatusBar({ settingsActive }: { readonly settingsActive: boolean
 
       <Stat
         className="lvl"
+        label={m.shell_level_name({
+          level: String(stats.level),
+          have: NUMBER.format(stats.xpInLevel),
+          need: NUMBER.format(stats.xpForNextLevel),
+        })}
         tip={m.shell_level_hint({
           next: String(stats.level + 1),
           left: NUMBER.format(Math.max(0, stats.xpForNextLevel - stats.xpInLevel)),
@@ -258,7 +278,13 @@ export function StatusBar({ settingsActive }: { readonly settingsActive: boolean
         </div>
       </Stat>
 
-      <Stat tip={m.shell_streak_hint({ days: String(stats.streak.days) })}>
+      <Stat
+        tip={m.shell_streak_hint({ days: String(stats.streak.days) })}
+        label={m.shell_streak_name({
+          days: String(stats.streak.days),
+          n: String(stats.streak.freezes),
+        })}
+      >
         <IconFlame size={24} className="flame" />
         <div className="sb__col">
           <div className="sb__top">

@@ -588,6 +588,12 @@
   transform: translate(0, -50%);
 }
 
+.tip__bubble--above {
+  top: auto;
+  bottom: calc(100% + 10px);
+  transform: translate(-50%, 4px);
+}
+
 .tip.tip--hidden > .tip__bubble {
   opacity: 0;
   visibility: hidden;
@@ -891,8 +897,20 @@
     padding: 0;
   }
 
+  /* Each tab sits in its tooltip wrapper: the wrapper takes an even fifth of the dock. */
+  .rail__nav > .tipw {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  /* No hover on a phone, and the side bubble would land off-screen; the tab names itself. */
+  .rail__nav .tip__bubble {
+    display: none;
+  }
+
   .rail__item {
     flex: 1;
+    min-width: 0;
     align-content: center;
     gap: 3px;
     padding: 6px 2px;
@@ -914,7 +932,9 @@
 
   .who,
   .bar .sb:not(.lvl),
+  .bar .tipw:has(> .sb:not(.lvl)),
   .seg,
+  .bar .tipw:has(> .seg),
   .gchip,
   .xp__txt {
     display: none;

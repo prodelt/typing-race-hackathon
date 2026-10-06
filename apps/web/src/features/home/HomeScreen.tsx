@@ -10,14 +10,16 @@ import {
 } from '@typing-race/curriculum'
 import type { Language, NextAction, Scale } from '@typing-race/domain'
 import { Button, IconFlame } from '@typing-race/ui'
-import { lazy, Suspense, useId, useMemo, useRef } from 'react'
+import { lazy, Suspense, useMemo, useRef } from 'react'
 import { useGuideScreen } from '../../app/guide/model.js'
 import { LiveGradient } from '../../app/LiveGradient.js'
 import { useScreenKeys } from '../../app/screenKeys.js'
 import { useGameStats } from '../../app/state/gameStats.js'
 import { useAppStore, useDerived } from '../../app/state/index.js'
+import { Tip } from '../../app/Tip.js'
 import { m } from '../../paraglide/messages.js'
 import { getLocale } from '../../paraglide/runtime.js'
+import { clearedDays, localDay, readStoredDays } from '../daily/model.js'
 import { useFirstRunHold } from '../firstrun/hold.js'
 import { routeGeometry } from '../map/model.js'
 import { RouteLine, useSize } from '../map/RouteLine.js'
@@ -32,8 +34,8 @@ import './home.css'
 
 /**
  * Home, the hub a returning learner lands on (direction B). One loud thing — Continue — and four
- * quiet panels around it, each with one way in and a key for it. The grid fills the stage; it
- * never scrolls as a page at desktop sizes.
+ * quiet panels around it, each with one way in and a key for it, and a row of free-practice modes
+ * under them. The grid fills the stage; it never scrolls as a page at desktop sizes.
  *
  * With no starting-level answer there is no progress to show, so the first run replaces the hub.
  * It is lazy: a returning learner, who is most of the visits, never downloads it.
@@ -53,6 +55,10 @@ export function HomeScreen() {
 
 const FirstRun = lazy(() =>
   import('../firstrun/FirstRun.js').then((module) => ({ default: module.FirstRun })),
+)
+
+const ModesRow = lazy(() =>
+  import('./ModesRow.js').then((module) => ({ default: module.ModesRow })),
 )
 
 const BLOCK_NAMES = [
@@ -81,7 +87,7 @@ function titleFor(action: NextAction): string {
 
 function Hub({ nextAction }: { readonly nextAction: NextAction }) {
   const navigate = useNavigate()
-  const { progress, layout, catalogue } = useDerived()
+  const { progress, layout, catalogue, accuracyFloor } = useDerived()
   const attempts = useAppStore((state) => state.attempts)
   const language = useAppStore((state) => state.settings.typingLanguage)
   const session = useSessionStore((store) => store.session)
@@ -107,6 +113,14 @@ function Hub({ nextAction }: { readonly nextAction: NextAction }) {
           layout,
           spots.map((spot) => spot.element),
         )
+
+  const dailyDone = useMemo(
+    () =>
+      clearedDays(attempts, accuracyFloor, readStoredDays(language), language).includes(
+        localDay(new Date()),
+      ),
+    [attempts, accuracyFloor, language],
+  )
 
   const running = session.status === 'running'
 
@@ -179,6 +193,14 @@ function Hub({ nextAction }: { readonly nextAction: NextAction }) {
         />
         <GoalPanel />
       </div>
+      {/* The fallback holds the row's place, so the panels above do not jump when it arrives. */}
+      <Suspense fallback={<div className="hub-panel hub-modes" />}>
+        <ModesRow
+          dailyDone={dailyDone}
+          sprintOpen={stage2Open(layout, progress.unlockedSet)}
+          onDrill={drillId === undefined ? undefined : drill}
+        />
+      </Suspense>
     </div>
   )
 }
@@ -458,9 +480,6 @@ function MapPanel() {
           <i className="lg lg--lock" />
           {m.home_legend_locked()}
         </span>
-        <Link to="/daily" className="hub-link">
-          {m.daily_home_link()}
-        </Link>
         <Link to="/map" className="hub-link" aria-keyshortcuts="2">
           {m.home_map_all()}
           <span className="kbd" aria-hidden="true">
@@ -572,14 +591,20 @@ function WeakPanel(props: {
 }
 
 function WeakChip({ spot }: { readonly spot: WeakSpot }) {
-  const id = useId()
   return (
-    // biome-ignore lint/a11y/noNoninteractiveTabindex: focusable so the explanation reaches keyboard users
-    <li className="hub-chip tip" tabIndex={0} aria-describedby={id}>
-      {spotLabel(spot.element)}
-      <span role="tooltip" id={id} className="tip__bubble">
-        {spotWhy(spot)}
-      </span>
+    <li>
+      <Tip text={spotWhy(spot)}>
+        {/* biome-ignore lint/a11y/useSemanticElements: a labelled read-out, not a fieldset of inputs */}
+        <span
+          role="group"
+          aria-label={spotLabel(spot.element)}
+          className="hub-chip"
+          // biome-ignore lint/a11y/noNoninteractiveTabindex: focusable so the explanation reaches keyboard users
+          tabIndex={0}
+        >
+          {spotLabel(spot.element)}
+        </span>
+      </Tip>
     </li>
   )
 }

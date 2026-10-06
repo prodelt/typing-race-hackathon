@@ -24,8 +24,6 @@
   "exercise_mode_test": "Залікова спроба",
   "exercise_mode_practice_hint": "З клавіатурою й підказкою. Не зараховується.",
   "exercise_mode_test_hint": "Без підказок. Три точні поспіль — засвоєно.",
-  "exercise_mode_take_test": "Пройти залікову спробу",
-  "exercise_mode_take_practice": "Потренуватися",
   "exercise_layout_checking": "Перевірка розкладки…",
   "exercise_layout_ok": "Розкладка {layout}. Натисніть будь-яку літеру для перевірки.",
   "exercise_layout_confirmed": "Розкладку {layout} підтверджено.",

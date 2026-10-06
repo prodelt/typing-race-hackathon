@@ -3,15 +3,18 @@ import { cloneElement, type ReactElement, useId, useRef, useState } from 'react'
 /**
  * A one-line tooltip for an icon or number control: shown on hover and on keyboard focus, read out
  * through `aria-describedby`, hidden by Esc, and nudged sideways so it never leaves the viewport.
- * `side` puts the bubble to the right of the control (the rail) instead of below it (the bar).
+ * `side` puts the bubble to the right of the control (the rail) instead of below it (the bar);
+ * `above` puts it over the control, for one that sits at the bottom of the screen.
  */
 export function Tip({
   text,
   side = false,
+  above = false,
   children,
 }: {
   readonly text: string
   readonly side?: boolean
+  readonly above?: boolean
   readonly children: ReactElement<{ 'aria-describedby'?: string }>
 }) {
   const id = useId()
@@ -61,7 +64,7 @@ export function Tip({
         ref={bubble}
         role="tooltip"
         id={id}
-        className={`tip__bubble${side ? ' tip__bubble--side' : ''}`}
+        className={`tip__bubble${side ? ' tip__bubble--side' : above ? ' tip__bubble--above' : ''}`}
         style={
           side && at !== null
             ? { position: 'fixed', left: at.left, top: at.top }

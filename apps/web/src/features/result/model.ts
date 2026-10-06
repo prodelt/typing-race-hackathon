@@ -3,10 +3,12 @@ import {
   deriveProgress,
   fingerOf,
   focusDrillFor,
+  isFreePracticeId,
   layouts,
   nextAction,
   scaleById,
   templateKeys,
+  typedByHand,
 } from '@typing-race/curriculum'
 import {
   type AttemptSummary,
@@ -86,9 +88,10 @@ export function buildResultModel(input: ModelInput): ResultModel | null {
   // Progress is a fold over the history (FR-050), so "as of this attempt" is the fold over the
   // attempts up to and including it. That is what makes this screen right for an old result too,
   // not just the newest one.
+  // Free practice is left out of the fold, as `derive` leaves it out of the live progress.
   const foldTo = (count: number) =>
     deriveProgress({
-      attempts: attempts.slice(0, count),
+      attempts: attempts.slice(0, count).filter((a) => !isFreePracticeId(a.scaleId)),
       layout,
       catalogue: scales,
       startingLevelChoice,
@@ -119,7 +122,8 @@ export function buildResultModel(input: ModelInput): ResultModel | null {
 
 /**
  * The best earlier result on this exercise, by accuracy and then speed. Accuracy leads because
- * speed never gates progress and a faster but sloppier run is not a better one.
+ * speed never gates progress and a faster but sloppier run is not a better one. An attempt not
+ * typed by hand sets no record (ADR-0003, 2026-10-06).
  */
 function previousBest(
   earlier: readonly AttemptSummary[],
@@ -128,6 +132,7 @@ function previousBest(
   let best: AttemptSummary | null = null
   for (const candidate of earlier) {
     if (candidate.scaleId !== attempt.scaleId || candidate.layoutId !== attempt.layoutId) continue
+    if (!typedByHand(candidate)) continue
     if (
       best === null ||
       candidate.metrics.accuracy > best.metrics.accuracy ||

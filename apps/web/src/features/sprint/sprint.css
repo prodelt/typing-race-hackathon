@@ -5,6 +5,16 @@
   text-align: center;
 }
 
+/* The countdown is the sprint's clock, so the line's count-up time would only contradict it. */
+.sprint .typing-line__readouts > div:has([data-testid="elapsed-time"]) {
+  display: none;
+}
+
+/* Ninety words would draw ninety stations: the line is endless, so the rule stays plain. */
+.sprint .typing-line__station {
+  display: none;
+}
+
 .sprint__timer {
   font-family: var(--font-display, "Unbounded", sans-serif);
   font-size: clamp(3rem, 8vw, 5rem);

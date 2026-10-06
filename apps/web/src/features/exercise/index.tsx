@@ -1,10 +1,17 @@
 import { useParams, useSearch } from '@tanstack/react-router'
-import { isRealTextId, isReviewDrillId, isWordDrillId, scaleById } from '@typing-race/curriculum'
+import {
+  isDailyId,
+  isOwnTextId,
+  isRealTextId,
+  isReviewDrillId,
+  isWordDrillId,
+  scaleById,
+} from '@typing-race/curriculum'
 import type { AttemptMode } from '@typing-race/domain'
 import { useDerived } from '../../app/state/index.js'
 import { m } from '../../paraglide/messages.js'
 import { DailyExercise } from '../daily/DailyExercise.js'
-import { isDailyId } from '../daily/model.js'
+import { OwnTextAgain } from '../owntext/OwnTextRun.js'
 import { ReviewDrillExercise } from '../review/ReviewDrill.js'
 import { RealTextExercise } from '../session/RealTextExercise.js'
 import { WordExercise } from '../words/WordExercise.js'
@@ -34,6 +41,8 @@ export function ExerciseScreen() {
   }
   if (params.scaleId !== undefined && isDailyId(params.scaleId))
     return <DailyExercise mode={mode} />
+  // "Again" on an own text's result: the same text, always practice — or the form if it is gone.
+  if (params.scaleId !== undefined && isOwnTextId(params.scaleId)) return <OwnTextAgain />
   if (params.scaleId !== undefined && isRealTextId(params.scaleId)) {
     return <RealTextExercise mode={mode} />
   }

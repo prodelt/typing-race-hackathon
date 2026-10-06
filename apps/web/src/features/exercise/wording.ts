@@ -22,6 +22,8 @@ export interface ExerciseWording {
   readonly focus: string
   /** The line is made of key strings, not words: the pre-start card says so (§3.2). */
   readonly mechanics?: boolean
+  /** One line the pre-start card shows under the goal, e.g. that an own text was cut. */
+  readonly notice?: string
 }
 
 export function scaleWording(scale: Scale): ExerciseWording {

@@ -18,6 +18,7 @@ import {
   type MachineState,
   pause as pauseState,
   resume as resumeState,
+  stop as stopState,
 } from './machine'
 import type { EngineView } from './types'
 
@@ -37,6 +38,12 @@ export interface Engine {
   pause(): void
   resume(): void
   abandon(): void
+  /**
+   * Ends a running or paused attempt where it stands, as `completed`: the whistle of a time-boxed
+   * run (Sprint 60 s), whose line is longer than anyone types in the time. `finish()` then returns
+   * the log so far. Does nothing to an idle or finished attempt.
+   */
+  stop(): void
   /** Only after `completed`. Throws otherwise — an unfinished attempt has no log (spec edge case). */
   finish(): KeystrokeEventLog
 }
@@ -173,6 +180,9 @@ export function createEngine(options: EngineOptions): Engine {
     },
     abandon() {
       transition(abandonState)
+    },
+    stop() {
+      transition(stopState)
     },
     finish() {
       if (machine.phase !== 'completed') {

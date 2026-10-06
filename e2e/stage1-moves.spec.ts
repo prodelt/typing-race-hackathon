@@ -81,7 +81,7 @@ test('the result names the weakest Transition and its one button opens a drill o
 
   const next = page.getByRole('region', { name: 'Що робити далі', exact: true })
   await expect(page.locator('[data-rule]')).toHaveAttribute('data-rule', 'weakTransition')
-  await expect(next).toContainText('Перехід ф → в найслабший')
+  await expect(next).toContainText('Потренуйте ф → в')
   await next.getByRole('button', { name: 'Далі' }).click()
 
   await expect(page).toHaveURL(/\/exercise\/yq\.transition\.KeyA-KeyD\?mode=practice/)

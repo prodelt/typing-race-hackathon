@@ -1,6 +1,7 @@
 import type { Page } from '@playwright/test'
 import { keyOf, layouts } from '../../packages/curriculum/src/layout/index'
 import type { LayoutId } from '../../packages/domain/src/index'
+import { HAND_GAP_MS } from './type.js'
 
 /**
  * The real-input driver — Chromium only, through the DevTools Protocol.
@@ -36,10 +37,46 @@ const BACKSPACE = { code: 'Backspace', key: 'Backspace', windowsVirtualKeyCode: 
 const ESCAPE = { code: 'Escape', key: 'Escape', windowsVirtualKeyCode: 27 } as const
 const SHIFT = 8
 
-/** What `active` produces from the physical key `code`, with whether Shift was held. */
-function produced(active: LayoutId, code: string, shifted: boolean): string | undefined {
+/**
+ * What a real US layout prints on the keys the curriculum's QWERTY leaves out. The curriculum lists
+ * only the keys an English exercise uses, but the operating system's layout has them all: on US the
+ * ЙЦУКЕН keys of «х», «ї», «ґ» and «.» print signs. Typing the ЙЦУКЕН letter for them instead made
+ * a US keyboard that types «ї», a learner nobody can be.
+ */
+const US_KEYS_OUTSIDE_THE_CURRICULUM: Readonly<Record<string, readonly [string, string]>> = {
+  BracketLeft: ['[', '{'],
+  BracketRight: [']', '}'],
+  Backslash: ['\\', '|'],
+  Slash: ['/', '?'],
+}
+
+/**
+ * What `active` prints on the physical key `code`, with whether Shift was held. A shifted sign the
+ * curriculum does not list is typed as the key's plain sign: still a sign, which is all a layout
+ * check reads. A key the layout has no entry for throws rather than guessing.
+ */
+function produced(active: LayoutId, code: string, shifted: boolean): string {
   const key = layouts[active].keys.find((candidate) => candidate.code === code)
-  return shifted ? (key?.shifted ?? key?.plain) : key?.plain
+  if (key !== undefined) return shifted ? (key.shifted ?? key.plain) : key.plain
+  const outside = active === 'qwerty' ? US_KEYS_OUTSIDE_THE_CURRICULUM[code] : undefined
+  if (outside === undefined) throw new Error(`the ${active} layout has no key ${code}`)
+  return shifted ? outside[1] : outside[0]
+}
+
+/** One physical key press: the key, what the active layout types with it, and whether Shift is held. */
+export interface Keystroke {
+  readonly code: string
+  readonly text: string
+  readonly shifted: boolean
+}
+
+/** The key that types `char` on the `intended` layout, pressed with the system on `active`. */
+export function keystrokeOf(char: string, active: LayoutId, intended: LayoutId): Keystroke {
+  if (char === ' ') return { code: 'Space', text: ' ', shifted: false }
+  const key = keyOf(layouts[intended], char)
+  if (key === undefined) throw new Error(`${intended} has no key for «${char}»`)
+  const shifted = key.shifted === char
+  return { code: key.code, text: produced(active, key.code, shifted), shifted }
 }
 
 export async function realKeyboard(page: Page, active: LayoutId): Promise<RealKeyboard> {
@@ -70,18 +107,11 @@ export async function realKeyboard(page: Page, active: LayoutId): Promise<RealKe
     async type(text, options = {}) {
       const intended = options.intended ?? active
       for (const char of text) {
-        if (char === ' ') {
-          await press('Space', ' ', false)
-        } else {
-          const key = keyOf(layouts[intended], char)
-          if (key === undefined) throw new Error(`${intended} has no key for «${char}»`)
-          const shifted = key.shifted === char
-          // The same physical key on the active layout; a key it lacks falls back to the intended
-          // character, which only a layout without that key (never one of ours) would reach.
-          const out = produced(active, key.code, shifted) ?? char
-          await press(key.code, out, shifted)
-        }
-        if (options.delayMs !== undefined) await page.waitForTimeout(options.delayMs)
+        const stroke = keystrokeOf(char, active, intended)
+        await press(stroke.code, stroke.text, stroke.shifted)
+        // A hand's pace by default: the product does not count typing faster than a hand can type
+        // (ADR-0003, 2026-10-06), and two CDP calls a key alone are far faster than that.
+        await page.waitForTimeout(options.delayMs ?? HAND_GAP_MS)
       }
     },
     backspace: () => tap(BACKSPACE),

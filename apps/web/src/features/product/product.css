@@ -319,6 +319,13 @@
   transition: background-color var(--dur-base) var(--ease-enter);
 }
 
+/* The game shell's stage is also `.stage`, placed at row 2, column 2 of the frame grid; here that
+   would stack all three cells in one place. Each cell takes its own track. */
+.stages > .stage {
+  grid-row: auto;
+  grid-column: auto;
+}
+
 .stage:not([data-live]):hover {
   background: #ffffff;
 }
@@ -692,5 +699,196 @@
   }
   .fact {
     min-height: 260px;
+  }
+}
+
+/* ---- Phone ------------------------------------------------------------------------------- *
+ * One column everywhere, the same blocks and the signature corner at phone scale, and type sized
+ * by the screen so the longest word of every headline fits 390 px inside a 16 px gutter. */
+
+@media (max-width: 767px) {
+  .landing {
+    --gutter: 16px;
+  }
+
+  .hero {
+    padding: 8px 8px 0 0;
+  }
+
+  .hero__frame {
+    min-height: 0;
+    gap: 28px;
+    padding: 20px var(--gutter) 32px;
+    border-radius: 0 48px 0 0;
+  }
+
+  /* The reveal ends on the frame's own corner, which is smaller here. */
+  @keyframes hero-frame {
+    from {
+      clip-path: inset(0 0 0 100% round 0 48px 0 0);
+    }
+    to {
+      clip-path: inset(0 0 0 0 round 0 48px 0 0);
+    }
+  }
+
+  .hero__content {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+  }
+
+  .hero__title {
+    font-size: clamp(40px, 13.5vw, 64px);
+  }
+
+  .hero__outline {
+    -webkit-text-stroke-width: 1.5px;
+  }
+
+  .hero__lede {
+    max-width: none;
+  }
+
+  .specimen {
+    padding: 16px 18px 18px;
+  }
+
+  .sec {
+    padding: 72px var(--gutter) 0;
+  }
+
+  .sec__head,
+  .accuracy,
+  .card__body,
+  .lead__top {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sec__title {
+    font-size: clamp(32px, 10vw, 48px);
+  }
+
+  .stages {
+    grid-template-columns: minmax(0, 1fr);
+    margin-top: 36px;
+  }
+
+  .stage {
+    min-height: 0;
+    padding: 22px 20px 24px;
+  }
+
+  .stage[data-live] {
+    border-radius: 0 40px 0 0;
+  }
+
+  .stage__name {
+    margin-top: 36px;
+    font-size: min(48px, 12.5cqi);
+  }
+
+  .stage__text {
+    padding-top: 24px;
+  }
+
+  .accuracy {
+    gap: 36px;
+  }
+
+  .accuracy__text {
+    position: static;
+  }
+
+  .manifesto {
+    margin-top: 24px;
+  }
+
+  .facts__col + .facts__col {
+    margin-top: 40px;
+  }
+
+  .fact {
+    min-height: 200px;
+    padding: 18px;
+  }
+
+  .fact__num {
+    font-size: 56px;
+  }
+
+  .fact__label {
+    font-size: 16px;
+  }
+
+  .sec--card {
+    padding-inline: 8px;
+  }
+
+  .card {
+    padding: 72px 18px 48px;
+    border-radius: 0 48px 0 0;
+  }
+
+  .card__index {
+    top: 26px;
+    left: 18px;
+  }
+
+  .torn {
+    font-size: clamp(28px, 8.6vw, 40px);
+  }
+
+  .torn .torn__a {
+    margin-left: 0;
+  }
+
+  .torn .torn__b {
+    margin-left: 10%;
+    max-width: 90%;
+  }
+
+  .card__body {
+    gap: 36px;
+    margin-top: 40px;
+  }
+
+  .point {
+    grid-template-columns: 52px minmax(0, 1fr);
+    gap: 0 14px;
+  }
+
+  .point + .point {
+    margin-top: 28px;
+  }
+
+  .point__n {
+    width: 52px;
+    height: 52px;
+    font-size: 16px;
+  }
+
+  .point__title {
+    margin-top: 4px;
+    font-size: 18px;
+  }
+
+  .sec--lead {
+    margin-top: 72px;
+    padding-bottom: 72px;
+  }
+
+  .lead__title {
+    font-size: clamp(28px, 8.6vw, 40px);
+  }
+
+  .submit {
+    min-height: 72px;
+    margin-top: 40px;
+    padding: 0 24px;
+    font-size: 17px;
+  }
+
+  .submit svg {
+    width: 32px;
   }
 }

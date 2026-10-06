@@ -133,7 +133,7 @@ test('home row open: Stage 2 words appear, type only home-row letters, and count
   // A Test Attempt: same words-only rule, and no keyboard guide or next-key hint (zero-peek).
   await openPath(page)
   await wordsRegion(page).getByRole('button', { name: 'Почати вправу «Перші слова»' }).click()
-  await page.getByRole('button', { name: 'Пройти залікову спробу' }).click()
+  await page.getByRole('button', { name: 'Залікова спроба', exact: true }).click()
   await expect(page).toHaveURL(/mode=test/)
   await page.getByRole('button', { name: 'Почати', exact: true }).click()
   await expect(page.getByTestId('typing-line')).toBeVisible()

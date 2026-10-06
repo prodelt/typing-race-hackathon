@@ -1,13 +1,39 @@
 import type { WordBank } from '@typing-race/curriculum'
-import { describe, expect, it } from 'vitest'
-import { dailySeed, dayStreak, isDailyId, pickDailyWords } from './model.js'
+import type { AttemptSummary } from '@typing-race/domain'
+import { afterEach, describe, expect, it } from 'vitest'
+import {
+  clearedDays,
+  dailySeed,
+  dayStreak,
+  pickDailyWords,
+  readStoredDays,
+  writeStoredDays,
+} from './model.js'
 
 function bank(language: 'uk' | 'en'): WordBank {
   const words = Array.from({ length: 400 }, (_, i) => ({ word: `w${i}`, rank: i + 1 }))
   return { language, source: 't', algorithmVersion: '1', words } as unknown as WordBank
 }
 
+function daily(language: 'uk' | 'en', at: Date, accuracy = 1): AttemptSummary {
+  return {
+    id: `${language}-${at.getTime()}`,
+    scaleId: language === 'uk' ? 'yq.daily' : 'qwerty.daily',
+    layoutId: language === 'uk' ? 'yq' : 'qwerty',
+    language,
+    mode: 'practice',
+    seed: 1,
+    startedAt: at.getTime() - 30_000,
+    completedAt: at.getTime(),
+    elapsedMs: 30_000,
+    metrics: { accuracy } as AttemptSummary['metrics'],
+    aggregates: { keys: {}, transitions: {} },
+  }
+}
+
 describe('daily challenge', () => {
+  afterEach(() => localStorage.clear())
+
   it('gives the same words for the same day and language', () => {
     expect(pickDailyWords(bank('uk'), '2026-10-05')).toEqual(
       pickDailyWords(bank('uk'), '2026-10-05'),
@@ -31,8 +57,25 @@ describe('daily challenge', () => {
     expect(dayStreak(['2026-10-02'], today)).toBe(0)
   })
 
-  it('recognises its id', () => {
-    expect(isDailyId('uk-jcuken.daily')).toBe(true)
-    expect(isDailyId('uk-jcuken.realtext')).toBe(false)
+  it('clears a day per language: an English daily does not clear the Ukrainian one', () => {
+    const attempts = [
+      daily('en', new Date(2026, 9, 5, 12)),
+      daily('uk', new Date(2026, 9, 4, 12)),
+      daily('uk', new Date(2026, 9, 3, 12), 0.5),
+    ]
+    expect(clearedDays(attempts, 0.95, [], 'uk')).toEqual(['2026-10-04'])
+    expect(clearedDays(attempts, 0.95, [], 'en')).toEqual(['2026-10-05'])
+  })
+
+  it('does not clear a day with typing no hand produces (ADR-0003, 2026-10-06)', () => {
+    const burst = daily('uk', new Date(2026, 9, 5, 12))
+    const attempts = [{ ...burst, metrics: { ...burst.metrics, implausible: 'burst' as const } }]
+    expect(clearedDays(attempts, 0.95, [], 'uk')).toEqual([])
+  })
+
+  it('stores the cleared days per language', () => {
+    writeStoredDays('uk', ['2026-10-05'])
+    expect(readStoredDays('uk')).toEqual(['2026-10-05'])
+    expect(readStoredDays('en')).toEqual([])
   })
 })

@@ -53,5 +53,20 @@
   "home_goal_chart": "Хвилини за останні 7 днів: {values}. Ціль {goal}.",
   "home_streak": "серія {n} дн.",
   "home_freeze": "заморозка {n}",
-  "home_freeze_tip": "Заморозка: один пропущений день не обнуляє серію."
+  "home_freeze_tip": "Заморозка: один пропущений день не обнуляє серію.",
+  "home_modes_title": "Режими",
+  "home_modes_sub": "вільна практика, без XP",
+  "home_mode_daily": "Виклик дня",
+  "home_mode_daily_sub": "Одна вправа на день, однакова для всіх",
+  "home_mode_daily_done": "готово",
+  "home_mode_sprint": "Спринт 60 с",
+  "home_mode_sprint_sub": "Скільки слів наберете за хвилину",
+  "home_mode_sprint_locked": "Відкриється з етапом «Слова»: пройдіть гами на мапі.",
+  "home_mode_own": "Свій текст",
+  "home_mode_own_glyph": "Аа",
+  "home_mode_own_sub": "Вставте будь-який текст або файл",
+  "home_mode_mistakes": "Помилки",
+  "home_mode_mistakes_sub": "Вправа на ваші слабкі місця",
+  "home_mode_mistakes_locked": "Відкриється, щойно з’являться слабкі місця: пройдіть кілька вправ.",
+  "home_mode_locked": "закрито"
 }

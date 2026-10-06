@@ -1,4 +1,9 @@
-import { isAcademyExerciseId, isReviewDrillId, isWordDrillId } from '@typing-race/curriculum'
+import {
+  isAcademyExerciseId,
+  isReviewDrillId,
+  isWordDrillId,
+  typedByHand,
+} from '@typing-race/curriculum'
 import type { AttemptSummary } from '@typing-race/domain'
 
 /**
@@ -10,13 +15,16 @@ export const RECENT_WINDOW = 10
 
 export interface CareerTotals {
   readonly attempts: number
-  /** Test attempts: the only ones that count toward mastery and XP. */
+  /** Test attempts typed by hand: the only ones that count toward mastery and XP. */
   readonly tests: number
   /** Whole minutes of typing, unfocused time excluded. */
   readonly minutes: number
   /** Distinct calendar days with at least one finished attempt. */
   readonly days: number
-  /** The fastest test attempt; practice never sets a record. `null` before the first test. */
+  /**
+   * The fastest test attempt; practice never sets a record, and nor does typing that was not by
+   * hand (ADR-0003, 2026-10-06). `null` before the first counted test.
+   */
   readonly bestSpm: number | null
   /** Mean accuracy (a fraction) of the newest `RECENT_WINDOW` attempts. */
   readonly recentAccuracy: number | null
@@ -30,7 +38,7 @@ export function careerTotals(
   attempts: readonly AttemptSummary[],
   dayOf: (ms: number) => string,
 ): CareerTotals {
-  const tests = attempts.filter((attempt) => attempt.mode === 'test')
+  const tests = attempts.filter((attempt) => attempt.mode === 'test' && typedByHand(attempt))
   const recent = newestFirst(attempts).slice(0, RECENT_WINDOW)
   const elapsed = attempts.reduce((sum, attempt) => sum + attempt.elapsedMs, 0)
   return {
@@ -53,9 +61,12 @@ export function recentAttempts(
   return newestFirst(attempts).slice(0, limit)
 }
 
-/** Speed of the newest `n` attempts, oldest first, in whole characters per minute. */
+/**
+ * Speed of the newest `n` attempts, oldest first, in whole characters per minute. Typing that was
+ * not by hand is not the learner's speed, so it is not on the line.
+ */
 export function speedTrend(attempts: readonly AttemptSummary[], n: number): number[] {
-  return recentAttempts(attempts, n)
+  return recentAttempts(attempts.filter(typedByHand), n)
     .reverse()
     .map((attempt) => Math.round(attempt.metrics.spm))
 }

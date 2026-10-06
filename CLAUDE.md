@@ -12,6 +12,7 @@ its fonts (Unbounded + Onest), palette, tokens, spacing and motion. Adapt it to 
 The app is a **game client**, not a website: the reference for every screen is
 `git show prototype/05-game-shell:prototypes/game-shell/b-red.html` (`?screen=home|play|result`).
 A screen is done when it has been looked at running, not when its tests pass.
+The light page background is white by the user's request (2026-10-05); panels keep the b-red tokens.
 
 ## Run it
 

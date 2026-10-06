@@ -7,6 +7,7 @@ import {
   STAGE1_WINDOW,
 } from '@typing-race/curriculum'
 import type { Level } from '@typing-race/domain'
+import { MAX_HUMAN_SPM, MIN_HUMAN_MEDIAN_IKI_MS } from '@typing-race/metrics'
 import { m } from '../../paraglide/messages.js'
 import { getLocale } from '../../paraglide/runtime.js'
 import { Block, Formula, P, Section } from './Formula.js'
@@ -26,8 +27,9 @@ const percent = (fraction: number) => `${Math.round(fraction * 100)} %`
 
 /**
  * The level table, rendered from the curriculum's one level config (`levels.json`) — names, goals,
- * benchmarks and floors alike — so the page cannot drift from the values in force, then the Mastery Rule, Stage 1 completion, and the statement that speed gates
- * nothing.
+ * benchmarks and floors alike — so the page cannot drift from the values in force, then the Mastery Rule, Stage 1 completion, the statement that speed gates
+ * nothing, and the one rule that keeps typing no hand produces from counting (ADR-0003,
+ * 2026-10-06), its thresholds read from `packages/metrics`.
  */
 export function Progression() {
   const floorPercent = Math.round(STAGE1_ACCURACY_FLOOR * 100)
@@ -93,7 +95,20 @@ export function Progression() {
       </Block>
 
       <Block title={m.formulas_speed_gates_title()}>
-        <P>{m.formulas_speed_gates_body()}</P>
+        <P>{m.formulas_speed_gates_body({ max: MAX_HUMAN_SPM })}</P>
+      </Block>
+
+      <Block title={m.formulas_by_hand_title()}>
+        <Formula>
+          {[
+            `counted ⇔ median(charInterval) ≥ ${MIN_HUMAN_MEDIAN_IKI_MS} ms ∧ SPM ≤ ${MAX_HUMAN_SPM}`,
+            'charInterval[i] = t(char[i]) − t(char[i−1])',
+          ].join('\n')}
+        </Formula>
+        <P>{m.formulas_by_hand_body()}</P>
+        <P>{m.formulas_by_hand_burst({ ms: MIN_HUMAN_MEDIAN_IKI_MS })}</P>
+        <P>{m.formulas_by_hand_fast({ max: MAX_HUMAN_SPM })}</P>
+        <P>{m.formulas_by_hand_insert()}</P>
       </Block>
     </Section>
   )
