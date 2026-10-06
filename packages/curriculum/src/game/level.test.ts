@@ -89,6 +89,18 @@ describe('XP per attempt', () => {
     expect(xpPerAttempt(attempts, floorFor)[3]).toBe(XP_PER_PASS + XP_MASTERY_BONUS)
   })
 
+  it('pays nothing for a test not typed by hand, which neither advances nor resets the streak', () => {
+    const burst = toSummary(makeAttempt({ scaleId: 'a', mode: 'test', implausible: 'burst' }))
+    const attempts = [test('a'), burst, test('a'), burst, test('a')]
+    expect(xpPerAttempt(attempts, floorFor)).toEqual([
+      XP_PER_PASS,
+      0,
+      XP_PER_PASS,
+      0,
+      XP_PER_PASS + XP_MASTERY_BONUS,
+    ])
+  })
+
   it('keeps a streak per scale', () => {
     const attempts = [test('a'), test('b'), test('a'), test('b'), test('a')]
     expect(xpPerAttempt(attempts, floorFor)[4]).toBe(XP_PER_PASS + XP_MASTERY_BONUS)

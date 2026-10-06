@@ -5,9 +5,10 @@ import {
   MASTERY_STREAK,
   nextLockedKey,
   SHIFT_TOKEN,
+  typedByHand,
   xpPerAttempt,
 } from '@typing-race/curriculum'
-import type { AttemptSummary, Layout, Progress } from '@typing-race/domain'
+import type { AttemptSummary, ImplausibleReason, Layout, Progress } from '@typing-race/domain'
 
 /**
  * What the top of the result screen celebrates, decided from the stored attempts alone: whether
@@ -24,7 +25,12 @@ export interface MasterySlot {
 
 export interface Reward {
   readonly mode: AttemptSummary['mode']
-  /** A Test Attempt at or above its floor: it counts toward mastery. */
+  /**
+   * Why the typing was not counted as a hand's, or `null` when it was. An attempt with a reason
+   * counts toward nothing, whatever its accuracy (ADR-0003, 2026-10-06).
+   */
+  readonly implausible: ImplausibleReason | null
+  /** A Test Attempt typed by hand at or above its floor: it counts toward mastery. */
   readonly passed: boolean
   readonly floor: number
   /** Consecutive passing Test Attempts on this exercise, this one included. */
@@ -57,11 +63,15 @@ export function rewardFor(args: {
 }): Reward {
   const { earlier, attempt, after, layout } = args
   const floor = floorFor(attempt)
-  const passed = attempt.mode === 'test' && attempt.metrics.accuracy >= floor
+  const passed =
+    attempt.mode === 'test' && typedByHand(attempt) && attempt.metrics.accuracy >= floor
   const streak = Math.min(MASTERY_STREAK, after.consecutivePasses[attempt.scaleId] ?? 0)
 
   const sameScale = (a: AttemptSummary) =>
-    a.scaleId === attempt.scaleId && a.layoutId === attempt.layoutId && a.mode === 'test'
+    a.scaleId === attempt.scaleId &&
+    a.layoutId === attempt.layoutId &&
+    a.mode === 'test' &&
+    typedByHand(a)
   const passes = [...earlier, attempt].filter(sameScale)
   const slots = passes.slice(Math.max(0, passes.length - streak)).map((a) => ({
     id: a.id,
@@ -83,6 +93,7 @@ export function rewardFor(args: {
 
   return {
     mode: attempt.mode,
+    implausible: attempt.metrics.implausible ?? null,
     passed,
     floor,
     streak: passed ? Math.max(1, streak) : streak,

@@ -13,6 +13,7 @@ import {
   levelStanding,
   type MasteryCount,
   streakOf,
+  typedByHand,
 } from '@typing-race/curriculum'
 import type { AttemptSummary, LayoutId, StartingLevelChoice } from '@typing-race/domain'
 import { useMemo } from 'react'
@@ -76,6 +77,9 @@ export function deriveGameStats(input: GameStatsInput): GameStats {
   const scales = catalogue[input.layoutId]
   const course = input.academyCourse?.layout === input.layoutId ? input.academyCourse : null
   const { startingLevelChoice } = input
+  // Typing no hand produces earns nothing here: no XP, no level, no streak day, no minutes
+  // (ADR-0003, 2026-10-06). It keeps its result screen and its place in the profile's list.
+  const attempts = input.attempts.filter(typedByHand)
 
   const masteryAt = (prefix: readonly AttemptSummary[]): MasteryCount => ({
     keysUnlocked:
@@ -90,7 +94,7 @@ export function deriveGameStats(input: GameStatsInput): GameStats {
 
   const standing = levelStanding({
     // A daily challenge is free practice: no XP.
-    attempts: input.attempts.filter(
+    attempts: attempts.filter(
       (attempt) => attempt.layoutId === input.layoutId && !isDailyId(attempt.scaleId),
     ),
     masteryAt,
@@ -103,10 +107,10 @@ export function deriveGameStats(input: GameStatsInput): GameStats {
     xpInLevel: standing.xpInLevel,
     xpForNextLevel: standing.xpForNextLevel,
     streak: streakOf(
-      input.attempts.map((attempt) => dayOf(attempt.completedAt)),
+      attempts.map((attempt) => dayOf(attempt.completedAt)),
       input.today,
     ),
-    dailyGoal: dailyGoal(input.attempts, {
+    dailyGoal: dailyGoal(attempts, {
       today: input.today,
       dayOf,
       goalMinutes: input.goalMinutes ?? DEFAULT_GOAL_MINUTES,

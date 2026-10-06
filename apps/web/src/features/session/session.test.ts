@@ -1,10 +1,10 @@
 import { catalogue, layouts, stage2Gate, wordCatalogue } from '@typing-race/curriculum'
-import type { NextAction, Progress } from '@typing-race/domain'
+import type { AttemptSummary, NextAction, Progress } from '@typing-race/domain'
 import { transitionKey } from '@typing-race/domain'
 import fc from 'fast-check'
 import { describe, expect, it } from 'vitest'
 import { composeSession } from './compose.js'
-import { MAX_MINUTES, MIN_MINUTES, sizeSession } from './sizing.js'
+import { currentSpm, MAX_MINUTES, MIN_MINUTES, sizeSession } from './sizing.js'
 
 describe('sizeSession', () => {
   it('always lands a full run between 15 and 25 minutes at any realistic speed (FR-077)', () => {
@@ -55,6 +55,17 @@ const action: NextAction = {
   values: {},
   startsScaleId: target.id,
 }
+
+describe('currentSpm', () => {
+  const at = (spm: number, implausible?: 'burst') =>
+    ({ metrics: { spm, ...(implausible ? { implausible } : {}) } }) as unknown as AttemptSummary
+
+  it('averages the recent attempts, leaving out typing that was not by hand', () => {
+    // A script's 9 949 SPM would size the next session for a learner who does not exist.
+    expect(currentSpm([at(100), at(9949, 'burst'), at(140)])).toBe(120)
+    expect(currentSpm([at(9949, 'burst')])).toBeNull()
+  })
+})
 
 describe('composeSession', () => {
   it('falls back to the target skill when there is no weak Transition, never skipping the warm-up', () => {

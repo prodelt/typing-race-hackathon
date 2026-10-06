@@ -7,12 +7,16 @@ import type {
   StartingLevelChoice,
 } from '@typing-race/domain'
 import { levelForStage, passes } from '../levels/table'
+import { typedByHand } from './by-hand'
 import { byCompletion } from './order'
 import { boundaryFor } from './starting-level'
 import type { ConfidencePort } from './types'
 
-/** Bumped when the fold changes, so a stale stored snapshot is detectable. */
-export const DERIVED_VERSION = 1
+/**
+ * Bumped when the fold changes, so a stale stored snapshot is detectable. 2: attempts not typed by
+ * hand are left out of the fold (ADR-0003, 2026-10-06).
+ */
+export const DERIVED_VERSION = 2
 /** Consecutive passing Test attempts that satisfy the Mastery Rule — FR-039. */
 export const MASTERY_STREAK = 3
 /** How many of the most recent attempts Stage 1 completion averages over — FR-044. */
@@ -63,6 +67,9 @@ export function deriveProgress(args: DeriveProgressArgs): Progress {
   for (const attempt of byCompletion(args.attempts)) {
     // One Progress per typing language — FR-051. Another layout's attempts are not ours.
     if (attempt.layoutId !== layout.id) continue
+    // Typing no hand produces is not progress: not in the history, the confidence or the Mastery
+    // Rule, which it neither advances nor resets (ADR-0003, 2026-10-06).
+    if (!typedByHand(attempt)) continue
     history.push(summarise(attempt))
     if (confidence) confidenceState = confidence.fold(confidenceState, attempt.aggregates)
 

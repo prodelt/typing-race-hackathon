@@ -3,6 +3,7 @@ import type {
   AttemptAggregates,
   AttemptSummary,
   ConfidenceState,
+  ImplausibleReason,
   Key,
   Language,
   Layout,
@@ -94,6 +95,8 @@ export interface AttemptOptions {
   readonly completedAt?: number
   readonly layoutId?: Attempt['layoutId']
   readonly aggregates?: AttemptAggregates
+  /** The verdict of an attempt that was not typed by hand. */
+  readonly implausible?: ImplausibleReason
 }
 
 let counter = 0
@@ -122,6 +125,7 @@ export function makeAttempt(options: AttemptOptions = {}): Attempt {
       rhythmConsistency: { value: options.rhythm ?? 90, breaksExcluded: 0 },
       meanIkiByKey: {},
       meanIkiByTransition: {},
+      ...(options.implausible === undefined ? {} : { implausible: options.implausible }),
     },
     aggregates: options.aggregates ?? { keys: {}, transitions: {} },
     log: {

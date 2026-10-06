@@ -1,12 +1,14 @@
 import type { AttemptSummary, Level } from '@typing-race/domain'
 import { levels, passes } from '../levels/table'
+import { typedByHand } from '../progress/by-hand'
 import { MASTERY_STREAK } from '../progress/derive'
 import type { AcademyCourse, AcademyExercise, AcademyModule } from './types'
 
 /**
  * Academy progress: a pure fold over the attempt history, like Stage 1's, and with the same
  * Mastery Rule — three consecutive **test** attempts at or above the level's accuracy floor.
- * Practice attempts neither advance nor reset a streak, and speed appears nowhere.
+ * Practice attempts neither advance nor reset a streak, an attempt not typed by hand is left out
+ * entirely, and speed appears nowhere.
  *
  * The level follows the stage, never the learner: Stage 3 is judged against the `confident` band
  * of `levels.json` ("words and common transitions"), the band whose goal is what the Academy
@@ -61,6 +63,8 @@ export function academyProgress(
   const ids = new Set(course.modules.flatMap((m) => m.exercises.map((e) => e.id)))
   for (const attempt of [...attempts].sort((a, b) => a.completedAt - b.completedAt)) {
     if (!ids.has(attempt.scaleId) || attempt.layoutId !== course.layout) continue
+    // Typing no hand produces is not an attempt of the exercise at all (ADR-0003, 2026-10-06).
+    if (!typedByHand(attempt)) continue
     const list = byExercise.get(attempt.scaleId) ?? []
     list.push(attempt)
     byExercise.set(attempt.scaleId, list)
