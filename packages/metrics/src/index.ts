@@ -7,6 +7,8 @@ export { confidenceOf, foldConfidence } from './confidence'
 export {
   CONFIDENCE_HALF_LIFE,
   CONFIDENCE_MIN_SAMPLES,
+  MAX_HUMAN_SPM,
+  MIN_HUMAN_MEDIAN_IKI_MS,
   REFERENCE_IKI_MS,
   RHYTHM_BREAK_MS,
 } from './constants'

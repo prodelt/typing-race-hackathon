@@ -13,6 +13,7 @@ function attempt(over: {
   accuracy?: number
   scaleId?: string
   ikis?: Record<string, number>
+  implausible?: 'burst' | 'tooFast'
 }): AttemptSummary {
   n++
   return {
@@ -20,7 +21,11 @@ function attempt(over: {
     scaleId: over.scaleId ?? SCALE,
     layoutId: 'yq',
     mode: over.mode ?? 'test',
-    metrics: { accuracy: over.accuracy ?? 0.98, meanIkiByTransition: over.ikis ?? {} },
+    metrics: {
+      accuracy: over.accuracy ?? 0.98,
+      meanIkiByTransition: over.ikis ?? {},
+      ...(over.implausible === undefined ? {} : { implausible: over.implausible }),
+    },
   } as unknown as AttemptSummary
 }
 
@@ -67,6 +72,29 @@ describe('rewardFor', () => {
     })
     expect(reward.passed).toBe(false)
     expect(reward.streak).toBe(0)
+  })
+
+  it('counts nothing for a test that was not typed by hand, however accurate', () => {
+    // The jury's burst: a whole line at once, 100% accurate. No pass, no slot, no XP.
+    const reward = rewardFor({
+      earlier: [attempt({}), attempt({})],
+      attempt: attempt({ accuracy: 1, implausible: 'burst' }),
+      after: after(2),
+      layout,
+    })
+    expect(reward.implausible).toBe('burst')
+    expect(reward.passed).toBe(false)
+    expect(reward.slots).toEqual([])
+    expect(reward.xp).toBe(0)
+  })
+
+  it('leaves an earlier attempt not typed by hand out of the streak slots', () => {
+    const first = attempt({})
+    const script = attempt({ implausible: 'tooFast' })
+    const now = attempt({})
+    const reward = rewardFor({ earlier: [first, script], attempt: now, after: after(2), layout })
+    expect(reward.implausible).toBeNull()
+    expect(reward.slots.map((slot) => slot.id)).toEqual([first.id, now.id])
   })
 
   it('names the next key to open and the slowest move of the attempt', () => {

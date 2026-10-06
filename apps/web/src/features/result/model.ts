@@ -7,6 +7,7 @@ import {
   nextAction,
   scaleById,
   templateKeys,
+  typedByHand,
 } from '@typing-race/curriculum'
 import {
   type AttemptSummary,
@@ -119,7 +120,8 @@ export function buildResultModel(input: ModelInput): ResultModel | null {
 
 /**
  * The best earlier result on this exercise, by accuracy and then speed. Accuracy leads because
- * speed never gates progress and a faster but sloppier run is not a better one.
+ * speed never gates progress and a faster but sloppier run is not a better one. An attempt not
+ * typed by hand sets no record (ADR-0003, 2026-10-06).
  */
 function previousBest(
   earlier: readonly AttemptSummary[],
@@ -128,6 +130,7 @@ function previousBest(
   let best: AttemptSummary | null = null
   for (const candidate of earlier) {
     if (candidate.scaleId !== attempt.scaleId || candidate.layoutId !== attempt.layoutId) continue
+    if (!typedByHand(candidate)) continue
     if (
       best === null ||
       candidate.metrics.accuracy > best.metrics.accuracy ||

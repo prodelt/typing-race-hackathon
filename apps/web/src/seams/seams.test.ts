@@ -134,12 +134,21 @@ describe('domInputSource (T016, T018)', () => {
     expect(seen).toEqual([{ kind: 'char', char: 'ф', at: 0 }])
   })
 
-  it('judges a multi-character insertion one code point at a time', () => {
-    // An input method can replace several characters at once; the spec requires each to be judged
-    // in order rather than the group counting as one keystroke.
+  it('takes an insertText of several characters as no keystroke at all', () => {
+    // One key makes one character. A whole line in one `insertText` is a script or an extension
+    // typing for the learner, and must not type (ADR-0003, 2026-10-06); an input method commits
+    // through `compositionend`, which is still judged character by character.
     const { element, seen } = harness()
-    beforeInput(element, 'insertText', 'фів')
-    expect(seen.map((e) => (e.kind === 'char' ? e.char : e.kind))).toEqual(['ф', 'і', 'в'])
+    beforeInput(element, 'insertText', 'фіва олдж')
+    expect(seen).toEqual([{ kind: 'ignored', reason: 'burst', at: 0 }])
+    expect(element.value).toBe('')
+  })
+
+  it('still reads one character made of two UTF-16 units as one keystroke', () => {
+    // Counted in code points, so a character outside the BMP is not mistaken for a burst.
+    const { element, seen } = harness()
+    beforeInput(element, 'insertText', '𝔞')
+    expect(seen).toEqual([{ kind: 'char', char: '𝔞', at: 0 }])
   })
 
   it('emits backspace for a backward deletion', () => {

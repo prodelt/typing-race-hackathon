@@ -91,7 +91,10 @@ test.describe('US4 the public Formulas page', () => {
     await page.goto('/formulas')
     const speed = section(page, 'Швидкість і точність')
 
-    await expect(speed).toContainText('SPM = characterKeystrokes × 60 000 ÷ elapsedMs')
+    // Characters of the text over time, so a wrong keystroke never adds speed (jury method §6.1).
+    await expect(speed).toContainText('SPM = typedChars × 60 000 ÷ elapsedMs')
+    await expect(speed).toContainText('typedChars = min(correctCharKeystrokes, textLength)')
+    await expect(speed).toContainText('SPM = 60 · N / T')
     await expect(speed).toContainText('WPM = SPM / 5')
 
     // The label sits on the WPM heading itself, so it cannot be read as belonging to SPM.
@@ -188,6 +191,11 @@ test.describe('US4 the public Formulas page', () => {
       progression.getByRole('heading', { name: 'Швидкість нічого не блокує' }),
     ).toBeVisible()
     await expect(progression).toContainText('Швидкість ніколи не блокує просування')
+
+    // The one rule that keeps typing no hand produces from counting, with both thresholds.
+    await expect(progression.getByRole('heading', { name: 'Набір руками' })).toBeVisible()
+    await expect(progression).toContainText('counted ⇔ median(charInterval) ≥ 25 ms ∧ SPM ≤ 1500')
+    await expect(progression).toContainText('Не зараховано: набір не схожий на ручний')
   })
 
   test('interval, rhythm consistency and Confidence are each defined (scenario 6)', async ({

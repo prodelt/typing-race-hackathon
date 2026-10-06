@@ -8,7 +8,12 @@ export function Speed() {
       <P>{m.formulas_speed_intro()}</P>
 
       <Block title={m.formulas_spm_title()}>
-        <Formula>{'SPM = characterKeystrokes × 60 000 ÷ elapsedMs'}</Formula>
+        <Formula>
+          {[
+            'SPM        = typedChars × 60 000 ÷ elapsedMs',
+            'typedChars = min(correctCharKeystrokes, textLength)',
+          ].join('\n')}
+        </Formula>
         <P>{m.formulas_spm_body()}</P>
       </Block>
 
