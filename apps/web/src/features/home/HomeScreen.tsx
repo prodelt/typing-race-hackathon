@@ -591,8 +591,14 @@ function WeakChip({ spot }: { readonly spot: WeakSpot }) {
   return (
     <li>
       <Tip text={spotWhy(spot)}>
-        {/* biome-ignore lint/a11y/noNoninteractiveTabindex: focusable so the explanation reaches keyboard users */}
-        <span className="hub-chip" tabIndex={0}>
+        {/* biome-ignore lint/a11y/useSemanticElements: a labelled read-out, not a fieldset of inputs */}
+        <span
+          role="group"
+          aria-label={spotLabel(spot.element)}
+          className="hub-chip"
+          // biome-ignore lint/a11y/noNoninteractiveTabindex: focusable so the explanation reaches keyboard users
+          tabIndex={0}
+        >
           {spotLabel(spot.element)}
         </span>
       </Tip>

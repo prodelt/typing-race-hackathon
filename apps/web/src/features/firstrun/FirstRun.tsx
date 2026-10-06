@@ -92,6 +92,19 @@ function Flow(props: {
 
   useEffect(() => () => useFirstRunHold.setState({ holding: false }), [])
 
+  // One language for the flow and the status bar's УКР/ENG switch: a pick here is the typing
+  // language at once, and a click on the switch is a pick here.
+  const typingLanguage = useAppStore((s) => s.settings.typingLanguage)
+  const pickLanguage = (language: Language): void => {
+    send({ type: 'pickLanguage', language })
+    if (language !== useAppStore.getState().settings.typingLanguage) {
+      void changeSettings({ typingLanguage: language })
+    }
+  }
+  useEffect(() => {
+    send({ type: 'pickLanguage', language: typingLanguage })
+  }, [typingLanguage])
+
   const finish = async (): Promise<void> => {
     if (state.level === null || busy) return
     setBusy(true)
@@ -137,7 +150,7 @@ function Flow(props: {
     if (state.step === 'language') {
       const language = LANGUAGES[n - 1]
       if (language === undefined) return false
-      send({ type: 'pickLanguage', language })
+      pickLanguage(language)
       return true
     }
     if (state.step === 'level') {
@@ -230,11 +243,7 @@ function Flow(props: {
 
       <div className="fr-body" key={state.step}>
         {state.step === 'language' && (
-          <LanguageStep
-            state={state}
-            titleRef={titleRef}
-            onPick={(language) => send({ type: 'pickLanguage', language })}
-          />
+          <LanguageStep state={state} titleRef={titleRef} onPick={pickLanguage} />
         )}
         {state.step === 'level' && (
           <LevelStep

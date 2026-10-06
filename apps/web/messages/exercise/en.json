@@ -24,8 +24,6 @@
   "exercise_mode_test": "Test attempt",
   "exercise_mode_practice_hint": "Keyboard and hints on. Does not count.",
   "exercise_mode_test_hint": "No guides. Three accurate in a row master it.",
-  "exercise_mode_take_test": "Take the test attempt",
-  "exercise_mode_take_practice": "Practise first",
   "exercise_layout_checking": "Checking the layout…",
   "exercise_layout_ok": "Layout {layout}. Press any letter to check it.",
   "exercise_layout_confirmed": "{layout} layout confirmed.",
